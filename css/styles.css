@@ -1,0 +1,112 @@
+/* ========================================================
+   ESTILOS PERSONALIZADOS Y MICROINTERACCIONES
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --inst-primary: #002B7A;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Modo Oscuro Global */
+html.dark {
+    color-scheme: dark;
+}
+
+html.dark body {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+/* Asegurar transparencia total en los logos institucionales oficiales */
+img[src*="assets/"] {
+    background-color: transparent !important;
+}
+
+body {
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Animaciones fluidas */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Microinteracciones táctiles en botones */
+.tap-effect {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tap-effect:active {
+    transform: scale(0.96);
+}
+
+/* Estilo Oficial del Botón Ko-fi */
+.kofi-btn {
+    background-color: #FF5E5B;
+    background-image: linear-gradient(135deg, #FF5E5B 0%, #FA4032 100%);
+    box-shadow: 0 4px 14px 0 rgba(255, 94, 91, 0.35);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.kofi-btn:hover {
+    background-image: linear-gradient(135deg, #FF4845 0%, #E62B1D 100%);
+    box-shadow: 0 6px 20px 0 rgba(255, 94, 91, 0.5);
+    transform: translateY(-1px);
+}
+.kofi-btn:active {
+    transform: scale(0.97) translateY(0);
+}
+
+/* Scrollbar moderno */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Estilo de formulario limpio */
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.4);
+}
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+}
+
+/* Marco con Contenedor de Fondo Blanco Sólido para Escudos Oficiales */
+.school-logo-frame {
+    background-color: #ffffff !important;
+}
+
+.school-logo-frame img {
+    background-color: transparent !important;
+    max-width: 100%;
+    max-height: 100%;
+}
