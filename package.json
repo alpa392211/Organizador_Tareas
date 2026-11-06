@@ -1,6 +1,6 @@
 {
   "name": "organizador-tareas",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "Organizador Escolar Pro y Gestor Académico Offline",
   "scripts": {
     "build:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --minify"

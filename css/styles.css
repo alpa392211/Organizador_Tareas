@@ -727,47 +727,43 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 14px 28px -4px rgba(234, 88, 12, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Botón Central Inferior: Totalmente sólido, opaco y sin resplandores transparentes */
+/* Botón Central Inferior: Acabado translúcido con degradado vibrante y resplandor suave */
 .fab-gradient-action {
-    background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0891b2 100%) !important;
-    background-color: #0d9488 !important;
-    opacity: 1 !important;
-    border: 4px solid #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.90) 0%, rgba(5, 150, 105, 0.90) 50%, rgba(16, 185, 129, 0.90) 100%) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+    color: #ffffff !important;
+    transition: all 0.22s var(--ease-spring);
 }
-html.dark:not(.theme-gray) .fab-gradient-action {
-    border: 4px solid #0f172a !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
+.fab-gradient-action:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 12px 28px -2px rgba(16, 185, 129, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
+}
+html.dark .fab-gradient-action {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.85) 0%, rgba(5, 150, 105, 0.85) 50%, rgba(16, 185, 129, 0.85) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
 }
 html.dark.theme-gray .fab-gradient-action {
-    border: 4px solid #252830 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
+    background: linear-gradient(135deg, rgba(71, 85, 105, 0.9) 0%, rgba(51, 65, 85, 0.9) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 8px 22px -2px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
 }
 html:not(.dark).theme-gray .fab-gradient-action {
-    border: 4px solid #f1f3f7 !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+    background: linear-gradient(135deg, rgba(100, 116, 139, 0.9) 0%, rgba(71, 85, 105, 0.9) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 8px 22px -2px rgba(15, 23, 42, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
 }
 
 #bottom-main-circle {
-    opacity: 1 !important;
-    border: 4px solid #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
-}
-html.dark:not(.theme-gray) #bottom-main-circle {
-    border: 4px solid #0f172a !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
-}
-html.dark.theme-gray #bottom-main-circle {
-    border: 4px solid #252830 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
-}
-html:not(.dark).theme-gray #bottom-main-circle {
-    border: 4px solid #f1f3f7 !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
+    transition: all 0.22s var(--ease-spring);
 }
 
 /* ========================================================
-   ALINEACIÓN PERFECTA DE SWITCHES EN CONFIGURACIÓN
+   INTERRUPTORES (SWITCHES) DE PRECISIÓN PIXEL-PERFECT
+   Garantiza que el conmutador jamás sobresalga del contenedor
    ======================================================== */
 .settings-switch-row {
     display: flex !important;
@@ -809,8 +805,78 @@ html:not(.dark).theme-gray .settings-switch-row {
     height: 24px !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
     margin-left: auto !important;
+}
+
+/* Switch Component */
+.app-switch {
+    position: relative !important;
+    display: inline-block !important;
+    width: 44px !important;
+    height: 24px !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    margin: 0 !important;
+}
+.app-switch input {
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+}
+.app-switch-track {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: #cbd5e1 !important;
+    border-radius: 9999px !important;
+    transition: background-color 0.22s ease !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden !important;
+}
+html.dark .app-switch-track {
+    background-color: #334155 !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+.app-switch-thumb {
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 20px !important;
+    height: 20px !important;
+    background-color: #ffffff !important;
+    border-radius: 50% !important;
+    box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.25) !important;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transform: translateX(0) !important;
+    translate: none !important;
+}
+.app-switch input:checked + .app-switch-track {
+    background-color: #4f46e5 !important;
+}
+.app-switch input:checked + .app-switch-track .app-switch-thumb {
+    transform: translateX(20px) !important;
+    translate: none !important;
+}
+
+/* Variantes de Color */
+.app-switch-purple input:checked + .app-switch-track {
+    background-color: #7c3aed !important;
+}
+.app-switch-slate input:checked + .app-switch-track {
+    background-color: #475569 !important;
+}
+.app-switch-amber input:checked + .app-switch-track {
+    background-color: #d97706 !important;
+}
+.app-switch-emerald input:checked + .app-switch-track {
+    background-color: #059669 !important;
 }
 
 /* ========================================================

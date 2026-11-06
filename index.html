@@ -42,8 +42,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.2.10">
-    <link rel="stylesheet" href="css/styles.css?v=1.2.10">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.2.11">
+    <link rel="stylesheet" href="css/styles.css?v=1.2.11">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -808,9 +808,11 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Al pulsar el escudo, se agranda hacia el centro mostrando lema y ciclo con resplandor temático.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer select-none">
-                                    <input type="checkbox" id="settings-logo-expand-toggle" class="sr-only peer" checked>
-                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-indigo-600"></div>
+                                <label class="app-switch" for="settings-logo-expand-toggle">
+                                    <input type="checkbox" id="settings-logo-expand-toggle" checked>
+                                    <div class="app-switch-track">
+                                        <span class="app-switch-thumb"></span>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -894,9 +896,11 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Oculta o muestra el acceso rápido sol/luna en el encabezado.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer select-none">
-                                    <input type="checkbox" id="settings-header-theme-toggle" class="sr-only peer" checked>
-                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-indigo-600"></div>
+                                <label class="app-switch" for="settings-header-theme-toggle">
+                                    <input type="checkbox" id="settings-header-theme-toggle" checked>
+                                    <div class="app-switch-track">
+                                        <span class="app-switch-thumb"></span>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -914,9 +918,11 @@
                                     <span class="text-[11px] text-slate-500 dark:text-slate-400">Estilo visual minimalista en escala de grises slate y zinc.</span>
                                 </div>
                                 <div class="settings-switch-toggle">
-                                    <label class="relative inline-flex items-center cursor-pointer select-none">
-                                        <input type="checkbox" id="settings-gray-mode-toggle" class="sr-only peer">
-                                        <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-slate-600"></div>
+                                    <label class="app-switch app-switch-slate" for="settings-gray-mode-toggle">
+                                        <input type="checkbox" id="settings-gray-mode-toggle">
+                                        <div class="app-switch-track">
+                                            <span class="app-switch-thumb"></span>
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -927,9 +933,11 @@
                                     <span class="text-[11px] text-slate-500 dark:text-slate-400">Muestra gatitos festivos al completar tareas y patitas escondidas en botones.</span>
                                 </div>
                                 <div class="settings-switch-toggle">
-                                    <label class="relative inline-flex items-center cursor-pointer select-none">
-                                        <input type="checkbox" id="settings-cats-toggle" class="sr-only peer" checked>
-                                        <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-purple-600"></div>
+                                    <label class="app-switch app-switch-purple" for="settings-cats-toggle">
+                                        <input type="checkbox" id="settings-cats-toggle" checked>
+                                        <div class="app-switch-track">
+                                            <span class="app-switch-thumb"></span>
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -1018,9 +1026,11 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Micro-pulsos táctiles al tocar botones, completar tareas y guardar notas.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer select-none">
-                                    <input type="checkbox" id="settings-haptics-toggle" class="sr-only peer" checked>
-                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-indigo-600"></div>
+                                <label class="app-switch" for="settings-haptics-toggle">
+                                    <input type="checkbox" id="settings-haptics-toggle" checked>
+                                    <div class="app-switch-track">
+                                        <span class="app-switch-thumb"></span>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -1094,9 +1104,11 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Si está activa, las notas y tareas en el baúl se eliminan definitivamente pasados 60 días de archivadas.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer select-none">
-                                    <input type="checkbox" id="settings-archive-purge-toggle" class="sr-only peer" checked>
-                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-amber-600"></div>
+                                <label class="app-switch app-switch-amber" for="settings-archive-purge-toggle">
+                                    <input type="checkbox" id="settings-archive-purge-toggle" checked>
+                                    <div class="app-switch-track">
+                                        <span class="app-switch-thumb"></span>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -1152,6 +1164,68 @@
                     </div>
                 </div>
 
+                <!-- 9. Acordeón: Aviso de Privacidad y Protección de Datos Estudiantiles -->
+                <div class="settings-accordion-card rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800">
+                    <button type="button" class="settings-accordion-header w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg shrink-0">🛡️</span>
+                            <div class="min-w-0">
+                                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Aviso de Privacidad y Seguridad</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Almacenamiento 100% local, sin rastreo ni servidores remotos.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 ml-2">
+                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hidden sm:inline">100% Local</span>
+                            <svg class="settings-accordion-chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </button>
+                    <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-4 bg-slate-50/40 dark:bg-slate-800/40">
+                        <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <div class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 flex items-start gap-3">
+                                <span class="text-base shrink-0">🔒</span>
+                                <div>
+                                    <strong class="font-extrabold text-emerald-900 dark:text-emerald-300 block mb-0.5">Tus datos nunca salen de tu dispositivo</strong>
+                                    <span>Todo tu horario, materias, tareas escolares, notas privadas, ciclo y configuraciones se conservan de forma exclusiva en el almacenamiento interno de tu dispositivo (Local Storage).</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 space-y-1">
+                                    <span class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>🚫</span> Sin Telemetría ni Rastreo
+                                    </span>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                        No utilizamos rastreadores de terceros, cookies publicitarias ni enviamos telemetría.
+                                    </p>
+                                </div>
+                                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 space-y-1">
+                                    <span class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>📴</span> Funcional 100% Fuera de Línea
+                                    </span>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                        No requiere conexión a internet ni crear cuentas o contraseñas en servidores externos.
+                                    </p>
+                                </div>
+                                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 space-y-1">
+                                    <span class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>📤</span> Propiedad Total y Respaldos
+                                    </span>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                        Tú eres el único dueño de tu información. Puedes descargar copias de respaldo en formato JSON cuando gustes.
+                                    </p>
+                                </div>
+                                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 space-y-1">
+                                    <span class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>🗑️</span> Borrado Definitivo
+                                    </span>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                        Puedes restablecer la aplicación y eliminar permanentemente todos tus datos con un solo toque.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Créditos & Donación Ko-fi en Settings -->
                 <div class="pt-4 border-t border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
@@ -1186,7 +1260,7 @@
                         class="tap-effect inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer select-none"
                         title="Toca 5 veces para desbloquear modo secreto">
                         <span>🐼</span>
-                        <span>Versión 1.2.10 "Panda"</span>
+                        <span>Versión 1.2.11 "Panda"</span>
                     </button>
                 </div>
             </div>
@@ -1588,9 +1662,11 @@
                                 Recibe una alerta enriquecida con el tipo y contenido de tu nota.
                             </span>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="note-has-reminder" class="sr-only peer">
-                            <div class="w-10 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                        <label class="app-switch app-switch-amber" for="note-has-reminder">
+                            <input type="checkbox" id="note-has-reminder">
+                            <div class="app-switch-track">
+                                <span class="app-switch-thumb"></span>
+                            </div>
                         </label>
                     </div>
 
@@ -1791,45 +1867,74 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- MODAL DE CONFIGURACIÓN OBLIGATORIA DEL CICLO ESCOLAR       -->
+    <!-- MODAL DE BIENVENIDA Y CONFIGURACIÓN INICIAL (ONBOARDING)  -->
     <!-- ========================================================= -->
     <div id="cycle-setup-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
         <div id="cycle-setup-backdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"></div>
         
-        <div class="modal-dialog relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 sm:p-7 space-y-4">
+        <div class="modal-dialog relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
             <div class="flex items-center gap-3">
-                <span class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-2xl shrink-0">
-                    🗓️
+                <span class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl shrink-0">
+                    🎓
                 </span>
                 <div>
                     <h2 class="text-lg font-black text-slate-900 dark:text-white leading-tight">
-                        Configuración del Ciclo Escolar
+                        ¡Bienvenido a tu Organizador!
                     </h2>
-                    <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                        Paso Obligatorio
+                    <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                        Configuración Inicial
                     </span>
                 </div>
             </div>
 
             <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Para calcular tus clases lectivas, programar tus tareas y sincronizar el calendario de tu institución, es necesario delimitar las fechas oficiales de inicio y término de tu ciclo escolar.
+                Selecciona tu casa de estudios oficial, tu grado o periodo lectivo y las fechas de tu ciclo escolar para comenzar:
             </p>
 
-            <form id="cycle-setup-welcome-form" class="space-y-3 pt-2">
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                            Fecha de Inicio *
-                        </label>
-                        <input type="date" id="welcome-cycle-start" required
-                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-500">
+            <form id="cycle-setup-welcome-form" class="space-y-3.5 pt-1">
+                <!-- 1. Selección de Institución Educativa con Vista Previa de Escudo -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        Institución Educativa *
+                    </label>
+                    <div class="flex items-center gap-2.5">
+                        <div id="welcome-inst-preview" class="shrink-0 flex items-center justify-center">
+                            <!-- Logo inyectado dinámicamente -->
+                        </div>
+                        <select id="welcome-institution-select" required
+                            class="flex-1 px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+                            <!-- Opciones cargadas por JS -->
+                        </select>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                            Fecha de Término *
-                        </label>
-                        <input type="date" id="welcome-cycle-end" required
-                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <!-- 2. Selección Dinámica de Semestre / Periodo Lectivo -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        Semestre / Periodo Activo *
+                    </label>
+                    <select id="welcome-period-select" required
+                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        <!-- Opciones adaptadas según institución -->
+                    </select>
+                </div>
+
+                <!-- 3. Fechas del Ciclo Escolar -->
+                <div class="space-y-1.5 pt-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        Ciclo Escolar (Fechas Oficiales) *
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">Inicio *</span>
+                            <input type="date" id="welcome-cycle-start" required
+                                class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">Término *</span>
+                            <input type="date" id="welcome-cycle-end" required
+                                class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                        </div>
                     </div>
                 </div>
 
@@ -1837,13 +1942,13 @@
                     <button type="submit" id="welcome-cycle-save-btn"
                         class="tap-effect w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>Configurar y Confirmar Ciclo Ahora</span>
+                        <span>Comenzar y Guardar Perfil</span>
                     </button>
 
                     <button type="button" id="welcome-cycle-later-btn"
                         class="tap-effect w-full py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
-                        title="Usar fecha sugerida provisional (marcada como pendiente de actualizar)">
-                        <span>Configurar después (Modo Provisional)</span>
+                        title="Guardar institución y usar fechas sugeridas provisionales">
+                        <span>Configurar fechas después (Ciclo Provisional)</span>
                     </button>
                 </div>
             </form>
@@ -1873,16 +1978,16 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js?v=1.2.10"></script>
-    <script src="js/storage.js?v=1.2.10"></script>
-    <script src="js/haptics.js?v=1.2.10"></script>
-    <script src="js/notifications.js?v=1.2.10"></script>
-    <script src="js/widgets.js?v=1.2.10"></script>
-    <script src="js/subjects.js?v=1.2.10"></script>
-    <script src="js/tasks.js?v=1.2.10"></script>
-    <script src="js/notes.js?v=1.2.10"></script>
-    <script src="js/calendar.js?v=1.2.10"></script>
-    <script src="js/archive.js?v=1.2.10"></script>
-    <script src="js/app.js?v=1.2.10"></script>
+    <script src="js/institutions.js?v=1.2.11"></script>
+    <script src="js/storage.js?v=1.2.11"></script>
+    <script src="js/haptics.js?v=1.2.11"></script>
+    <script src="js/notifications.js?v=1.2.11"></script>
+    <script src="js/widgets.js?v=1.2.11"></script>
+    <script src="js/subjects.js?v=1.2.11"></script>
+    <script src="js/tasks.js?v=1.2.11"></script>
+    <script src="js/notes.js?v=1.2.11"></script>
+    <script src="js/calendar.js?v=1.2.11"></script>
+    <script src="js/archive.js?v=1.2.11"></script>
+    <script src="js/app.js?v=1.2.11"></script>
 </body>
 </html>

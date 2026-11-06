@@ -40,6 +40,7 @@ window.InstitutionsModule = (() => {
                 primary: '#6C1D45', // Guinda Politécnico
                 secondary: '#FFFFFF',
                 accent: '#9A2A63',
+                aura: '#9A2A63',
                 badgeBg: 'bg-[#6C1D45]',
                 badgeText: 'text-white'
             },
@@ -62,6 +63,7 @@ window.InstitutionsModule = (() => {
                 primary: '#E84D0E', // Naranja UAM
                 secondary: '#1C1C1C',
                 accent: '#FF6B2B',
+                aura: '#E84D0E', // Resplandor naranja institucional radiante
                 badgeBg: 'bg-[#E84D0E]',
                 badgeText: 'text-white'
             },

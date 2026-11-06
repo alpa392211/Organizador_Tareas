@@ -163,6 +163,13 @@ window.StorageModule = (() => {
             localStorage.setItem(KEYS.ACADEMIC_PERIOD, period);
         },
 
+        isOnboardingCompleted() {
+            return localStorage.getItem('org_escolar_onboarding_v1') === 'true';
+        },
+        setOnboardingCompleted(completed) {
+            localStorage.setItem('org_escolar_onboarding_v1', completed ? 'true' : 'false');
+        },
+
         // --- Ciclo Escolar (Fecha Inicio - Fecha Fin) y Verificación de Configuración ---
         isCycleConfigured() {
             const val = localStorage.getItem(KEYS.CYCLE_CONFIGURED);

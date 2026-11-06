@@ -120,8 +120,8 @@
             // 11. Renderizado inicial completo
             this.refreshAll();
 
-            // 12. Comprobar si el ciclo escolar está configurado obligatoriamente en primer inicio
-            if (!Storage.isCycleConfigured?.() && urlParams.get('openSchoolModal') !== '1') {
+            // 12. Comprobar si es primer inicio (onboarding obligatorio de institución y ciclo)
+            if ((!Storage.isOnboardingCompleted?.() || !Storage.isCycleConfigured?.()) && urlParams.get('openSchoolModal') !== '1') {
                 setTimeout(() => {
                     this.openCycleWelcomeModal?.();
                 }, 400);
@@ -203,11 +203,16 @@
                         settingsCycleStatus.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-600 text-white animate-pulse';
                     } else {
                         const todayStr = new Date().toISOString().split('T')[0];
-                        const isCurrent = todayStr >= cycle.startDate && todayStr <= cycle.endDate;
-                        settingsCycleStatus.textContent = isCurrent ? 'Ciclo Vigente' : 'Programado';
-                        settingsCycleStatus.className = isCurrent 
-                            ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white'
-                            : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-600 text-white';
+                        if (cycle.endDate && todayStr > cycle.endDate) {
+                            settingsCycleStatus.textContent = 'Terminado';
+                            settingsCycleStatus.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-500 text-white';
+                        } else if (cycle.startDate && todayStr < cycle.startDate) {
+                            settingsCycleStatus.textContent = 'Programado';
+                            settingsCycleStatus.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-600 text-white';
+                        } else {
+                            settingsCycleStatus.textContent = 'Ciclo Vigente';
+                            settingsCycleStatus.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white';
+                        }
                     }
                 }
             }
@@ -784,16 +789,13 @@
             const isGray = Storage.getGrayModeEnabled?.();
             const isDark = document.documentElement.classList.contains('dark');
 
-            // Limpiar cualquier estilo de fondo en línea para mantener los colores vivos siempre
+            // Limpiar estilos en línea para permitir el acabado translúcido y resplandor
             circle.style.removeProperty('background');
-
-            // Borde perimetral sólido sin halo difuso ni transparencias, adaptado a la barra
-            const borderColor = isDark ? (isGray ? '#252830' : '#0f172a') : (isGray ? '#f1f3f7' : '#ffffff');
-            circle.style.setProperty('border', `4px solid ${borderColor}`, 'important');
-            circle.style.setProperty('box-shadow', isDark ? '0 4px 12px rgba(0, 0, 0, 0.45)' : '0 4px 12px rgba(15, 23, 42, 0.25)', 'important');
+            circle.style.removeProperty('border');
+            circle.style.removeProperty('box-shadow');
 
             if (action === 'notes') {
-                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-amber-600 via-orange-600 to-rose-600 text-white flex items-center justify-center transition-all opacity-100';
+                circle.className = 'w-14 h-14 rounded-full btn-gradient-note text-white flex items-center justify-center transition-all opacity-100';
                 label.className = 'text-[10px] font-extrabold text-amber-600 dark:text-amber-400 mt-1 truncate max-w-[80px]';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -806,7 +808,7 @@
                     window.NotesModule?.openAddModal?.();
                 };
             } else if (action === 'calendar') {
-                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-700 via-purple-600 to-violet-700 text-white flex items-center justify-center transition-all opacity-100';
+                circle.className = 'w-14 h-14 rounded-full btn-gradient-subject text-white flex items-center justify-center transition-all opacity-100';
                 label.className = 'text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate max-w-[80px]';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -952,19 +954,41 @@
                         cycleBadge.textContent = 'Provisional';
                         cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-600 text-white shadow-xs';
                     } else {
-                        cycleBadge.textContent = 'Vigente';
-                        cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-xs';
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        if (cycle.endDate && todayStr > cycle.endDate) {
+                            cycleBadge.textContent = 'Terminado';
+                            cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-500 text-white shadow-xs';
+                        } else if (cycle.startDate && todayStr < cycle.startDate) {
+                            cycleBadge.textContent = 'Programado';
+                            cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-600 text-white shadow-xs';
+                        } else {
+                            cycleBadge.textContent = 'Vigente';
+                            cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-xs';
+                        }
                     }
                 }
 
-                // Resplandor temático con el color de la escuela (y aura dorada brillante para CCH)
+                // Resplandor temático con el aura institucional oficial (UAM naranja, CCH dorado, IPN guinda)
                 if (glow) {
-                    let auraColor = inst.colors?.aura || inst.colors?.secondary || inst.colors?.primary || '#6366F1';
-                    if (inst.id === 'cch') {
-                        auraColor = '#F59E0B'; // Resplandor dorado luminoso característico de CCH
+                    let auraColor = inst.colors?.aura;
+                    if (!auraColor) {
+                        const sec = inst.colors?.secondary;
+                        if (sec && sec !== '#1C1C1C' && sec !== '#FFFFFF' && sec !== '#000000') {
+                            auraColor = sec;
+                        } else {
+                            auraColor = inst.colors?.primary || '#6366F1';
+                        }
+                    }
+                    if (inst.id === 'uam') {
+                        auraColor = '#E84D0E'; // Naranja institucional radiante UAM
+                    } else if (inst.id === 'cch') {
+                        auraColor = '#F59E0B'; // Resplandor dorado CCH
+                    } else if (inst.id === 'ipn' || inst.id === 'cecyt') {
+                        auraColor = '#9A2A63'; // Magenta/guinda Politécnico
                     }
                     glow.style.backgroundColor = auraColor;
-                    glow.style.boxShadow = `0 0 110px 40px ${auraColor}`;
+                    glow.style.boxShadow = `0 0 130px 48px ${auraColor}`;
+                    glow.style.opacity = '0.75';
                 }
 
                 // Calcular origen de animación dinámica desde el logo superior hasta el centro
@@ -1030,17 +1054,59 @@
            ======================================================== */
         setupCycleWelcomeModal() {
             const modal = document.getElementById('cycle-setup-modal');
-            const backdrop = document.getElementById('cycle-setup-backdrop');
             const form = document.getElementById('cycle-setup-welcome-form');
             const laterBtn = document.getElementById('welcome-cycle-later-btn');
             const startInput = document.getElementById('welcome-cycle-start');
             const endInput = document.getElementById('welcome-cycle-end');
+            const instSelect = document.getElementById('welcome-institution-select');
+            const periodSelect = document.getElementById('welcome-period-select');
+            const instPreview = document.getElementById('welcome-inst-preview');
             const Storage = window.StorageModule;
+            const InstitutionsModule = window.InstitutionsModule;
 
             if (!modal) return;
 
+            const updatePeriodsForInst = (instId, selectedPeriod) => {
+                if (!periodSelect || !InstitutionsModule) return;
+                const inst = InstitutionsModule.getInstitution(instId);
+                periodSelect.innerHTML = '';
+                (inst.periods || []).forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p;
+                    opt.textContent = p;
+                    if (p === selectedPeriod) opt.selected = true;
+                    periodSelect.appendChild(opt);
+                });
+                if (instPreview) {
+                    instPreview.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-10 h-10', 'w-full h-full object-contain');
+                }
+            };
+
             const openWelcome = () => {
+                const currentInstId = Storage.getInstitution?.() || 'unam';
+                const currentPeriod = Storage.getAcademicPeriod?.() || '1.º Semestre';
                 const cycle = Storage.getAcademicCycle?.() || {};
+
+                if (instSelect && InstitutionsModule) {
+                    instSelect.innerHTML = '';
+                    Object.values(InstitutionsModule.INSTITUTIONS).forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = `${item.name} - ${item.systemType || item.shortBadge}`;
+                        if (item.id === currentInstId) opt.selected = true;
+                        instSelect.appendChild(opt);
+                    });
+
+                    instSelect.onchange = (e) => {
+                        const newInstId = e.target.value;
+                        const newInst = InstitutionsModule.getInstitution(newInstId);
+                        updatePeriodsForInst(newInstId, newInst.defaultPeriod || '1.º Semestre');
+                        window.HapticsModule?.light();
+                    };
+
+                    updatePeriodsForInst(currentInstId, currentPeriod);
+                }
+
                 if (startInput && cycle.startDate) startInput.value = cycle.startDate;
                 if (endInput && cycle.endDate) endInput.value = cycle.endDate;
 
@@ -1068,10 +1134,14 @@
                 form.onsubmit = (e) => {
                     e.preventDefault();
                     window.HapticsModule?.double();
-                    const s = startInput.value;
-                    const end = endInput.value;
+
+                    const chosenInst = instSelect ? instSelect.value : Storage.getInstitution();
+                    const chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
+                    const s = startInput ? startInput.value : '';
+                    const end = endInput ? endInput.value : '';
+
                     if (!s || !end) {
-                        this.showToast('Por favor completa ambas fechas.', 'warning');
+                        this.showToast('Por favor confirma ambas fechas de tu ciclo escolar.', 'warning');
                         return;
                     }
                     if (s > end) {
@@ -1079,22 +1149,47 @@
                         return;
                     }
 
+                    if (chosenInst) {
+                        Storage.setInstitution(chosenInst);
+                        this.setInstitution(chosenInst);
+                    }
+                    if (chosenPeriod) {
+                        Storage.setAcademicPeriod(chosenPeriod);
+                        const headerPeriod = document.getElementById('header-inst-period');
+                        if (headerPeriod) headerPeriod.textContent = chosenPeriod;
+                    }
+
                     Storage.setAcademicCycle(s, end);
                     Storage.setCycleConfigured(true);
+                    Storage.setOnboardingCompleted(true);
                     closeWelcome();
-                    this.updateCycleBadges();
-                    window.CalendarModule?.render?.();
-                    this.showToast('Ciclo escolar oficial confirmado y sincronizado.', 'success');
+                    this.refreshAll();
+                    this.showToast('¡Perfil escolar e institución configurados exitosamente!', 'success');
                 };
             }
 
             if (laterBtn) {
                 laterBtn.onclick = () => {
                     window.HapticsModule?.light();
+
+                    const chosenInst = instSelect ? instSelect.value : Storage.getInstitution();
+                    const chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
+
+                    if (chosenInst) {
+                        Storage.setInstitution(chosenInst);
+                        this.setInstitution(chosenInst);
+                    }
+                    if (chosenPeriod) {
+                        Storage.setAcademicPeriod(chosenPeriod);
+                        const headerPeriod = document.getElementById('header-inst-period');
+                        if (headerPeriod) headerPeriod.textContent = chosenPeriod;
+                    }
+
                     Storage.setProvisionalCycle();
+                    Storage.setOnboardingCompleted(true);
                     closeWelcome();
-                    this.updateCycleBadges();
-                    this.showToast('Ciclo asignado en modo provisional. Puedes confirmarlo en Ajustes.', 'warning');
+                    this.refreshAll();
+                    this.showToast('Institución guardada. Ciclo asignado en modo provisional para actualizar después.', 'warning');
                 };
             }
         }
