@@ -72,9 +72,9 @@ html:not(.dark) .settings-accordion-card {
     box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03) !important;
 }
 
-/* Modo Claro: Encabezado y Barra Inferior Limpios (sin tonos grises sucios) */
-html:not(.dark) header,
-html:not(.dark) #bottom-nav {
+/* Modo Claro Estándar: Encabezado y Barra Inferior Limpios (cuando NO es modo gris) */
+html:not(.dark):not(.theme-gray) header,
+html:not(.dark):not(.theme-gray) #bottom-nav {
     background-color: #ffffff !important;
     border-color: #e2e8f0 !important;
 }
@@ -99,27 +99,38 @@ html:not(.dark).theme-gray {
     color-scheme: light;
 }
 html:not(.dark).theme-gray body {
-    background-color: #e2e6eb !important;
+    background-color: #e5e8ee !important;
     color: #0f172a !important;
 }
 html:not(.dark).theme-gray header {
-    background-color: rgba(255, 255, 255, 0.96) !important;
-    border-bottom: 1px solid #cbd5e1 !important;
+    background-color: #f1f3f7 !important;
+    border-bottom: 1px solid #cbd2dc !important;
+}
+html:not(.dark).theme-gray #bottom-nav {
+    background-color: #f1f3f7 !important;
+    border-top: 1px solid #cbd2dc !important;
+}
+html:not(.dark).theme-gray #sidebar-drawer {
+    background-color: #f8fafc !important;
+}
+html:not(.dark).theme-gray #sidebar-drawer-footer {
+    background-color: #e5e8ee !important;
+    border-top: 1px solid #cbd2dc !important;
 }
 html:not(.dark).theme-gray nav {
-    border-color: #cbd5e1 !important;
+    border-color: #cbd2dc !important;
 }
-html:not(.dark).theme-gray .bg-white,
+html:not(.dark).theme-gray .bg-white:not(header):not(#bottom-nav):not(#sidebar-drawer-footer),
 html:not(.dark).theme-gray .stagger-card,
 html:not(.dark).theme-gray .settings-accordion-card {
     background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.09) !important;
+    border: 1px solid #cbd2dc !important;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.08) !important;
 }
 html:not(.dark).theme-gray .bg-slate-50,
 html:not(.dark).theme-gray .bg-slate-100 {
-    background-color: #dbe0e7 !important;
-    border-color: #cbd5e1 !important;
+    background-color: #e2e6ec !important;
+    border-color: #cbd2dc !important;
 }
 html:not(.dark).theme-gray .text-slate-900,
 html:not(.dark).theme-gray .text-slate-800 {
@@ -134,7 +145,7 @@ html:not(.dark).theme-gray .text-slate-500 {
 }
 html:not(.dark).theme-gray .border-slate-200,
 html:not(.dark).theme-gray .border-slate-100 {
-    border-color: #cbd5e1 !important;
+    border-color: #cbd2dc !important;
 }
 html:not(.dark).theme-gray .btn-gradient-subject,
 html:not(.dark).theme-gray .btn-gradient-task,
@@ -142,37 +153,44 @@ html:not(.dark).theme-gray .btn-gradient-note,
 html:not(.dark).theme-gray .fab-gradient-action {
     background: linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%) !important;
     color: #ffffff !important;
-    box-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
 }
 
-/* Caso 2: Modo Monocromático en MODO OSCURO (Carbón & Zinc Profundo) */
+/* Caso 2: Modo Monocromático en MODO OSCURO (Titanium & Slate Gray Notorio) */
 html.dark.theme-gray {
     color-scheme: dark;
 }
 html.dark.theme-gray body {
-    background-color: #141518 !important;
+    background-color: #181a1f !important;
     color: #f1f2f5 !important;
+}
+html.dark.theme-gray header {
+    background-color: #252830 !important;
+    border-bottom: 1px solid #383c46 !important;
+}
+html.dark.theme-gray #bottom-nav {
+    background-color: #252830 !important;
+    border-top: 1px solid #383c46 !important;
+}
+html.dark.theme-gray #sidebar-drawer {
+    background-color: #202228 !important;
+}
+html.dark.theme-gray #sidebar-drawer-footer {
+    background-color: #181a1f !important;
+    border-top: 1px solid #383c46 !important;
 }
 html.dark.theme-gray .bg-white,
 html.dark.theme-gray .dark\:bg-slate-800,
 html.dark.theme-gray .stagger-card,
 html.dark.theme-gray .settings-accordion-card {
-    background-color: #1c1d22 !important;
-    border-color: #2e3037 !important;
+    background-color: #252830 !important;
+    border-color: #383c46 !important;
 }
 html.dark.theme-gray .bg-slate-50,
 html.dark.theme-gray .bg-slate-100,
 html.dark.theme-gray .dark\:bg-slate-700 {
-    background-color: #27292f !important;
-    border-color: #383a42 !important;
-}
-html.dark.theme-gray header {
-    background-color: #141518 !important;
-    border-bottom: 1px solid #282a30 !important;
-}
-html.dark.theme-gray #bottom-nav {
-    background-color: #141518 !important;
-    border-top: 1px solid #282a30 !important;
+    background-color: #2d313b !important;
+    border-color: #404552 !important;
 }
 html.dark.theme-gray .text-slate-900,
 html.dark.theme-gray .text-slate-800,
@@ -188,12 +206,12 @@ html.dark.theme-gray .dark\:text-slate-300 {
 html.dark.theme-gray .text-slate-500,
 html.dark.theme-gray .text-slate-400,
 html.dark.theme-gray .dark\:text-slate-400 {
-    color: #949aa4 !important;
+    color: #94a3b8 !important;
 }
 html.dark.theme-gray .border-slate-200,
 html.dark.theme-gray .border-slate-100,
 html.dark.theme-gray .dark\:border-slate-700 {
-    border-color: #2e3037 !important;
+    border-color: #383c46 !important;
 }
 html.dark.theme-gray .btn-gradient-subject,
 html.dark.theme-gray .btn-gradient-task,
@@ -201,7 +219,7 @@ html.dark.theme-gray .btn-gradient-note,
 html.dark.theme-gray .fab-gradient-action {
     background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%) !important;
     color: #ffffff !important;
-    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* Iconos de Sol y Luna para Header */
@@ -718,46 +736,92 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 14px 28px -4px rgba(234, 88, 12, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Botón Central Inferior: Totalmente sólido, opaco y sin transparencia */
+/* Botón Central Inferior: Totalmente sólido, opaco y sin resplandores transparentes */
 .fab-gradient-action {
     background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0891b2 100%) !important;
     background-color: #0d9488 !important;
     opacity: 1 !important;
     border: 4px solid #ffffff !important;
-    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
-html.dark .fab-gradient-action {
+html.dark:not(.theme-gray) .fab-gradient-action {
     border: 4px solid #0f172a !important;
-    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark.theme-gray .fab-gradient-action {
+    background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%) !important;
+    border: 4px solid #252830 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+html:not(.dark).theme-gray .fab-gradient-action {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%) !important;
+    border: 4px solid #f1f3f7 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+}
+
+#bottom-main-circle {
+    opacity: 1 !important;
+    border: 4px solid #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+html.dark:not(.theme-gray) #bottom-main-circle {
+    border: 4px solid #0f172a !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark.theme-gray #bottom-main-circle {
+    border: 4px solid #252830 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+html:not(.dark).theme-gray #bottom-main-circle {
+    border: 4px solid #f1f3f7 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
 }
 
 /* ========================================================
    ALINEACIÓN PERFECTA DE SWITCHES EN CONFIGURACIÓN
    ======================================================== */
 .settings-switch-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.75rem 0;
-    min-height: 3.25rem;
-    width: 100%;
-    box-sizing: border-box;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    padding: 0.85rem 1rem !important;
+    border-radius: 1.25rem !important;
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease !important;
+}
+html.dark .settings-switch-row {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+html.dark.theme-gray .settings-switch-row {
+    background-color: #2b2e35 !important;
+    border-color: #3d414b !important;
+}
+html:not(.dark).theme-gray .settings-switch-row {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
 }
 .settings-switch-label {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding-right: 0.5rem;
-    display: flex;
-    flex-direction: column;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding-right: 0.75rem !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 .settings-switch-toggle {
-    flex: 0 0 44px;
-    width: 44px;
-    height: 24px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-end;
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    height: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
 }
 
 /* ========================================================

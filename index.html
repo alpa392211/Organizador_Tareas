@@ -42,8 +42,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.2.10">
+    <link rel="stylesheet" href="css/styles.css?v=1.2.10">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -304,7 +304,7 @@
         <!-- ======================================================== -->
         <!-- PIE DEL DRAWER: APOYO Y SALIDA DE LA APLICACIÓN          -->
         <!-- ======================================================== -->
-        <div class="p-5 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div id="sidebar-drawer-footer" class="p-5 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
             <div class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 text-center mb-2">
                 ¿Te gusta el organizador escolar?
             </div>
@@ -802,7 +802,7 @@
                         </div>
 
                         <!-- Toggle de Efecto Dinámico al Tocar Logo (Alineado con settings-switch-row) -->
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 settings-switch-row">
+                        <div class="settings-switch-row">
                             <div class="settings-switch-label">
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Efecto dinámico al tocar logo institucional</span>
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Al pulsar el escudo, se agranda hacia el centro mostrando lema y ciclo con resplandor temático.</span>
@@ -888,7 +888,7 @@
                         </div>
 
                         <!-- Toggle de Botón en Barra Superior (Alineado) -->
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 settings-switch-row">
+                        <div class="settings-switch-row">
                             <div class="settings-switch-label">
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Mostrar botón de tema en la barra superior</span>
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Oculta o muestra el acceso rápido sol/luna en el encabezado.</span>
@@ -921,7 +921,7 @@
                                 </div>
                             </div>
 
-                            <div class="settings-switch-row border-t border-purple-200/30 dark:border-purple-800/30 pt-1">
+                            <div class="settings-switch-row">
                                 <div class="settings-switch-label">
                                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Celebración con Gatitos</span>
                                     <span class="text-[11px] text-slate-500 dark:text-slate-400">Muestra gatitos festivos al completar tareas y patitas escondidas en botones.</span>
@@ -1186,7 +1186,7 @@
                         class="tap-effect inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer select-none"
                         title="Toca 5 veces para desbloquear modo secreto">
                         <span>🐼</span>
-                        <span>Versión 1.2.7 "Panda"</span>
+                        <span>Versión 1.2.10 "Panda"</span>
                     </button>
                 </div>
             </div>
@@ -1274,7 +1274,7 @@
             <button type="button" id="bottom-main-action-btn"
                 class="flex flex-col items-center -mt-7 tap-effect group px-2"
                 title="Atajo de Acción Rápida">
-                <div id="bottom-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center shadow-2xl ring-4 ring-white dark:ring-slate-900 transition-all opacity-100">
+                <div id="bottom-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center transition-all opacity-100">
                     <span id="bottom-main-icon">
                         <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -1873,16 +1873,16 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/haptics.js"></script>
-    <script src="js/notifications.js"></script>
-    <script src="js/widgets.js"></script>
-    <script src="js/subjects.js"></script>
-    <script src="js/tasks.js"></script>
-    <script src="js/notes.js"></script>
-    <script src="js/calendar.js"></script>
-    <script src="js/archive.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/institutions.js?v=1.2.10"></script>
+    <script src="js/storage.js?v=1.2.10"></script>
+    <script src="js/haptics.js?v=1.2.10"></script>
+    <script src="js/notifications.js?v=1.2.10"></script>
+    <script src="js/widgets.js?v=1.2.10"></script>
+    <script src="js/subjects.js?v=1.2.10"></script>
+    <script src="js/tasks.js?v=1.2.10"></script>
+    <script src="js/notes.js?v=1.2.10"></script>
+    <script src="js/calendar.js?v=1.2.10"></script>
+    <script src="js/archive.js?v=1.2.10"></script>
+    <script src="js/app.js?v=1.2.10"></script>
 </body>
 </html>
