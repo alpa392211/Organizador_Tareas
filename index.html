@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Organizador Escolar Pro - Horarios y Tareas</title>
     
-    <!-- Meta tags Mobile-First -->
+    <!-- Meta tags Mobile-First & Orientación -->
     <meta name="theme-color" content="#4F46E5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="x5-page-mode" content="app">
+    <meta name="browsermode" content="application">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,7 +50,7 @@
     <!-- ========================================== -->
     <!-- ENCABEZADO INSTITUCIONAL Y BARRA SUPERIOR -->
     <!-- ========================================== -->
-    <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-700/60 shadow-xs transition-colors">
+    <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 gap-3">
                 
@@ -131,8 +135,8 @@
                         <span id="header-theme-label" class="text-xs font-bold hidden xl:inline">Tema</span>
                     </button>
 
-                    <!-- Navegación Desktop Rápida -->
-                    <nav class="hidden lg:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                    <!-- Navegación Desktop y Tablet Rápida -->
+                    <nav class="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
                         <button type="button" data-view-target="subjects"
                             class="nav-link-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs">
                             <span>📚 Materias</span>
@@ -300,7 +304,7 @@
         <!-- ======================================================== -->
         <!-- PIE DEL DRAWER: APOYO Y SALIDA DE LA APLICACIÓN          -->
         <!-- ======================================================== -->
-        <div class="p-5 border-t border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/40">
+        <div class="p-5 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
             <div class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 text-center mb-2">
                 ¿Te gusta el organizador escolar?
             </div>
@@ -331,7 +335,7 @@
     <!-- ========================================== -->
     <!-- CONTENIDO PRINCIPAL DINÁMICO (VISTAS)     -->
     <!-- ========================================== -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:pb-12">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
         
         <!-- ========================================================= -->
         <!-- VISTA 1: MATERIAS Y HORARIOS (LÍMITE ESTRICTO 1 A 16)    -->
@@ -1182,7 +1186,7 @@
                         class="tap-effect inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer select-none"
                         title="Toca 5 veces para desbloquear modo secreto">
                         <span>🐼</span>
-                        <span>Versión 1.2.6 "Panda"</span>
+                        <span>Versión 1.2.7 "Panda"</span>
                     </button>
                 </div>
             </div>
@@ -1255,7 +1259,7 @@
     <!-- ========================================================= -->
     <!-- BARRA INFERIOR DE ACCESO RÁPIDO PARA MÓVILES (BOTTOM NAV - 3 BOTONES) -->
     <!-- ========================================================= -->
-    <nav class="fixed bottom-0 inset-x-0 z-30 sm:hidden bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700/60 px-6 py-2 shadow-2xl">
+    <nav id="bottom-nav" class="fixed bottom-0 inset-x-0 z-30 md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 py-2 shadow-2xl">
         <div class="flex items-center justify-between max-w-sm mx-auto">
             <!-- 1. Lateral Izquierdo: Materias -->
             <button type="button" data-view-target="subjects"
@@ -1270,7 +1274,7 @@
             <button type="button" id="bottom-main-action-btn"
                 class="flex flex-col items-center -mt-7 tap-effect group px-2"
                 title="Atajo de Acción Rápida">
-                <div id="bottom-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center shadow-2xl fab-glow ring-4 ring-white dark:ring-slate-900 transition-all opacity-100">
+                <div id="bottom-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center shadow-2xl ring-4 ring-white dark:ring-slate-900 transition-all opacity-100">
                     <span id="bottom-main-icon">
                         <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -1843,6 +1847,21 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- BLOQUEO DINÁMICO DE ORIENTACIÓN HORIZONTAL EN CELULARES   -->
+    <!-- ========================================================= -->
+    <div id="mobile-orientation-blocker" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md text-white text-center select-none">
+        <div class="max-w-xs space-y-4 flex flex-col items-center">
+            <div class="w-16 h-16 rounded-3xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-3xl animate-bounce">
+                📱🔄
+            </div>
+            <h3 class="text-lg font-black tracking-tight text-white">Gira tu celular</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                El organizador escolar está diseñado para utilizarse verticalmente en teléfonos móviles. Por favor, gira tu dispositivo a posición vertical.
+            </p>
         </div>
     </div>
 

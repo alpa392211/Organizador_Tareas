@@ -68,15 +68,15 @@ html:not(.dark) #view-notes > div.bg-white,
 html:not(.dark) #view-settings > div.bg-white,
 html:not(.dark) .settings-accordion-card {
     background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 1px 3px 0 rgba(15, 23, 42, 0.04) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03) !important;
 }
 
-/* Sub-tarjetas y contenedores internos con tono ligeramente grisáceo para mayor profundidad táctil */
-html:not(.dark) .bg-slate-50,
-html:not(.dark) .bg-slate-100 {
-    background-color: #e2e8f0 !important;
-    border-color: #cbd5e1 !important;
+/* Modo Claro: Encabezado y Barra Inferior Limpios (sin tonos grises sucios) */
+html:not(.dark) header,
+html:not(.dark) #bottom-nav {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
 }
 
 /* Modo Oscuro Global */
@@ -166,10 +166,24 @@ html.dark.theme-gray .dark\:bg-slate-700 {
     background-color: #27292f !important;
     border-color: #383a42 !important;
 }
+html.dark.theme-gray header {
+    background-color: #141518 !important;
+    border-bottom: 1px solid #282a30 !important;
+}
+html.dark.theme-gray #bottom-nav {
+    background-color: #141518 !important;
+    border-top: 1px solid #282a30 !important;
+}
 html.dark.theme-gray .text-slate-900,
 html.dark.theme-gray .text-slate-800,
 html.dark.theme-gray .dark\:text-white {
     color: #f8fafc !important;
+}
+html.dark.theme-gray .text-slate-700,
+html.dark.theme-gray .text-slate-600,
+html.dark.theme-gray .dark\:text-slate-200,
+html.dark.theme-gray .dark\:text-slate-300 {
+    color: #e2e8f0 !important;
 }
 html.dark.theme-gray .text-slate-500,
 html.dark.theme-gray .text-slate-400,
@@ -601,10 +615,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     will-change: transform, opacity;
 }
 
+@keyframes schoolIdentityExitRightAnim {
+    0% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(160%, 0, 0) scale(0.9) rotate(5deg);
+    }
+}
+
 .school-identity-exit-right {
-    transform: translate3d(125%, 0, 0) scale(0.92) !important;
-    opacity: 0 !important;
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease-out !important;
+    animation: schoolIdentityExitRightAnim 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
     pointer-events: none;
 }
 
@@ -700,11 +723,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0891b2 100%) !important;
     background-color: #0d9488 !important;
     opacity: 1 !important;
-    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 0 0 4px #ffffff !important;
-    border: none !important;
+    border: 4px solid #ffffff !important;
+    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 4px 10px rgba(0, 0, 0, 0.15) !important;
 }
 html.dark .fab-gradient-action {
-    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 0 0 4px #0f172a !important;
+    border: 4px solid #0f172a !important;
+    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 4px 10px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* ========================================================
@@ -792,4 +816,63 @@ html:not(.dark) .vault-suspense-container {
     transform: rotate(0deg) scale(1.2);
     opacity: 1;
 }
+
+/* ========================================================
+   BLOQUEO DE ORIENTACIÓN HORIZONTAL EN CELULARES
+   (Sólo activa en pantallas móviles con altura reducida;
+    no interfiere con tablets u ordenadores)
+   ======================================================== */
+@media screen and (max-width: 899px) and (orientation: landscape) and (max-height: 550px) {
+    #mobile-orientation-blocker {
+        display: flex !important;
+    }
+}
+
+/* ========================================================
+   CALENDARIO EN MODO MONOCROMÁTICO (THEME-GRAY)
+   Contraste nítido para números, celdas y fechas
+   ======================================================== */
+html.dark.theme-gray #calendar-modal .modal-dialog,
+html.dark.theme-gray #view-calendar {
+    background-color: #18191e !important;
+    color: #f1f2f5 !important;
+}
+html.dark.theme-gray #cal-days-grid button {
+    background-color: #22242b !important;
+    border-color: #353842 !important;
+    color: #f8fafc !important;
+}
+html.dark.theme-gray #cal-days-grid button span {
+    color: #f8fafc !important;
+}
+html.dark.theme-gray #cal-days-grid button .text-indigo-400 {
+    color: #cbd5e1 !important;
+}
+html.dark.theme-gray #cal-days-grid div.select-none {
+    background-color: #1a1b20 !important;
+}
+html.dark.theme-gray #cal-days-grid div.select-none span {
+    color: #64748b !important;
+}
+html.dark.theme-gray #cal-days-grid .text-slate-400,
+html.dark.theme-gray #cal-days-grid .text-slate-500,
+html.dark.theme-gray #cal-days-grid .text-slate-600 {
+    color: #94a3b8 !important;
+}
+
+/* Calendario en Modo Claro Monocromático */
+html:not(.dark).theme-gray #calendar-modal .modal-dialog,
+html:not(.dark).theme-gray #view-calendar {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-gray #cal-days-grid button {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-gray #cal-days-grid button span {
+    color: #0f172a !important;
+}
+
 

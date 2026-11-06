@@ -186,7 +186,7 @@ window.CalendarModule = (() => {
             let baseStyles = 'min-h-[50px] sm:min-h-[64px] p-1 rounded-xl transition-all duration-150 flex flex-col items-center justify-between text-xs border relative group ';
             
             if (!isInCycle) {
-                baseStyles += 'opacity-40 bg-slate-100/50 dark:bg-slate-800/30 border-dashed border-slate-200 dark:border-slate-700/50 hover:opacity-75 ';
+                baseStyles += 'bg-slate-100/60 dark:bg-slate-800/40 border-dashed border-slate-300 dark:border-slate-700/70 hover:opacity-90 ';
             } else if (isSelected) {
                 baseStyles += 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/40 shadow-sm ring-2 ring-indigo-500/30 ';
             } else {
@@ -197,10 +197,14 @@ window.CalendarModule = (() => {
             cell.title = isInCycle ? 'Día lectivo' : 'Fuera del ciclo escolar activo';
 
             const numSpan = document.createElement('span');
-            numSpan.className = `w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs transition-colors ${
+            numSpan.className = `w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors ${
                 isToday 
-                    ? 'bg-indigo-600 text-white shadow-xs' 
-                    : isSelected ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'text-slate-700 dark:text-slate-200'
+                    ? 'bg-indigo-600 text-white font-black shadow-xs' 
+                    : isSelected 
+                        ? 'text-indigo-600 dark:text-indigo-400 font-black' 
+                        : !isInCycle 
+                            ? 'text-slate-400 dark:text-slate-400 font-bold' 
+                            : 'text-slate-900 dark:text-slate-100 font-extrabold'
             }`;
             numSpan.textContent = dayNum;
 

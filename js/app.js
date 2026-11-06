@@ -45,6 +45,9 @@
             // 4. Inicializar y aplicar tipografía seleccionada (5 opciones con botones)
             this.initFontFamily();
 
+            // Bloqueo de orientación horizontal en teléfonos móviles (Portrait Lock)
+            this.initOrientationLock();
+
             // 5. Cargar institución y periodo activo
             const instId = Storage.getInstitution();
             this.setInstitution(instId);
@@ -217,6 +220,14 @@
             const Storage = window.StorageModule;
             const font = Storage.getFontFamily?.() || 'calibri';
             this.applyFontFamily(font);
+        }
+
+        initOrientationLock() {
+            try {
+                if (window.screen?.orientation?.lock) {
+                    window.screen.orientation.lock('portrait').catch(() => {});
+                }
+            } catch (e) {}
         }
 
         applyFontFamily(fontKey) {
@@ -761,7 +772,7 @@
             const action = Storage.getBottomAction();
 
             if (action === 'notes') {
-                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-amber-600 via-orange-600 to-rose-600 text-white flex items-center justify-center shadow-2xl fab-glow ring-4 ring-white dark:ring-slate-900 transition-all opacity-100';
+                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-amber-600 via-orange-600 to-rose-600 text-white flex items-center justify-center shadow-2xl ring-4 ring-white dark:ring-slate-900 transition-all opacity-100';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -774,7 +785,7 @@
                     window.NotesModule?.openAddModal?.();
                 };
             } else if (action === 'calendar') {
-                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-700 via-purple-600 to-violet-700 text-white flex items-center justify-center shadow-2xl fab-glow ring-4 ring-white dark:ring-slate-900 transition-all opacity-100';
+                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-700 via-purple-600 to-violet-700 text-white flex items-center justify-center shadow-2xl ring-4 ring-white dark:ring-slate-900 transition-all opacity-100';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -787,7 +798,7 @@
                     window.CalendarModule?.openModal?.();
                 };
             } else {
-                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-700 text-white flex items-center justify-center shadow-2xl fab-glow ring-4 ring-white dark:ring-slate-900 transition-all opacity-100';
+                circle.className = 'w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center shadow-2xl ring-4 ring-white dark:ring-slate-900 transition-all opacity-100';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -957,20 +968,29 @@
             };
 
             const closeModal = () => {
-                if (!modal || modal.classList.contains('hidden')) return;
+                if (!modal || modal.classList.contains('hidden') || card.classList.contains('school-identity-exit-right')) return;
                 window.HapticsModule?.light();
 
                 // Salida rápida y dinámica de la ventana y el escudo hacia el lado DERECHO
                 card.classList.remove('school-identity-card-anim');
                 card.classList.add('school-identity-exit-right');
-                modal.classList.remove('active');
+
+                if (backdrop) {
+                    backdrop.style.transition = 'opacity 0.32s ease';
+                    backdrop.style.opacity = '0';
+                }
 
                 setTimeout(() => {
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
+                    modal.classList.remove('active');
                     card.classList.remove('school-identity-exit-right');
+                    if (backdrop) {
+                        backdrop.style.opacity = '';
+                        backdrop.style.transition = '';
+                    }
                     document.body.classList.remove('overflow-hidden');
-                }, 280);
+                }, 310);
             };
 
             this.openSchoolIdentityModal = openModal;
