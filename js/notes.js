@@ -143,7 +143,7 @@ window.NotesModule = (() => {
         window.HapticsModule?.light();
         const Storage = window.StorageModule;
         const notes = Storage.getNotes();
-        const note = notes.find(n => n.id === id);
+        const note = notes.find(n => String(n.id) === String(id));
         if (!note) return;
 
         editingNoteId = id;

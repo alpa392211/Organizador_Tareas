@@ -237,7 +237,7 @@ window.TasksModule = (() => {
     function openEditModal(id) {
         const Storage = window.StorageModule;
         const tasks = Storage.getTasks();
-        const task = tasks.find(t => t.id === id);
+        const task = tasks.find(t => String(t.id) === String(id));
         if (!task) return;
 
         const cycle = Storage.getAcademicCycle();
@@ -426,7 +426,7 @@ window.TasksModule = (() => {
     function deleteTaskPrompt(id) {
         const Storage = window.StorageModule;
         const tasks = Storage.getTasks();
-        const task = tasks.find(t => t.id === id);
+        const task = tasks.find(t => String(t.id) === String(id));
         if (!task) return;
 
         if (confirm(`¿Eliminar la tarea "${task.title}"?`)) {
@@ -547,6 +547,7 @@ window.TasksModule = (() => {
             }`;
             card.style.setProperty('--stagger-i', index);
             card.style.borderLeft = `6px solid ${subject.color}`;
+            card.dataset.taskId = task.id;
 
             card.innerHTML = `
                 <!-- Contenido Principal & Checkbox -->
@@ -645,15 +646,22 @@ window.TasksModule = (() => {
             `;
 
             card.querySelector('[data-action="toggle"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
                 toggleTask(task.id, e.currentTarget);
             });
-            card.querySelector('[data-action="edit"]')?.addEventListener('click', () => {
+            card.querySelector('[data-action="edit"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
                 openEditModal(task.id);
             });
-            card.querySelector('[data-action="archive"]')?.addEventListener('click', () => {
+            card.querySelector('[data-action="archive"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
                 archiveTask(task.id);
             });
-            card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+            card.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
                 deleteTaskPrompt(task.id);
             });
 

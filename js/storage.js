@@ -262,7 +262,9 @@ window.StorageModule = (() => {
         getSubjects() {
             try {
                 const data = localStorage.getItem(KEYS.SUBJECTS);
-                return data ? JSON.parse(data) : [];
+                if (!data) return [];
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
             } catch (e) {
                 console.error('Error al leer materias:', e);
                 return [];
@@ -298,7 +300,7 @@ window.StorageModule = (() => {
         },
         updateSubject(id, updatedFields) {
             const subjects = this.getSubjects();
-            const index = subjects.findIndex(s => s.id === id);
+            const index = subjects.findIndex(s => String(s.id) === String(id));
             if (index === -1) return null;
             subjects[index] = {
                 ...subjects[index],
@@ -310,10 +312,10 @@ window.StorageModule = (() => {
         },
         deleteSubject(id) {
             const subjects = this.getSubjects();
-            const filtered = subjects.filter(s => s.id !== id);
+            const filtered = subjects.filter(s => String(s.id) !== String(id));
             this.saveSubjects(filtered);
             const tasks = this.getTasks();
-            const updatedTasks = tasks.filter(t => t.subjectId !== id);
+            const updatedTasks = tasks.filter(t => String(t.subjectId) !== String(id));
             this.saveTasks(updatedTasks);
             return true;
         },
@@ -322,7 +324,9 @@ window.StorageModule = (() => {
         getTasks() {
             try {
                 const data = localStorage.getItem(KEYS.TASKS);
-                return data ? JSON.parse(data) : [];
+                if (!data) return [];
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
             } catch (e) {
                 console.error('Error al leer tareas:', e);
                 return [];
@@ -351,7 +355,7 @@ window.StorageModule = (() => {
         },
         updateTask(id, updatedFields) {
             const tasks = this.getTasks();
-            const index = tasks.findIndex(t => t.id === id);
+            const index = tasks.findIndex(t => String(t.id) === String(id));
             if (index === -1) return null;
             tasks[index] = {
                 ...tasks[index],
@@ -363,7 +367,7 @@ window.StorageModule = (() => {
         },
         toggleTask(id) {
             const tasks = this.getTasks();
-            const task = tasks.find(t => t.id === id);
+            const task = tasks.find(t => String(t.id) === String(id));
             if (task) {
                 task.completed = !task.completed;
                 this.saveTasks(tasks);
@@ -373,7 +377,7 @@ window.StorageModule = (() => {
         },
         deleteTask(id) {
             const tasks = this.getTasks();
-            const filtered = tasks.filter(t => t.id !== id);
+            const filtered = tasks.filter(t => String(t.id) !== String(id));
             this.saveTasks(filtered);
             return true;
         },
@@ -382,7 +386,9 @@ window.StorageModule = (() => {
         getNotes() {
             try {
                 const data = localStorage.getItem(KEYS.NOTES);
-                return data ? JSON.parse(data) : [];
+                if (!data) return [];
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
             } catch (e) {
                 console.error('Error al leer notas:', e);
                 return [];
@@ -411,7 +417,7 @@ window.StorageModule = (() => {
         },
         updateNote(id, updatedFields) {
             const notes = this.getNotes();
-            const index = notes.findIndex(n => n.id === id);
+            const index = notes.findIndex(n => String(n.id) === String(id));
             if (index === -1) return null;
             notes[index] = {
                 ...notes[index],
@@ -424,7 +430,7 @@ window.StorageModule = (() => {
         },
         deleteNote(id) {
             const notes = this.getNotes();
-            const filtered = notes.filter(n => n.id !== id);
+            const filtered = notes.filter(n => String(n.id) !== String(id));
             this.saveNotes(filtered);
             return true;
         },
@@ -477,7 +483,9 @@ window.StorageModule = (() => {
         getArchivedTasks() {
             try {
                 const data = localStorage.getItem(KEYS.ARCHIVED_TASKS);
-                return data ? JSON.parse(data) : [];
+                if (!data) return [];
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
             } catch (e) {
                 return [];
             }
@@ -488,8 +496,9 @@ window.StorageModule = (() => {
             return true;
         },
         archiveTask(id) {
+            if (!id && id !== 0) return null;
             const tasks = this.getTasks();
-            const taskIndex = tasks.findIndex(t => t.id === id);
+            const taskIndex = tasks.findIndex(t => String(t.id) === String(id));
             if (taskIndex === -1) return null;
             const task = tasks.splice(taskIndex, 1)[0];
             this.saveTasks(tasks);
@@ -501,11 +510,14 @@ window.StorageModule = (() => {
             return task;
         },
         unarchiveTask(id) {
+            if (!id && id !== 0) return null;
             const archived = this.getArchivedTasks();
-            const index = archived.findIndex(t => t.id === id);
+            const index = archived.findIndex(t => String(t.id) === String(id));
             if (index === -1) return null;
             const task = archived.splice(index, 1)[0];
             delete task.archivedAt;
+            // Reactivar como pendiente para visualización inmediata en lista de pendientes
+            task.completed = false;
             this.saveArchivedTasks(archived);
 
             const tasks = this.getTasks();
@@ -514,8 +526,9 @@ window.StorageModule = (() => {
             return task;
         },
         deleteArchivedTask(id) {
+            if (!id && id !== 0) return false;
             const archived = this.getArchivedTasks();
-            const filtered = archived.filter(t => t.id !== id);
+            const filtered = archived.filter(t => String(t.id) !== String(id));
             this.saveArchivedTasks(filtered);
             return true;
         },
@@ -523,7 +536,9 @@ window.StorageModule = (() => {
         getArchivedNotes() {
             try {
                 const data = localStorage.getItem(KEYS.ARCHIVED_NOTES);
-                return data ? JSON.parse(data) : [];
+                if (!data) return [];
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
             } catch (e) {
                 return [];
             }
@@ -534,8 +549,9 @@ window.StorageModule = (() => {
             return true;
         },
         archiveNote(id) {
+            if (!id && id !== 0) return null;
             const notes = this.getNotes();
-            const noteIndex = notes.findIndex(n => n.id === id);
+            const noteIndex = notes.findIndex(n => String(n.id) === String(id));
             if (noteIndex === -1) return null;
             const note = notes.splice(noteIndex, 1)[0];
             this.saveNotes(notes);
@@ -547,8 +563,9 @@ window.StorageModule = (() => {
             return note;
         },
         unarchiveNote(id) {
+            if (!id && id !== 0) return null;
             const archived = this.getArchivedNotes();
-            const index = archived.findIndex(n => n.id === id);
+            const index = archived.findIndex(n => String(n.id) === String(id));
             if (index === -1) return null;
             const note = archived.splice(index, 1)[0];
             delete note.archivedAt;
@@ -560,8 +577,9 @@ window.StorageModule = (() => {
             return note;
         },
         deleteArchivedNote(id) {
+            if (!id && id !== 0) return false;
             const archived = this.getArchivedNotes();
-            const filtered = archived.filter(n => n.id !== id);
+            const filtered = archived.filter(n => String(n.id) !== String(id));
             this.saveArchivedNotes(filtered);
             return true;
         },
@@ -580,12 +598,26 @@ window.StorageModule = (() => {
             const now = Date.now();
 
             const archivedTasks = this.getArchivedTasks();
-            const validTasks = archivedTasks.filter(t => (now - (t.archivedAt || now)) <= maxAgeMs);
+            const validTasks = archivedTasks.filter(t => {
+                if (!t) return false;
+                const archivedTime = typeof t.archivedAt === 'number'
+                    ? t.archivedAt
+                    : (t.archivedAt ? new Date(t.archivedAt).getTime() : now);
+                const safeTime = isNaN(archivedTime) ? now : archivedTime;
+                return (now - safeTime) <= maxAgeMs;
+            });
             const purgedTasks = archivedTasks.length - validTasks.length;
             if (purgedTasks > 0) this.saveArchivedTasks(validTasks);
 
             const archivedNotes = this.getArchivedNotes();
-            const validNotes = archivedNotes.filter(n => (now - (n.archivedAt || now)) <= maxAgeMs);
+            const validNotes = archivedNotes.filter(n => {
+                if (!n) return false;
+                const archivedTime = typeof n.archivedAt === 'number'
+                    ? n.archivedAt
+                    : (n.archivedAt ? new Date(n.archivedAt).getTime() : now);
+                const safeTime = isNaN(archivedTime) ? now : archivedTime;
+                return (now - safeTime) <= maxAgeMs;
+            });
             const purgedNotes = archivedNotes.length - validNotes.length;
             if (purgedNotes > 0) this.saveArchivedNotes(validNotes);
 

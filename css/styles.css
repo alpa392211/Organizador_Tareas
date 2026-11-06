@@ -65,6 +65,8 @@ html:not(.dark):not(.theme-gray) .card-hover,
 html:not(.dark):not(.theme-gray) #view-subjects > div.bg-white,
 html:not(.dark):not(.theme-gray) #view-tasks > div.bg-white,
 html:not(.dark):not(.theme-gray) #view-notes > div.bg-white,
+html:not(.dark):not(.theme-gray) #view-archive > div.bg-white,
+html:not(.dark):not(.theme-gray) #archive-empty-state,
 html:not(.dark):not(.theme-gray) #view-settings > div.bg-white,
 html:not(.dark):not(.theme-gray) .settings-accordion-card {
     background-color: #ffffff !important;
@@ -176,6 +178,7 @@ html.theme-gray input[name="subject-days"]:checked + span {
 }
 html.theme-gray [data-task-filter].bg-indigo-600,
 html.theme-gray [data-note-filter].bg-indigo-600,
+html.theme-gray [data-archive-filter].bg-indigo-600,
 html.theme-gray [data-note-category].bg-amber-500 {
     background-color: #525d70 !important;
     color: #ffffff !important;

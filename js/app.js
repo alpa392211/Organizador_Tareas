@@ -156,6 +156,7 @@
             const navSubCount = document.getElementById('nav-sub-count');
             const navTaskCount = document.getElementById('nav-task-count');
             const navNoteCount = document.getElementById('nav-note-count');
+            const navArchiveCount = document.getElementById('nav-archive-count');
 
             const archiveBadge = document.getElementById('archive-count-badge');
 
@@ -167,6 +168,7 @@
             if (navSubCount) navSubCount.textContent = subjects.length;
             if (navTaskCount) navTaskCount.textContent = pendingTasks;
             if (navNoteCount) navNoteCount.textContent = notes.length;
+            if (navArchiveCount) navArchiveCount.textContent = archivedTasks.length + archivedNotes.length;
 
             if (archiveBadge) archiveBadge.textContent = `${archivedTasks.length + archivedNotes.length} elementos`;
         }
@@ -686,7 +688,9 @@
         setupNavigation() {
             const navButtons = document.querySelectorAll('[data-view-target]');
             navButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
                     const targetView = btn.dataset.viewTarget;
                     this.switchView(targetView);
                     this.closeSidebarDrawer?.();
@@ -1673,6 +1677,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const app = new App();
+        window.App = app;
         window.AppInstance = app;
         app.init();
     });

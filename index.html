@@ -156,6 +156,11 @@
                             class="nav-link-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1.5">
                             <span>🗓️ Calendario</span>
                         </button>
+                        <button type="button" data-view-target="archive"
+                            class="nav-link-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1.5">
+                            <span>🗄️ Baúl</span>
+                            <span id="nav-archive-count" class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">0</span>
+                        </button>
                     </nav>
 
                 </div>
@@ -415,14 +420,22 @@
                         </div>
                     </div>
 
-                    <!-- Botón CTA Nueva Tarea con Degradado Enriquecido -->
-                    <button type="button" id="add-task-btn"
-                        class="btn-gradient-task tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm transition-all">
-                        <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        <span>Nueva Tarea</span>
-                    </button>
+                    <!-- Acciones de Tareas (Baúl y Nueva Tarea) -->
+                    <div class="flex items-center gap-2">
+                        <button type="button" data-view-target="archive"
+                            class="tap-effect inline-flex items-center justify-center gap-1.5 px-3 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all border border-slate-200/60 dark:border-slate-600/60"
+                            title="Ir al Baúl de Archivados">
+                            <span>🗄️</span>
+                            <span class="hidden sm:inline">Baúl</span>
+                        </button>
+                        <button type="button" id="add-task-btn"
+                            class="btn-gradient-task tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm transition-all">
+                            <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span>Nueva Tarea</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Barra de Búsqueda y Filtros de Estado & Materia -->
@@ -513,14 +526,22 @@
                         </p>
                     </div>
 
-                    <!-- Botón CTA Nueva Nota con Degradado Enriquecido -->
-                    <button type="button" id="add-note-btn"
-                        class="btn-gradient-note tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm transition-all">
-                        <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        <span>Nueva Nota</span>
-                    </button>
+                    <!-- Acciones de Notas (Baúl y Nueva Nota) -->
+                    <div class="flex items-center gap-2">
+                        <button type="button" data-view-target="archive"
+                            class="tap-effect inline-flex items-center justify-center gap-1.5 px-3 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all border border-slate-200/60 dark:border-slate-600/60"
+                            title="Ir al Baúl de Archivados">
+                            <span>🗄️</span>
+                            <span class="hidden sm:inline">Baúl</span>
+                        </button>
+                        <button type="button" id="add-note-btn"
+                            class="btn-gradient-note tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm transition-all">
+                            <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span>Nueva Nota</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Barra de Búsqueda y Filtros de Categoría -->
@@ -1784,6 +1805,39 @@
                 <button type="button" id="confirm-exit-btn"
                     class="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-500/20 tap-effect transition-all flex items-center justify-center gap-1.5">
                     <span>Salir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 6: CONFIRMACIÓN DE ACCIONES EN EL BAÚL DE ARCHIVADOS -->
+    <!-- ========================================================= -->
+    <div id="archive-confirm-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div id="archive-confirm-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+
+        <div class="modal-dialog relative w-full max-w-sm bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform text-center p-6 space-y-4">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-inner">
+                🗄️
+            </div>
+
+            <div>
+                <h3 id="archive-confirm-title" class="text-lg font-black text-slate-900 dark:text-white">
+                    ¿Eliminar definitivamente?
+                </h3>
+                <p id="archive-confirm-desc" class="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+                    Esta acción no se puede deshacer y el elemento se borrará por completo del dispositivo.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button type="button" id="archive-cancel-btn"
+                    class="py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 font-bold text-xs tap-effect transition-all">
+                    Cancelar
+                </button>
+                <button type="button" id="archive-confirm-btn"
+                    class="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-500/20 tap-effect transition-all flex items-center justify-center gap-1.5">
+                    <span>Eliminar</span>
                 </button>
             </div>
         </div>
