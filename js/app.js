@@ -40,6 +40,7 @@
             // 3. Inicializar y aplicar modo oscuro / claro y visibilidad del botón de tema
             this.initTheme();
             this.applyHeaderThemeBtnVisibility();
+            this.applySecretFeaturesUI();
 
             // 4. Inicializar y aplicar tipografía seleccionada (5 opciones con botones)
             this.initFontFamily();
@@ -66,6 +67,8 @@
             this.setupCycleWelcomeModal();
             this.setupExitModal();
             this.setupSettingsView();
+            this.setupSecretVersionTrigger();
+            this.setupSecretVault();
 
             // 8. Exponer funciones globales para interacción fluida entre módulos
             window.onDataChanged = () => this.refreshAll();
@@ -341,6 +344,12 @@
         updateThemeUI(activeTheme, isAuto = false) {
             const isDark = activeTheme === 'dark';
 
+            // Sincronizar iconos de Sol y Luna en Header explícitamente
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
+            if (moonIcon) moonIcon.style.display = isDark ? 'none' : 'block';
+
             const pill = document.getElementById('settings-theme-pill');
             if (pill) {
                 if (isAuto) {
@@ -369,6 +378,80 @@
             updateBtn(lightBtn, !isAuto && !isDark);
             updateBtn(darkBtn, !isAuto && isDark);
             updateBtn(autoBtn, isAuto);
+        }
+
+        applyGrayMode(enabled) {
+            const Storage = window.StorageModule;
+            if (typeof enabled === 'boolean') {
+                Storage.setGrayModeEnabled(enabled);
+            }
+            const isGray = Storage.getGrayModeEnabled();
+            document.documentElement.classList.toggle('theme-gray', isGray);
+            const toggle = document.getElementById('settings-gray-mode-toggle');
+            if (toggle) toggle.checked = isGray;
+        }
+
+        applySecretFeaturesUI() {
+            const Storage = window.StorageModule;
+            const isUnlocked = Storage.isSecretUnlocked();
+            const secretSection = document.getElementById('secret-theme-controls');
+            if (secretSection) {
+                if (isUnlocked) {
+                    secretSection.classList.remove('hidden');
+                } else {
+                    secretSection.classList.add('hidden');
+                }
+            }
+
+            const grayToggle = document.getElementById('settings-gray-mode-toggle');
+            if (grayToggle) {
+                grayToggle.checked = Storage.getGrayModeEnabled();
+                grayToggle.onchange = (e) => {
+                    window.HapticsModule?.light();
+                    this.applyGrayMode(e.target.checked);
+                    this.showToast(e.target.checked ? 'Modo Gris activado.' : 'Modo Gris desactivado.', 'info');
+                };
+            }
+
+            const catsToggle = document.getElementById('settings-cats-toggle');
+            if (catsToggle) {
+                catsToggle.checked = Storage.getSecretCatsEnabled();
+                catsToggle.onchange = (e) => {
+                    window.HapticsModule?.light();
+                    Storage.setSecretCatsEnabled(e.target.checked);
+                    this.updateHiddenKitties();
+                    this.showToast(e.target.checked ? '🐾 ¡Gatitos activados!' : 'Gatitos desactivados.', 'info');
+                };
+            }
+
+            this.applyGrayMode(Storage.getGrayModeEnabled());
+            this.updateHiddenKitties();
+        }
+
+        updateHiddenKitties() {
+            const Storage = window.StorageModule;
+            const useCats = Storage.isSecretUnlocked() && Storage.getSecretCatsEnabled();
+            const targets = [
+                document.getElementById('add-task-btn'),
+                document.getElementById('add-note-btn'),
+                document.getElementById('add-subject-btn')
+            ];
+
+            targets.forEach(btn => {
+                if (!btn) return;
+                let badge = btn.querySelector('.hidden-kitty-badge');
+                if (useCats) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'hidden-kitty-badge select-none';
+                        badge.textContent = '🐾';
+                        btn.style.position = 'relative';
+                        btn.appendChild(badge);
+                    }
+                } else {
+                    if (badge) badge.remove();
+                }
+            });
         }
 
         setInstitution(id) {
@@ -588,7 +671,7 @@
             this.currentView = viewName;
             window.HapticsModule?.light();
 
-            const views = ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings'];
+            const views = ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'];
             views.forEach(v => {
                 const section = document.getElementById(`view-${v}`);
                 if (section) {
@@ -611,7 +694,7 @@
                     if (isMatch) {
                         btn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'font-bold');
                         btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-semibold');
-                        if (btn.closest('nav.hidden.lg\:flex')) {
+                        if (btn.closest('header nav')) {
                             btn.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-xs');
                         }
                     } else {
@@ -842,11 +925,14 @@
                     }
                 }
 
-                // Resplandor temático con el color de la escuela
+                // Resplandor temático con el color de la escuela (y aura dorada brillante para CCH)
                 if (glow) {
-                    const primaryColor = inst.colors?.primary || '#6366F1';
-                    glow.style.backgroundColor = primaryColor;
-                    glow.style.boxShadow = `0 0 100px 30px ${primaryColor}`;
+                    let auraColor = inst.colors?.aura || inst.colors?.secondary || inst.colors?.primary || '#6366F1';
+                    if (inst.id === 'cch') {
+                        auraColor = '#F59E0B'; // Resplandor dorado luminoso característico de CCH
+                    }
+                    glow.style.backgroundColor = auraColor;
+                    glow.style.boxShadow = `0 0 110px 40px ${auraColor}`;
                 }
 
                 // Calcular origen de animación dinámica desde el logo superior hasta el centro
@@ -1291,6 +1377,119 @@
             this.applyFontFamily(Storage.getFontFamily?.() || 'calibri');
         }
 
+        setupSecretVersionTrigger() {
+            const versionPill = document.getElementById('settings-version-pill');
+            if (!versionPill) return;
+
+            let clickCount = 0;
+            let resetTimer = null;
+
+            versionPill.addEventListener('click', () => {
+                clickCount++;
+                window.HapticsModule?.light?.();
+
+                clearTimeout(resetTimer);
+                resetTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 2200);
+
+                if (clickCount >= 5) {
+                    clickCount = 0;
+                    clearTimeout(resetTimer);
+                    const Storage = window.StorageModule;
+                    Storage.unlockSecret();
+                    Storage.setGrayModeEnabled(true);
+                    Storage.setSecretCatsEnabled(true);
+                    window.HapticsModule?.double?.();
+                    this.applySecretFeaturesUI();
+                    this.showToast('🐱 ¡Modo Secreto Desbloqueado! Modo Gris y Gatitos activados.', 'success');
+                }
+            });
+        }
+
+        setupSecretVault() {
+            const openBtn = document.getElementById('open-secret-codes-btn');
+            const backBtn = document.getElementById('vault-back-btn');
+            const p1 = document.getElementById('vault-code-p1');
+            const p2 = document.getElementById('vault-code-p2');
+            const submitBtn = document.getElementById('vault-submit-btn');
+            const statusMsg = document.getElementById('vault-status-message');
+            const cardContainer = document.getElementById('vault-card-container');
+
+            if (openBtn) {
+                openBtn.onclick = () => {
+                    window.HapticsModule?.medium?.();
+                    this.switchView('secret-codes');
+                    setTimeout(() => p1?.focus(), 250);
+                };
+            }
+
+            if (backBtn) {
+                backBtn.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    this.switchView('settings');
+                };
+            }
+
+            if (p1 && p2) {
+                p1.addEventListener('input', () => {
+                    p1.value = p1.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    if (p1.value.length >= 4) {
+                        p2.focus();
+                    }
+                });
+
+                p2.addEventListener('input', () => {
+                    p2.value = p2.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                });
+
+                p2.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && p2.value.length === 0) {
+                        p1.focus();
+                    } else if (e.key === 'Enter') {
+                        verifyCode();
+                    }
+                });
+
+                p1.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        if (p1.value.length < 4) {
+                            verifyCode();
+                        } else {
+                            p2.focus();
+                        }
+                    }
+                });
+            }
+
+            const verifyCode = () => {
+                const code = ((p1?.value || '') + (p2?.value || '')).trim().toUpperCase();
+                window.HapticsModule?.error?.();
+
+                // Requerimiento: Cualquier código alfanumérico es erróneo y despliega aura de suspenso y sacudida
+                if (cardContainer) {
+                    cardContainer.classList.remove('vault-shake');
+                    void cardContainer.offsetWidth; // Forzar reflow
+                    cardContainer.classList.add('vault-shake');
+                }
+
+                if (statusMsg) {
+                    statusMsg.className = 'min-h-[24px] text-xs font-mono font-bold text-rose-400 animate-pulse';
+                    statusMsg.textContent = '⚠️ Acceso denegado: Código no reconocido o credencial inválida.';
+                }
+
+                setTimeout(() => {
+                    if (p1) p1.value = '';
+                    if (p2) p2.value = '';
+                    p1?.focus();
+                }, 1500);
+            };
+
+            if (submitBtn) {
+                submitBtn.onclick = verifyCode;
+            }
+        }
+
         showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -1334,6 +1533,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const app = new App();
+        window.AppInstance = app;
         app.init();
     });
 })();

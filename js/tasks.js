@@ -362,7 +362,11 @@ window.TasksModule = (() => {
     }
 
     function triggerCelebration(sourceEl = null) {
-        const emojis = ['🎉', '🥳', '✨', '⭐', '🎊', '👏', '🎈'];
+        const Storage = window.StorageModule;
+        const useCats = Storage?.getSecretCatsEnabled ? Storage.getSecretCatsEnabled() : false;
+        const emojis = useCats
+            ? ['🐱', '😸', '😻', '🐾', '🐈', '😺', '😽', '🧶']
+            : ['🎉', '🥳', '✨', '⭐', '🎊', '👏', '🎈'];
         let originX = window.innerWidth / 2;
         let originY = window.innerHeight / 2;
 
@@ -372,7 +376,7 @@ window.TasksModule = (() => {
             originY = rect.top + rect.height / 2;
         }
 
-        const count = 7;
+        const count = useCats ? 9 : 7;
         for (let i = 0; i < count; i++) {
             const span = document.createElement('span');
             span.className = 'celebration-emoji-particle';
@@ -612,13 +616,24 @@ window.TasksModule = (() => {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                         </svg>
                     </button>
-                    <button type="button" data-action="archive" data-id="${task.id}"
-                        class="p-2 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors"
-                        title="Archivar en el baúl">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
-                        </svg>
-                    </button>
+                    ${task.completed ? `
+                        <button type="button" data-action="archive" data-id="${task.id}"
+                            class="tap-effect flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm shadow-amber-500/30 transition-transform active:scale-95"
+                            title="Archivar actividad completada en el baúl">
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                            </svg>
+                            <span>Archivar</span>
+                        </button>
+                    ` : `
+                        <button type="button" data-action="archive" data-id="${task.id}"
+                            class="p-2 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors"
+                            title="Archivar en el baúl">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                            </svg>
+                        </button>
+                    `}
                     <button type="button" data-action="delete" data-id="${task.id}"
                         class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"
                         title="Eliminar tarea">

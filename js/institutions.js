@@ -82,10 +82,11 @@ window.InstitutionsModule = (() => {
             icon: 'assets/cch.png',
             colors: {
                 primary: '#0B3B60',
-                secondary: '#D4AF37',
-                accent: '#C53030',
+                secondary: '#F59E0B',
+                accent: '#E6B800',
+                aura: '#F59E0B',
                 badgeBg: 'bg-[#0B3B60]',
-                badgeText: 'text-[#D4AF37]'
+                badgeText: 'text-[#F59E0B]'
             },
             periods: [
                 '1.º Semestre', '2.º Semestre', '3.º Semestre',

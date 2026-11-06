@@ -23,6 +23,9 @@ window.StorageModule = (() => {
         LOGO_EXPAND: 'org_escolar_logo_expand',
         HEADER_THEME_BTN: 'org_escolar_header_theme_btn',
         CYCLE_CONFIGURED: 'org_escolar_cycle_configured_v1',
+        SECRET_UNLOCKED: 'org_escolar_secret_unlocked_v1',
+        GRAY_MODE: 'org_escolar_gray_mode_v1',
+        CATS_ENABLED: 'org_escolar_cats_enabled_v1',
         INITIALIZED: 'org_escolar_initialized_v3'
     };
 
@@ -179,12 +182,23 @@ window.StorageModule = (() => {
             return !this.isCycleConfigured();
         },
         setProvisionalCycle() {
-            const defaults = getDefaultCycleDates();
+            const today = new Date();
+            const y1 = today.getFullYear();
+            const m1 = String(today.getMonth() + 1).padStart(2, '0');
+            const d1 = String(today.getDate()).padStart(2, '0');
+            const startDate = `${y1}-${m1}-${d1}`;
+
+            const future = new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000);
+            const y2 = future.getFullYear();
+            const m2 = String(future.getMonth() + 1).padStart(2, '0');
+            const d2 = String(future.getDate()).padStart(2, '0');
+            const endDate = `${y2}-${m2}-${d2}`;
+
             const cycle = {
-                startDate: defaults.startDate,
-                endDate: defaults.endDate,
+                startDate,
+                endDate,
                 isProvisional: true,
-                provisionalReason: 'Dato no confirmado • Requiere actualizar'
+                provisionalReason: 'Dato provisional (60 días adelantados) • Requiere actualizar'
             };
             localStorage.setItem(KEYS.ACADEMIC_CYCLE, JSON.stringify(cycle));
             localStorage.setItem(KEYS.CYCLE_CONFIGURED, 'false');
@@ -571,34 +585,11 @@ window.StorageModule = (() => {
             return { purgedTasks, purgedNotes };
         },
 
-        // --- Auto-archivado de tareas completadas tras 30 días ---
+        // --- Archivado de tareas: Las tareas completadas NO se auto-archivan; el usuario decide subirlas manualmente ---
         checkAutoArchiveTasks() {
-            const tasks = this.getTasks();
-            const maxAgeMs = 30 * 24 * 60 * 60 * 1000; // 30 días
-            const now = Date.now();
-            let archivedCount = 0;
-
-            const remainingTasks = [];
-            const toArchive = [];
-
-            tasks.forEach(t => {
-                const referenceDate = t.dueDate ? new Date(t.dueDate).getTime() : (t.createdAt || now);
-                const isOver30Days = (now - referenceDate) > maxAgeMs;
-
-                if (t.completed && isOver30Days) {
-                    toArchive.push({ ...t, archivedAt: now });
-                    archivedCount++;
-                } else {
-                    remainingTasks.push(t);
-                }
-            });
-
-            if (archivedCount > 0) {
-                this.saveTasks(remainingTasks);
-                const existingArchived = this.getArchivedTasks();
-                this.saveArchivedTasks([...toArchive, ...existingArchived]);
-            }
-            return archivedCount;
+            // Requerimiento explícito: las actividades ya realizadas no se deben poner automáticamente en los archivados,
+            // sino que el dueño las sube manualmente con el botón destacado que se agranda al completarse.
+            return 0;
         },
 
         // --- Preferencia de animación dinámica del logo institucional (Desactivable) ---
@@ -617,6 +608,28 @@ window.StorageModule = (() => {
         },
         setHeaderThemeBtnEnabled(enabled) {
             localStorage.setItem(KEYS.HEADER_THEME_BTN, enabled ? 'true' : 'false');
+        },
+
+        // --- Función Secreta: Desbloqueo, Modo Grises y Gatitos ---
+        isSecretUnlocked() {
+            return localStorage.getItem(KEYS.SECRET_UNLOCKED) === 'true';
+        },
+        unlockSecret() {
+            localStorage.setItem(KEYS.SECRET_UNLOCKED, 'true');
+            return true;
+        },
+        getGrayModeEnabled() {
+            return localStorage.getItem(KEYS.GRAY_MODE) === 'true';
+        },
+        setGrayModeEnabled(enabled) {
+            localStorage.setItem(KEYS.GRAY_MODE, enabled ? 'true' : 'false');
+        },
+        getSecretCatsEnabled() {
+            const val = localStorage.getItem(KEYS.CATS_ENABLED);
+            return val === null ? true : val === 'true';
+        },
+        setSecretCatsEnabled(enabled) {
+            localStorage.setItem(KEYS.CATS_ENABLED, enabled ? 'true' : 'false');
         },
 
         // --- Métricas de Almacenamiento Local ---
@@ -712,6 +725,9 @@ window.StorageModule = (() => {
                 autoPurgeArchive: this.getAutoPurgeArchive(),
                 logoExpandEnabled: this.getLogoExpandEnabled(),
                 headerThemeBtnEnabled: this.getHeaderThemeBtnEnabled(),
+                secretUnlocked: this.isSecretUnlocked(),
+                grayMode: this.getGrayModeEnabled(),
+                secretCatsEnabled: this.getSecretCatsEnabled(),
                 subjects: this.getSubjects(),
                 tasks: this.getTasks(),
                 notes: this.getNotes(),
@@ -745,6 +761,9 @@ window.StorageModule = (() => {
                 if (typeof data.autoPurgeArchive === 'boolean') this.setAutoPurgeArchive(data.autoPurgeArchive);
                 if (typeof data.logoExpandEnabled === 'boolean') this.setLogoExpandEnabled(data.logoExpandEnabled);
                 if (typeof data.headerThemeBtnEnabled === 'boolean') this.setHeaderThemeBtnEnabled(data.headerThemeBtnEnabled);
+                if (typeof data.secretUnlocked === 'boolean' && data.secretUnlocked) this.unlockSecret();
+                if (typeof data.grayMode === 'boolean') this.setGrayModeEnabled(data.grayMode);
+                if (typeof data.secretCatsEnabled === 'boolean') this.setSecretCatsEnabled(data.secretCatsEnabled);
 
                 this.saveSubjects(data.subjects);
                 this.saveTasks(data.tasks);

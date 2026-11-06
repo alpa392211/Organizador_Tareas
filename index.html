@@ -13,25 +13,27 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            brand: {
+                                50: '#eef2ff',
+                                100: '#e0e7ff',
+                                500: '#6366f1',
+                                600: '#4f46e5',
+                                700: '#4338ca',
+                            }
+                        },
+                        borderRadius: {
+                            '2xl': '1rem',
+                            '3xl': '1.5rem',
                         }
-                    },
-                    borderRadius: {
-                        '2xl': '1rem',
-                        '3xl': '1.5rem',
                     }
                 }
-            }
+            };
         }
     </script>
 
@@ -119,11 +121,11 @@
                         class="p-2 sm:px-3 sm:py-2 rounded-2xl bg-slate-100 dark:bg-slate-700/60 hover:bg-amber-50 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 hover:text-amber-600 tap-effect transition-all flex items-center gap-1.5"
                         title="Cambiar tema claro / oscuro" aria-label="Cambiar tema">
                         <!-- Icono Sol (se muestra en modo oscuro para cambiar a claro) -->
-                        <svg class="w-5 h-5 hidden dark:block text-amber-400 transition-transform hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="theme-icon-sun" class="w-5 h-5 text-amber-400 transition-transform hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
                         <!-- Icono Luna (se muestra en modo claro para cambiar a oscuro) -->
-                        <svg class="w-5 h-5 block dark:hidden text-slate-600 transition-transform hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="theme-icon-moon" class="w-5 h-5 text-slate-600 transition-transform hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                         </svg>
                         <span id="header-theme-label" class="text-xs font-bold hidden xl:inline">Tema</span>
@@ -308,9 +310,8 @@
                 title="Apóyame en Ko-fi invitándome un café">
                 <!-- Icono oficial taza de café Ko-fi en SVG -->
                 <svg class="w-5 h-5 fill-white transition-transform group-hover:rotate-6" viewBox="0 0 24 24">
-                    <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.022 7.02c-4.495.021-10.154 0-10.154 0-.493-.016-.549-.38-.052-3.861.026-9.155.026-9.155h15.222s.104 5.485.052 9.155c0 0-.056.364-.549.38-1.393.007-4.058 0-4.058 0zm7.842-3.866c-.347.078-.71.12-1.082.126.012-.662.018-1.353.018-2.071 0-.961-.012-1.879-.033-2.748 1.488.083 2.588.667 2.766 1.609.289 1.53-.16 2.809-1.669 3.084z"/>
-                    <!-- Corazón característico de Ko-fi dentro de la taza -->
-                    <path d="M7.78 7.38c-1.39 0-2.52 1.13-2.52 2.52 0 1.95 3.32 4.41 3.52 4.56.09.07.21.11.33.11.12 0 .24-.04.33-.11.2-.15 3.52-2.61 3.52-4.56 0-1.39-1.13-2.52-2.52-2.52-.92 0-1.72.5-2.14 1.25-.42-.75-1.22-1.25-2.14-1.25z"/>
+                    <path d="M2 3h16v8a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V3zm16 2v4a3 3 0 0 0 3-3V6a1 1 0 0 0-1-1h-2zM4 19h14v2H4v-2z"/>
+                    <path d="M9.5 7.5a1.5 1.5 0 0 0-2.12 0 1.5 1.5 0 0 0 0 2.12L9.5 11.74l2.12-2.12a1.5 1.5 0 0 0 0-2.12 1.5 1.5 0 0 0-2.12 0l-.5.5-.5-.5z"/>
                 </svg>
                 <span>Apóyame en Ko-fi</span>
             </a>
@@ -354,9 +355,9 @@
                     </p>
                 </div>
 
-                <!-- Botón CTA con Degradado Vivo y Efecto Hover/Touch -->
+                <!-- Botón CTA con Degradado Enriquecido y Efecto Hover/Touch -->
                 <button type="button" id="add-subject-btn"
-                    class="tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 hover:from-violet-700 hover:via-indigo-700 hover:to-blue-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all">
+                    class="btn-gradient-subject tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm transition-all">
                     <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -410,9 +411,9 @@
                         </div>
                     </div>
 
-                    <!-- Botón CTA Nueva Tarea -->
+                    <!-- Botón CTA Nueva Tarea con Degradado Enriquecido -->
                     <button type="button" id="add-task-btn"
-                        class="tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 text-white font-bold text-sm shadow-lg shadow-teal-500/25 transition-all">
+                        class="btn-gradient-task tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm transition-all">
                         <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -508,9 +509,9 @@
                         </p>
                     </div>
 
-                    <!-- Botón CTA Nueva Nota -->
+                    <!-- Botón CTA Nueva Nota con Degradado Enriquecido -->
                     <button type="button" id="add-note-btn"
-                        class="tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:via-orange-600 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-orange-500/25 transition-all">
+                        class="btn-gradient-note tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm transition-all">
                         <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -749,6 +750,22 @@
                     </p>
                 </div>
 
+                <!-- ACCESO RÁPIDO SUPERIOR: BÓVEDA DE CÓDIGOS SECRETOS -->
+                <button type="button" id="open-secret-codes-btn"
+                    class="tap-effect w-full p-4 rounded-2xl bg-gradient-to-r from-purple-900/40 via-indigo-900/40 to-slate-900/50 hover:from-purple-900/60 hover:via-indigo-900/60 hover:to-slate-900/70 border border-purple-500/30 hover:border-purple-400/60 shadow-lg flex items-center justify-between text-left transition-all">
+                    <div class="flex items-center gap-3.5">
+                        <span class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl shrink-0 shadow-inner">🗝️</span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-extrabold text-purple-700 dark:text-purple-300">Bóveda de Códigos Secretos</h3>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">Clasificado</span>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Terminal de claves y códigos del sistema.</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
                 <!-- 1. Acordeón: Institución Educativa y Nivel / Semestre -->
                 <div class="settings-accordion-card open rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800">
                     <button type="button" class="settings-accordion-header w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
@@ -796,16 +813,18 @@
                             <select id="settings-period-select" class="hidden"></select>
                         </div>
 
-                        <!-- Toggle de Efecto Dinámico al Tocar Logo -->
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                            <div>
+                        <!-- Toggle de Efecto Dinámico al Tocar Logo (Alineado con settings-switch-row) -->
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 settings-switch-row">
+                            <div class="settings-switch-label">
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Efecto dinámico al tocar logo institucional</span>
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Al pulsar el escudo, se agranda hacia el centro mostrando lema y ciclo con resplandor temático.</span>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-3">
-                                <input type="checkbox" id="settings-logo-expand-toggle" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                            </label>
+                            <div class="settings-switch-toggle">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="settings-logo-expand-toggle" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -848,14 +867,14 @@
                     </div>
                 </div>
 
-                <!-- 3. Acordeón: Tema y Barra Superior -->
+                <!-- 3. Acordeón: Tema, Apariencia y Tipografía (TODO UNIFICADO) -->
                 <div class="settings-accordion-card rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800">
                     <button type="button" class="settings-accordion-header w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
                         <div class="flex items-center gap-3 min-w-0">
                             <span class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg shrink-0">🌓</span>
                             <div class="min-w-0">
                                 <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Tema y Apariencia</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Modo claro, oscuro y visibilidad de controles.</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Modo claro, oscuro, fuentes y estilos visuales.</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0 ml-2">
@@ -863,95 +882,128 @@
                             <svg class="settings-accordion-chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </button>
-                    <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-4 bg-slate-50/40 dark:bg-slate-800/40">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                            <button type="button" id="settings-theme-light" class="tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
-                                <span>☀️</span><span>Modo Claro</span>
-                            </button>
-                            <button type="button" id="settings-theme-dark" class="tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
-                                <span>🌙</span><span>Modo Oscuro</span>
-                            </button>
-                            <button type="button" id="settings-theme-auto" class="tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
-                                <span>💻</span><span>Automático (Sistema)</span>
-                            </button>
+                    <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-5 bg-slate-50/40 dark:bg-slate-800/40">
+                        <!-- Selección Básica de Tema -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Modo de Color Principal</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                <button type="button" id="settings-theme-light" class="tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
+                                    <span>☀️</span><span>Modo Claro</span>
+                                </button>
+                                <button type="button" id="settings-theme-dark" class="tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
+                                    <span>🌙</span><span>Modo Oscuro</span>
+                                </button>
+                                <button type="button" id="settings-theme-auto" class="tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
+                                    <span>💻</span><span>Automático</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                            <div>
+
+                        <!-- Toggle de Botón en Barra Superior (Alineado) -->
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 settings-switch-row">
+                            <div class="settings-switch-label">
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Mostrar botón de tema en la barra superior</span>
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Oculta o muestra el acceso rápido sol/luna en el encabezado.</span>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-3">
-                                <input type="checkbox" id="settings-header-theme-toggle" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. Acordeón: Tipografía y Estilo de Texto (TODO CON BOTONES) -->
-                <div class="settings-accordion-card rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800">
-                    <button type="button" class="settings-accordion-header w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shrink-0">🔤</span>
-                            <div class="min-w-0">
-                                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Tipografía y Fuentes</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Elige la fuente de la app mediante botones interactivos.</p>
+                            <div class="settings-switch-toggle">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="settings-header-theme-toggle" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0 ml-2">
-                            <span id="settings-font-pill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">Calibri</span>
-                            <svg class="settings-accordion-chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </button>
-                    <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-4 bg-slate-50/40 dark:bg-slate-800/40">
-                        <!-- Cuadrícula de 5 Botones de Fuente (Sin Menús Desplegables) -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5" id="settings-font-buttons-grid">
-                            <button type="button" data-font-btn="calibri" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-bold text-slate-900 dark:text-white">1. Calibri</span>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Sans</span>
+
+                        <!-- PANEL SECRETO DESBLOQUEABLE: MODO GRISES Y GATITOS -->
+                        <div id="secret-theme-controls" class="hidden pt-3 border-t border-purple-200/40 dark:border-purple-800/40 bg-purple-500/5 p-3.5 rounded-2xl border space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-base">🐱</span>
+                                <h4 class="text-xs font-black uppercase tracking-wider text-purple-700 dark:text-purple-300">Funciones Especiales Desbloqueadas</h4>
+                            </div>
+
+                            <div class="settings-switch-row">
+                                <div class="settings-switch-label">
+                                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Modo Monocromático (Gris Elegante)</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Estilo visual minimalista en escala de grises slate y zinc.</span>
                                 </div>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400">Limpia, moderna y neutra para el día a día.</span>
-                            </button>
-                            <button type="button" data-font-btn="times" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 font-serif">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-bold text-slate-900 dark:text-white">2. Times New Roman</span>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Serif</span>
+                                <div class="settings-switch-toggle">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="settings-gray-mode-toggle" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-500"></div>
+                                    </label>
                                 </div>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-sans">Académica tradicional con remates clásicos.</span>
-                            </button>
-                            <button type="button" data-font-btn="montserrat" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-bold text-slate-900 dark:text-white">3. Montserrat</span>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Moderna</span>
+                            </div>
+
+                            <div class="settings-switch-row border-t border-purple-200/30 dark:border-purple-800/30 pt-2">
+                                <div class="settings-switch-label">
+                                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Celebración con Gatitos</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Muestra gatitos festivos al completar tareas y patitas escondidas en botones.</span>
                                 </div>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400">Geométrica, estilizada y tecnológica.</span>
-                            </button>
-                            <button type="button" data-font-btn="lora" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-bold text-slate-900 dark:text-white">4. Lora</span>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Editorial</span>
+                                <div class="settings-switch-toggle">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="settings-cats-toggle" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                                    </label>
                                 </div>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400">Literaria contemporánea de alto contraste.</span>
-                            </button>
-                            <button type="button" data-font-btn="poppins" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-bold text-slate-900 dark:text-white">5. Poppins</span>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Amigable</span>
-                                </div>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400">Redondeada, estética y juvenil.</span>
-                            </button>
+                            </div>
                         </div>
 
-                        <!-- Muestra de Vista Previa en Vivo -->
-                        <div id="settings-font-preview-card" class="p-3.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/70 space-y-1">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">Vista previa en tiempo real</span>
-                            <p id="settings-font-preview-text" class="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-relaxed">
-                                El rápido zorro marrón salta sobre el perro perezoso. 1234567890
-                            </p>
-                            <span id="settings-font-preview-desc" class="text-xs text-indigo-600 dark:text-indigo-400 font-medium block">
-                                Tipografía institucional clara y de óptima lectura.
-                            </span>
+                        <!-- SECCIÓN DE TIPOGRAFÍAS Y FUENTES (INTEGRADA AQUÍ) -->
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                    Tipografía y Fuentes (5 Estilos Seleccionables)
+                                </label>
+                                <span id="settings-font-pill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">Calibri</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5" id="settings-font-buttons-grid">
+                                <button type="button" data-font-btn="calibri" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white">1. Calibri</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Sans</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Limpia, moderna y neutra para el día a día.</span>
+                                </button>
+                                <button type="button" data-font-btn="times" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 font-serif">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white">2. Times New Roman</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Serif</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-sans">Académica tradicional con remates clásicos.</span>
+                                </button>
+                                <button type="button" data-font-btn="montserrat" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white">3. Montserrat</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Moderna</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Geométrica, estilizada y tecnológica.</span>
+                                </button>
+                                <button type="button" data-font-btn="lora" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white">4. Lora</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Editorial</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Literaria contemporánea de alto contraste.</span>
+                                </button>
+                                <button type="button" data-font-btn="poppins" class="font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-bold text-slate-900 dark:text-white">5. Poppins</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-mono">Amigable</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Redondeada, estética y juvenil.</span>
+                                </button>
+                            </div>
+
+                            <!-- Muestra de Vista Previa en Vivo -->
+                            <div id="settings-font-preview-card" class="p-3.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/70 space-y-1">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">Vista previa en tiempo real</span>
+                                <p id="settings-font-preview-text" class="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-relaxed">
+                                    El rápido zorro marrón salta sobre el perro perezoso. 1234567890
+                                </p>
+                                <span id="settings-font-preview-desc" class="text-xs text-indigo-600 dark:text-indigo-400 font-medium block">
+                                    Tipografía institucional clara y de óptima lectura.
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -972,15 +1024,17 @@
                         </div>
                     </button>
                     <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-3 bg-slate-50/40 dark:bg-slate-800/40">
-                        <div class="flex items-center justify-between">
-                            <div>
+                        <div class="settings-switch-row">
+                            <div class="settings-switch-label">
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Activar vibración táctil</span>
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Micro-pulsos táctiles al tocar botones, completar tareas y guardar notas.</span>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-3">
-                                <input type="checkbox" id="settings-haptics-toggle" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                            </label>
+                            <div class="settings-switch-toggle">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="settings-haptics-toggle" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1046,15 +1100,17 @@
                         </div>
                     </button>
                     <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-4 bg-slate-50/40 dark:bg-slate-800/40">
-                        <div class="flex items-center justify-between">
-                            <div>
+                        <div class="settings-switch-row">
+                            <div class="settings-switch-label">
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Depuración automática tras 60 días</span>
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Si está activa, las notas y tareas en el baúl se eliminan definitivamente pasados 60 días de archivadas.</span>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-3">
-                                <input type="checkbox" id="settings-archive-purge-toggle" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
-                            </label>
+                            <div class="settings-switch-toggle">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="settings-archive-purge-toggle" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                </label>
+                            </div>
                         </div>
                         <div class="pt-2">
                             <button type="button" data-view-target="archive" class="tap-effect w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
@@ -1115,18 +1171,82 @@
                         <p class="text-[11px] text-slate-500 dark:text-slate-400">Compatible con UNAM, IPN, UAM, CCH, ENP, CECyT y Bachilleratos.</p>
                     </div>
                     <a href="https://ko-fi.com/edrx_ngl" target="_blank" rel="noopener noreferrer" class="kofi-btn px-4 py-2.5 rounded-xl text-white font-bold text-xs flex items-center gap-2 shadow-md tap-effect" title="Apóyame en Ko-fi invitándome un café">
-                        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.022 7.02c-4.495.021-10.154 0-10.154 0-.493-.016-.549-.38-.052-3.861.026-9.155.026-9.155h15.222s.104 5.485.052 9.155c0 0-.056.364-.549.38-1.393.007-4.058 0-4.058 0zm7.842-3.866c-.347.078-.71.12-1.082.126.012-.662.018-1.353.018-2.071 0-.961-.012-1.879-.033-2.748 1.488.083 2.588.667 2.766 1.609.289 1.53-.16 2.809-1.669 3.084z"/></svg>
+                        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M2 3h16v8a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V3zm16 2v4a3 3 0 0 0 3-3V6a1 1 0 0 0-1-1h-2zM4 19h14v2H4v-2z"/><path d="M9.5 7.5a1.5 1.5 0 0 0-2.12 0 1.5 1.5 0 0 0 0 2.12L9.5 11.74l2.12-2.12a1.5 1.5 0 0 0 0-2.12 1.5 1.5 0 0 0-2.12 0l-.5.5-.5-.5z"/></svg>
                         <span>Ko-fi Donación</span>
                     </a>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO CON NOMBRE CLAVE "PANDA" -->
+                <!-- VERSIÓN HASTA ABAJO CON NOMBRE CLAVE "PANDA" (5 TOQUES PARA DESBLOQUEAR MODO SECRETO) -->
                 <div class="text-center pt-2">
-                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
+                    <button type="button" id="settings-version-pill"
+                        class="tap-effect inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer select-none"
+                        title="Toca 5 veces para desbloquear modo secreto">
                         <span>🐼</span>
                         <span>Versión 1.2.4 "Panda"</span>
-                    </span>
+                    </button>
                 </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- VISTA 7: BÓVEDA DE CÓDIGOS SECRETOS (ATMÓSFERA DE SUSPENSO) -->
+        <!-- ========================================================= -->
+        <section id="view-secret-codes" class="hidden min-h-[75vh] flex flex-col justify-between py-2">
+            <!-- Barra Superior: Botón de Regreso a Configuración -->
+            <div class="flex items-center justify-between mb-4">
+                <button type="button" id="vault-back-btn" data-view-target="settings"
+                    class="tap-effect inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-800 dark:text-white font-bold text-xs border border-white/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    <span>Volver a Configuración</span>
+                </button>
+                <span class="text-xs font-mono font-bold text-purple-400/80 uppercase tracking-widest">TERMINAL SEC-08</span>
+            </div>
+
+            <!-- Contenedor Central con Aura de Suspenso Cinematográfica -->
+            <div id="vault-card-container" class="vault-suspense-container flex-1 rounded-3xl p-6 sm:p-10 flex flex-col items-center justify-center text-center shadow-2xl relative my-auto">
+                <div class="relative z-10 max-w-md w-full space-y-6">
+                    <!-- Icono o Símbolo Enigmático -->
+                    <div class="w-20 h-20 mx-auto rounded-3xl bg-purple-950/60 border border-purple-500/40 text-purple-400 flex items-center justify-center text-3xl shadow-lg shadow-purple-900/50 animate-pulse">
+                        🔒
+                    </div>
+
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-widest uppercase mb-1">
+                            Bóveda Clasificada
+                        </h2>
+                        <p class="text-xs text-purple-300/80 font-mono tracking-wider">
+                            Introduce el código de 8 caracteres alfanuméricos
+                        </p>
+                    </div>
+
+                    <!-- Campo Dividido en 2 bloques de 4 caracteres [ ____ ] - [ ____ ] -->
+                    <div class="space-y-4">
+                        <div id="vault-inputs-wrapper" class="flex items-center justify-center gap-3">
+                            <input type="text" id="vault-code-p1" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+                                placeholder="••••"
+                                class="w-32 sm:w-36 text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-2 rounded-2xl bg-black/60 border-2 border-purple-500/40 text-purple-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/20 transition-all placeholder:text-purple-800">
+                            
+                            <span class="text-2xl font-bold text-purple-400/70 select-none">—</span>
+
+                            <input type="text" id="vault-code-p2" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+                                placeholder="••••"
+                                class="w-32 sm:w-36 text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-2 rounded-2xl bg-black/60 border-2 border-purple-500/40 text-purple-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/20 transition-all placeholder:text-purple-800">
+                        </div>
+
+                        <!-- Mensaje de Retroalimentación de Error -->
+                        <div id="vault-status-message" class="min-h-[24px] text-xs font-mono font-bold transition-all"></div>
+
+                        <!-- Botón de Transmitir / Verificar Código -->
+                        <button type="button" id="vault-submit-btn"
+                            class="tap-effect w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm tracking-widest uppercase shadow-xl shadow-purple-900/50 border border-purple-400/30 transition-all">
+                            Verificar Código
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center pt-3 text-[11px] font-mono text-slate-500">
+                <span>ESTADO: SISTEMA ACTIVO • PROTOCOLO CRIPTOGRÁFICO v2.4</span>
             </div>
         </section>
 
@@ -1150,7 +1270,7 @@
             <button type="button" id="bottom-main-action-btn"
                 class="flex flex-col items-center -mt-7 tap-effect group px-2"
                 title="Atajo de Acción Rápida">
-                <div id="bottom-main-circle" class="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-600 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all">
+                <div id="bottom-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all">
                     <span id="bottom-main-icon">
                         <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>

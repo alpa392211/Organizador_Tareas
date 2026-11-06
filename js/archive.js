@@ -67,6 +67,28 @@ window.ArchiveModule = (() => {
         return Math.max(0, 60 - elapsedDays);
     }
 
+    const COBWEB_SVGS = [
+        // Tipo 1: Esquina superior derecha clásica
+        `<svg class="cobweb-corner-card pointer-events-none absolute top-0 right-0 w-12 h-12 text-slate-400/35 dark:text-slate-500/30 overflow-visible z-10" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="100" y1="0" x2="0" y2="0"/><line x1="100" y1="0" x2="100" y2="100"/><line x1="100" y1="0" x2="0" y2="100"/><line x1="100" y1="0" x2="35" y2="100"/><line x1="100" y1="0" x2="0" y2="50"/><path d="M75 0 Q75 25 100 25"/><path d="M50 0 Q50 50 100 50"/><path d="M25 0 Q25 75 100 75"/><path d="M0 0 Q0 100 100 100"/></svg>`,
+        // Tipo 2: Esquina superior izquierda colgante
+        `<svg class="cobweb-corner-card pointer-events-none absolute top-0 left-0 w-12 h-12 text-slate-400/35 dark:text-slate-500/30 overflow-visible z-10" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="0" y1="0" x2="100" y2="0"/><line x1="0" y1="0" x2="0" y2="100"/><line x1="0" y1="0" x2="80" y2="80"/><line x1="0" y1="0" x2="40" y2="90"/><line x1="0" y1="0" x2="90" y2="40"/><path d="M25 0 Q25 25 0 25"/><path d="M55 0 Q55 55 0 55"/><path d="M85 0 Q85 85 0 85"/><circle cx="80" cy="80" r="3" fill="currentColor"/></svg>`,
+        // Tipo 3: Esquina superior derecha densa radial
+        `<svg class="cobweb-corner-card pointer-events-none absolute top-0 right-0 w-14 h-14 text-slate-400/35 dark:text-slate-500/30 overflow-visible z-10" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2"><path d="M100,0 L0,0 M100,0 L100,100 M100,0 L20,80 M100,0 L60,100 M100,0 L0,40 M100,0 L40,40"/><path d="M80,0 C80,15 85,20 100,20"/><path d="M60,0 C60,30 70,40 100,40"/><path d="M40,0 C40,45 55,60 100,60"/><path d="M20,0 C20,60 40,80 100,80"/><path d="M0,0 C0,75 25,100 100,100"/></svg>`,
+        // Tipo 4: Esquina superior derecha con hebras asimétricas
+        `<svg class="cobweb-corner-card pointer-events-none absolute top-0 right-0 w-13 h-13 text-slate-400/35 dark:text-slate-500/30 overflow-visible z-10" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.3"><line x1="100" y1="0" x2="0" y2="0"/><line x1="100" y1="0" x2="100" y2="100"/><line x1="100" y1="0" x2="15" y2="85"/><line x1="100" y1="0" x2="70" y2="95"/><path d="M85,0 Q88,20 100,15"/><path d="M65,0 Q70,35 100,35"/><path d="M45,0 Q50,55 100,55"/><path d="M25,0 Q30,75 100,75"/><path d="M70,95 Q72,110 70,120" stroke-dasharray="3,3"/></svg>`
+    ];
+
+    function getRandomCobweb(id) {
+        let hash = 0;
+        const str = String(id || 'archive_item');
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash |= 0;
+        }
+        const index = Math.abs(hash) % COBWEB_SVGS.length;
+        return COBWEB_SVGS[index];
+    }
+
     function render() {
         const Storage = window.StorageModule;
         if (!Storage) return;
@@ -162,6 +184,7 @@ window.ArchiveModule = (() => {
             const daysLeft = calculateDaysRemaining(item.archivedAt);
             const daysElapsed = Math.floor((Date.now() - item.archivedAt) / (1000 * 60 * 60 * 24));
             const elapsedText = daysElapsed === 0 ? 'Hoy' : `Hace ${daysElapsed} día${daysElapsed > 1 ? 's' : ''}`;
+            const cobwebSvg = getRandomCobweb(item.id);
 
             const purgeBadge = autoPurge
                 ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -175,9 +198,10 @@ window.ArchiveModule = (() => {
                 const subColor = item.subject ? item.subject.color : '#6366F1';
                 const subName = item.subject ? item.subject.name : 'Materia general';
                 return `
-                    <div class="stagger-card bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col justify-between"
+                    <div class="stagger-card relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col justify-between"
                          style="--stagger-i: ${index};">
-                        <div>
+                        ${cobwebSvg}
+                        <div class="relative z-10">
                             <div class="flex items-center justify-between gap-2 mb-2">
                                 <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
                                       style="background-color: ${subColor};">
@@ -203,7 +227,7 @@ window.ArchiveModule = (() => {
                             ` : ''}
                         </div>
 
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 mt-2">
+                        <div class="relative z-10 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 mt-2">
                             <span class="text-[11px] text-slate-400 font-mono">
                                 Archivada ${elapsedText}
                             </span>
@@ -226,9 +250,10 @@ window.ArchiveModule = (() => {
                 `;
             } else {
                 return `
-                    <div class="stagger-card bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col justify-between"
+                    <div class="stagger-card relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col justify-between"
                          style="--stagger-i: ${index};">
-                        <div>
+                        ${cobwebSvg}
+                        <div class="relative z-10">
                             <div class="flex items-center justify-between gap-2 mb-2">
                                 <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                     <span>📝</span>
@@ -253,7 +278,7 @@ window.ArchiveModule = (() => {
                             ` : ''}
                         </div>
 
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 mt-2">
+                        <div class="relative z-10 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 mt-2">
                             <span class="text-[11px] text-slate-400 font-mono">
                                 Archivada ${elapsedText}
                             </span>
