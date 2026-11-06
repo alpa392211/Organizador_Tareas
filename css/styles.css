@@ -89,6 +89,13 @@ html.dark body {
     color: #f8fafc;
 }
 
+/* Modo Oscuro Estándar: Encabezado y Barra Inferior Azul Marino Elegante (cuando NO es modo gris) */
+html.dark:not(.theme-gray) header,
+html.dark:not(.theme-gray) #bottom-nav {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+}
+
 /* ========================================================
    MODO MONOCROMÁTICO (GRIS ELEGANTE)
    Adaptado meticulosamente a Modo Claro y Modo Oscuro
@@ -147,14 +154,6 @@ html:not(.dark).theme-gray .border-slate-200,
 html:not(.dark).theme-gray .border-slate-100 {
     border-color: #cbd2dc !important;
 }
-html:not(.dark).theme-gray .btn-gradient-subject,
-html:not(.dark).theme-gray .btn-gradient-task,
-html:not(.dark).theme-gray .btn-gradient-note,
-html:not(.dark).theme-gray .fab-gradient-action {
-    background: linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
-}
 
 /* Caso 2: Modo Monocromático en MODO OSCURO (Titanium & Slate Gray Notorio) */
 html.dark.theme-gray {
@@ -212,14 +211,6 @@ html.dark.theme-gray .border-slate-200,
 html.dark.theme-gray .border-slate-100,
 html.dark.theme-gray .dark\:border-slate-700 {
     border-color: #383c46 !important;
-}
-html.dark.theme-gray .btn-gradient-subject,
-html.dark.theme-gray .btn-gradient-task,
-html.dark.theme-gray .btn-gradient-note,
-html.dark.theme-gray .fab-gradient-action {
-    background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* Iconos de Sol y Luna para Header */
@@ -749,12 +740,10 @@ html.dark:not(.theme-gray) .fab-gradient-action {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
 }
 html.dark.theme-gray .fab-gradient-action {
-    background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%) !important;
     border: 4px solid #252830 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
 }
 html:not(.dark).theme-gray .fab-gradient-action {
-    background: linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%) !important;
     border: 4px solid #f1f3f7 !important;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
 }
@@ -770,7 +759,7 @@ html.dark:not(.theme-gray) #bottom-main-circle {
 }
 html.dark.theme-gray #bottom-main-circle {
     border: 4px solid #252830 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
 }
 html:not(.dark).theme-gray #bottom-main-circle {
     border: 4px solid #f1f3f7 !important;

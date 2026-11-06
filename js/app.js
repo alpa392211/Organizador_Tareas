@@ -784,28 +784,17 @@
             const isGray = Storage.getGrayModeEnabled?.();
             const isDark = document.documentElement.classList.contains('dark');
 
-            if (isGray) {
-                const borderColor = isDark ? '#252830' : '#f1f3f7';
-                const shadow = isDark ? '0 4px 12px rgba(0, 0, 0, 0.45)' : '0 4px 12px rgba(15, 23, 42, 0.2)';
-                circle.style.setProperty('background', 'linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%)', 'important');
-                circle.style.setProperty('border', `4px solid ${borderColor}`, 'important');
-                circle.style.setProperty('box-shadow', shadow, 'important');
-                label.className = isDark
-                    ? 'text-[10px] font-extrabold text-slate-300 dark:text-slate-300 mt-1 truncate max-w-[80px]'
-                    : 'text-[10px] font-extrabold text-slate-700 mt-1 truncate max-w-[80px]';
-            } else {
-                circle.style.removeProperty('background');
-                circle.style.removeProperty('border');
-                circle.style.removeProperty('box-shadow');
-            }
+            // Limpiar cualquier estilo de fondo en línea para mantener los colores vivos siempre
+            circle.style.removeProperty('background');
+
+            // Borde perimetral sólido sin halo difuso ni transparencias, adaptado a la barra
+            const borderColor = isDark ? (isGray ? '#252830' : '#0f172a') : (isGray ? '#f1f3f7' : '#ffffff');
+            circle.style.setProperty('border', `4px solid ${borderColor}`, 'important');
+            circle.style.setProperty('box-shadow', isDark ? '0 4px 12px rgba(0, 0, 0, 0.45)' : '0 4px 12px rgba(15, 23, 42, 0.25)', 'important');
 
             if (action === 'notes') {
-                if (!isGray) {
-                    circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-amber-600 via-orange-600 to-rose-600 text-white flex items-center justify-center transition-all opacity-100';
-                    label.className = 'text-[10px] font-extrabold text-amber-600 dark:text-amber-400 mt-1 truncate max-w-[80px]';
-                } else {
-                    circle.className = 'w-14 h-14 rounded-full text-white flex items-center justify-center transition-all opacity-100';
-                }
+                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-amber-600 via-orange-600 to-rose-600 text-white flex items-center justify-center transition-all opacity-100';
+                label.className = 'text-[10px] font-extrabold text-amber-600 dark:text-amber-400 mt-1 truncate max-w-[80px]';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -817,12 +806,8 @@
                     window.NotesModule?.openAddModal?.();
                 };
             } else if (action === 'calendar') {
-                if (!isGray) {
-                    circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-700 via-purple-600 to-violet-700 text-white flex items-center justify-center transition-all opacity-100';
-                    label.className = 'text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate max-w-[80px]';
-                } else {
-                    circle.className = 'w-14 h-14 rounded-full text-white flex items-center justify-center transition-all opacity-100';
-                }
+                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-700 via-purple-600 to-violet-700 text-white flex items-center justify-center transition-all opacity-100';
+                label.className = 'text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate max-w-[80px]';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -834,12 +819,8 @@
                     window.CalendarModule?.openModal?.();
                 };
             } else {
-                if (!isGray) {
-                    circle.className = 'w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center transition-all opacity-100';
-                    label.className = 'text-[10px] font-extrabold text-teal-600 dark:text-teal-400 mt-1 truncate max-w-[80px]';
-                } else {
-                    circle.className = 'w-14 h-14 rounded-full text-white flex items-center justify-center transition-all opacity-100';
-                }
+                circle.className = 'w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center transition-all opacity-100';
+                label.className = 'text-[10px] font-extrabold text-teal-600 dark:text-teal-400 mt-1 truncate max-w-[80px]';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
