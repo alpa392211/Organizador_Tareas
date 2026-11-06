@@ -17,6 +17,12 @@ window.StorageModule = (() => {
         BOTTOM_ACTION: 'org_escolar_bottom_action',
         HAPTICS: 'org_escolar_haptics',
         FONT_FAMILY: 'org_escolar_font',
+        ARCHIVED_TASKS: 'org_escolar_archived_tasks',
+        ARCHIVED_NOTES: 'org_escolar_archived_notes',
+        AUTO_PURGE_ARCHIVE: 'org_escolar_auto_purge_archive',
+        LOGO_EXPAND: 'org_escolar_logo_expand',
+        HEADER_THEME_BTN: 'org_escolar_header_theme_btn',
+        CYCLE_CONFIGURED: 'org_escolar_cycle_configured_v1',
         INITIALIZED: 'org_escolar_initialized_v3'
     };
 
@@ -154,7 +160,36 @@ window.StorageModule = (() => {
             localStorage.setItem(KEYS.ACADEMIC_PERIOD, period);
         },
 
-        // --- Ciclo Escolar (Fecha Inicio - Fecha Fin) ---
+        // --- Ciclo Escolar (Fecha Inicio - Fecha Fin) y Verificación de Configuración ---
+        isCycleConfigured() {
+            const val = localStorage.getItem(KEYS.CYCLE_CONFIGURED);
+            return val === 'true';
+        },
+        setCycleConfigured(configured) {
+            localStorage.setItem(KEYS.CYCLE_CONFIGURED, configured ? 'true' : 'false');
+        },
+        isCycleProvisional() {
+            try {
+                const data = localStorage.getItem(KEYS.ACADEMIC_CYCLE);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    return Boolean(parsed.isProvisional);
+                }
+            } catch (e) {}
+            return !this.isCycleConfigured();
+        },
+        setProvisionalCycle() {
+            const defaults = getDefaultCycleDates();
+            const cycle = {
+                startDate: defaults.startDate,
+                endDate: defaults.endDate,
+                isProvisional: true,
+                provisionalReason: 'Dato no confirmado • Requiere actualizar'
+            };
+            localStorage.setItem(KEYS.ACADEMIC_CYCLE, JSON.stringify(cycle));
+            localStorage.setItem(KEYS.CYCLE_CONFIGURED, 'false');
+            return cycle;
+        },
         getAcademicCycle() {
             try {
                 const data = localStorage.getItem(KEYS.ACADEMIC_CYCLE);
@@ -167,9 +202,8 @@ window.StorageModule = (() => {
             } catch (e) {
                 console.error('Error al leer ciclo escolar:', e);
             }
-            const defaults = getDefaultCycleDates();
-            this.setAcademicCycle(defaults.startDate, defaults.endDate);
-            return defaults;
+            // Si nunca se ha fijado, sugerir provisional
+            return this.setProvisionalCycle();
         },
         setAcademicCycle(startDate, endDate) {
             if (!startDate || !endDate) {
@@ -178,8 +212,9 @@ window.StorageModule = (() => {
             if (startDate > endDate) {
                 throw new Error('La fecha de inicio de ciclo no puede ser posterior a la fecha de término.');
             }
-            const cycle = { startDate, endDate };
+            const cycle = { startDate, endDate, isProvisional: false };
             localStorage.setItem(KEYS.ACADEMIC_CYCLE, JSON.stringify(cycle));
+            this.setCycleConfigured(true);
             return cycle;
         },
 
@@ -417,6 +452,173 @@ window.StorageModule = (() => {
             return chosen;
         },
 
+        // --- Elementos Archivados (Baúl de Tareas y Notas) ---
+        getArchivedTasks() {
+            try {
+                const data = localStorage.getItem(KEYS.ARCHIVED_TASKS);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        },
+        saveArchivedTasks(tasks) {
+            if (!Array.isArray(tasks)) return false;
+            localStorage.setItem(KEYS.ARCHIVED_TASKS, JSON.stringify(tasks));
+            return true;
+        },
+        archiveTask(id) {
+            const tasks = this.getTasks();
+            const taskIndex = tasks.findIndex(t => t.id === id);
+            if (taskIndex === -1) return null;
+            const task = tasks.splice(taskIndex, 1)[0];
+            this.saveTasks(tasks);
+
+            const archived = this.getArchivedTasks();
+            task.archivedAt = Date.now();
+            archived.unshift(task);
+            this.saveArchivedTasks(archived);
+            return task;
+        },
+        unarchiveTask(id) {
+            const archived = this.getArchivedTasks();
+            const index = archived.findIndex(t => t.id === id);
+            if (index === -1) return null;
+            const task = archived.splice(index, 1)[0];
+            delete task.archivedAt;
+            this.saveArchivedTasks(archived);
+
+            const tasks = this.getTasks();
+            tasks.unshift(task);
+            this.saveTasks(tasks);
+            return task;
+        },
+        deleteArchivedTask(id) {
+            const archived = this.getArchivedTasks();
+            const filtered = archived.filter(t => t.id !== id);
+            this.saveArchivedTasks(filtered);
+            return true;
+        },
+
+        getArchivedNotes() {
+            try {
+                const data = localStorage.getItem(KEYS.ARCHIVED_NOTES);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        },
+        saveArchivedNotes(notes) {
+            if (!Array.isArray(notes)) return false;
+            localStorage.setItem(KEYS.ARCHIVED_NOTES, JSON.stringify(notes));
+            return true;
+        },
+        archiveNote(id) {
+            const notes = this.getNotes();
+            const noteIndex = notes.findIndex(n => n.id === id);
+            if (noteIndex === -1) return null;
+            const note = notes.splice(noteIndex, 1)[0];
+            this.saveNotes(notes);
+
+            const archived = this.getArchivedNotes();
+            note.archivedAt = Date.now();
+            archived.unshift(note);
+            this.saveArchivedNotes(archived);
+            return note;
+        },
+        unarchiveNote(id) {
+            const archived = this.getArchivedNotes();
+            const index = archived.findIndex(n => n.id === id);
+            if (index === -1) return null;
+            const note = archived.splice(index, 1)[0];
+            delete note.archivedAt;
+            this.saveArchivedNotes(archived);
+
+            const notes = this.getNotes();
+            notes.unshift(note);
+            this.saveNotes(notes);
+            return note;
+        },
+        deleteArchivedNote(id) {
+            const archived = this.getArchivedNotes();
+            const filtered = archived.filter(n => n.id !== id);
+            this.saveArchivedNotes(filtered);
+            return true;
+        },
+
+        // --- Purga Automática de Archivados tras 60 días (Activable/Desactivable) ---
+        getAutoPurgeArchive() {
+            const val = localStorage.getItem(KEYS.AUTO_PURGE_ARCHIVE);
+            return val === null ? true : val === 'true';
+        },
+        setAutoPurgeArchive(enabled) {
+            localStorage.setItem(KEYS.AUTO_PURGE_ARCHIVE, enabled ? 'true' : 'false');
+        },
+        runArchivePurge() {
+            if (!this.getAutoPurgeArchive()) return { purgedTasks: 0, purgedNotes: 0 };
+            const maxAgeMs = 60 * 24 * 60 * 60 * 1000; // 60 días
+            const now = Date.now();
+
+            const archivedTasks = this.getArchivedTasks();
+            const validTasks = archivedTasks.filter(t => (now - (t.archivedAt || now)) <= maxAgeMs);
+            const purgedTasks = archivedTasks.length - validTasks.length;
+            if (purgedTasks > 0) this.saveArchivedTasks(validTasks);
+
+            const archivedNotes = this.getArchivedNotes();
+            const validNotes = archivedNotes.filter(n => (now - (n.archivedAt || now)) <= maxAgeMs);
+            const purgedNotes = archivedNotes.length - validNotes.length;
+            if (purgedNotes > 0) this.saveArchivedNotes(validNotes);
+
+            return { purgedTasks, purgedNotes };
+        },
+
+        // --- Auto-archivado de tareas completadas tras 30 días ---
+        checkAutoArchiveTasks() {
+            const tasks = this.getTasks();
+            const maxAgeMs = 30 * 24 * 60 * 60 * 1000; // 30 días
+            const now = Date.now();
+            let archivedCount = 0;
+
+            const remainingTasks = [];
+            const toArchive = [];
+
+            tasks.forEach(t => {
+                const referenceDate = t.dueDate ? new Date(t.dueDate).getTime() : (t.createdAt || now);
+                const isOver30Days = (now - referenceDate) > maxAgeMs;
+
+                if (t.completed && isOver30Days) {
+                    toArchive.push({ ...t, archivedAt: now });
+                    archivedCount++;
+                } else {
+                    remainingTasks.push(t);
+                }
+            });
+
+            if (archivedCount > 0) {
+                this.saveTasks(remainingTasks);
+                const existingArchived = this.getArchivedTasks();
+                this.saveArchivedTasks([...toArchive, ...existingArchived]);
+            }
+            return archivedCount;
+        },
+
+        // --- Preferencia de animación dinámica del logo institucional (Desactivable) ---
+        getLogoExpandEnabled() {
+            const val = localStorage.getItem(KEYS.LOGO_EXPAND);
+            return val === null ? true : val === 'true';
+        },
+        setLogoExpandEnabled(enabled) {
+            localStorage.setItem(KEYS.LOGO_EXPAND, enabled ? 'true' : 'false');
+        },
+
+        // --- Preferencia de visibilidad del botón de tema en Header (Ocultable) ---
+        getHeaderThemeBtnEnabled() {
+            const val = localStorage.getItem(KEYS.HEADER_THEME_BTN);
+            return val === null ? true : val === 'true';
+        },
+        setHeaderThemeBtnEnabled(enabled) {
+            localStorage.setItem(KEYS.HEADER_THEME_BTN, enabled ? 'true' : 'false');
+        },
+
         // --- Métricas de Almacenamiento Local ---
         getStorageMetrics() {
             let totalBytes = 0;
@@ -491,22 +693,30 @@ window.StorageModule = (() => {
             this.saveSubjects([]);
             this.saveTasks([]);
             this.saveNotes([]);
+            this.saveArchivedTasks([]);
+            this.saveArchivedNotes([]);
         },
 
         exportJson() {
             const data = {
-                version: '3.0.0',
+                version: '3.1.0',
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),
                 institution: this.getInstitution(),
                 academicPeriod: this.getAcademicPeriod(),
                 academicCycle: this.getAcademicCycle(),
+                isCycleConfigured: this.isCycleConfigured(),
                 bottomAction: this.getBottomAction(),
                 hapticsEnabled: this.getHapticsEnabled(),
+                autoPurgeArchive: this.getAutoPurgeArchive(),
+                logoExpandEnabled: this.getLogoExpandEnabled(),
+                headerThemeBtnEnabled: this.getHeaderThemeBtnEnabled(),
                 subjects: this.getSubjects(),
                 tasks: this.getTasks(),
-                notes: this.getNotes()
+                notes: this.getNotes(),
+                archivedTasks: this.getArchivedTasks(),
+                archivedNotes: this.getArchivedNotes()
             };
             return JSON.stringify(data, null, 2);
         },
@@ -527,13 +737,25 @@ window.StorageModule = (() => {
                 if (data.academicCycle && data.academicCycle.startDate && data.academicCycle.endDate) {
                     this.setAcademicCycle(data.academicCycle.startDate, data.academicCycle.endDate);
                 }
+                if (typeof data.isCycleConfigured === 'boolean') {
+                    this.setCycleConfigured(data.isCycleConfigured);
+                }
                 if (data.bottomAction) this.setBottomAction(data.bottomAction);
                 if (typeof data.hapticsEnabled === 'boolean') this.setHapticsEnabled(data.hapticsEnabled);
+                if (typeof data.autoPurgeArchive === 'boolean') this.setAutoPurgeArchive(data.autoPurgeArchive);
+                if (typeof data.logoExpandEnabled === 'boolean') this.setLogoExpandEnabled(data.logoExpandEnabled);
+                if (typeof data.headerThemeBtnEnabled === 'boolean') this.setHeaderThemeBtnEnabled(data.headerThemeBtnEnabled);
 
                 this.saveSubjects(data.subjects);
                 this.saveTasks(data.tasks);
                 if (Array.isArray(data.notes)) {
                     this.saveNotes(data.notes);
+                }
+                if (Array.isArray(data.archivedTasks)) {
+                    this.saveArchivedTasks(data.archivedTasks);
+                }
+                if (Array.isArray(data.archivedNotes)) {
+                    this.saveArchivedNotes(data.archivedNotes);
                 }
                 return true;
             } catch (e) {

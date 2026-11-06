@@ -1,15 +1,16 @@
 /**
  * Aplicación Principal - Orquestador
- * Integra UI, navegación por Drawer de pantalla completa, selector institucional oficial,
+ * Integra UI, navegación por Drawer, selector institucional oficial,
  * selector dinámico de periodos/semestres, ciclo escolar obligatorio, notas rápidas,
- * selector de 3 tipografías (Calibri, Times New Roman, Elegante), sistema háptico,
- * botón central de atajo de acción rápida personalizable y widgets nativos.
+ * baúl de archivados con depuración de 60 días y telarañas decorativas,
+ * selector de 5 tipografías mediante botones interactivos, sistema háptico,
+ * botón central de atajo de acción rápida personalizable, animación de logo escolar y widgets nativos.
  */
 
 (() => {
     class App {
         constructor() {
-            this.currentView = 'subjects'; // 'subjects' | 'tasks' | 'notes' | 'settings'
+            this.currentView = 'subjects'; // 'subjects' | 'tasks' | 'notes' | 'calendar' | 'archive' | 'settings'
             this.activeInstitution = null;
         }
 
@@ -20,6 +21,7 @@
             const TasksModule = window.TasksModule;
             const CalendarModule = window.CalendarModule;
             const NotesModule = window.NotesModule;
+            const ArchiveModule = window.ArchiveModule;
             const HapticsModule = window.HapticsModule;
             const NotificationsModule = window.NotificationsModule;
             const WidgetSyncModule = window.WidgetSyncModule;
@@ -27,14 +29,19 @@
             // 1. Inicialización limpia en localStorage
             Storage.initIfFirstTime();
 
+            // Depuración de archivados de 60 días y auto-archivo de tareas de 30 días
+            Storage.runArchivePurge?.();
+            Storage.checkAutoArchiveTasks?.();
+
             // 2. Inicializar sistema háptico y notificaciones locales enriquecidas
             HapticsModule?.bindGlobalInteractions?.();
             NotificationsModule?.init?.();
 
-            // 3. Inicializar y aplicar modo oscuro / claro
+            // 3. Inicializar y aplicar modo oscuro / claro y visibilidad del botón de tema
             this.initTheme();
+            this.applyHeaderThemeBtnVisibility();
 
-            // 4. Inicializar y aplicar tipografía seleccionada (Calibri, Times New Roman, Elegante)
+            // 4. Inicializar y aplicar tipografía seleccionada (5 opciones con botones)
             this.initFontFamily();
 
             // 5. Cargar institución y periodo activo
@@ -46,14 +53,17 @@
             TasksModule?.init?.();
             NotesModule?.init?.();
             CalendarModule?.init?.();
+            ArchiveModule?.init?.();
             WidgetSyncModule?.init?.();
 
-            // 7. Configurar navegación, drawer, selectores, botón principal de atajo y confirmación de salida
+            // 7. Configurar navegación, drawer, selectores, botón principal de atajo, modales y confirmación de salida
             this.setupNavigation();
             this.setupSidebarDrawer();
             this.setupInstitutionAndPeriodSelectors();
             this.setupBottomActionButton();
             this.setupModalsAndShortcuts();
+            this.setupSchoolIdentityModal();
+            this.setupCycleWelcomeModal();
             this.setupExitModal();
             this.setupSettingsView();
 
@@ -64,6 +74,7 @@
             window.navigateToTasks = () => this.switchView('tasks');
             window.navigateToNotes = () => this.switchView('notes');
             window.navigateToCalendar = () => this.switchView('calendar');
+            window.navigateToArchive = () => this.switchView('archive');
             window.navigateToSettings = () => this.switchView('settings');
             window.navigateToTasksWithSubject = (subjectId) => {
                 this.switchView('tasks');
@@ -80,13 +91,14 @@
                 TasksModule,
                 NotesModule,
                 CalendarModule,
+                ArchiveModule,
                 switchView: (v) => this.switchView(v)
             });
 
             // 10. Soporte para parámetros URL (Widgets de Android y Deep Linking)
             const urlParams = new URLSearchParams(window.location.search);
             const initialView = urlParams.get('view');
-            if (initialView && ['subjects', 'tasks', 'notes', 'calendar', 'settings'].includes(initialView)) {
+            if (initialView && ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings'].includes(initialView)) {
                 this.switchView(initialView);
             }
             if (urlParams.get('openDrawer') === '1') {
@@ -95,15 +107,26 @@
             if (urlParams.get('openExit') === '1') {
                 setTimeout(() => document.getElementById('app-exit-btn')?.click(), 50);
             }
+            if (urlParams.get('openSchoolModal') === '1') {
+                setTimeout(() => document.getElementById('header-inst-logo')?.click(), 80);
+            }
 
             // 11. Renderizado inicial completo
             this.refreshAll();
+
+            // 12. Comprobar si el ciclo escolar está configurado obligatoriamente en primer inicio
+            if (!Storage.isCycleConfigured?.() && urlParams.get('openSchoolModal') !== '1') {
+                setTimeout(() => {
+                    this.openCycleWelcomeModal?.();
+                }, 400);
+            }
         }
 
         refreshAll() {
             window.SubjectsModule?.render?.();
             window.TasksModule?.render?.();
             window.NotesModule?.render?.();
+            window.ArchiveModule?.render?.();
             this.updateHeaderStats();
             this.updateCycleBadges();
             this.updateStorageMetrics();
@@ -115,40 +138,71 @@
             const subjects = Storage.getSubjects();
             const tasks = Storage.getTasks();
             const notes = Storage.getNotes();
+            const archivedTasks = Storage.getArchivedTasks?.() || [];
+            const archivedNotes = Storage.getArchivedNotes?.() || [];
             const pendingTasks = tasks.filter(t => !t.completed).length;
 
             const drawerSubCount = document.getElementById('drawer-sub-count');
             const drawerTaskCount = document.getElementById('drawer-task-count');
             const drawerNoteCount = document.getElementById('drawer-note-count');
+            const drawerArchiveCount = document.getElementById('drawer-archive-count');
 
             const navSubCount = document.getElementById('nav-sub-count');
             const navTaskCount = document.getElementById('nav-task-count');
             const navNoteCount = document.getElementById('nav-note-count');
 
+            const archiveBadge = document.getElementById('archive-count-badge');
+
             if (drawerSubCount) drawerSubCount.textContent = subjects.length;
             if (drawerTaskCount) drawerTaskCount.textContent = pendingTasks;
             if (drawerNoteCount) drawerNoteCount.textContent = notes.length;
+            if (drawerArchiveCount) drawerArchiveCount.textContent = archivedTasks.length + archivedNotes.length;
 
             if (navSubCount) navSubCount.textContent = subjects.length;
             if (navTaskCount) navTaskCount.textContent = pendingTasks;
             if (navNoteCount) navNoteCount.textContent = notes.length;
+
+            if (archiveBadge) archiveBadge.textContent = `${archivedTasks.length + archivedNotes.length} elementos`;
         }
 
         updateCycleBadges() {
             const Storage = window.StorageModule;
             const cycle = Storage.getAcademicCycle?.();
+            const isProvisional = Storage.isCycleProvisional?.();
+
             const drawerCycleText = document.getElementById('drawer-cycle-text');
+            const drawerCycleWarning = document.getElementById('drawer-cycle-warning');
+            const headerCycleWarning = document.getElementById('header-cycle-warning');
+            const settingsCycleWarningBox = document.getElementById('settings-cycle-warning-box');
             const settingsCycleStatus = document.getElementById('settings-cycle-status-pill');
 
+            // Actualizar advertencias de ciclo provisional / pendiente
+            if (headerCycleWarning) {
+                headerCycleWarning.classList.toggle('hidden', !isProvisional);
+            }
+            if (drawerCycleWarning) {
+                drawerCycleWarning.classList.toggle('hidden', !isProvisional);
+            }
+            if (settingsCycleWarningBox) {
+                settingsCycleWarningBox.classList.toggle('hidden', !isProvisional);
+            }
+
             if (cycle && cycle.startDate && cycle.endDate) {
-                if (drawerCycleText) drawerCycleText.textContent = `📅 ${cycle.startDate} - ${cycle.endDate}`;
+                if (drawerCycleText) {
+                    drawerCycleText.textContent = `📅 ${cycle.startDate} - ${cycle.endDate}`;
+                }
                 if (settingsCycleStatus) {
-                    const todayStr = new Date().toISOString().split('T')[0];
-                    const isCurrent = todayStr >= cycle.startDate && todayStr <= cycle.endDate;
-                    settingsCycleStatus.textContent = isCurrent ? 'Ciclo Vigente' : 'Programado';
-                    settingsCycleStatus.className = isCurrent 
-                        ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white'
-                        : 'text-xs font-bold px-2.5 py-1 rounded-full bg-amber-600 text-white';
+                    if (isProvisional) {
+                        settingsCycleStatus.textContent = 'Provisional (Actualizar)';
+                        settingsCycleStatus.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-600 text-white animate-pulse';
+                    } else {
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        const isCurrent = todayStr >= cycle.startDate && todayStr <= cycle.endDate;
+                        settingsCycleStatus.textContent = isCurrent ? 'Ciclo Vigente' : 'Programado';
+                        settingsCycleStatus.className = isCurrent 
+                            ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white'
+                            : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-600 text-white';
+                    }
                 }
             }
         }
@@ -166,7 +220,7 @@
             const valid = ['calibri', 'times', 'montserrat', 'lora', 'poppins'];
             const activeFont = valid.includes(fontKey) ? fontKey : 'calibri';
 
-            // Aplicar atributo data-font en la etiqueta raíz para que CSS adapte todas las fuentes
+            // Aplicar data-font en la etiqueta raíz y body
             document.documentElement.setAttribute('data-font', activeFont);
             document.body.setAttribute('data-font', activeFont);
 
@@ -186,22 +240,37 @@
                 poppins: 'Moderna, geométrica y amigable con proporciones equilibradas.'
             };
 
-            // Actualizar etiqueta pill de la tipografía en Ajustes
             const fontPill = document.getElementById('settings-font-pill');
             if (fontPill) {
                 fontPill.textContent = labels[activeFont] || activeFont;
             }
 
-            // Sincronizar el select desplegable en Ajustes
-            const fontSelect = document.getElementById('settings-font-select');
-            if (fontSelect && fontSelect.value !== activeFont) {
-                fontSelect.value = activeFont;
-            }
-
-            // Actualizar descripción de la vista previa en vivo
             const previewDesc = document.getElementById('settings-font-preview-desc');
             if (previewDesc) {
                 previewDesc.textContent = descs[activeFont] || '';
+            }
+
+            // Sincronizar estilo visual de los 5 botones de selección directa
+            document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]').forEach(btn => {
+                const isSelected = btn.dataset.fontBtn === activeFont;
+                if (isSelected) {
+                    btn.className = `font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all ring-2 ring-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/50 border-indigo-500 shadow-xs ${
+                        btn.dataset.fontBtn === 'times' ? 'font-serif' : ''
+                    }`;
+                } else {
+                    btn.className = `font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-indigo-400 ${
+                        btn.dataset.fontBtn === 'times' ? 'font-serif' : ''
+                    }`;
+                }
+            });
+        }
+
+        applyHeaderThemeBtnVisibility() {
+            const Storage = window.StorageModule;
+            const isVisible = Storage.getHeaderThemeBtnEnabled?.() !== false;
+            const btn = document.getElementById('theme-toggle-btn');
+            if (btn) {
+                btn.style.display = isVisible ? 'inline-flex' : 'none';
             }
         }
 
@@ -272,7 +341,6 @@
         updateThemeUI(activeTheme, isAuto = false) {
             const isDark = activeTheme === 'dark';
 
-            // Actualizar botones y selector de Configuración
             const pill = document.getElementById('settings-theme-pill');
             if (pill) {
                 if (isAuto) {
@@ -331,18 +399,18 @@
             const settingsFullName = document.getElementById('settings-inst-fullname');
             const settingsSlogan = document.getElementById('settings-inst-slogan');
             const settingsTypeBadge = document.getElementById('settings-inst-type-badge');
+            const settingsBadgePill = document.getElementById('settings-inst-badge-pill');
 
             if (settingsLogo) settingsLogo.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-14 h-14');
             if (settingsName) settingsName.textContent = inst.name;
             if (settingsFullName) settingsFullName.textContent = inst.fullName;
             if (settingsSlogan) settingsSlogan.textContent = `"${inst.slogan}"`;
             if (settingsTypeBadge) settingsTypeBadge.textContent = inst.systemType || inst.type;
+            if (settingsBadgePill) settingsBadgePill.textContent = inst.name;
 
-            // Actualizar selectores institucionales
+            // Actualizar selector institucional en el header
             const headerSelect = document.getElementById('header-institution-select');
-            const settingsSelect = document.getElementById('settings-institution-select');
             if (headerSelect) headerSelect.value = id;
-            if (settingsSelect) settingsSelect.value = id;
 
             // Actualizar selector dinámico de periodos
             this.updatePeriodSelectors(inst);
@@ -514,14 +582,13 @@
                     this.closeSidebarDrawer?.();
                 });
             });
-            // NOTA: Se eliminó la navegación a ajustes al tocar el logo escolar conforme a los requerimientos
         }
 
         switchView(viewName) {
             this.currentView = viewName;
             window.HapticsModule?.light();
 
-            const views = ['subjects', 'tasks', 'notes', 'calendar', 'settings'];
+            const views = ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings'];
             views.forEach(v => {
                 const section = document.getElementById(`view-${v}`);
                 if (section) {
@@ -537,14 +604,14 @@
                 }
             });
 
-            // Actualizar botones de navegación activos (tanto barra superior como drawer y barra inferior de 3 botones)
+            // Actualizar botones de navegación activos
             document.querySelectorAll('[data-view-target]').forEach(btn => {
                 const isMatch = btn.dataset.viewTarget === viewName;
                 if (btn.classList.contains('nav-link-btn')) {
                     if (isMatch) {
                         btn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'font-bold');
                         btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-semibold');
-                        if (btn.closest('nav.hidden.lg\\:flex')) {
+                        if (btn.closest('nav.hidden.lg\:flex')) {
                             btn.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-xs');
                         }
                     } else {
@@ -559,6 +626,7 @@
             if (viewName === 'tasks') window.TasksModule?.render?.();
             if (viewName === 'notes') window.NotesModule?.render?.();
             if (viewName === 'calendar') window.CalendarModule?.render?.();
+            if (viewName === 'archive') window.ArchiveModule?.render?.();
             if (viewName === 'settings') this.updateStorageMetrics();
 
             // Scroll suave hacia la parte superior
@@ -598,13 +666,6 @@
             if (backdrop) backdrop.onclick = closeDrawer;
         }
 
-        /**
-         * Configura el Botón Central Prominente (Atajo de Acción Rápida)
-         * Funciona como un disparador directo de acción sin necesidad de salir de la vista actual:
-         * 1. 'add_task' -> Abre inmediatamente el modal de agregar tarea sobre la pantalla actual.
-         * 2. 'notes'    -> Abre inmediatamente el modal para redactar nota rápida sobre la pantalla actual.
-         * 3. 'calendar' -> Abre la ventana emergente del calendario mensual interactivo.
-         */
         setupBottomActionButton() {
             const Storage = window.StorageModule;
             const mainBtn = document.getElementById('bottom-main-action-btn');
@@ -617,7 +678,6 @@
             const action = Storage.getBottomAction();
 
             if (action === 'notes') {
-                // Opción 2: Atajo Rápido para Crear Nota
                 circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -628,11 +688,9 @@
                 label.className = 'text-[10px] font-extrabold text-amber-600 dark:text-amber-400 mt-1 truncate max-w-[80px]';
                 mainBtn.onclick = () => {
                     window.HapticsModule?.medium();
-                    // Atajo: Abre directamente el modal para anotar al instante sin cambiar de vista
                     window.NotesModule?.openAddModal?.();
                 };
             } else if (action === 'calendar') {
-                // Opción 3: Atajo Rápido para Ver Calendario
                 circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-600 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -643,11 +701,9 @@
                 label.className = 'text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate max-w-[80px]';
                 mainBtn.onclick = () => {
                     window.HapticsModule?.medium();
-                    // Atajo: Abre la ventana modal del calendario sobre la pantalla actual
                     window.CalendarModule?.openModal?.();
                 };
             } else {
-                // Opción 1: Atajo Rápido para Agregar Tarea (Valor por defecto)
                 circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-600 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all';
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -658,7 +714,6 @@
                 label.className = 'text-[10px] font-extrabold text-teal-600 dark:text-teal-400 mt-1 truncate max-w-[80px]';
                 mainBtn.onclick = () => {
                     window.HapticsModule?.medium();
-                    // Atajo: Abre directamente el modal para crear tarea al instante sin entrar al menú de tareas
                     window.TasksModule?.openAddModal?.();
                 };
             }
@@ -720,10 +775,201 @@
                     TasksModule?.closeModal?.();
                     NotesModule?.closeModal?.();
                     CalendarModule?.closeModal?.();
+                    this.closeSchoolIdentityModal?.();
+                    this.closeCycleWelcomeModal?.();
                     this.closeExitModal?.();
                     this.closeSidebarDrawer?.();
                 }
             });
+        }
+
+        /* ========================================================
+           MODAL DE IDENTIDAD INSTITUCIONAL (LOGO DINÁMICO ZOOM & GLOW)
+           ======================================================== */
+        setupSchoolIdentityModal() {
+            const modal = document.getElementById('school-identity-modal');
+            const card = document.getElementById('school-identity-card');
+            const backdrop = document.getElementById('school-identity-backdrop');
+            const closeBtn = document.getElementById('close-school-identity-btn');
+            const actionBtn = document.getElementById('school-identity-action-btn');
+            const headerLogo = document.getElementById('header-inst-logo');
+
+            if (!modal || !card) return;
+
+            const openModal = (e) => {
+                const Storage = window.StorageModule;
+                if (!Storage.getLogoExpandEnabled?.()) {
+                    return; // Desactivado por configuración del usuario
+                }
+
+                window.HapticsModule?.medium();
+                const InstitutionsModule = window.InstitutionsModule;
+                const inst = this.activeInstitution || InstitutionsModule.getInstitution('unam');
+                const cycle = Storage.getAcademicCycle?.() || {};
+
+                // Inyectar escudo, nombres y lema oficial
+                const logoContent = document.getElementById('school-identity-logo-content');
+                const nameEl = document.getElementById('school-identity-name');
+                const fullnameEl = document.getElementById('school-identity-fullname');
+                const sloganEl = document.getElementById('school-identity-slogan');
+                const systemBadge = document.getElementById('school-identity-system-badge');
+                const cycleDates = document.getElementById('school-identity-cycle-dates');
+                const cycleBadge = document.getElementById('school-identity-cycle-badge');
+                const glow = document.getElementById('school-identity-glow');
+
+                if (logoContent) {
+                    logoContent.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-20 h-20 sm:w-24 sm:h-24');
+                }
+                if (nameEl) nameEl.textContent = inst.name;
+                if (fullnameEl) fullnameEl.textContent = inst.fullName;
+                if (sloganEl) sloganEl.textContent = `"${inst.slogan}"`;
+                if (systemBadge) systemBadge.textContent = inst.systemType || inst.type;
+
+                if (cycleDates) {
+                    cycleDates.textContent = (cycle.startDate && cycle.endDate) 
+                        ? `${cycle.startDate} al ${cycle.endDate}`
+                        : 'Periodo lectivo pendiente de confirmar';
+                }
+
+                if (cycleBadge) {
+                    const isProv = Storage.isCycleProvisional?.();
+                    if (isProv) {
+                        cycleBadge.textContent = 'Provisional';
+                        cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-600 text-white shadow-xs';
+                    } else {
+                        cycleBadge.textContent = 'Vigente';
+                        cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-xs';
+                    }
+                }
+
+                // Resplandor temático con el color de la escuela
+                if (glow) {
+                    const primaryColor = inst.colors?.primary || '#6366F1';
+                    glow.style.backgroundColor = primaryColor;
+                    glow.style.boxShadow = `0 0 100px 30px ${primaryColor}`;
+                }
+
+                // Calcular origen de animación dinámica desde el logo superior hasta el centro
+                if (headerLogo) {
+                    const rect = headerLogo.getBoundingClientRect();
+                    const originX = (rect.left + rect.width / 2) - (window.innerWidth / 2);
+                    const originY = (rect.top + rect.height / 2) - (window.innerHeight / 2);
+                    card.style.setProperty('--origin-x', `${originX}px`);
+                    card.style.setProperty('--origin-y', `${originY}px`);
+                }
+
+                card.classList.remove('school-identity-exit-left');
+                card.classList.add('school-identity-card-anim');
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+
+                requestAnimationFrame(() => {
+                    modal.classList.add('active');
+                });
+            };
+
+            const closeModal = () => {
+                if (!modal || modal.classList.contains('hidden')) return;
+                window.HapticsModule?.light();
+
+                // Salida fluida de la ventana y el escudo hacia el lado izquierdo
+                card.classList.remove('school-identity-card-anim');
+                card.classList.add('school-identity-exit-left');
+                modal.classList.remove('active');
+
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    card.classList.remove('school-identity-exit-left');
+                    document.body.classList.remove('overflow-hidden');
+                }, 360);
+            };
+
+            this.openSchoolIdentityModal = openModal;
+            this.closeSchoolIdentityModal = closeModal;
+
+            if (headerLogo) {
+                headerLogo.onclick = (e) => openModal(e);
+            }
+            if (closeBtn) closeBtn.onclick = closeModal;
+            if (actionBtn) actionBtn.onclick = closeModal;
+            if (backdrop) backdrop.onclick = closeModal;
+        }
+
+        /* ========================================================
+           MODAL DE BIENVENIDA / CONFIGURACIÓN OBLIGATORIA DEL CICLO
+           ======================================================== */
+        setupCycleWelcomeModal() {
+            const modal = document.getElementById('cycle-setup-modal');
+            const backdrop = document.getElementById('cycle-setup-backdrop');
+            const form = document.getElementById('cycle-setup-welcome-form');
+            const laterBtn = document.getElementById('welcome-cycle-later-btn');
+            const startInput = document.getElementById('welcome-cycle-start');
+            const endInput = document.getElementById('welcome-cycle-end');
+            const Storage = window.StorageModule;
+
+            if (!modal) return;
+
+            const openWelcome = () => {
+                const cycle = Storage.getAcademicCycle?.() || {};
+                if (startInput && cycle.startDate) startInput.value = cycle.startDate;
+                if (endInput && cycle.endDate) endInput.value = cycle.endDate;
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+                requestAnimationFrame(() => {
+                    modal.classList.add('active');
+                });
+            };
+
+            const closeWelcome = () => {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.classList.remove('overflow-hidden');
+                }, 200);
+            };
+
+            this.openCycleWelcomeModal = openWelcome;
+            this.closeCycleWelcomeModal = closeWelcome;
+
+            if (form) {
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    window.HapticsModule?.double();
+                    const s = startInput.value;
+                    const end = endInput.value;
+                    if (!s || !end) {
+                        this.showToast('Por favor completa ambas fechas.', 'warning');
+                        return;
+                    }
+                    if (s > end) {
+                        this.showToast('La fecha de inicio debe ser anterior a la de término.', 'error');
+                        return;
+                    }
+
+                    Storage.setAcademicCycle(s, end);
+                    Storage.setCycleConfigured(true);
+                    closeWelcome();
+                    this.updateCycleBadges();
+                    window.CalendarModule?.render?.();
+                    this.showToast('Ciclo escolar oficial confirmado y sincronizado.', 'success');
+                };
+            }
+
+            if (laterBtn) {
+                laterBtn.onclick = () => {
+                    window.HapticsModule?.light();
+                    Storage.setProvisionalCycle();
+                    closeWelcome();
+                    this.updateCycleBadges();
+                    this.showToast('Ciclo asignado en modo provisional. Puedes confirmarlo en Ajustes.', 'warning');
+                };
+            }
         }
 
         setupExitModal() {
@@ -767,7 +1013,6 @@
                     window.HapticsModule?.double();
                     closeExit();
 
-                    // Cierre en entorno nativo híbrido (Capacitor/Cordova) o navegador
                     if (window.Capacitor?.Plugins?.App?.exitApp) {
                         window.Capacitor.Plugins.App.exitApp();
                     } else if (navigator.app && navigator.app.exitApp) {
@@ -783,7 +1028,6 @@
                 };
             }
 
-            // Atender retroceso en Android / Navegador si el modal está abierto
             window.addEventListener('popstate', () => {
                 if (exitModal && !exitModal.classList.contains('hidden')) {
                     closeExit();
@@ -796,20 +1040,34 @@
             const metrics = Storage.getStorageMetrics();
             const barFill = document.getElementById('storage-bar-fill');
             const percentLabel = document.getElementById('storage-percentage-label');
-            const detailLabel = document.getElementById('storage-detail');
+            const detailLabel = document.getElementById('storage-detail-used');
 
             if (barFill) barFill.style.width = `${Math.min(100, Math.max(2, metrics.percentage || metrics.percent || 2))}%`;
             if (percentLabel) percentLabel.textContent = `${metrics.percentage || metrics.percent || 0}%`;
             if (detailLabel) {
-                detailLabel.textContent = `Espacio: ${metrics.usedFormatted || (metrics.usedKb + ' KB')} de 5 MB • ${metrics.subjectsCount} materias, ${metrics.tasksCount} tareas, ${metrics.notesCount} notas`;
+                detailLabel.textContent = `${metrics.usedFormatted || (metrics.usedKb + ' KB')} utilizados • ${metrics.subjectsCount} materias, ${metrics.tasksCount} tareas, ${metrics.notesCount} notas`;
             }
         }
 
+        /* ========================================================
+           VISTA DE CONFIGURACIONES (ACORDEONES COLAPSABLES)
+           ======================================================== */
         setupSettingsView() {
-            const InstitutionsModule = window.InstitutionsModule;
             const Storage = window.StorageModule;
 
-            // 1. Configuración del Ciclo Escolar (Fechas Inicio y Término Obligatorias)
+            // 1. Manejo de Acordeones Colapsables
+            document.querySelectorAll('.settings-accordion-header').forEach(header => {
+                header.onclick = (e) => {
+                    e.preventDefault();
+                    window.HapticsModule?.light();
+                    const card = header.closest('.settings-accordion-card');
+                    if (card) {
+                        card.classList.toggle('open');
+                    }
+                };
+            });
+
+            // 2. Formulario de Ciclo Escolar Activo (Obligatorio)
             const cycle = Storage.getAcademicCycle();
             const startInput = document.getElementById('settings-cycle-start');
             const endInput = document.getElementById('settings-cycle-end');
@@ -836,6 +1094,7 @@
 
                     try {
                         Storage.setAcademicCycle(newStart, newEnd);
+                        Storage.setCycleConfigured(true);
                         this.updateCycleBadges();
                         window.CalendarModule?.render?.();
                         window.WidgetSyncModule?.sync?.();
@@ -846,31 +1105,22 @@
                 };
             }
 
-            // 2. Selectores de Institución y Periodo en Settings
-            const instSelect = document.getElementById('settings-institution-select');
-            const periodSelect = document.getElementById('settings-period-select');
-
-            if (instSelect) {
-                instSelect.innerHTML = Object.values(InstitutionsModule.INSTITUTIONS).map(inst => `
-                    <option value="${inst.id}">🎓 ${inst.name} - ${inst.fullName}</option>
-                `).join('');
-                instSelect.value = this.activeInstitution.id;
-                instSelect.onchange = (e) => {
-                    this.setInstitution(e.target.value);
-                    this.showToast('Institución actualizada.', 'success');
-                };
-            }
-
-            if (periodSelect) {
-                periodSelect.onchange = (e) => {
-                    this.setAcademicPeriod(e.target.value);
-                };
-            }
-
-            // Inicializar galería de escudos en Settings
+            // 3. Inicializar galería de escudos en Settings
             this.renderInstitutionGrid();
 
-            // 3. Tema y Modo Oscuro en Configuración
+            // 4. Toggle de Animación Dinámica del Logo Escolar
+            const logoExpandToggle = document.getElementById('settings-logo-expand-toggle');
+            if (logoExpandToggle) {
+                logoExpandToggle.checked = Storage.getLogoExpandEnabled?.() !== false;
+                logoExpandToggle.onchange = (e) => {
+                    const enabled = e.target.checked;
+                    Storage.setLogoExpandEnabled(enabled);
+                    window.HapticsModule?.light();
+                    this.showToast(enabled ? 'Efecto dinámico de escudo activado.' : 'Efecto dinámico de escudo desactivado.', 'info');
+                };
+            }
+
+            // 5. Tema y Modo Oscuro en Configuración
             document.getElementById('settings-theme-light')?.addEventListener('click', () => {
                 this.setTheme('light');
             });
@@ -886,12 +1136,23 @@
                 !Storage.getTheme()
             );
 
-            // 4. Selector de Tipografías en Menú Desplegable (5 Opciones)
-            const fontSelect = document.getElementById('settings-font-select');
-            if (fontSelect) {
-                fontSelect.value = Storage.getFontFamily?.() || 'calibri';
-                fontSelect.onchange = (e) => {
-                    const font = e.target.value;
+            // Toggle para mostrar/ocultar botón de tema en Header
+            const headerThemeToggle = document.getElementById('settings-header-theme-toggle');
+            if (headerThemeToggle) {
+                headerThemeToggle.checked = Storage.getHeaderThemeBtnEnabled?.() !== false;
+                headerThemeToggle.onchange = (e) => {
+                    const enabled = e.target.checked;
+                    Storage.setHeaderThemeBtnEnabled(enabled);
+                    this.applyHeaderThemeBtnVisibility();
+                    window.HapticsModule?.light();
+                    this.showToast(enabled ? 'Acceso rápido de tema visible en cabecera.' : 'Acceso rápido de tema oculto en cabecera.', 'info');
+                };
+            }
+
+            // 6. Tipografía Mediante Botones Interactivos (5 Opciones - Sin Menú Desplegable)
+            document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]').forEach(btn => {
+                btn.onclick = () => {
+                    const font = btn.dataset.fontBtn;
                     Storage.setFontFamily(font);
                     this.applyFontFamily(font);
                     window.HapticsModule?.light();
@@ -904,9 +1165,9 @@
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
                 };
-            }
+            });
 
-            // 5. Interruptor de Vibración Háptica Global
+            // 7. Interruptor de Vibración Háptica Global (Texto limpio sin "Web + Android")
             const hapticsToggle = document.getElementById('settings-haptics-toggle');
             const hapticsStatus = document.getElementById('settings-haptics-status');
 
@@ -916,8 +1177,8 @@
                 if (hapticsStatus) {
                     hapticsStatus.textContent = isEnabled ? 'Activada' : 'Desactivada';
                     hapticsStatus.className = isEnabled 
-                        ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                        : 'text-xs font-bold px-2.5 py-1 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20';
+                        ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                        : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20';
                 }
 
                 hapticsToggle.onchange = (e) => {
@@ -926,8 +1187,8 @@
                     if (hapticsStatus) {
                         hapticsStatus.textContent = enabled ? 'Activada' : 'Desactivada';
                         hapticsStatus.className = enabled 
-                            ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                            : 'text-xs font-bold px-2.5 py-1 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20';
+                            ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                            : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20';
                     }
                     if (enabled) {
                         window.HapticsModule?.double();
@@ -936,7 +1197,7 @@
                 };
             }
 
-            // 6. Selector de Atajo Rápido del Botón Central Inferior
+            // 8. Selector de Atajo Rápido del Botón Central Inferior
             const bottomRadios = document.querySelectorAll('input[name="bottom-action-choice"]');
             const currentBottomAction = Storage.getBottomAction();
             bottomRadios.forEach(radio => {
@@ -954,70 +1215,44 @@
                 };
             });
 
-            // 7. Submenú "Opciones avanzadas de almacenamiento" (Acordeón)
-            const accordionToggle = document.getElementById('storage-accordion-toggle');
-            const accordionContent = document.getElementById('storage-accordion-content');
-            const accordionChevron = document.getElementById('storage-accordion-chevron');
-
-            if (accordionToggle && accordionContent) {
-                accordionToggle.onclick = () => {
+            // 9. Depuración Automática de 60 Días para el Baúl
+            const archivePurgeToggle = document.getElementById('settings-archive-purge-toggle');
+            if (archivePurgeToggle) {
+                archivePurgeToggle.checked = Storage.getAutoPurgeArchive?.() !== false;
+                archivePurgeToggle.onchange = (e) => {
+                    const enabled = e.target.checked;
+                    Storage.setAutoPurgeArchive(enabled);
+                    window.ArchiveModule?.render?.();
                     window.HapticsModule?.light();
-                    const isExpanded = accordionContent.classList.toggle('expanded');
-                    if (accordionChevron) {
-                        accordionChevron.classList.toggle('rotate-180', isExpanded);
-                    }
-                    if (isExpanded) {
-                        this.updateStorageMetrics();
-                    }
+                    this.showToast(enabled ? 'Depuración automática a los 60 días activada.' : 'Depuración desactivada (conservación permanente).', 'info');
                 };
             }
 
-            // Cargar Demo opcional
-            document.getElementById('settings-load-demo')?.addEventListener('click', () => {
-                window.HapticsModule?.warning();
-                if (confirm('¿Cargar datos de demostración? Esto añadirá materias, tareas y notas de ejemplo para probar.')) {
-                    Storage.loadDemo();
-                    this.setInstitution(Storage.getInstitution());
-                    this.refreshAll();
-                    this.showToast('Datos de demostración cargados.', 'success');
-                    this.switchView('subjects');
-                }
-            });
+            // 10. Opciones Avanzadas de Almacenamiento (Exportar, Importar, Limpiar)
+            const exportBtn = document.getElementById('settings-export-btn') || document.getElementById('settings-export-json');
+            if (exportBtn) {
+                exportBtn.onclick = () => {
+                    window.HapticsModule?.light();
+                    const dataStr = Storage.exportJson();
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `organizador_escolar_${Date.now()}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    this.showToast('Respaldo descargado.', 'success');
+                };
+            }
 
-            // Limpiar Todo
-            document.getElementById('settings-clear-all')?.addEventListener('click', () => {
-                window.HapticsModule?.warning();
-                if (confirm('¿Estás seguro de eliminar todas las materias, tareas y notas? Esta acción no se puede deshacer.')) {
-                    window.TasksModule?.cancelAllNotifications?.();
-                    Storage.clearAll();
-                    this.refreshAll();
-                    this.showToast('Todos los datos han sido eliminados.', 'info');
-                    this.switchView('subjects');
-                }
-            });
-
-            // Exportar JSON
-            document.getElementById('settings-export-json')?.addEventListener('click', () => {
-                window.HapticsModule?.light();
-                const dataStr = Storage.exportJson();
-                const blob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `organizador_escolar_${Date.now()}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                this.showToast('Respaldo descargado.', 'success');
-            });
-
-            // Importar JSON
             const importInput = document.getElementById('settings-import-input');
-            document.getElementById('settings-import-btn')?.addEventListener('click', () => {
-                window.HapticsModule?.light();
-                importInput?.click();
-            });
+            const importBtn = document.getElementById('settings-import-btn');
+            if (importBtn && importInput) {
+                importBtn.onclick = () => {
+                    window.HapticsModule?.light();
+                    importInput.click();
+                };
 
-            if (importInput) {
                 importInput.onchange = (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
@@ -1039,6 +1274,17 @@
                     reader.readAsText(file);
                 };
             }
+
+            document.getElementById('settings-clear-all')?.addEventListener('click', () => {
+                window.HapticsModule?.warning();
+                if (confirm('¿Estás seguro de eliminar todas las materias, tareas, notas y archivados? Esta acción no se puede deshacer.')) {
+                    window.TasksModule?.cancelAllNotifications?.();
+                    Storage.clearAll();
+                    this.refreshAll();
+                    this.showToast('Todos los datos han sido eliminados.', 'info');
+                    this.switchView('subjects');
+                }
+            });
 
             // Cálculo inicial de métricas de almacenamiento y aplicación de tipografía
             this.updateStorageMetrics();

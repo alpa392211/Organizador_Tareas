@@ -436,6 +436,20 @@ window.TasksModule = (() => {
         }
     }
 
+    function archiveTask(id) {
+        const Storage = window.StorageModule;
+        window.HapticsModule?.medium();
+        cancelTaskNotification(id);
+        const archived = Storage.archiveTask(id);
+        if (archived) {
+            window.showNotification?.('Tarea archivada en el baúl.', 'info');
+            render();
+            window.onDataChanged?.();
+            window.WidgetSyncModule?.sync();
+            window.ArchiveModule?.render?.();
+        }
+    }
+
     function render() {
         const Storage = window.StorageModule;
         const container = document.getElementById('tasks-container');
@@ -598,6 +612,13 @@ window.TasksModule = (() => {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                         </svg>
                     </button>
+                    <button type="button" data-action="archive" data-id="${task.id}"
+                        class="p-2 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors"
+                        title="Archivar en el baúl">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                        </svg>
+                    </button>
                     <button type="button" data-action="delete" data-id="${task.id}"
                         class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"
                         title="Eliminar tarea">
@@ -613,6 +634,9 @@ window.TasksModule = (() => {
             });
             card.querySelector('[data-action="edit"]')?.addEventListener('click', () => {
                 openEditModal(task.id);
+            });
+            card.querySelector('[data-action="archive"]')?.addEventListener('click', () => {
+                archiveTask(task.id);
             });
             card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
                 deleteTaskPrompt(task.id);

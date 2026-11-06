@@ -274,6 +274,19 @@ window.NotesModule = (() => {
         render();
     }
 
+    function archiveNote(id) {
+        window.HapticsModule?.medium();
+        window.NotificationsModule?.cancelNote(id);
+        const Storage = window.StorageModule;
+        const archived = Storage.archiveNote(id);
+        if (archived) {
+            window.showNotification?.('Nota archivada en el baúl.', 'info');
+            window.onDataChanged?.();
+            render();
+            window.ArchiveModule?.render?.();
+        }
+    }
+
     function copyNoteContent(content) {
         if (!content) return;
         window.HapticsModule?.light();
@@ -376,6 +389,14 @@ window.NotesModule = (() => {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                     </svg>
                                 </button>
+                                <!-- Botón Archivar -->
+                                <button type="button" data-note-archive="${note.id}"
+                                    class="p-1.5 rounded-xl text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 tap-effect"
+                                    title="Archivar en el baúl">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                    </svg>
+                                </button>
                                 <!-- Botón Eliminar -->
                                 <button type="button" data-note-delete="${note.id}"
                                     class="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 tap-effect"
@@ -414,6 +435,13 @@ window.NotesModule = (() => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 openEditModal(btn.dataset.noteEdit);
+            };
+        });
+
+        container.querySelectorAll('[data-note-archive]').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                archiveNote(btn.dataset.noteArchive);
             };
         });
 

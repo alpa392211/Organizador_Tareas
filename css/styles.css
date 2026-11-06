@@ -70,10 +70,59 @@ button, input, select, textarea {
     font-family: inherit;
 }
 
-/* Asegurar transparencia total en los logos institucionales oficiales */
+/* Asegurar transparencia total en los logos institucionales oficiales y contención estricta */
 img[src*="assets/"] {
     background-color: transparent !important;
 }
+
+.hidden {
+    display: none !important;
+}
+
+.school-logo-frame {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #ffffff !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+.school-logo-frame img {
+    max-width: 90% !important;
+    max-height: 90% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    background-color: transparent !important;
+    display: block !important;
+}
+
+#header-inst-logo .school-logo-frame {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+}
+
+#drawer-inst-logo .school-logo-frame {
+    width: 3rem !important;
+    height: 3rem !important;
+}
+
+#settings-inst-logo-container .school-logo-frame {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+}
+
+#school-identity-logo-content .school-logo-frame {
+    width: 6rem !important;
+    height: 6rem !important;
+}
+
+.inst-grid-card .school-logo-frame {
+    width: 3rem !important;
+    height: 3rem !important;
+}
+
 
 /* ========================================================
    SISTEMA DE TRANSICIONES Y ANIMACIONES DINÁMICAS
@@ -392,5 +441,79 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 1.6rem;
     animation: emojiFloatBurst 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     will-change: transform, opacity;
+}
+
+/* ========================================================
+   ANIMACIÓN DEL LOGO INSTITUCIONAL (ZOOM, GLOW Y SALIDA A LA IZQUIERDA)
+   ======================================================== */
+@keyframes schoolIdentityEnter {
+    0% {
+        opacity: 0;
+        transform: scale(0.65) translate3d(var(--origin-x, 0px), var(--origin-y, -30px), 0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translate3d(0, 0, 0);
+    }
+}
+
+.school-identity-card-anim {
+    animation: schoolIdentityEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: transform, opacity;
+}
+
+.school-identity-exit-left {
+    transform: translate3d(-125%, 0, 0) scale(0.9) !important;
+    opacity: 0 !important;
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease-out !important;
+    pointer-events: none;
+}
+
+/* ========================================================
+   ACORDEONES DE CONFIGURACIÓN COLAPSABLES
+   ======================================================== */
+.settings-accordion-card {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.settings-accordion-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.settings-accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+
+.settings-accordion-card.open .settings-accordion-body {
+    max-height: 3500px;
+    opacity: 1;
+}
+
+.settings-accordion-card .settings-accordion-chevron {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.settings-accordion-card.open .settings-accordion-chevron {
+    transform: rotate(180deg);
+}
+
+/* ========================================================
+   DETALLE DECORATIVO DE TELARAÑAS (BAÚL DE ARCHIVADOS)
+   ======================================================== */
+.cobweb-corner {
+    position: absolute;
+    width: 68px;
+    height: 68px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.2;
+    transition: opacity 0.3s ease;
+}
+.dark .cobweb-corner {
+    opacity: 0.15;
 }
 
