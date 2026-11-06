@@ -1,12 +1,53 @@
 /* ========================================================
-   ESTILOS PERSONALIZADOS Y MICROINTERACCIONES
+   ESTILOS PERSONALIZADOS, ANIMACIONES DINÁMICAS Y TIPOGRAFÍAS
+   Mobile-First & Android Hybrid Ready
    ======================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
     --inst-primary: #002B7A;
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Calibri', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    
+    /* Curvas de aceleración dinámica y elástica por hardware */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-fast: 0.16s var(--ease-smooth);
+    --transition-normal: 0.28s var(--ease-smooth);
+}
+
+/* ========================================================
+   SISTEMA DE TIPOGRAFÍAS SELECCIONABLES (5 ESTILOS)
+   1. Calibri (Moderna / Institucional)
+   2. Times New Roman (Académica / Clásica)
+   3. Montserrat (Geométrica / Estilizada)
+   4. Lora (Serif Literaria / Cálida)
+   5. Poppins (Moderna / Amigable)
+   ======================================================== */
+:root[data-font="calibri"], body[data-font="calibri"] {
+    --font-sans: 'Calibri', 'Segoe UI', Candara, -apple-system, sans-serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="times"], body[data-font="times"] {
+    --font-sans: 'Times New Roman', Times, 'Baskerville', Georgia, serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="montserrat"], body[data-font="montserrat"] {
+    --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="lora"], body[data-font="lora"] {
+    --font-sans: 'Lora', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="poppins"], body[data-font="poppins"] {
+    --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
 }
 
 /* Modo Oscuro Global */
@@ -15,8 +56,18 @@ html.dark {
 }
 
 html.dark body {
-    background-color: #0f172a;
+    background-color: #0b1120;
     color: #f8fafc;
+}
+
+body {
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth);
+}
+
+button, input, select, textarea {
+    font-family: inherit;
 }
 
 /* Asegurar transparencia total en los logos institucionales oficiales */
@@ -24,34 +75,232 @@ img[src*="assets/"] {
     background-color: transparent !important;
 }
 
-body {
-    font-family: var(--font-sans);
-    -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.25s ease, color 0.25s ease;
-}
+/* ========================================================
+   SISTEMA DE TRANSICIONES Y ANIMACIONES DINÁMICAS
+   ======================================================== */
 
-/* Animaciones fluidas */
-@keyframes fadeIn {
-    from {
+/* 1. Transición Dinámica de Vistas (Slide-up, Scale & Fade) */
+@keyframes viewSlideUpFade {
+    0% {
         opacity: 0;
-        transform: translateY(6px);
+        transform: translate3d(0, 20px, 0) scale(0.985);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0) scale(1);
     }
 }
 
-.animate-fadeIn {
-    animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.view-transition {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.985);
+    transition: opacity 0.32s var(--ease-smooth), transform 0.32s var(--ease-smooth);
+    will-change: transform, opacity;
 }
 
-/* Microinteracciones táctiles en botones */
-.tap-effect {
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+.view-transition.active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
 }
+
+/* 2. Modales Dinámicos con Rebote Elástico (Backdrop + Dialog) */
+.modal-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s var(--ease-smooth);
+    will-change: opacity;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-dialog {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0) scale(0.92);
+    transition: transform 0.35s var(--ease-spring), opacity 0.28s var(--ease-smooth);
+    will-change: transform, opacity;
+}
+
+.modal-overlay.active .modal-dialog {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* 3. Menú Lateral de Pantalla Completa (Sidebar Drawer Full-Page) */
+#sidebar-drawer {
+    transition: transform 0.36s var(--ease-smooth);
+    will-change: transform;
+}
+
+#drawer-backdrop {
+    transition: opacity 0.32s var(--ease-smooth);
+    will-change: opacity;
+}
+
+/* 4. Efecto Dinámico Staggered Fade-in para Tarjetas (Grid Items) */
+@keyframes cardStaggerIn {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 18px, 0) scale(0.96);
+    }
+    70% {
+        transform: translate3d(0, -2px, 0) scale(1.005);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+.stagger-card {
+    animation: cardStaggerIn 0.42s var(--ease-spring) both;
+    animation-delay: calc(var(--stagger-i, 0) * 40ms);
+    will-change: transform, opacity;
+}
+
+/* 5. Microinteracciones Táctiles y Efecto Scale en Botones */
+.tap-effect {
+    transition: transform 0.16s var(--ease-spring), box-shadow 0.16s var(--ease-smooth), background-color 0.16s var(--ease-smooth);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 .tap-effect:active {
-    transform: scale(0.96);
+    transform: scale(0.96) !important;
+}
+
+.tap-scale {
+    transition: transform 0.18s var(--ease-spring);
+}
+
+.tap-scale:active {
+    transform: scale(0.94);
+}
+
+/* Hover dinámico en tarjetas interactivas */
+.card-hover {
+    transition: transform 0.24s var(--ease-smooth), box-shadow 0.24s var(--ease-smooth), border-color 0.24s var(--ease-smooth);
+}
+
+.card-hover:hover {
+    transform: translateY(-3px) scale(1.008);
+    box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.1), 0 8px 12px -6px rgba(0, 0, 0, 0.05);
+}
+
+.dark .card-hover:hover {
+    box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.45), 0 8px 12px -6px rgba(0, 0, 0, 0.25);
+}
+
+/* 6. Botón Flotante Central (FAB) con Pulso Dinámico */
+@keyframes fabGlowPulse {
+    0%, 100% {
+        box-shadow: 0 10px 25px -3px rgba(13, 148, 136, 0.45), 0 0 0 0 rgba(13, 148, 136, 0.35);
+    }
+    50% {
+        box-shadow: 0 14px 30px -3px rgba(13, 148, 136, 0.65), 0 0 0 8px rgba(13, 148, 136, 0);
+    }
+}
+
+.fab-glow {
+    box-shadow: 0 10px 25px -3px rgba(99, 102, 241, 0.45), 0 4px 6px -4px rgba(99, 102, 241, 0.3);
+    animation: fabGlowPulse 3.5s infinite var(--ease-smooth);
+    transition: transform 0.22s var(--ease-spring), box-shadow 0.22s var(--ease-smooth);
+}
+
+.fab-glow:hover {
+    transform: translateY(-3px) scale(1.06);
+}
+
+.fab-glow:active {
+    transform: scale(0.94) !important;
+}
+
+/* 7. Categorías de Notas Rápidas (Chips & Badges) */
+.note-badge-idea {
+    background-color: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+.dark .note-badge-idea {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.note-badge-apunte {
+    background-color: rgba(99, 102, 241, 0.12);
+    color: #4f46e5;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+}
+.dark .note-badge-apunte {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: #818cf8;
+}
+
+.note-badge-pendiente {
+    background-color: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.dark .note-badge-pendiente {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.note-badge-importante {
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.dark .note-badge-importante {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.note-badge-personal {
+    background-color: rgba(168, 85, 247, 0.12);
+    color: #9333ea;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+}
+.dark .note-badge-personal {
+    background-color: rgba(168, 85, 247, 0.2);
+    color: #c084fc;
+}
+
+/* 8. Acordeón de Opciones Avanzadas de Almacenamiento */
+.accordion-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.38s var(--ease-smooth), opacity 0.32s var(--ease-smooth);
+}
+
+.accordion-content.expanded {
+    max-height: 900px;
+    opacity: 1;
+}
+
+.accordion-chevron {
+    transition: transform 0.32s var(--ease-smooth);
+}
+
+.accordion-chevron.rotate-180 {
+    transform: rotate(180deg);
+}
+
+/* 9. Barra de Uso de Almacenamiento */
+.storage-progress-bar {
+    transition: width 0.6s var(--ease-smooth);
+}
+
+/* 10. Switch Toggle Personalizado */
+.switch-track {
+    transition: background-color 0.22s var(--ease-smooth);
+}
+
+.switch-thumb {
+    transition: transform 0.22s var(--ease-spring);
 }
 
 /* Estilo Oficial del Botón Ko-fi */
@@ -59,15 +308,15 @@ body {
     background-color: #FF5E5B;
     background-image: linear-gradient(135deg, #FF5E5B 0%, #FA4032 100%);
     box-shadow: 0 4px 14px 0 rgba(255, 94, 91, 0.35);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.22s var(--ease-smooth);
 }
 .kofi-btn:hover {
     background-image: linear-gradient(135deg, #FF4845 0%, #E62B1D 100%);
     box-shadow: 0 6px 20px 0 rgba(255, 94, 91, 0.5);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
 }
 .kofi-btn:active {
-    transform: scale(0.97) translateY(0);
+    transform: scale(0.96) translateY(0);
 }
 
 /* Scrollbar moderno */
@@ -91,12 +340,14 @@ body {
 
 /* Estilo de formulario limpio */
 input[type="time"]::-webkit-calendar-picker-indicator,
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     filter: invert(0.4);
 }
 .dark input[type="time"]::-webkit-calendar-picker-indicator,
-.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(0.8);
 }
 
@@ -110,3 +361,36 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     max-width: 100%;
     max-height: 100%;
 }
+
+/* ========================================================
+   ANIMACIÓN DE CELEBRACIÓN DE TAREAS (EMOJIS FIESTA)
+   ======================================================== */
+@keyframes emojiFloatBurst {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(0.3) rotate(0deg);
+    }
+    20% {
+        opacity: 1;
+        transform: translate3d(var(--x-offset, 0px), -24px, 0) scale(1.25) rotate(var(--rot, 0deg));
+    }
+    75% {
+        opacity: 0.95;
+        transform: translate3d(calc(var(--x-offset, 0px) * 1.3), -55px, 0) scale(1) rotate(calc(var(--rot, 0deg) * 1.5));
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(calc(var(--x-offset, 0px) * 1.6), -90px, 0) scale(0.65) rotate(calc(var(--rot, 0deg) * 2));
+    }
+}
+
+.celebration-emoji-particle {
+    position: fixed;
+    pointer-events: none;
+    user-select: none;
+    z-index: 9999;
+    font-size: 1.6rem;
+    animation: emojiFloatBurst 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: transform, opacity;
+}
+

@@ -21,71 +21,93 @@ window.CalendarModule = (() => {
     }
 
     function setupEventListeners() {
-        const prevBtn = document.getElementById('cal-prev-month');
-        const nextBtn = document.getElementById('cal-next-month');
-        const todayBtn = document.getElementById('cal-today-btn');
+        const setupNavPair = (prevId, nextId, todayId) => {
+            const prevBtn = document.getElementById(prevId);
+            const nextBtn = document.getElementById(nextId);
+            const todayBtn = document.getElementById(todayId);
+
+            if (prevBtn) {
+                prevBtn.onclick = () => {
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                    render();
+                };
+            }
+
+            if (nextBtn) {
+                nextBtn.onclick = () => {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    render();
+                };
+            }
+
+            if (todayBtn) {
+                todayBtn.onclick = () => {
+                    currentDate = new Date();
+                    selectedDate = new Date();
+                    render();
+                    renderDayDetails(selectedDate);
+                };
+            }
+        };
+
+        setupNavPair('cal-prev-month', 'cal-next-month', 'cal-today-btn');
+        setupNavPair('cal-view-prev-month', 'cal-view-next-month', 'cal-view-today-btn');
+
         const closeBtn = document.getElementById('close-calendar-modal');
         const modalBackdrop = document.getElementById('calendar-modal-backdrop');
-
-        if (prevBtn) {
-            prevBtn.onclick = () => {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                render();
-            };
-        }
-
-        if (nextBtn) {
-            nextBtn.onclick = () => {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                render();
-            };
-        }
-
-        if (todayBtn) {
-            todayBtn.onclick = () => {
-                currentDate = new Date();
-                selectedDate = new Date();
-                render();
-                renderDayDetails(selectedDate);
-            };
-        }
 
         if (closeBtn) closeBtn.onclick = () => closeModal();
         if (modalBackdrop) modalBackdrop.onclick = () => closeModal();
     }
 
     function openModal() {
+        window.HapticsModule?.light();
         const modal = document.getElementById('calendar-modal');
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
+            requestAnimationFrame(() => {
+                modal.classList.add('active');
+            });
             render();
             renderDayDetails(selectedDate);
         }
     }
 
     function closeModal() {
+        window.HapticsModule?.light();
         const modal = document.getElementById('calendar-modal');
         if (modal) {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            }, 200);
         }
     }
 
     function render() {
+        renderToContainer('cal-month-title', 'cal-days-grid', 'cal-cycle-banner');
+        renderToContainer('cal-view-month-title', 'cal-view-days-grid', 'cal-view-cycle-banner');
+        renderDayDetails(selectedDate);
+    }
+
+    function renderToContainer(titleId, gridId, bannerId) {
         const Storage = window.StorageModule;
-        const titleEl = document.getElementById('cal-month-title');
-        const gridEl = document.getElementById('cal-days-grid');
-        const cycleBanner = document.getElementById('cal-cycle-banner');
-        if (!gridEl || !titleEl || !Storage) return;
+        const titleEl = document.getElementById(titleId);
+        const gridEl = document.getElementById(gridId);
+        const cycleBanner = document.getElementById(bannerId);
+        if (!gridEl || !Storage) return;
 
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const cycle = Storage.getAcademicCycle();
 
-        titleEl.textContent = `${MONTH_NAMES[month]} ${year}`;
+        if (titleEl) {
+            titleEl.textContent = `${MONTH_NAMES[month]} ${year}`;
+        }
 
         // Banner informativo del ciclo escolar en el calendario
         if (cycleBanner && cycle) {
@@ -232,8 +254,14 @@ window.CalendarModule = (() => {
 
     function renderDayDetails(date) {
         const Storage = window.StorageModule;
-        const detailsContainer = document.getElementById('cal-day-details');
-        if (!detailsContainer || !Storage) return;
+        if (!Storage) return;
+
+        const targetContainers = [
+            document.getElementById('cal-day-details'),
+            document.getElementById('cal-view-day-details')
+        ].filter(Boolean);
+
+        if (targetContainers.length === 0) return;
 
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -325,7 +353,7 @@ window.CalendarModule = (() => {
             `;
         }
 
-        detailsContainer.innerHTML = `
+        const html = `
             <div class="pt-3 border-t border-slate-200 dark:border-slate-700">
                 ${cycleStatusBanner}
                 <div class="flex items-center justify-between mb-3">
@@ -357,6 +385,10 @@ window.CalendarModule = (() => {
                 </div>
             </div>
         `;
+
+        targetContainers.forEach(container => {
+            container.innerHTML = html;
+        });
     }
 
     function escapeHtml(str) {

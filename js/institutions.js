@@ -35,7 +35,7 @@ window.InstitutionsModule = (() => {
             shortBadge: 'IPN',
             systemType: 'Semestral',
             slogan: 'La técnica al servicio de la patria',
-            icon: 'assets/ipn.png',
+            icon: 'assets/ipn.svg',
             colors: {
                 primary: '#6C1D45', // Guinda Politécnico
                 secondary: '#FFFFFF',
@@ -195,15 +195,14 @@ window.InstitutionsModule = (() => {
         const item = typeof inst === 'string' ? getInstitution(inst) : inst;
         if (!item) return '';
 
-        // Limpiar clases si se especificaron propiedades de img en el parámetro de contenedor
         let containerClass = containerSizeOrClass || 'w-11 h-11';
         containerClass = containerClass.replace(/object-contain|object-cover/g, '').trim();
 
-        const rounded = containerClass.includes('rounded-') ? '' : 'rounded-xl';
-        const padding = containerClass.includes('p-') ? '' : 'p-1.5';
+        const rounded = containerClass.includes('rounded-') ? '' : 'rounded-2xl';
+        const padding = containerClass.includes('p-') ? '' : 'p-1';
 
-        return `<div class="school-logo-frame ${containerClass} ${rounded} ${padding} bg-white border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105" style="background-color: #ffffff !important;">` +
-               `<img src="${item.icon}" alt="Escudo ${item.name}" class="${imgClass}" style="background-color: transparent;" loading="lazy">` +
+        return `<div class="school-logo-frame ${containerClass} ${rounded} ${padding} bg-white border border-slate-200/90 dark:border-slate-700 shadow-xs flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105" style="background-color: #ffffff !important;">` +
+               `<img src="${item.icon}" alt="Escudo ${item.name}" class="${imgClass}" style="background-color: transparent; max-height: 88%; max-width: 88%; object-fit: contain;" loading="lazy">` +
                `</div>`;
     }
 

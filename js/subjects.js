@@ -127,11 +127,15 @@ window.SubjectsModule = (() => {
     }
 
     function openModal() {
+        window.HapticsModule?.light();
         const modal = document.getElementById('subject-modal');
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
+            requestAnimationFrame(() => {
+                modal.classList.add('active');
+            });
             setTimeout(() => {
                 document.getElementById('subject-name')?.focus();
             }, 100);
@@ -139,11 +143,15 @@ window.SubjectsModule = (() => {
     }
 
     function closeModal() {
+        window.HapticsModule?.light();
         const modal = document.getElementById('subject-modal');
         if (modal) {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            }, 200);
         }
         editingSubjectId = null;
     }
@@ -189,9 +197,11 @@ window.SubjectsModule = (() => {
                 Storage.addSubject(data);
                 window.showNotification?.('¡Materia registrada exitosamente!', 'success');
             }
+            window.HapticsModule?.double();
             closeModal();
             render();
             window.onDataChanged?.();
+            window.WidgetSyncModule?.sync();
         } catch (e) {
             window.showNotification?.(e.message, 'error');
         }
@@ -209,10 +219,12 @@ window.SubjectsModule = (() => {
             : `¿Estás seguro de eliminar la materia "${subject.name}"?`;
 
         if (confirm(confirmMsg)) {
+            window.HapticsModule?.double();
             Storage.deleteSubject(id);
             window.showNotification?.(`Materia "${subject.name}" eliminada.`, 'info');
             render();
             window.onDataChanged?.();
+            window.WidgetSyncModule?.sync();
         }
     }
 
@@ -269,12 +281,13 @@ window.SubjectsModule = (() => {
         container.classList.remove('hidden');
         container.innerHTML = '';
 
-        subjects.forEach(subject => {
+        subjects.forEach((subject, index) => {
             const subjectTasks = tasks.filter(t => t.subjectId === subject.id);
             const pendingTasks = subjectTasks.filter(t => !t.completed).length;
 
             const card = document.createElement('div');
-            card.className = `group relative bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between`;
+            card.className = `stagger-card card-hover group relative bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col justify-between`;
+            card.style.setProperty('--stagger-i', index);
             card.style.borderLeft = `6px solid ${subject.color}`;
 
             const daysHtml = DAYS_CONFIG.map(day => {

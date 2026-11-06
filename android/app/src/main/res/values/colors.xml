@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colores base de UI y fondo -->
+    <color name="widget_background">#FFFFFF</color>
+    <color name="widget_background_dark">#1E293B</color>
+    <color name="widget_surface">#F8FAFC</color>
+    <color name="widget_surface_dark">#0F172A</color>
+    <color name="widget_card_border">#E2E8F0</color>
+    <color name="widget_card_border_dark">#334155</color>
+    
+    <!-- Colores de texto -->
+    <color name="widget_text_primary">#0F172A</color>
+    <color name="widget_text_secondary">#64748B</color>
+    <color name="widget_text_muted">#94A3B8</color>
+    <color name="widget_text_white">#FFFFFF</color>
+
+    <!-- Colores Institucionales -->
+    <color name="unam_primary">#002B7A</color>
+    <color name="unam_accent">#D59F0F</color>
+    <color name="ipn_primary">#6C1D45</color>
+    <color name="uam_primary">#E31C23</color>
+    <color name="brand_primary">#4F46E5</color>
+    <color name="brand_primary_gradient">#6366F1</color>
+    <color name="brand_teal">#0D9488</color>
+    <color name="brand_emerald">#059669</color>
+
+    <!-- Urgencias e Indicadores -->
+    <color name="urgency_high">#E11D48</color>
+    <color name="urgency_high_bg">#FFE4E6</color>
+    <color name="urgency_medium">#D97706</color>
+    <color name="urgency_medium_bg">#FEF3C7</color>
+    <color name="urgency_low">#10B981</color>
+    <color name="urgency_low_bg">#D1FAE5</color>
+
+    <!-- Puntos de actividad en calendario -->
+    <color name="dot_class">#3B82F6</color>
+    <color name="dot_task">#EF4444</color>
+    <color name="dot_reminder">#F59E0B</color>
+</resources>

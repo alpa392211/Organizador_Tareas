@@ -60,7 +60,7 @@
 
                     <!-- Insignia y Datos de la Institución con Periodo Adaptado -->
                     <div class="flex items-center gap-2.5">
-                        <div id="header-inst-logo" class="shrink-0 flex items-center justify-center cursor-pointer tap-effect" title="Configuración institucional">
+                        <div id="header-inst-logo" class="shrink-0 flex items-center justify-center">
                             <!-- Inyectado dinámicamente con escudo oficial en contenedor blanco -->
                         </div>
                         <div class="flex flex-col">
@@ -77,15 +77,12 @@
                                 <span id="header-inst-type" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                                     Semestral
                                 </span>
-                                <span id="header-cycle-badge" class="hidden md:inline-block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
-                                    <!-- Ciclo activo -->
-                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Lado Derecho: Selectores Dinámicos + Botón de Calendario -->
+                <!-- Lado Derecho: Selectores Dinámicos + Tema -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     
                     <!-- Selector Institucional Oficial (UNAM, IPN, UAM, CCH, ENP, CECyT, Colbach, General) -->
@@ -111,16 +108,6 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </div>
-
-                    <!-- Botón de Calendario Mensual Interactivo -->
-                    <button type="button" data-open-calendar
-                        class="p-2 sm:px-3 sm:py-2 rounded-2xl bg-slate-100 dark:bg-slate-700/60 hover:bg-indigo-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-indigo-600 tap-effect transition-all flex items-center gap-1.5"
-                        title="Ver Calendario Mensual Interactivo" aria-label="Abrir Calendario">
-                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <span class="text-xs font-bold hidden lg:inline">Calendario</span>
-                    </button>
 
                     <!-- Interruptor Rápido de Modo Oscuro / Claro (Header) -->
                     <button type="button" id="theme-toggle-btn"
@@ -149,6 +136,15 @@
                             <span>✅ Tareas</span>
                             <span id="nav-task-count" class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700 font-bold">0</span>
                         </button>
+                        <button type="button" data-view-target="notes"
+                            class="nav-link-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1.5">
+                            <span>📝 Notas</span>
+                            <span id="nav-note-count" class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">0</span>
+                        </button>
+                        <button type="button" data-view-target="calendar"
+                            class="nav-link-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1.5">
+                            <span>🗓️ Calendario</span>
+                        </button>
                     </nav>
 
                 </div>
@@ -162,14 +158,14 @@
     <div id="drawer-backdrop" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
     <aside id="sidebar-drawer"
-        class="fixed top-0 bottom-0 left-0 z-50 w-72 sm:w-80 bg-white dark:bg-slate-800 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between">
+        class="fixed top-0 bottom-0 left-0 z-50 w-[78vw] sm:w-80 max-w-sm bg-white dark:bg-slate-800 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between">
         
-        <!-- Contenido Superior del Drawer -->
-        <div class="p-5 flex-1 overflow-y-auto">
+        <!-- Contenido Superior del Drawer (Página Completa) -->
+        <div class="p-6 flex-1 overflow-y-auto">
             <!-- Cabecera del Drawer -->
             <div class="flex items-center justify-between pb-5 border-b border-slate-100 dark:border-slate-700/60">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div id="drawer-inst-logo" class="shrink-0 flex items-center justify-center cursor-pointer tap-effect" title="Configuración institucional">
+                    <div id="drawer-inst-logo" class="shrink-0 flex items-center justify-center">
                         <!-- Logo institucional oficial en contenedor blanco -->
                     </div>
                     <div class="min-w-0 flex-1">
@@ -233,21 +229,35 @@
                     <span id="drawer-task-count" class="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600">0</span>
                 </button>
 
-                <!-- Calendario Modal Trigger desde Drawer -->
-                <button type="button" data-open-calendar
-                    class="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 hover:text-indigo-600 tap-effect transition-all text-left">
+                <!-- 3. Notas Rápidas -->
+                <button type="button" data-view-target="notes"
+                    class="nav-link-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-slate-700/60 hover:text-amber-600 tap-effect transition-all text-left">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </span>
+                        <span>Notas Rápidas</span>
+                    </div>
+                    <span id="drawer-note-count" class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">0</span>
+                </button>
+
+                <!-- 4. Calendario (Menú y Vista Completa) -->
+                <button type="button" data-view-target="calendar"
+                    class="nav-link-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 hover:text-indigo-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3">
                         <span class="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </span>
-                        <span>Calendario Mensual</span>
+                        <span>Calendario Escolar</span>
                     </div>
                     <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600">Ver</span>
                 </button>
 
-                <!-- 3. Configuración -->
+                <!-- 5. Configuración -->
                 <button type="button" data-view-target="settings"
                     class="nav-link-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 hover:text-indigo-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3">
@@ -260,33 +270,11 @@
                         <span>Configuración</span>
                     </div>
                 </button>
-
-                <!-- Interruptor de Tema Modo Oscuro / Claro en Drawer -->
-                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 mt-2">
-                    <button type="button" id="drawer-theme-toggle-btn"
-                        class="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 tap-effect transition-all text-left"
-                        title="Cambiar tema claro / oscuro" aria-label="Cambiar tema">
-                        <div class="flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 flex items-center justify-center shrink-0">
-                                <svg class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                </svg>
-                                <svg class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-                                </svg>
-                            </span>
-                            <span id="drawer-theme-text">Modo Oscuro</span>
-                        </div>
-                        <span id="drawer-theme-pill" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-amber-400">
-                            Cambiar
-                        </span>
-                    </button>
-                </div>
             </nav>
         </div>
 
         <!-- ======================================================== -->
-        <!-- 4. BOTÓN DE DONACIÓN KO-FI (ESTILO OFICIAL Y DESTACADO)  -->
+        <!-- PIE DEL DRAWER: APOYO Y SALIDA DE LA APLICACIÓN          -->
         <!-- ======================================================== -->
         <div class="p-5 border-t border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/40">
             <div class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 text-center mb-2">
@@ -304,6 +292,16 @@
                 </svg>
                 <span>Apóyame en Ko-fi</span>
             </a>
+
+            <!-- Botón de Salida Segura de la Aplicación -->
+            <button type="button" id="app-exit-btn"
+                class="w-full mt-2.5 py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-700/60 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold flex items-center justify-center gap-2 border border-slate-200/80 dark:border-slate-700 transition-colors tap-effect"
+                title="Cerrar la aplicación">
+                <svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                <span>Salir de la aplicación</span>
+            </button>
             
             <p class="text-[10px] text-center text-slate-600 dark:text-slate-300 mt-2 font-mono">
                 v1.0.0 • Mobile-First Pro
@@ -471,16 +469,178 @@
         </section>
 
         <!-- ========================================================= -->
-        <!-- VISTA 3: CONFIGURACIÓN Y GESTIÓN DE DATOS                 -->
+        <!-- VISTA 3: NOTAS RÁPIDAS Y APUNTES                          -->
+        <!-- ========================================================= -->
+        <section id="view-notes" class="hidden space-y-6">
+            
+            <!-- Barra Superior de Notas: Título, Filtros de Categoría y Botón CTA -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2.5 mb-1">
+                            <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                                Notas Rápidas
+                            </h1>
+                            <span id="notes-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                                0
+                            </span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                            Guarda ideas, pendientes, apuntes de clase y recordatorios en cualquier momento.
+                        </p>
+                    </div>
+
+                    <!-- Botón CTA Nueva Nota -->
+                    <button type="button" id="add-note-btn"
+                        class="tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:via-orange-600 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-orange-500/25 transition-all">
+                        <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Nueva Nota</span>
+                    </button>
+                </div>
+
+                <!-- Barra de Búsqueda y Filtros de Categoría -->
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 items-center">
+                    <!-- Buscador en Vivo -->
+                    <div class="sm:col-span-5 relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="notes-search-input" placeholder="Buscar en títulos o contenido de notas..."
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-700 transition-colors">
+                    </div>
+
+                    <!-- Filtros por Tipo de Nota (Pills deslizables) -->
+                    <div class="sm:col-span-7 flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                        <button type="button" data-note-filter="all"
+                            class="tap-effect shrink-0 px-3 py-1.5 text-xs font-bold rounded-xl transition-all bg-indigo-600 text-white shadow-md">
+                            Todas
+                        </button>
+                        <button type="button" data-note-filter="idea"
+                            class="tap-effect shrink-0 px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1">
+                            <span>💡</span> <span>Ideas</span>
+                        </button>
+                        <button type="button" data-note-filter="apunte"
+                            class="tap-effect shrink-0 px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1">
+                            <span>📝</span> <span>Apuntes</span>
+                        </button>
+                        <button type="button" data-note-filter="pendiente"
+                            class="tap-effect shrink-0 px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1">
+                            <span>📌</span> <span>Pendientes</span>
+                        </button>
+                        <button type="button" data-note-filter="importante"
+                            class="tap-effect shrink-0 px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1">
+                            <span>⚠️</span> <span>Importante</span>
+                        </button>
+                        <button type="button" data-note-filter="personal"
+                            class="tap-effect shrink-0 px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-all flex items-center gap-1">
+                            <span>🔒</span> <span>Personal</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State de Notas -->
+            <div id="notes-empty-state" class="hidden text-center py-12 px-6 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-3xl bg-amber-50 dark:bg-slate-700/60 text-amber-500 flex items-center justify-center shadow-inner">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                </div>
+                <h3 class="text-base font-bold text-slate-800 dark:text-white mb-1">Sin notas registradas</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto mb-5">
+                    Anota rápidamente recordatorios, fórmulas, libros por leer o pendientes del semestre.
+                </p>
+                <button type="button" id="empty-add-note-btn"
+                    class="tap-effect inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span>Crear mi primera nota</span>
+                </button>
+            </div>
+
+            <!-- Grid de Tarjetas de Notas -->
+            <div id="notes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Inyectado por notes.js -->
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- VISTA 4: CALENDARIO ESCOLAR Y ENTREGAS (VISTA COMPLETA)   -->
+        <!-- ========================================================= -->
+        <section id="view-calendar" class="hidden space-y-6">
+            <!-- Barra Superior del Calendario: Título y Navegación del Mes -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs">
+                <div>
+                    <div class="flex items-center gap-2.5 mb-1">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                            <span>🗓️</span> Calendario Escolar y Entregas
+                        </h1>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                        Consulta tus materias, horarios lectivos y fechas límite de tareas según el ciclo escolar.
+                    </p>
+                </div>
+
+                <!-- Controles de Navegación del Mes -->
+                <div class="flex items-center gap-2 self-start sm:self-center">
+                    <button type="button" id="cal-view-prev-month"
+                        class="p-2 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 tap-effect transition-colors"
+                        title="Mes anterior">
+                        <svg class="w-5 h-5 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button type="button" id="cal-view-today-btn"
+                        class="px-3.5 py-2 rounded-2xl bg-indigo-50 dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 tap-effect transition-colors">
+                        Hoy
+                    </button>
+                    <button type="button" id="cal-view-next-month"
+                        class="p-2 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 tap-effect transition-colors"
+                        title="Mes siguiente">
+                        <svg class="w-5 h-5 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Título del Mes Activo y Leyendas -->
+            <div class="flex items-center justify-between px-2 flex-wrap gap-2">
+                <h2 id="cal-view-month-title" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white capitalize">
+                    Mes Año
+                </h2>
+                <div class="flex items-center gap-3 text-xs text-slate-500 font-medium">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> Clases vigentes</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Entregas de tareas</span>
+                </div>
+            </div>
+
+            <!-- Banner Informativo del Ciclo Escolar Activo -->
+            <div id="cal-view-cycle-banner"></div>
+
+            <!-- Cuadrícula Mensual del Calendario -->
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
+                <div id="cal-view-days-grid" class="grid grid-cols-7 gap-1 sm:gap-2">
+                    <!-- Inyectado dinámicamente por CalendarModule -->
+                </div>
+            </div>
+
+            <!-- Desglose de Clases y Tareas del Día Seleccionado -->
+            <div id="cal-view-day-details" class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
+                <!-- Inyectado dinámicamente por CalendarModule -->
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- VISTA 5: CONFIGURACIÓN Y GESTIÓN DE DATOS                 -->
         <!-- ========================================================= -->
         <section id="view-settings" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-6">
                 <div>
                     <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-1">
-                        Configuración y Datos
+                        Configuración y Preferencias
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                        Personaliza tu institución y administra el respaldo de tus datos locales.
+                        Personaliza tu institución, tema visual, accesos rápidos y administra tus respaldos.
                     </p>
                 </div>
 
@@ -567,26 +727,39 @@
                         </div>
                     </div>
 
-                    <!-- Selectores Dropdown Tradicionales (Institución y Periodo) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-                        <div class="space-y-1.5">
+                    <!-- Selector de Grado / Semestre / Periodo Activo en Botones Tipo Píldora -->
+                    <div class="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+                        <div class="flex items-center justify-between">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                Lista de Instituciones
+                                Semestre o Periodo Lectivo Activo
                             </label>
-                            <select id="settings-institution-select" class="w-full bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white text-xs sm:text-sm font-semibold p-2.5 rounded-xl focus:border-indigo-500 focus:outline-none cursor-pointer">
-                            </select>
+                            <span class="text-[11px] text-slate-500 font-medium">Pulsa tu periodo</span>
                         </div>
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                Grado / Semestre / Periodo Activo
-                            </label>
-                            <select id="settings-period-select" class="w-full bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white text-xs sm:text-sm font-semibold p-2.5 rounded-xl focus:border-indigo-500 focus:outline-none cursor-pointer">
+                        <!-- Botones Tipo Píldora Interactivos para Selección Inmediata -->
+                        <div id="settings-period-pills" class="flex flex-wrap gap-2 pt-0.5">
+                            <!-- Inyectado dinámicamente con botones atractivos -->
+                        </div>
+                        <!-- Select tradicional oculto para compatibilidad -->
+                        <select id="settings-period-select" class="hidden"></select>
+                    </div>
+
+                    <!-- Lista Desplegable Estilizada de Institución -->
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                            Búsqueda Directa por Lista
+                        </label>
+                        <div class="relative">
+                            <select id="settings-institution-select"
+                                class="appearance-none w-full bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm font-semibold pl-4 pr-10 py-3 rounded-2xl border border-slate-200 dark:border-slate-600 focus:border-indigo-500 focus:outline-none cursor-pointer transition-colors shadow-2xs">
                             </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Apariencia y Modo Oscuro -->
+                <!-- 3. Apariencia y Modo Oscuro (Consolidado) -->
                 <div class="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 space-y-3">
                     <div class="flex items-center justify-between flex-wrap gap-2">
                         <div>
@@ -620,37 +793,193 @@
                     </div>
                 </div>
 
-                <!-- Opciones de Backup / Demo -->
-                <div class="pt-6 border-t border-slate-100 dark:border-slate-700 space-y-4">
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                        Gestión de Información (LocalStorage)
-                    </h3>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <button type="button" id="settings-load-demo"
-                            class="tap-effect p-3.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-indigo-200/50 dark:border-indigo-800">
-                            <span class="text-lg">🧪</span>
-                            <span>Cargar Datos Demo</span>
-                        </button>
+                <!-- 4. Tipografía y Estilo de Texto (Menú Desplegable con 5 Opciones) -->
+                <div class="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span>🔤</span> Tipografía y Estilo de Texto
+                            </h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">
+                                Selecciona el estilo de fuente para toda la interfaz desde el menú desplegable.
+                            </p>
+                        </div>
+                        <span id="settings-font-pill" class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+                            Calibri
+                        </span>
+                    </div>
 
-                        <button type="button" id="settings-export-json"
-                            class="tap-effect p-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-emerald-200/50 dark:border-emerald-800">
-                            <span class="text-lg">💾</span>
-                            <span>Exportar Respaldo (JSON)</span>
-                        </button>
+                    <!-- Menú Desplegable de Fuentes (5 Opciones) -->
+                    <div class="relative pt-1">
+                        <select id="settings-font-select"
+                            class="appearance-none w-full bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm font-bold pl-4 pr-10 py-3 rounded-2xl border border-slate-200 dark:border-slate-600 focus:border-indigo-500 focus:outline-none cursor-pointer transition-colors shadow-2xs">
+                            <option value="calibri">1. Calibri (Limpia y Moderna - Sans-serif)</option>
+                            <option value="times">2. Times New Roman (Académica y Tradicional - Serif)</option>
+                            <option value="montserrat">3. Montserrat (Geométrica y Estilizada - Sans-serif)</option>
+                            <option value="lora">4. Lora (Editorial y Literaria - Serif)</option>
+                            <option value="poppins">5. Poppins (Moderna y Amigable - Sans-serif)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 pt-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
 
-                        <button type="button" id="settings-import-btn"
-                            class="tap-effect p-3.5 rounded-2xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-blue-200/50 dark:border-blue-800">
-                            <span class="text-lg">📥</span>
-                            <span>Restaurar Respaldo</span>
-                        </button>
-                        <input type="file" id="settings-import-input" accept=".json" class="hidden">
+                    <!-- Muestra de Vista Previa en Vivo -->
+                    <div id="settings-font-preview-card" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/70 space-y-1">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">Vista previa en tiempo real</span>
+                        <p id="settings-font-preview-text" class="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-relaxed">
+                            El rápido zorro marrón salta sobre el perro perezoso. 1234567890
+                        </p>
+                        <span id="settings-font-preview-desc" class="text-xs text-indigo-600 dark:text-indigo-400 font-medium block">
+                            Tipografía institucional clara y de óptima lectura.
+                        </span>
+                    </div>
+                </div>
 
-                        <button type="button" id="settings-clear-all"
-                            class="tap-effect p-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-rose-200/50 dark:border-rose-800">
-                            <span class="text-lg">🗑️</span>
-                            <span>Borrar Todos los Datos</span>
-                        </button>
+                <!-- 5. Vibración Háptica Global -->
+                <div class="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span>📳</span> Vibración Háptica Global
+                            </h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">
+                                Respuesta táctil sutil al interactuar con botones, cambiar pestañas y guardar elementos.
+                            </p>
+                        </div>
+                        <span id="settings-haptics-status" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                            Activada
+                        </span>
+                    </div>
+                    <div class="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-700/60">
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Activar vibración táctil (Web + Android Haptics)
+                        </span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="settings-haptics-toggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 6. Atajo Rápido del Botón Central Inferior -->
+                <div class="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 space-y-3">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>🔘</span> Atajo Rápido del Botón Central Inferior
+                        </h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-400">
+                            Elige qué acción directa ejecuta el botón grande de en medio como atajo instantáneo (sin salir de la pantalla actual):
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                        <!-- Opción 1: Agregar Tarea -->
+                        <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all border-slate-200 dark:border-slate-700 hover:border-indigo-500 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/60 dark:has-[:checked]:bg-indigo-950/40">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-base">
+                                    ✅
+                                </span>
+                                <input type="radio" name="bottom-action-choice" value="add_task" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500" checked>
+                            </div>
+                            <span class="text-xs font-bold text-slate-900 dark:text-white">Atajo: Agregar Tarea</span>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Abre la ventana modal para registrar tarea al instante sin cambiar de vista.</span>
+                        </label>
+
+                        <!-- Opción 2: Crear Nota Rápida -->
+                        <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all border-slate-200 dark:border-slate-700 hover:border-indigo-500 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/60 dark:has-[:checked]:bg-indigo-950/40">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center font-bold text-base">
+                                    📝
+                                </span>
+                                <input type="radio" name="bottom-action-choice" value="notes" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                            </div>
+                            <span class="text-xs font-bold text-slate-900 dark:text-white">Atajo: Crear Nota</span>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Abre la ventana modal para anotar ideas o apuntes sin salir de tu vista.</span>
+                        </label>
+
+                        <!-- Opción 3: Ver Calendario -->
+                        <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all border-slate-200 dark:border-slate-700 hover:border-indigo-500 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/60 dark:has-[:checked]:bg-indigo-950/40">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center font-bold text-base">
+                                    🗓️
+                                </span>
+                                <input type="radio" name="bottom-action-choice" value="calendar" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                            </div>
+                            <span class="text-xs font-bold text-slate-900 dark:text-white">Atajo: Calendario</span>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Abre la ventana emergente del calendario mensual interactivo.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 6. Submenú "Opciones avanzadas de almacenamiento" (Acordeón Desplegable) -->
+                <div class="rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800 transition-all">
+                    <!-- Botón disparador del Acordeón -->
+                    <button type="button" id="storage-accordion-toggle"
+                        class="tap-effect w-full p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-300 flex items-center justify-center text-lg">
+                                ⚙️
+                            </span>
+                            <div>
+                                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">
+                                    Opciones avanzadas de almacenamiento
+                                </h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">
+                                    Uso de memoria, exportación, restauración y reinicio de datos locales.
+                                </p>
+                            </div>
+                        </div>
+                        <svg id="storage-accordion-chevron" class="accordion-chevron w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Panel Interior del Acordeón -->
+                    <div id="storage-accordion-content" class="accordion-content border-t border-slate-100 dark:border-slate-700/60 p-5 space-y-5 bg-slate-50/50 dark:bg-slate-800/40">
+                        <!-- Estado y Barra de Uso de Almacenamiento -->
+                        <div class="space-y-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 shadow-xs">
+                            <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                                <span class="flex items-center gap-1.5">
+                                    <span>📊</span> Capacidad Utilizada en Almacenamiento Local
+                                </span>
+                                <span id="storage-percentage-label" class="font-mono text-indigo-600 dark:text-indigo-400 font-extrabold">0%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                <div id="storage-bar-fill" class="storage-progress-bar h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full" style="width: 2%;"></div>
+                            </div>
+                            <p id="storage-detail" class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                                Calculando uso de almacenamiento...
+                            </p>
+                        </div>
+
+                        <!-- Cuadrícula de Acciones de Almacenamiento -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <button type="button" id="settings-load-demo"
+                                class="tap-effect p-3.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-indigo-200/50 dark:border-indigo-800">
+                                <span class="text-lg">🧪</span>
+                                <span>Cargar Datos Demo</span>
+                            </button>
+
+                            <button type="button" id="settings-export-json"
+                                class="tap-effect p-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-emerald-200/50 dark:border-emerald-800">
+                                <span class="text-lg">💾</span>
+                                <span>Exportar Respaldo (JSON)</span>
+                            </button>
+
+                            <button type="button" id="settings-import-btn"
+                                class="tap-effect p-3.5 rounded-2xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-blue-200/50 dark:border-blue-800">
+                                <span class="text-lg">📥</span>
+                                <span>Restaurar Respaldo</span>
+                            </button>
+                            <input type="file" id="settings-import-input" accept=".json" class="hidden">
+
+                            <button type="button" id="settings-clear-all"
+                                class="tap-effect p-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-rose-200/50 dark:border-rose-800">
+                                <span class="text-lg">🗑️</span>
+                                <span>Borrar Todos los Datos</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -661,7 +990,7 @@
                         <p class="text-[11px] text-slate-600 dark:text-slate-300">Compatible con UNAM, IPN, UAM, CCH, ENP, CECyT y Bachilleratos.</p>
                     </div>
                     <a href="https://ko-fi.com/edrx_ngl" target="_blank" rel="noopener noreferrer" class="kofi-btn px-4 py-2.5 rounded-xl text-white font-bold text-xs flex items-center gap-2 shadow-md tap-effect" title="Apóyame en Ko-fi invitándome un café">
-                        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.022 7.02c-4.495.021-10.154 0-10.154 0-.493-.016-.549-.38-.549-.38-.052-3.861.026-9.155.026-9.155h15.222s.104 5.485.052 9.155c0 0-.056.364-.549.38-1.393.007-4.058 0-4.058 0zm7.842-3.866c-.347.078-.71.12-1.082.126.012-.662.018-1.353.018-2.071 0-.961-.012-1.879-.033-2.748 1.488.083 2.588.667 2.766 1.609.289 1.53-.16 2.809-1.669 3.084z"/></svg>
+                        <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.022 7.02c-4.495.021-10.154 0-10.154 0-.493-.016-.549-.38-.052-3.861.026-9.155.026-9.155h15.222s.104 5.485.052 9.155c0 0-.056.364-.549.38-1.393.007-4.058 0-4.058 0zm7.842-3.866c-.347.078-.71.12-1.082.126.012-.662.018-1.353.018-2.071 0-.961-.012-1.879-.033-2.748 1.488.083 2.588.667 2.766 1.609.289 1.53-.16 2.809-1.669 3.084z"/></svg>
                         <span>Ko-fi Donación</span>
                     </a>
                 </div>
@@ -671,35 +1000,42 @@
     </main>
 
     <!-- ========================================================= -->
-    <!-- BARRA INFERIOR DE ACCESO RÁPIDO PARA MÓVILES (BOTTOM NAV) -->
+    <!-- BARRA INFERIOR DE ACCESO RÁPIDO PARA MÓVILES (BOTTOM NAV - 3 BOTONES) -->
     <!-- ========================================================= -->
-    <nav class="fixed bottom-0 inset-x-0 z-30 sm:hidden bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700/60 px-4 py-2 shadow-lg">
-        <div class="flex items-center justify-around">
+    <nav class="fixed bottom-0 inset-x-0 z-30 sm:hidden bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700/60 px-6 py-2 shadow-2xl">
+        <div class="flex items-center justify-between max-w-sm mx-auto">
+            <!-- 1. Lateral Izquierdo: Materias -->
             <button type="button" data-view-target="subjects"
-                class="nav-link-btn flex flex-col items-center text-xs font-semibold text-indigo-600 tap-effect">
-                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="nav-link-btn flex flex-col items-center justify-center py-1.5 px-4 text-xs font-bold text-slate-600 dark:text-slate-400 tap-effect rounded-2xl transition-all">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
-                <span>Materias</span>
+                <span class="text-[11px] font-bold">Materias</span>
             </button>
 
-            <!-- Botón Central Calendario -->
-            <button type="button" data-open-calendar
-                class="flex flex-col items-center -mt-5 tap-effect">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+            <!-- 2. Botón Central Grande: Atajo de Acción Rápida (Personalizable) -->
+            <button type="button" id="bottom-main-action-btn"
+                class="flex flex-col items-center -mt-7 tap-effect group px-2"
+                title="Atajo de Acción Rápida">
+                <div id="bottom-main-circle" class="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-600 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all">
+                    <span id="bottom-main-icon">
+                        <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </span>
                 </div>
-                <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mt-1">Calendario</span>
+                <span id="bottom-main-label" class="text-[10px] font-extrabold text-teal-600 dark:text-teal-400 mt-1 truncate max-w-[80px]">
+                    + Tarea
+                </span>
             </button>
 
+            <!-- 3. Lateral Derecho: Tareas -->
             <button type="button" data-view-target="tasks"
-                class="nav-link-btn flex flex-col items-center text-xs font-semibold text-slate-600 dark:text-slate-400 tap-effect">
-                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="nav-link-btn flex flex-col items-center justify-center py-1.5 px-4 text-xs font-bold text-slate-600 dark:text-slate-400 tap-effect rounded-2xl transition-all">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                 </svg>
-                <span>Tareas</span>
+                <span class="text-[11px] font-bold">Tareas</span>
             </button>
         </div>
     </nav>
@@ -707,10 +1043,10 @@
     <!-- ========================================================= -->
     <!-- MODAL 1: NUEVA / EDITAR MATERIA (CON SELECTOR DE COLOR)   -->
     <!-- ========================================================= -->
-    <div id="subject-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div id="subject-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
         <div id="subject-modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
         
-        <div class="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform transition-all animate-fadeIn">
+        <div class="modal-dialog relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform">
             <!-- Cabecera Modal -->
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
                 <h3 id="subject-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">
@@ -854,10 +1190,10 @@
     <!-- ========================================================= -->
     <!-- MODAL 2: NUEVA / EDITAR TAREA                             -->
     <!-- ========================================================= -->
-    <div id="task-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div id="task-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
         <div id="task-modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
         
-        <div class="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform transition-all animate-fadeIn">
+        <div class="modal-dialog relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
                 <h3 id="task-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">
                     Nueva Tarea Escolar
@@ -935,12 +1271,103 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- MODAL 3: CALENDARIO MENSUAL INTERACTIVO                   -->
+    <!-- MODAL 3: NUEVA / EDITAR NOTA RÁPIDA (NUEVO REQUERIMIENTO)  -->
     <!-- ========================================================= -->
-    <div id="calendar-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6">
+    <div id="note-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div id="note-modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+        
+        <div class="modal-dialog relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
+                <h3 id="note-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">
+                    Nueva Nota Rápida
+                </h3>
+                <button type="button" id="close-note-modal" class="p-2 rounded-2xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 tap-effect">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form id="note-form" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                <!-- Título -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Título de la Nota *
+                    </label>
+                    <input type="text" id="note-title" required placeholder="Ej. Fórmulas de examen, Idea de proyecto, Pendiente"
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                </div>
+
+                <!-- Selector de Categoría / Tipo de Nota -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Tipo de Nota / Categoría
+                    </label>
+                    <select id="note-type"
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        <option value="apunte" selected>📝 Apunte Rápido</option>
+                        <option value="idea">💡 Idea</option>
+                        <option value="pendiente">📌 Pendiente</option>
+                        <option value="importante">⚠️ Importante</option>
+                        <option value="personal">🔒 Personal</option>
+                    </select>
+                </div>
+
+                <!-- Contenido -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Contenido / Apunte
+                    </label>
+                    <textarea id="note-content" rows="4" placeholder="Escribe aquí los detalles, texto o recordatorio..."
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500 resize-none font-normal"></textarea>
+                </div>
+
+                <!-- Recordatorio de Notificación -->
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                                ⏰ Activar Recordatorio de Notificación
+                            </span>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400">
+                                Recibe una alerta enriquecida con el tipo y contenido de tu nota.
+                            </span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="note-has-reminder" class="sr-only peer">
+                            <div class="w-10 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Selector Fecha y Hora (Visible solo si hasReminder está activo) -->
+                    <div id="note-reminder-datetime-container" class="hidden animate-fadeIn">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                            Fecha y Hora Exacta del Recordatorio *
+                        </label>
+                        <input type="datetime-local" id="note-reminder-datetime"
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-700">
+                    <button type="button" id="cancel-note-btn"
+                        class="px-5 py-2.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs tap-effect transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="save-note-btn"
+                        class="px-6 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 tap-effect transition-all">
+                        Guardar Nota
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 4: CALENDARIO MENSUAL INTERACTIVO                   -->
+    <!-- ========================================================= -->
+    <div id="calendar-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6">
         <div id="calendar-modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
         
-        <div class="relative w-full max-w-3xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform transition-all animate-fadeIn flex flex-col max-h-[92vh]">
+        <div class="modal-dialog relative w-full max-w-3xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform flex flex-col max-h-[92vh]">
             <!-- Barra Superior del Calendario -->
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800">
                 <div class="flex items-center gap-2">
@@ -996,6 +1423,39 @@
         </div>
     </div>
 
+    <!-- ========================================================= -->
+    <!-- MODAL 5: CONFIRMACIÓN DE SALIDA DE LA APP                 -->
+    <!-- ========================================================= -->
+    <div id="exit-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div id="exit-modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+
+        <div class="modal-dialog relative w-full max-w-sm bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform text-center p-6 space-y-4">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-2xl shadow-inner">
+                🚪
+            </div>
+
+            <div>
+                <h3 class="text-lg font-black text-slate-900 dark:text-white">
+                    ¿Estás seguro de salir de la app?
+                </h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+                    Tus materias, tareas y notas quedan guardadas en tu dispositivo. Puedes volver en cualquier momento.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button type="button" id="cancel-exit-btn"
+                    class="py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 font-bold text-xs tap-effect transition-all">
+                    Seguir aquí
+                </button>
+                <button type="button" id="confirm-exit-btn"
+                    class="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-500/20 tap-effect transition-all flex items-center justify-center gap-1.5">
+                    <span>Salir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========================================== -->
     <!-- CONTENEDOR DE TOASTS NOTIFICACIONES       -->
     <!-- ========================================== -->
@@ -1006,8 +1466,12 @@
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
     <script src="js/institutions.js"></script>
     <script src="js/storage.js"></script>
+    <script src="js/haptics.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/widgets.js"></script>
     <script src="js/subjects.js"></script>
     <script src="js/tasks.js"></script>
+    <script src="js/notes.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/app.js"></script>
 </body>

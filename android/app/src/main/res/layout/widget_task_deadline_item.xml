@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_deadline_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/widget_card_background"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <!-- Barra Vertical con Código de Color de la Materia -->
+    <View
+        android:id="@+id/item_subject_color_bar"
+        android:layout_width="4dp"
+        android:layout_height="36dp"
+        android:background="@color/brand_primary" />
+
+    <!-- Datos de la Tarea y Materia -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/item_task_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Ensayo sobre la Revolución"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_subject_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Historia de México I"
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- Fecha de Entrega e Indicador de Urgencia -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/item_due_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hoy 23:59"
+            android:textColor="@color/urgency_high"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_urgency_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Alta 🔴"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="9sp" />
+    </LinearLayout>
+
+</LinearLayout>

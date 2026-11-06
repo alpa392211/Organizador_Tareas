@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_task_deadlines_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_card_background"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Cabecera del Widget de Entregas -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Próximas Entregas"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_deadlines_inst_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_badge_background"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:text="UNAM"
+            android:textColor="@color/widget_text_white"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_deadlines_btn_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/widget_button_add"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="+ Tarea"
+            android:textColor="@color/widget_text_white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/widget_card_border" />
+
+    <!-- Lista Desplazable de Tareas Pendientes -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="6dp">
+
+        <ListView
+            android:id="@+id/widget_deadlines_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="6dp" />
+
+        <!-- Vista vacía cuando no hay tareas pendientes -->
+        <TextView
+            android:id="@+id/widget_deadlines_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="¡Felicidades! No hay entregas pendientes 🎉"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</LinearLayout>

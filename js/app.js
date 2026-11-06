@@ -1,13 +1,15 @@
 /**
  * Aplicación Principal - Orquestador
- * Integra UI, navegación por Drawer, selector institucional con escudos oficiales,
- * selector dinámico de periodos/semestres, ciclo escolar obligatorio y vistas.
+ * Integra UI, navegación por Drawer de pantalla completa, selector institucional oficial,
+ * selector dinámico de periodos/semestres, ciclo escolar obligatorio, notas rápidas,
+ * selector de 3 tipografías (Calibri, Times New Roman, Elegante), sistema háptico,
+ * botón central de atajo de acción rápida personalizable y widgets nativos.
  */
 
 (() => {
     class App {
         constructor() {
-            this.currentView = 'subjects'; // 'subjects' | 'tasks' | 'settings'
+            this.currentView = 'subjects'; // 'subjects' | 'tasks' | 'notes' | 'settings'
             this.activeInstitution = null;
         }
 
@@ -17,79 +19,128 @@
             const SubjectsModule = window.SubjectsModule;
             const TasksModule = window.TasksModule;
             const CalendarModule = window.CalendarModule;
+            const NotesModule = window.NotesModule;
+            const HapticsModule = window.HapticsModule;
+            const NotificationsModule = window.NotificationsModule;
+            const WidgetSyncModule = window.WidgetSyncModule;
 
-            // Inicialización limpia en localStorage
+            // 1. Inicialización limpia en localStorage
             Storage.initIfFirstTime();
 
-            // Inicializar y aplicar modo oscuro / claro
+            // 2. Inicializar sistema háptico y notificaciones locales enriquecidas
+            HapticsModule?.bindGlobalInteractions?.();
+            NotificationsModule?.init?.();
+
+            // 3. Inicializar y aplicar modo oscuro / claro
             this.initTheme();
 
-            // Cargar institución y periodo activo
+            // 4. Inicializar y aplicar tipografía seleccionada (Calibri, Times New Roman, Elegante)
+            this.initFontFamily();
+
+            // 5. Cargar institución y periodo activo
             const instId = Storage.getInstitution();
             this.setInstitution(instId);
 
-            // Inicializar módulos
-            SubjectsModule.init();
-            TasksModule.init();
-            CalendarModule.init();
+            // 6. Inicializar submódulos
+            SubjectsModule?.init?.();
+            TasksModule?.init?.();
+            NotesModule?.init?.();
+            CalendarModule?.init?.();
+            WidgetSyncModule?.init?.();
 
-            // Configurar navegación, menús y eventos globales
+            // 7. Configurar navegación, drawer, selectores, botón principal de atajo y confirmación de salida
             this.setupNavigation();
             this.setupSidebarDrawer();
             this.setupInstitutionAndPeriodSelectors();
+            this.setupBottomActionButton();
             this.setupModalsAndShortcuts();
+            this.setupExitModal();
             this.setupSettingsView();
 
-            // Exponer funciones globales para interacción fluida entre módulos
+            // 8. Exponer funciones globales para interacción fluida entre módulos
             window.onDataChanged = () => this.refreshAll();
             window.showNotification = (msg, type) => this.showToast(msg, type);
             window.navigateToSubjects = () => this.switchView('subjects');
+            window.navigateToTasks = () => this.switchView('tasks');
+            window.navigateToNotes = () => this.switchView('notes');
+            window.navigateToCalendar = () => this.switchView('calendar');
+            window.navigateToSettings = () => this.switchView('settings');
             window.navigateToTasksWithSubject = (subjectId) => {
                 this.switchView('tasks');
-                TasksModule.subjectFilter = subjectId;
-                const select = document.getElementById('task-subject-filter');
-                if (select) select.value = subjectId;
-                TasksModule.render();
+                if (window.TasksModule) {
+                    window.TasksModule.subjectFilter = subjectId;
+                    const select = document.getElementById('task-subject-filter');
+                    if (select) select.value = subjectId;
+                    window.TasksModule.render();
+                }
             };
 
-            // Renderizado inicial
+            // 9. Atender posibles accesos directos desde Widgets de Android
+            WidgetSyncModule?.handleIntent?.({
+                TasksModule,
+                NotesModule,
+                CalendarModule,
+                switchView: (v) => this.switchView(v)
+            });
+
+            // 10. Soporte para parámetros URL (Widgets de Android y Deep Linking)
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialView = urlParams.get('view');
+            if (initialView && ['subjects', 'tasks', 'notes', 'calendar', 'settings'].includes(initialView)) {
+                this.switchView(initialView);
+            }
+            if (urlParams.get('openDrawer') === '1') {
+                setTimeout(() => document.getElementById('drawer-toggle-btn')?.click(), 50);
+            }
+            if (urlParams.get('openExit') === '1') {
+                setTimeout(() => document.getElementById('app-exit-btn')?.click(), 50);
+            }
+
+            // 11. Renderizado inicial completo
             this.refreshAll();
         }
 
         refreshAll() {
-            window.SubjectsModule.render();
-            window.TasksModule.render();
+            window.SubjectsModule?.render?.();
+            window.TasksModule?.render?.();
+            window.NotesModule?.render?.();
             this.updateHeaderStats();
             this.updateCycleBadges();
+            this.updateStorageMetrics();
+            window.WidgetSyncModule?.sync?.();
         }
 
         updateHeaderStats() {
             const Storage = window.StorageModule;
             const subjects = Storage.getSubjects();
             const tasks = Storage.getTasks();
+            const notes = Storage.getNotes();
             const pendingTasks = tasks.filter(t => !t.completed).length;
 
             const drawerSubCount = document.getElementById('drawer-sub-count');
             const drawerTaskCount = document.getElementById('drawer-task-count');
+            const drawerNoteCount = document.getElementById('drawer-note-count');
+
             const navSubCount = document.getElementById('nav-sub-count');
             const navTaskCount = document.getElementById('nav-task-count');
+            const navNoteCount = document.getElementById('nav-note-count');
 
             if (drawerSubCount) drawerSubCount.textContent = subjects.length;
             if (drawerTaskCount) drawerTaskCount.textContent = pendingTasks;
+            if (drawerNoteCount) drawerNoteCount.textContent = notes.length;
+
             if (navSubCount) navSubCount.textContent = subjects.length;
             if (navTaskCount) navTaskCount.textContent = pendingTasks;
+            if (navNoteCount) navNoteCount.textContent = notes.length;
         }
 
         updateCycleBadges() {
             const Storage = window.StorageModule;
-            const cycle = Storage.getAcademicCycle();
-            const headerCycleBadge = document.getElementById('header-cycle-badge');
+            const cycle = Storage.getAcademicCycle?.();
             const drawerCycleText = document.getElementById('drawer-cycle-text');
             const settingsCycleStatus = document.getElementById('settings-cycle-status-pill');
 
             if (cycle && cycle.startDate && cycle.endDate) {
-                const label = `Ciclo: ${cycle.startDate} al ${cycle.endDate}`;
-                if (headerCycleBadge) headerCycleBadge.textContent = label;
                 if (drawerCycleText) drawerCycleText.textContent = `📅 ${cycle.startDate} - ${cycle.endDate}`;
                 if (settingsCycleStatus) {
                     const todayStr = new Date().toISOString().split('T')[0];
@@ -99,6 +150,58 @@
                         ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white'
                         : 'text-xs font-bold px-2.5 py-1 rounded-full bg-amber-600 text-white';
                 }
+            }
+        }
+
+        /* ========================================================
+           SISTEMA DE TIPOGRAFÍAS (5 OPCIONES: Calibri, Times New Roman, Montserrat, Lora, Poppins)
+           ======================================================== */
+        initFontFamily() {
+            const Storage = window.StorageModule;
+            const font = Storage.getFontFamily?.() || 'calibri';
+            this.applyFontFamily(font);
+        }
+
+        applyFontFamily(fontKey) {
+            const valid = ['calibri', 'times', 'montserrat', 'lora', 'poppins'];
+            const activeFont = valid.includes(fontKey) ? fontKey : 'calibri';
+
+            // Aplicar atributo data-font en la etiqueta raíz para que CSS adapte todas las fuentes
+            document.documentElement.setAttribute('data-font', activeFont);
+            document.body.setAttribute('data-font', activeFont);
+
+            const labels = {
+                calibri: 'Calibri',
+                times: 'Times New Roman',
+                montserrat: 'Montserrat',
+                lora: 'Lora',
+                poppins: 'Poppins'
+            };
+
+            const descs = {
+                calibri: 'Tipografía institucional clara, moderna y de lectura descansada.',
+                times: 'Serif formal y tradicional para estilo académico formal.',
+                montserrat: 'Geométrica estilizada con excelente legibilidad en títulos.',
+                lora: 'Serif literaria cálida, sofisticada y con estilo editorial.',
+                poppins: 'Moderna, geométrica y amigable con proporciones equilibradas.'
+            };
+
+            // Actualizar etiqueta pill de la tipografía en Ajustes
+            const fontPill = document.getElementById('settings-font-pill');
+            if (fontPill) {
+                fontPill.textContent = labels[activeFont] || activeFont;
+            }
+
+            // Sincronizar el select desplegable en Ajustes
+            const fontSelect = document.getElementById('settings-font-select');
+            if (fontSelect && fontSelect.value !== activeFont) {
+                fontSelect.value = activeFont;
+            }
+
+            // Actualizar descripción de la vista previa en vivo
+            const previewDesc = document.getElementById('settings-font-preview-desc');
+            if (previewDesc) {
+                previewDesc.textContent = descs[activeFont] || '';
             }
         }
 
@@ -124,15 +227,10 @@
                 });
             }
 
-            // Botones de cambio rápido (Header y Sidebar/Drawer)
+            // Botón de cambio rápido en el Header
             const headerToggleBtn = document.getElementById('theme-toggle-btn');
-            const drawerToggleBtn = document.getElementById('drawer-theme-toggle-btn');
-
             if (headerToggleBtn) {
                 headerToggleBtn.onclick = () => this.toggleTheme();
-            }
-            if (drawerToggleBtn) {
-                drawerToggleBtn.onclick = () => this.toggleTheme();
             }
         }
 
@@ -152,6 +250,8 @@
 
         setTheme(themeMode) {
             const Storage = window.StorageModule;
+            window.HapticsModule?.light();
+
             if (themeMode === 'auto') {
                 Storage.setTheme(null);
                 const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -171,19 +271,6 @@
 
         updateThemeUI(activeTheme, isAuto = false) {
             const isDark = activeTheme === 'dark';
-
-            // Actualizar textos y badges del Drawer
-            const drawerText = document.getElementById('drawer-theme-text');
-            const drawerPill = document.getElementById('drawer-theme-pill');
-            if (drawerText) {
-                drawerText.textContent = isDark ? 'Modo Oscuro (Activo)' : 'Modo Claro (Activo)';
-            }
-            if (drawerPill) {
-                drawerPill.textContent = isDark ? '🌙 Oscuro' : '☀️ Claro';
-                drawerPill.className = isDark
-                    ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-slate-700 text-amber-400'
-                    : 'text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700';
-            }
 
             // Actualizar botones y selector de Configuración
             const pill = document.getElementById('settings-theme-pill');
@@ -260,7 +347,7 @@
             // Actualizar selector dinámico de periodos
             this.updatePeriodSelectors(inst);
 
-            // Re-renderizar o actualizar resaltado de la galería en Settings
+            // Re-renderizar resaltado de la galería en Settings
             this.renderInstitutionGrid();
 
             document.documentElement.style.setProperty('--inst-primary', inst.colors.primary);
@@ -303,6 +390,7 @@
             grid.querySelectorAll('.inst-grid-card').forEach(card => {
                 card.onclick = () => {
                     const instId = card.dataset.instId;
+                    window.HapticsModule?.light();
                     this.setInstitution(instId);
                     this.showToast(`Institución seleccionada: ${this.activeInstitution.name}`, 'success');
                 };
@@ -314,9 +402,13 @@
             const currentPeriod = Storage.getAcademicPeriod();
             const headerPeriodSelect = document.getElementById('header-period-select');
             const settingsPeriodSelect = document.getElementById('settings-period-select');
+            const periodPillsContainer = document.getElementById('settings-period-pills');
             const headerPeriodLabel = document.getElementById('header-inst-period');
             const drawerPeriodLabel = document.getElementById('drawer-inst-period');
             const settingsPeriodBadge = document.getElementById('settings-inst-period-badge');
+
+            const activePeriod = inst.periods.includes(currentPeriod) ? currentPeriod : inst.defaultPeriod;
+            Storage.setAcademicPeriod(activePeriod);
 
             const optionsHtml = inst.periods.map(p => `
                 <option value="${p}">${p}</option>
@@ -324,16 +416,36 @@
 
             if (headerPeriodSelect) {
                 headerPeriodSelect.innerHTML = optionsHtml;
-                headerPeriodSelect.value = inst.periods.includes(currentPeriod) ? currentPeriod : inst.defaultPeriod;
+                headerPeriodSelect.value = activePeriod;
             }
 
             if (settingsPeriodSelect) {
                 settingsPeriodSelect.innerHTML = optionsHtml;
-                settingsPeriodSelect.value = inst.periods.includes(currentPeriod) ? currentPeriod : inst.defaultPeriod;
+                settingsPeriodSelect.value = activePeriod;
             }
 
-            const activePeriod = inst.periods.includes(currentPeriod) ? currentPeriod : inst.defaultPeriod;
-            Storage.setAcademicPeriod(activePeriod);
+            // Renderizar grupo de botones tipo píldora para selección táctil hermosa
+            if (periodPillsContainer) {
+                periodPillsContainer.innerHTML = inst.periods.map(p => {
+                    const isSelected = p === activePeriod;
+                    return `
+                        <button type="button" data-period-btn="${p}"
+                            class="period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                                isSelected
+                                    ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
+                                    : 'bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent'
+                            }">
+                            ${p}
+                        </button>
+                    `;
+                }).join('');
+
+                periodPillsContainer.querySelectorAll('.period-pill-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        this.setAcademicPeriod(btn.dataset.periodBtn);
+                    };
+                });
+            }
 
             if (headerPeriodLabel) headerPeriodLabel.textContent = activePeriod;
             if (drawerPeriodLabel) drawerPeriodLabel.textContent = activePeriod;
@@ -342,17 +454,30 @@
 
         setAcademicPeriod(period) {
             const Storage = window.StorageModule;
+            window.HapticsModule?.light();
             Storage.setAcademicPeriod(period);
 
             const headerPeriodSelect = document.getElementById('header-period-select');
             const settingsPeriodSelect = document.getElementById('settings-period-select');
             const headerPeriodLabel = document.getElementById('header-inst-period');
             const drawerPeriodLabel = document.getElementById('drawer-inst-period');
+            const settingsPeriodBadge = document.getElementById('settings-inst-period-badge');
 
             if (headerPeriodSelect) headerPeriodSelect.value = period;
             if (settingsPeriodSelect) settingsPeriodSelect.value = period;
             if (headerPeriodLabel) headerPeriodLabel.textContent = period;
             if (drawerPeriodLabel) drawerPeriodLabel.textContent = period;
+            if (settingsPeriodBadge) settingsPeriodBadge.textContent = period;
+
+            // Actualizar estilo visual de los botones píldora en Ajustes
+            document.querySelectorAll('#settings-period-pills button[data-period-btn]').forEach(btn => {
+                const isSelected = btn.dataset.periodBtn === period;
+                if (isSelected) {
+                    btn.className = 'period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20';
+                } else {
+                    btn.className = 'period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent';
+                }
+            });
 
             this.showToast(`Periodo actualizado: ${period}`, 'info');
         }
@@ -386,51 +511,58 @@
                 btn.addEventListener('click', () => {
                     const targetView = btn.dataset.viewTarget;
                     this.switchView(targetView);
-                    this.closeSidebarDrawer();
+                    this.closeSidebarDrawer?.();
                 });
             });
-
-            // Permitir abrir configuración tocando el escudo en encabezado o drawer
-            document.getElementById('header-inst-logo')?.addEventListener('click', () => {
-                this.switchView('settings');
-            });
-            document.getElementById('drawer-inst-logo')?.addEventListener('click', () => {
-                this.switchView('settings');
-                this.closeSidebarDrawer();
-            });
+            // NOTA: Se eliminó la navegación a ajustes al tocar el logo escolar conforme a los requerimientos
         }
 
         switchView(viewName) {
             this.currentView = viewName;
+            window.HapticsModule?.light();
 
-            const views = ['subjects', 'tasks', 'settings'];
+            const views = ['subjects', 'tasks', 'notes', 'calendar', 'settings'];
             views.forEach(v => {
                 const section = document.getElementById(`view-${v}`);
                 if (section) {
                     if (v === viewName) {
                         section.classList.remove('hidden');
-                        section.classList.add('animate-fadeIn');
+                        requestAnimationFrame(() => {
+                            section.classList.add('active');
+                        });
                     } else {
+                        section.classList.remove('active');
                         section.classList.add('hidden');
                     }
                 }
             });
 
+            // Actualizar botones de navegación activos (tanto barra superior como drawer y barra inferior de 3 botones)
             document.querySelectorAll('[data-view-target]').forEach(btn => {
                 const isMatch = btn.dataset.viewTarget === viewName;
                 if (btn.classList.contains('nav-link-btn')) {
                     if (isMatch) {
-                        btn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-50', 'dark:bg-slate-700/60', 'font-bold');
-                        btn.classList.remove('text-slate-600', 'dark:text-slate-400');
+                        btn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'font-bold');
+                        btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-semibold');
+                        if (btn.closest('nav.hidden.lg\\:flex')) {
+                            btn.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-xs');
+                        }
                     } else {
-                        btn.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-50', 'dark:bg-slate-700/60', 'font-bold');
-                        btn.classList.add('text-slate-600', 'dark:text-slate-400');
+                        btn.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'font-bold', 'bg-white', 'dark:bg-slate-700', 'shadow-xs');
+                        btn.classList.add('text-slate-600', 'dark:text-slate-400', 'font-semibold');
                     }
                 }
             });
 
-            if (viewName === 'subjects') window.SubjectsModule.render();
-            if (viewName === 'tasks') window.TasksModule.render();
+            // Re-renderizado de la vista activada
+            if (viewName === 'subjects') window.SubjectsModule?.render?.();
+            if (viewName === 'tasks') window.TasksModule?.render?.();
+            if (viewName === 'notes') window.NotesModule?.render?.();
+            if (viewName === 'calendar') window.CalendarModule?.render?.();
+            if (viewName === 'settings') this.updateStorageMetrics();
+
+            // Scroll suave hacia la parte superior
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         setupSidebarDrawer() {
@@ -441,6 +573,7 @@
 
             const openDrawer = () => {
                 if (!drawer || !backdrop) return;
+                window.HapticsModule?.light();
                 drawer.classList.remove('-translate-x-full');
                 backdrop.classList.remove('opacity-0', 'pointer-events-none');
                 backdrop.classList.add('opacity-100');
@@ -458,59 +591,218 @@
             this.closeSidebarDrawer = closeDrawer;
 
             if (toggleBtn) toggleBtn.onclick = openDrawer;
-            if (closeBtn) closeBtn.onclick = closeDrawer;
+            if (closeBtn) closeBtn.onclick = () => {
+                window.HapticsModule?.light();
+                closeDrawer();
+            };
             if (backdrop) backdrop.onclick = closeDrawer;
+        }
+
+        /**
+         * Configura el Botón Central Prominente (Atajo de Acción Rápida)
+         * Funciona como un disparador directo de acción sin necesidad de salir de la vista actual:
+         * 1. 'add_task' -> Abre inmediatamente el modal de agregar tarea sobre la pantalla actual.
+         * 2. 'notes'    -> Abre inmediatamente el modal para redactar nota rápida sobre la pantalla actual.
+         * 3. 'calendar' -> Abre la ventana emergente del calendario mensual interactivo.
+         */
+        setupBottomActionButton() {
+            const Storage = window.StorageModule;
+            const mainBtn = document.getElementById('bottom-main-action-btn');
+            const circle = document.getElementById('bottom-main-circle');
+            const icon = document.getElementById('bottom-main-icon');
+            const label = document.getElementById('bottom-main-label');
+
+            if (!mainBtn || !circle || !icon || !label) return;
+
+            const action = Storage.getBottomAction();
+
+            if (action === 'notes') {
+                // Opción 2: Atajo Rápido para Crear Nota
+                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all';
+                icon.innerHTML = `
+                    <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                `;
+                label.textContent = '+ Nota';
+                label.className = 'text-[10px] font-extrabold text-amber-600 dark:text-amber-400 mt-1 truncate max-w-[80px]';
+                mainBtn.onclick = () => {
+                    window.HapticsModule?.medium();
+                    // Atajo: Abre directamente el modal para anotar al instante sin cambiar de vista
+                    window.NotesModule?.openAddModal?.();
+                };
+            } else if (action === 'calendar') {
+                // Opción 3: Atajo Rápido para Ver Calendario
+                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-600 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all';
+                icon.innerHTML = `
+                    <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                `;
+                label.textContent = 'Calendario';
+                label.className = 'text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate max-w-[80px]';
+                mainBtn.onclick = () => {
+                    window.HapticsModule?.medium();
+                    // Atajo: Abre la ventana modal del calendario sobre la pantalla actual
+                    window.CalendarModule?.openModal?.();
+                };
+            } else {
+                // Opción 1: Atajo Rápido para Agregar Tarea (Valor por defecto)
+                circle.className = 'w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-600 text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all';
+                icon.innerHTML = `
+                    <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                `;
+                label.textContent = '+ Tarea';
+                label.className = 'text-[10px] font-extrabold text-teal-600 dark:text-teal-400 mt-1 truncate max-w-[80px]';
+                mainBtn.onclick = () => {
+                    window.HapticsModule?.medium();
+                    // Atajo: Abre directamente el modal para crear tarea al instante sin entrar al menú de tareas
+                    window.TasksModule?.openAddModal?.();
+                };
+            }
         }
 
         setupModalsAndShortcuts() {
             const SubjectsModule = window.SubjectsModule;
             const TasksModule = window.TasksModule;
+            const NotesModule = window.NotesModule;
             const CalendarModule = window.CalendarModule;
 
+            // Botones directos para Materias
             const addSubBtn = document.getElementById('add-subject-btn');
             const addSubEmptyBtn = document.getElementById('empty-add-subject-btn');
+            if (addSubBtn) addSubBtn.onclick = () => SubjectsModule?.openAddModal();
+            if (addSubEmptyBtn) addSubEmptyBtn.onclick = () => SubjectsModule?.openAddModal();
+
+            // Botones directos para Tareas
             const addTaskBtn = document.getElementById('add-task-btn');
             const addTaskEmptyBtn = document.getElementById('empty-add-task-btn');
+            if (addTaskBtn) addTaskBtn.onclick = () => TasksModule?.openAddModal();
+            if (addTaskEmptyBtn) addTaskEmptyBtn.onclick = () => TasksModule?.openAddModal();
 
-            if (addSubBtn) addSubBtn.onclick = () => SubjectsModule.openAddModal();
-            if (addSubEmptyBtn) addSubEmptyBtn.onclick = () => SubjectsModule.openAddModal();
+            // Botones directos para Notas
+            const addNoteBtn = document.getElementById('add-note-btn');
+            const addNoteEmptyBtn = document.getElementById('empty-add-note-btn');
+            if (addNoteBtn) addNoteBtn.onclick = () => NotesModule?.openAddModal();
+            if (addNoteEmptyBtn) addNoteEmptyBtn.onclick = () => NotesModule?.openAddModal();
 
-            if (addTaskBtn) addTaskBtn.onclick = () => TasksModule.openAddModal();
-            if (addTaskEmptyBtn) addTaskEmptyBtn.onclick = () => TasksModule.openAddModal();
-
+            // Botones para abrir Calendario
             const calendarBtns = document.querySelectorAll('[data-open-calendar]');
             calendarBtns.forEach(btn => {
-                btn.onclick = () => CalendarModule.openModal();
+                btn.onclick = () => {
+                    window.HapticsModule?.light();
+                    CalendarModule?.openModal();
+                    this.closeSidebarDrawer?.();
+                };
             });
 
-            document.getElementById('close-subject-modal')?.addEventListener('click', () => {
-                SubjectsModule.closeModal();
-            });
-            document.getElementById('cancel-subject-btn')?.addEventListener('click', () => {
-                SubjectsModule.closeModal();
-            });
-            document.getElementById('subject-modal-backdrop')?.addEventListener('click', () => {
-                SubjectsModule.closeModal();
-            });
+            // Cerrar Modal Materias
+            document.getElementById('close-subject-modal')?.addEventListener('click', () => SubjectsModule?.closeModal());
+            document.getElementById('cancel-subject-btn')?.addEventListener('click', () => SubjectsModule?.closeModal());
+            document.getElementById('subject-modal-backdrop')?.addEventListener('click', () => SubjectsModule?.closeModal());
 
-            document.getElementById('close-task-modal')?.addEventListener('click', () => {
-                TasksModule.closeModal();
-            });
-            document.getElementById('cancel-task-btn')?.addEventListener('click', () => {
-                TasksModule.closeModal();
-            });
-            document.getElementById('task-modal-backdrop')?.addEventListener('click', () => {
-                TasksModule.closeModal();
-            });
+            // Cerrar Modal Tareas
+            document.getElementById('close-task-modal')?.addEventListener('click', () => TasksModule?.closeModal());
+            document.getElementById('cancel-task-btn')?.addEventListener('click', () => TasksModule?.closeModal());
+            document.getElementById('task-modal-backdrop')?.addEventListener('click', () => TasksModule?.closeModal());
 
+            // Cerrar Modal Notas
+            document.getElementById('close-note-modal')?.addEventListener('click', () => NotesModule?.closeModal());
+            document.getElementById('cancel-note-btn')?.addEventListener('click', () => NotesModule?.closeModal());
+            document.getElementById('note-modal-backdrop')?.addEventListener('click', () => NotesModule?.closeModal());
+
+            // Cerrar con tecla Escape
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    SubjectsModule.closeModal();
-                    TasksModule.closeModal();
-                    CalendarModule.closeModal();
-                    this.closeSidebarDrawer();
+                    SubjectsModule?.closeModal?.();
+                    TasksModule?.closeModal?.();
+                    NotesModule?.closeModal?.();
+                    CalendarModule?.closeModal?.();
+                    this.closeExitModal?.();
+                    this.closeSidebarDrawer?.();
                 }
             });
+        }
+
+        setupExitModal() {
+            const exitBtn = document.getElementById('app-exit-btn');
+            const exitModal = document.getElementById('exit-modal');
+            const cancelBtn = document.getElementById('cancel-exit-btn');
+            const confirmBtn = document.getElementById('confirm-exit-btn');
+            const backdrop = document.getElementById('exit-modal-backdrop');
+
+            const openExit = () => {
+                if (!exitModal) return;
+                window.HapticsModule?.medium();
+                this.closeSidebarDrawer?.();
+                exitModal.classList.remove('hidden');
+                exitModal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+                requestAnimationFrame(() => {
+                    exitModal.classList.add('active');
+                });
+            };
+
+            const closeExit = () => {
+                if (!exitModal) return;
+                window.HapticsModule?.light();
+                exitModal.classList.remove('active');
+                setTimeout(() => {
+                    exitModal.classList.add('hidden');
+                    exitModal.classList.remove('flex');
+                    document.body.classList.remove('overflow-hidden');
+                }, 200);
+            };
+
+            this.closeExitModal = closeExit;
+
+            if (exitBtn) exitBtn.onclick = openExit;
+            if (cancelBtn) cancelBtn.onclick = closeExit;
+            if (backdrop) backdrop.onclick = closeExit;
+
+            if (confirmBtn) {
+                confirmBtn.onclick = () => {
+                    window.HapticsModule?.double();
+                    closeExit();
+
+                    // Cierre en entorno nativo híbrido (Capacitor/Cordova) o navegador
+                    if (window.Capacitor?.Plugins?.App?.exitApp) {
+                        window.Capacitor.Plugins.App.exitApp();
+                    } else if (navigator.app && navigator.app.exitApp) {
+                        navigator.app.exitApp();
+                    } else {
+                        this.showToast('¡Hasta pronto! Tus datos escolares están respaldados.', 'info');
+                        setTimeout(() => {
+                            try {
+                                window.close();
+                            } catch (_) {}
+                        }, 500);
+                    }
+                };
+            }
+
+            // Atender retroceso en Android / Navegador si el modal está abierto
+            window.addEventListener('popstate', () => {
+                if (exitModal && !exitModal.classList.contains('hidden')) {
+                    closeExit();
+                }
+            });
+        }
+
+        updateStorageMetrics() {
+            const Storage = window.StorageModule;
+            const metrics = Storage.getStorageMetrics();
+            const barFill = document.getElementById('storage-bar-fill');
+            const percentLabel = document.getElementById('storage-percentage-label');
+            const detailLabel = document.getElementById('storage-detail');
+
+            if (barFill) barFill.style.width = `${Math.min(100, Math.max(2, metrics.percentage || metrics.percent || 2))}%`;
+            if (percentLabel) percentLabel.textContent = `${metrics.percentage || metrics.percent || 0}%`;
+            if (detailLabel) {
+                detailLabel.textContent = `Espacio: ${metrics.usedFormatted || (metrics.usedKb + ' KB')} de 5 MB • ${metrics.subjectsCount} materias, ${metrics.tasksCount} tareas, ${metrics.notesCount} notas`;
+            }
         }
 
         setupSettingsView() {
@@ -529,6 +821,7 @@
             if (cycleForm) {
                 cycleForm.onsubmit = (e) => {
                     e.preventDefault();
+                    window.HapticsModule?.light();
                     const newStart = startInput.value;
                     const newEnd = endInput.value;
 
@@ -544,7 +837,8 @@
                     try {
                         Storage.setAcademicCycle(newStart, newEnd);
                         this.updateCycleBadges();
-                        window.CalendarModule?.render();
+                        window.CalendarModule?.render?.();
+                        window.WidgetSyncModule?.sync?.();
                         this.showToast(`Ciclo escolar guardado: ${newStart} al ${newEnd}`, 'success');
                     } catch (err) {
                         this.showToast(err.message, 'error');
@@ -573,7 +867,7 @@
                 };
             }
 
-            // Inicializar galería de escudos en marco blanco en Configuración
+            // Inicializar galería de escudos en Settings
             this.renderInstitutionGrid();
 
             // 3. Tema y Modo Oscuro en Configuración
@@ -587,15 +881,101 @@
                 this.setTheme('auto');
             });
 
-            // Sincronizar estado inicial de los botones de tema en settings
             this.updateThemeUI(
                 document.documentElement.classList.contains('dark') ? 'dark' : 'light',
                 !Storage.getTheme()
             );
 
+            // 4. Selector de Tipografías en Menú Desplegable (5 Opciones)
+            const fontSelect = document.getElementById('settings-font-select');
+            if (fontSelect) {
+                fontSelect.value = Storage.getFontFamily?.() || 'calibri';
+                fontSelect.onchange = (e) => {
+                    const font = e.target.value;
+                    Storage.setFontFamily(font);
+                    this.applyFontFamily(font);
+                    window.HapticsModule?.light();
+                    const fontNames = {
+                        calibri: 'Calibri',
+                        times: 'Times New Roman',
+                        montserrat: 'Montserrat',
+                        lora: 'Lora',
+                        poppins: 'Poppins'
+                    };
+                    this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
+                };
+            }
+
+            // 5. Interruptor de Vibración Háptica Global
+            const hapticsToggle = document.getElementById('settings-haptics-toggle');
+            const hapticsStatus = document.getElementById('settings-haptics-status');
+
+            if (hapticsToggle) {
+                const isEnabled = Storage.getHapticsEnabled();
+                hapticsToggle.checked = isEnabled;
+                if (hapticsStatus) {
+                    hapticsStatus.textContent = isEnabled ? 'Activada' : 'Desactivada';
+                    hapticsStatus.className = isEnabled 
+                        ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                        : 'text-xs font-bold px-2.5 py-1 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20';
+                }
+
+                hapticsToggle.onchange = (e) => {
+                    const enabled = e.target.checked;
+                    Storage.setHapticsEnabled(enabled);
+                    if (hapticsStatus) {
+                        hapticsStatus.textContent = enabled ? 'Activada' : 'Desactivada';
+                        hapticsStatus.className = enabled 
+                            ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                            : 'text-xs font-bold px-2.5 py-1 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20';
+                    }
+                    if (enabled) {
+                        window.HapticsModule?.double();
+                    }
+                    this.showToast(enabled ? 'Vibraciones hápticas activadas.' : 'Vibraciones desactivadas.', 'info');
+                };
+            }
+
+            // 6. Selector de Atajo Rápido del Botón Central Inferior
+            const bottomRadios = document.querySelectorAll('input[name="bottom-action-choice"]');
+            const currentBottomAction = Storage.getBottomAction();
+            bottomRadios.forEach(radio => {
+                if (radio.value === currentBottomAction) {
+                    radio.checked = true;
+                }
+                radio.onchange = (e) => {
+                    if (e.target.checked) {
+                        const newAction = e.target.value;
+                        Storage.setBottomAction(newAction);
+                        this.setupBottomActionButton();
+                        window.HapticsModule?.light();
+                        this.showToast('Atajo del botón central actualizado.', 'success');
+                    }
+                };
+            });
+
+            // 7. Submenú "Opciones avanzadas de almacenamiento" (Acordeón)
+            const accordionToggle = document.getElementById('storage-accordion-toggle');
+            const accordionContent = document.getElementById('storage-accordion-content');
+            const accordionChevron = document.getElementById('storage-accordion-chevron');
+
+            if (accordionToggle && accordionContent) {
+                accordionToggle.onclick = () => {
+                    window.HapticsModule?.light();
+                    const isExpanded = accordionContent.classList.toggle('expanded');
+                    if (accordionChevron) {
+                        accordionChevron.classList.toggle('rotate-180', isExpanded);
+                    }
+                    if (isExpanded) {
+                        this.updateStorageMetrics();
+                    }
+                };
+            }
+
             // Cargar Demo opcional
             document.getElementById('settings-load-demo')?.addEventListener('click', () => {
-                if (confirm('¿Cargar datos de demostración? Esto añadirá materias y tareas de ejemplo para probar.')) {
+                window.HapticsModule?.warning();
+                if (confirm('¿Cargar datos de demostración? Esto añadirá materias, tareas y notas de ejemplo para probar.')) {
                     Storage.loadDemo();
                     this.setInstitution(Storage.getInstitution());
                     this.refreshAll();
@@ -606,17 +986,19 @@
 
             // Limpiar Todo
             document.getElementById('settings-clear-all')?.addEventListener('click', () => {
-                if (confirm('¿Estás seguro de eliminar todas las materias y tareas?')) {
+                window.HapticsModule?.warning();
+                if (confirm('¿Estás seguro de eliminar todas las materias, tareas y notas? Esta acción no se puede deshacer.')) {
                     window.TasksModule?.cancelAllNotifications?.();
                     Storage.clearAll();
                     this.refreshAll();
-                    this.showToast('Todas las materias y tareas han sido eliminadas.', 'info');
+                    this.showToast('Todos los datos han sido eliminados.', 'info');
                     this.switchView('subjects');
                 }
             });
 
             // Exportar JSON
             document.getElementById('settings-export-json')?.addEventListener('click', () => {
+                window.HapticsModule?.light();
                 const dataStr = Storage.exportJson();
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -631,6 +1013,7 @@
             // Importar JSON
             const importInput = document.getElementById('settings-import-input');
             document.getElementById('settings-import-btn')?.addEventListener('click', () => {
+                window.HapticsModule?.light();
                 importInput?.click();
             });
 
@@ -644,6 +1027,7 @@
                         try {
                             Storage.importJson(evt.target.result);
                             this.setInstitution(Storage.getInstitution());
+                            this.initFontFamily();
                             this.refreshAll();
                             this.showToast('Respaldo restaurado con éxito.', 'success');
                             this.switchView('subjects');
@@ -655,6 +1039,10 @@
                     reader.readAsText(file);
                 };
             }
+
+            // Cálculo inicial de métricas de almacenamiento y aplicación de tipografía
+            this.updateStorageMetrics();
+            this.applyFontFamily(Storage.getFontFamily?.() || 'calibri');
         }
 
         showToast(message, type = 'info') {

@@ -65,81 +65,21 @@ window.TasksModule = (() => {
      */
     async function scheduleTaskNotification(task) {
         if (!task || !task.dueDate || task.completed) return;
-        if (!isLocalNotificationsAvailable()) return;
-
-        try {
-            const dueDate = new Date(task.dueDate);
-            if (isNaN(dueDate.getTime()) || dueDate.getTime() <= Date.now()) return;
-
-            const { LocalNotifications } = (typeof capacitorExports !== 'undefined' ? capacitorExports : null) || window.Capacitor.Plugins;
-            if (!LocalNotifications || typeof LocalNotifications.schedule !== 'function') return;
-
-            const Storage = window.StorageModule;
-            const subjects = Storage ? Storage.getSubjects() : [];
-            const subject = subjects.find(s => s.id === task.subjectId);
-            const subjectName = subject ? subject.name : 'tu materia';
-
-            let body = `Recordatorio: Tu tarea de ${subjectName} vence pronto.`;
-            if (task.notes && task.notes.trim()) {
-                body += ` ${task.notes.trim()}`;
-            }
-
-            const notifId = taskIdToNotificationId(task.id);
-
-            await LocalNotifications.schedule({
-                notifications: [
-                    {
-                        id: notifId,
-                        title: task.title,
-                        body: body,
-                        schedule: { at: dueDate },
-                        sound: 'default'
-                    }
-                ]
-            });
-        } catch (err) {
-            console.warn('Error al programar notificación local para tarea:', err);
+        if (window.NotificationsModule) {
+            await window.NotificationsModule.scheduleTask(task);
         }
     }
 
-    /**
-     * Cancela la notificación local pendiente de una tarea específica
-     */
     async function cancelTaskNotification(taskId) {
         if (!taskId) return;
-        if (!isLocalNotificationsAvailable()) return;
-
-        try {
-            const { LocalNotifications } = (typeof capacitorExports !== 'undefined' ? capacitorExports : null) || window.Capacitor.Plugins;
-            if (!LocalNotifications || typeof LocalNotifications.cancel !== 'function') return;
-
-            const notifId = taskIdToNotificationId(taskId);
-            await LocalNotifications.cancel({
-                notifications: [
-                    { id: notifId }
-                ]
-            });
-        } catch (err) {
-            console.warn('Error al cancelar notificación local de tarea:', err);
+        if (window.NotificationsModule) {
+            await window.NotificationsModule.cancelTask(taskId);
         }
     }
 
-    /**
-     * Cancela todas las notificaciones pendientes de tareas
-     */
     async function cancelAllNotifications() {
-        if (!isLocalNotificationsAvailable()) return;
-        try {
-            const { LocalNotifications } = (typeof capacitorExports !== 'undefined' ? capacitorExports : null) || window.Capacitor.Plugins;
-            if (!LocalNotifications) return;
-            if (typeof LocalNotifications.getPending === 'function' && typeof LocalNotifications.cancel === 'function') {
-                const pending = await LocalNotifications.getPending();
-                if (pending && pending.notifications && pending.notifications.length > 0) {
-                    await LocalNotifications.cancel({ notifications: pending.notifications });
-                }
-            }
-        } catch (err) {
-            console.warn('Error al cancelar todas las notificaciones:', err);
+        if (window.NotificationsModule) {
+            await window.NotificationsModule.cancelAll();
         }
     }
 
@@ -326,11 +266,15 @@ window.TasksModule = (() => {
     }
 
     function openModal() {
+        window.HapticsModule?.light();
         const modal = document.getElementById('task-modal');
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
+            requestAnimationFrame(() => {
+                modal.classList.add('active');
+            });
             setTimeout(() => {
                 document.getElementById('task-title')?.focus();
             }, 100);
@@ -338,11 +282,15 @@ window.TasksModule = (() => {
     }
 
     function closeModal() {
+        window.HapticsModule?.light();
         const modal = document.getElementById('task-modal');
         if (modal) {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            }, 200);
         }
         editingTaskId = null;
     }
@@ -403,27 +351,71 @@ window.TasksModule = (() => {
                 }
                 window.showNotification?.('¡Tarea agregada exitosamente!', 'success');
             }
+            window.HapticsModule?.double();
             closeModal();
             render();
             window.onDataChanged?.();
+            window.WidgetSyncModule?.sync();
         } catch (e) {
             window.showNotification?.(e.message, 'error');
         }
     }
 
-    function toggleTask(id) {
+    function triggerCelebration(sourceEl = null) {
+        const emojis = ['🎉', '🥳', '✨', '⭐', '🎊', '👏', '🎈'];
+        let originX = window.innerWidth / 2;
+        let originY = window.innerHeight / 2;
+
+        if (sourceEl && sourceEl.getBoundingClientRect) {
+            const rect = sourceEl.getBoundingClientRect();
+            originX = rect.left + rect.width / 2;
+            originY = rect.top + rect.height / 2;
+        }
+
+        const count = 7;
+        for (let i = 0; i < count; i++) {
+            const span = document.createElement('span');
+            span.className = 'celebration-emoji-particle';
+            span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+            const xOffset = (Math.random() - 0.5) * 160;
+            const rot = (Math.random() - 0.5) * 60;
+            const delay = Math.random() * 0.15;
+            const scale = 0.85 + Math.random() * 0.45;
+
+            span.style.left = `${originX}px`;
+            span.style.top = `${originY}px`;
+            span.style.setProperty('--x-offset', `${xOffset}px`);
+            span.style.setProperty('--rot', `${rot}deg`);
+            span.style.animationDelay = `${delay}s`;
+            span.style.fontSize = `${1.3 * scale}rem`;
+
+            document.body.appendChild(span);
+            setTimeout(() => {
+                span.remove();
+            }, 1300);
+        }
+    }
+
+    function toggleTask(id, sourceEl = null) {
         const Storage = window.StorageModule;
         const updated = Storage.toggleTask(id);
         if (updated) {
             if (updated.completed) {
+                window.HapticsModule?.double();
                 cancelTaskNotification(id);
-            } else if (updated.dueDate) {
-                scheduleTaskNotification(updated);
+                triggerCelebration(sourceEl);
+            } else {
+                window.HapticsModule?.light();
+                if (updated.dueDate) {
+                    scheduleTaskNotification(updated);
+                }
             }
             const msg = updated.completed ? '🎉 ¡Tarea completada!' : 'Tarea marcada como pendiente.';
             window.showNotification?.(msg, 'success');
             render();
             window.onDataChanged?.();
+            window.WidgetSyncModule?.sync();
         }
     }
 
@@ -434,11 +426,13 @@ window.TasksModule = (() => {
         if (!task) return;
 
         if (confirm(`¿Eliminar la tarea "${task.title}"?`)) {
+            window.HapticsModule?.double();
             cancelTaskNotification(id);
             Storage.deleteTask(id);
             window.showNotification?.('Tarea eliminada.', 'info');
             render();
             window.onDataChanged?.();
+            window.WidgetSyncModule?.sync();
         }
     }
 
@@ -521,7 +515,7 @@ window.TasksModule = (() => {
         container.classList.remove('hidden');
         container.innerHTML = '';
 
-        filtered.forEach(task => {
+        filtered.forEach((task, index) => {
             const subject = subjectMap.get(task.subjectId) || {
                 name: 'Materia',
                 color: '#64748B'
@@ -530,9 +524,10 @@ window.TasksModule = (() => {
             const urgencyInfo = getUrgencyDetails(task.dueDate, task.completed);
 
             const card = document.createElement('div');
-            card.className = `group relative bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-700/60 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+            card.className = `stagger-card card-hover group relative bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
                 task.completed ? 'opacity-70 bg-slate-50/60 dark:bg-slate-800/40' : ''
             }`;
+            card.style.setProperty('--stagger-i', index);
             card.style.borderLeft = `6px solid ${subject.color}`;
 
             card.innerHTML = `
@@ -613,8 +608,8 @@ window.TasksModule = (() => {
                 </div>
             `;
 
-            card.querySelector('[data-action="toggle"]')?.addEventListener('click', () => {
-                toggleTask(task.id);
+            card.querySelector('[data-action="toggle"]')?.addEventListener('click', (e) => {
+                toggleTask(task.id, e.currentTarget);
             });
             card.querySelector('[data-action="edit"]')?.addEventListener('click', () => {
                 openEditModal(task.id);
