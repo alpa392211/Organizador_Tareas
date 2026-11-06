@@ -794,9 +794,13 @@
             circle.style.removeProperty('border');
             circle.style.removeProperty('box-shadow');
 
+            const labelColorClass = isGray
+                ? 'text-slate-600 dark:text-slate-300'
+                : (action === 'notes' ? 'text-amber-600 dark:text-amber-400' : (action === 'calendar' ? 'text-indigo-600 dark:text-indigo-400' : 'text-teal-600 dark:text-teal-400'));
+
             if (action === 'notes') {
                 circle.className = 'w-14 h-14 rounded-full btn-gradient-note text-white flex items-center justify-center transition-all opacity-100';
-                label.className = 'text-[10px] font-extrabold text-amber-600 dark:text-amber-400 mt-1 truncate max-w-[80px]';
+                label.className = `text-[10px] font-extrabold ${labelColorClass} mt-1 truncate max-w-[80px]`;
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -809,7 +813,7 @@
                 };
             } else if (action === 'calendar') {
                 circle.className = 'w-14 h-14 rounded-full btn-gradient-subject text-white flex items-center justify-center transition-all opacity-100';
-                label.className = 'text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate max-w-[80px]';
+                label.className = `text-[10px] font-extrabold ${labelColorClass} mt-1 truncate max-w-[80px]`;
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -822,7 +826,7 @@
                 };
             } else {
                 circle.className = 'w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center transition-all opacity-100';
-                label.className = 'text-[10px] font-extrabold text-teal-600 dark:text-teal-400 mt-1 truncate max-w-[80px]';
+                label.className = `text-[10px] font-extrabold ${labelColorClass} mt-1 truncate max-w-[80px]`;
                 icon.innerHTML = `
                     <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>

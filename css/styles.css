@@ -59,14 +59,14 @@ body {
     transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth);
 }
 
-/* Modo Claro: Contraste diferenciado para clases, tareas y tarjetas para que no se pierdan con el fondo */
-html:not(.dark) .stagger-card,
-html:not(.dark) .card-hover,
-html:not(.dark) #view-subjects > div.bg-white,
-html:not(.dark) #view-tasks > div.bg-white,
-html:not(.dark) #view-notes > div.bg-white,
-html:not(.dark) #view-settings > div.bg-white,
-html:not(.dark) .settings-accordion-card {
+/* Modo Claro: Contraste diferenciado para clases, tareas y tarjetas para que no se pierdan con el fondo (cuando NO es modo gris) */
+html:not(.dark):not(.theme-gray) .stagger-card,
+html:not(.dark):not(.theme-gray) .card-hover,
+html:not(.dark):not(.theme-gray) #view-subjects > div.bg-white,
+html:not(.dark):not(.theme-gray) #view-tasks > div.bg-white,
+html:not(.dark):not(.theme-gray) #view-notes > div.bg-white,
+html:not(.dark):not(.theme-gray) #view-settings > div.bg-white,
+html:not(.dark):not(.theme-gray) .settings-accordion-card {
     background-color: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
     box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03) !important;
@@ -101,50 +101,61 @@ html.dark:not(.theme-gray) #bottom-nav {
    Adaptado meticulosamente a Modo Claro y Modo Oscuro
    ======================================================== */
 
-/* Caso 1: Modo Monocromático en MODO CLARO (Editorial Silver & White Minimalista) */
+/* Caso 1: Modo Monocromático en MODO CLARO (Silver & Slate Suave Equilibrado - No tan oscuro ni blanco deslumbrante) */
 html:not(.dark).theme-gray {
     color-scheme: light;
 }
-html:not(.dark).theme-gray body {
-    background-color: #e5e8ee !important;
-    color: #0f172a !important;
+html:not(.dark).theme-gray body,
+html:not(.dark).theme-gray body.bg-slate-50 {
+    background-color: #d6dbe4 !important;
+    color: #1e293b !important;
 }
-html:not(.dark).theme-gray header {
-    background-color: #f1f3f7 !important;
+html:not(.dark).theme-gray header,
+html:not(.dark).theme-gray header.bg-white {
+    background-color: #e2e6ed !important;
     border-bottom: 1px solid #cbd2dc !important;
 }
-html:not(.dark).theme-gray #bottom-nav {
-    background-color: #f1f3f7 !important;
+html:not(.dark).theme-gray #bottom-nav,
+html:not(.dark).theme-gray #bottom-nav.bg-white {
+    background-color: #e2e6ed !important;
     border-top: 1px solid #cbd2dc !important;
 }
-html:not(.dark).theme-gray #sidebar-drawer {
-    background-color: #f8fafc !important;
+html:not(.dark).theme-gray #sidebar-drawer,
+html:not(.dark).theme-gray #sidebar-drawer.bg-white {
+    background-color: #eaedf4 !important;
 }
 html:not(.dark).theme-gray #sidebar-drawer-footer {
-    background-color: #e5e8ee !important;
+    background-color: #d6dbe4 !important;
     border-top: 1px solid #cbd2dc !important;
 }
 html:not(.dark).theme-gray nav {
     border-color: #cbd2dc !important;
 }
-html:not(.dark).theme-gray .bg-white:not(header):not(#bottom-nav):not(#sidebar-drawer-footer),
 html:not(.dark).theme-gray .stagger-card,
-html:not(.dark).theme-gray .settings-accordion-card {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd2dc !important;
+html:not(.dark).theme-gray .card-hover,
+html:not(.dark).theme-gray #view-subjects > div.bg-white,
+html:not(.dark).theme-gray #view-tasks > div.bg-white,
+html:not(.dark).theme-gray #view-notes > div.bg-white,
+html:not(.dark).theme-gray #view-settings > div.bg-white,
+html:not(.dark).theme-gray .settings-accordion-card,
+html:not(.dark).theme-gray .modal-dialog,
+html:not(.dark).theme-gray #school-modal > div,
+html:not(.dark).theme-gray .bg-white:not(header):not(#bottom-nav):not(#sidebar-drawer):not(#sidebar-drawer-footer) {
+    background-color: #edf1f6 !important;
+    border: 1px solid #c2c9d4 !important;
     box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.08) !important;
 }
-html:not(.dark).theme-gray .bg-slate-50,
+html:not(.dark).theme-gray .bg-slate-50:not(body),
 html:not(.dark).theme-gray .bg-slate-100 {
-    background-color: #e2e6ec !important;
+    background-color: #dfe4ec !important;
     border-color: #cbd2dc !important;
 }
 html:not(.dark).theme-gray .text-slate-900,
 html:not(.dark).theme-gray .text-slate-800 {
-    color: #0f172a !important;
+    color: #1e293b !important;
 }
 html:not(.dark).theme-gray .text-slate-700 {
-    color: #1e293b !important;
+    color: #334155 !important;
 }
 html:not(.dark).theme-gray .text-slate-600,
 html:not(.dark).theme-gray .text-slate-500 {
@@ -154,24 +165,49 @@ html:not(.dark).theme-gray .border-slate-200,
 html:not(.dark).theme-gray .border-slate-100 {
     border-color: #cbd2dc !important;
 }
+html:not(.dark).theme-gray .settings-switch-row {
+    background-color: #dfe4ec !important;
+    border-color: #cbd2dc !important;
+}
+html.theme-gray input[name="subject-days"]:checked + span {
+    background-color: #525d70 !important;
+    border-color: #525d70 !important;
+    color: #ffffff !important;
+}
+html.theme-gray [data-task-filter].bg-indigo-600,
+html.theme-gray [data-note-filter].bg-indigo-600,
+html.theme-gray [data-note-category].bg-amber-500 {
+    background-color: #525d70 !important;
+    color: #ffffff !important;
+}
+html.theme-gray #bottom-main-label {
+    color: #475569 !important;
+}
+html.dark.theme-gray #bottom-main-label {
+    color: #cbd5e1 !important;
+}
 
 /* Caso 2: Modo Monocromático en MODO OSCURO (Titanium & Slate Gray Notorio) */
 html.dark.theme-gray {
     color-scheme: dark;
 }
-html.dark.theme-gray body {
+html.dark.theme-gray body,
+html.dark.theme-gray body.dark\:bg-slate-900 {
     background-color: #181a1f !important;
     color: #f1f2f5 !important;
 }
-html.dark.theme-gray header {
+html.dark.theme-gray header,
+html.dark.theme-gray header.dark\:bg-slate-900 {
     background-color: #252830 !important;
     border-bottom: 1px solid #383c46 !important;
 }
-html.dark.theme-gray #bottom-nav {
+html.dark.theme-gray #bottom-nav,
+html.dark.theme-gray #bottom-nav.dark\:bg-slate-900 {
     background-color: #252830 !important;
     border-top: 1px solid #383c46 !important;
 }
-html.dark.theme-gray #sidebar-drawer {
+html.dark.theme-gray #sidebar-drawer,
+html.dark.theme-gray #sidebar-drawer.dark\:bg-slate-900 {
     background-color: #202228 !important;
 }
 html.dark.theme-gray #sidebar-drawer-footer {
@@ -746,15 +782,67 @@ html.dark .fab-gradient-action {
     border: 2px solid rgba(255, 255, 255, 0.35) !important;
     box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
 }
-html.dark.theme-gray .fab-gradient-action {
-    background: linear-gradient(135deg, rgba(71, 85, 105, 0.9) 0%, rgba(51, 65, 85, 0.9) 100%) !important;
-    border: 2px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 8px 22px -2px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+/* MODO MONOCROMÁTICO UNIFICADO: TODOS LOS BOTONES DE ACCESO DIRECTO Y ACCIONES PRINCIPALES */
+html:not(.dark).theme-gray .btn-gradient-subject,
+html:not(.dark).theme-gray .btn-gradient-task,
+html:not(.dark).theme-gray .btn-gradient-note,
+html:not(.dark).theme-gray .fab-gradient-action,
+html:not(.dark).theme-gray #bottom-main-circle,
+html:not(.dark).theme-gray #empty-add-subject-btn,
+html:not(.dark).theme-gray #empty-add-task-btn,
+html:not(.dark).theme-gray #empty-add-note-btn,
+html:not(.dark).theme-gray button[type="submit"]:not(.kofi-btn) {
+    background: linear-gradient(135deg, #5b6576 0%, #4a5464 50%, #3a4350 100%) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.45) !important;
+    box-shadow: 0 8px 20px -2px rgba(71, 85, 105, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
 }
-html:not(.dark).theme-gray .fab-gradient-action {
-    background: linear-gradient(135deg, rgba(100, 116, 139, 0.9) 0%, rgba(71, 85, 105, 0.9) 100%) !important;
-    border: 2px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 22px -2px rgba(15, 23, 42, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+
+html:not(.dark).theme-gray .btn-gradient-subject:hover,
+html:not(.dark).theme-gray .btn-gradient-task:hover,
+html:not(.dark).theme-gray .btn-gradient-note:hover,
+html:not(.dark).theme-gray .fab-gradient-action:hover,
+html:not(.dark).theme-gray #bottom-main-circle:hover,
+html:not(.dark).theme-gray #empty-add-subject-btn:hover,
+html:not(.dark).theme-gray #empty-add-task-btn:hover,
+html:not(.dark).theme-gray #empty-add-note-btn:hover,
+html:not(.dark).theme-gray button[type="submit"]:not(.kofi-btn):hover {
+    background: linear-gradient(135deg, #647082 0%, #525d6e 50%, #414b59 100%) !important;
+    box-shadow: 0 12px 26px -2px rgba(71, 85, 105, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+    transform: translateY(-2px) scale(1.02);
+}
+
+html.dark.theme-gray .btn-gradient-subject,
+html.dark.theme-gray .btn-gradient-task,
+html.dark.theme-gray .btn-gradient-note,
+html.dark.theme-gray .fab-gradient-action,
+html.dark.theme-gray #bottom-main-circle,
+html.dark.theme-gray #empty-add-subject-btn,
+html.dark.theme-gray #empty-add-task-btn,
+html.dark.theme-gray #empty-add-note-btn,
+html.dark.theme-gray button[type="submit"]:not(.kofi-btn) {
+    background: linear-gradient(135deg, #475569 0%, #3a4556 50%, #2f3846 100%) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 8px 22px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.25) !important;
+    color: #f8fafc !important;
+}
+
+html.dark.theme-gray .btn-gradient-subject:hover,
+html.dark.theme-gray .btn-gradient-task:hover,
+html.dark.theme-gray .btn-gradient-note:hover,
+html.dark.theme-gray .fab-gradient-action:hover,
+html.dark.theme-gray #bottom-main-circle:hover,
+html.dark.theme-gray #empty-add-subject-btn:hover,
+html.dark.theme-gray #empty-add-task-btn:hover,
+html.dark.theme-gray #empty-add-note-btn:hover,
+html.dark.theme-gray button[type="submit"]:not(.kofi-btn):hover {
+    background: linear-gradient(135deg, #526177 0%, #435063 50%, #353f4e 100%) !important;
+    box-shadow: 0 12px 26px -2px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
+    transform: translateY(-2px) scale(1.02);
 }
 
 #bottom-main-circle {
