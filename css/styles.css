@@ -52,11 +52,31 @@
 
 /* Modo Claro: Fondo gris suave relajante para evitar deslumbramientos */
 body {
-    background-color: #f1f4f9;
+    background-color: #eaeff5;
     color: #1e293b;
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth);
+}
+
+/* Modo Claro: Contraste diferenciado para clases, tareas y tarjetas para que no se pierdan con el fondo */
+html:not(.dark) .stagger-card,
+html:not(.dark) .card-hover,
+html:not(.dark) #view-subjects > div.bg-white,
+html:not(.dark) #view-tasks > div.bg-white,
+html:not(.dark) #view-notes > div.bg-white,
+html:not(.dark) #view-settings > div.bg-white,
+html:not(.dark) .settings-accordion-card {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 1px 3px 0 rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Sub-tarjetas y contenedores internos con tono ligeramente grisáceo para mayor profundidad táctil */
+html:not(.dark) .bg-slate-50,
+html:not(.dark) .bg-slate-100 {
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
 }
 
 /* Modo Oscuro Global */
@@ -69,34 +89,105 @@ html.dark body {
     color: #f8fafc;
 }
 
-/* Modo Secreto de Colores Grises (Monocromático Estético) */
-html.theme-gray {
+/* ========================================================
+   MODO MONOCROMÁTICO (GRIS ELEGANTE)
+   Adaptado meticulosamente a Modo Claro y Modo Oscuro
+   ======================================================== */
+
+/* Caso 1: Modo Monocromático en MODO CLARO (Editorial Silver & White Minimalista) */
+html:not(.dark).theme-gray {
+    color-scheme: light;
+}
+html:not(.dark).theme-gray body {
+    background-color: #e2e6eb !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-gray header {
+    background-color: rgba(255, 255, 255, 0.96) !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+}
+html:not(.dark).theme-gray nav {
+    border-color: #cbd5e1 !important;
+}
+html:not(.dark).theme-gray .bg-white,
+html:not(.dark).theme-gray .stagger-card,
+html:not(.dark).theme-gray .settings-accordion-card {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.09) !important;
+}
+html:not(.dark).theme-gray .bg-slate-50,
+html:not(.dark).theme-gray .bg-slate-100 {
+    background-color: #dbe0e7 !important;
+    border-color: #cbd5e1 !important;
+}
+html:not(.dark).theme-gray .text-slate-900,
+html:not(.dark).theme-gray .text-slate-800 {
+    color: #0f172a !important;
+}
+html:not(.dark).theme-gray .text-slate-700 {
+    color: #1e293b !important;
+}
+html:not(.dark).theme-gray .text-slate-600,
+html:not(.dark).theme-gray .text-slate-500 {
+    color: #475569 !important;
+}
+html:not(.dark).theme-gray .border-slate-200,
+html:not(.dark).theme-gray .border-slate-100 {
+    border-color: #cbd5e1 !important;
+}
+html:not(.dark).theme-gray .btn-gradient-subject,
+html:not(.dark).theme-gray .btn-gradient-task,
+html:not(.dark).theme-gray .btn-gradient-note,
+html:not(.dark).theme-gray .fab-gradient-action {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.4) !important;
+}
+
+/* Caso 2: Modo Monocromático en MODO OSCURO (Carbón & Zinc Profundo) */
+html.dark.theme-gray {
     color-scheme: dark;
 }
-html.theme-gray body {
-    background-color: #18191c !important;
-    color: #e4e5e8 !important;
+html.dark.theme-gray body {
+    background-color: #141518 !important;
+    color: #f1f2f5 !important;
 }
-html.theme-gray .bg-white {
-    background-color: #232529 !important;
-    border-color: #383a40 !important;
+html.dark.theme-gray .bg-white,
+html.dark.theme-gray .dark\:bg-slate-800,
+html.dark.theme-gray .stagger-card,
+html.dark.theme-gray .settings-accordion-card {
+    background-color: #1c1d22 !important;
+    border-color: #2e3037 !important;
 }
-html.theme-gray .bg-slate-50,
-html.theme-gray .bg-slate-100 {
-    background-color: #2b2d31 !important;
-    border-color: #383a40 !important;
+html.dark.theme-gray .bg-slate-50,
+html.dark.theme-gray .bg-slate-100,
+html.dark.theme-gray .dark\:bg-slate-700 {
+    background-color: #27292f !important;
+    border-color: #383a42 !important;
 }
-html.theme-gray .text-slate-900,
-html.theme-gray .text-slate-800 {
-    color: #f2f3f5 !important;
+html.dark.theme-gray .text-slate-900,
+html.dark.theme-gray .text-slate-800,
+html.dark.theme-gray .dark\:text-white {
+    color: #f8fafc !important;
 }
-html.theme-gray .text-slate-500,
-html.theme-gray .text-slate-400 {
-    color: #949ba4 !important;
+html.dark.theme-gray .text-slate-500,
+html.dark.theme-gray .text-slate-400,
+html.dark.theme-gray .dark\:text-slate-400 {
+    color: #949aa4 !important;
 }
-html.theme-gray .border-slate-200,
-html.theme-gray .border-slate-100 {
-    border-color: #383a40 !important;
+html.dark.theme-gray .border-slate-200,
+html.dark.theme-gray .border-slate-100,
+html.dark.theme-gray .dark\:border-slate-700 {
+    border-color: #2e3037 !important;
+}
+html.dark.theme-gray .btn-gradient-subject,
+html.dark.theme-gray .btn-gradient-task,
+html.dark.theme-gray .btn-gradient-note,
+html.dark.theme-gray .fab-gradient-action {
+    background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Iconos de Sol y Luna para Header */
@@ -510,10 +601,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     will-change: transform, opacity;
 }
 
-.school-identity-exit-left {
-    transform: translate3d(-125%, 0, 0) scale(0.9) !important;
+.school-identity-exit-right {
+    transform: translate3d(125%, 0, 0) scale(0.92) !important;
     opacity: 0 !important;
-    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease-out !important;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease-out !important;
     pointer-events: none;
 }
 
@@ -604,10 +695,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 14px 28px -4px rgba(234, 88, 12, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
 }
 
+/* Botón Central Inferior: Totalmente sólido, opaco y sin transparencia */
 .fab-gradient-action {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 45%, #ec4899 100%) !important;
-    box-shadow: 0 12px 28px -4px rgba(139, 92, 246, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0891b2 100%) !important;
+    background-color: #0d9488 !important;
+    opacity: 1 !important;
+    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 0 0 4px #ffffff !important;
+    border: none !important;
+}
+html.dark .fab-gradient-action {
+    box-shadow: 0 14px 30px -4px rgba(13, 148, 136, 0.65), 0 0 0 4px #0f172a !important;
 }
 
 /* ========================================================
@@ -617,20 +714,26 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 0.85rem 0;
-    min-height: 3.5rem;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    min-height: 3.25rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 .settings-switch-label {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    padding-right: 0.5rem;
     display: flex;
     flex-direction: column;
 }
 .settings-switch-toggle {
-    flex-shrink: 0;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 24px;
     display: inline-flex;
     align-items: center;
+    justify-content: flex-end;
 }
 
 /* ========================================================
@@ -638,10 +741,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    ======================================================== */
 @keyframes vaultSuspenseGlow {
     0%, 100% {
-        box-shadow: inset 0 0 120px 40px rgba(88, 28, 135, 0.45), 0 0 80px 20px rgba(126, 34, 206, 0.3);
+        box-shadow: inset 0 0 120px 40px rgba(88, 28, 135, 0.5), 0 0 80px 20px rgba(126, 34, 206, 0.35);
     }
     50% {
-        box-shadow: inset 0 0 160px 70px rgba(147, 51, 234, 0.6), 0 0 120px 40px rgba(168, 85, 247, 0.45);
+        box-shadow: inset 0 0 160px 70px rgba(147, 51, 234, 0.65), 0 0 120px 40px rgba(168, 85, 247, 0.5);
     }
 }
 
@@ -657,10 +760,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .vault-suspense-container {
     background: radial-gradient(circle at center, #1b0f33 0%, #0e061e 50%, #030108 100%) !important;
-    animation: vaultSuspenseGlow 5s infinite ease-in-out;
-    border: 1px solid rgba(168, 85, 247, 0.35);
+    animation: vaultSuspenseGlow 4.5s infinite ease-in-out;
+    border: 1.5px solid rgba(168, 85, 247, 0.45);
     position: relative;
     overflow: hidden;
+}
+
+/* Adaptación del aura para Modo Claro: misteriosa, cinematográfica y limpia */
+html:not(.dark) .vault-suspense-container {
+    background: radial-gradient(circle at center, #2e1065 0%, #1e1b4b 60%, #0f172a 100%) !important;
+    box-shadow: 0 20px 50px -10px rgba(109, 40, 217, 0.45), 0 0 0 1px rgba(139, 92, 246, 0.35), inset 0 0 100px 30px rgba(147, 51, 234, 0.3) !important;
+    border: 1.5px solid rgba(147, 51, 234, 0.6) !important;
 }
 
 .vault-shake {

@@ -750,22 +750,6 @@
                     </p>
                 </div>
 
-                <!-- ACCESO RÁPIDO SUPERIOR: BÓVEDA DE CÓDIGOS SECRETOS -->
-                <button type="button" id="open-secret-codes-btn"
-                    class="tap-effect w-full p-4 rounded-2xl bg-gradient-to-r from-purple-900/40 via-indigo-900/40 to-slate-900/50 hover:from-purple-900/60 hover:via-indigo-900/60 hover:to-slate-900/70 border border-purple-500/30 hover:border-purple-400/60 shadow-lg flex items-center justify-between text-left transition-all">
-                    <div class="flex items-center gap-3.5">
-                        <span class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl shrink-0 shadow-inner">🗝️</span>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-extrabold text-purple-700 dark:text-purple-300">Bóveda de Códigos Secretos</h3>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">Clasificado</span>
-                            </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Terminal de claves y códigos del sistema.</p>
-                        </div>
-                    </div>
-                    <svg class="w-5 h-5 text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"/></svg>
-                </button>
-
                 <!-- 1. Acordeón: Institución Educativa y Nivel / Semestre -->
                 <div class="settings-accordion-card open rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800">
                     <button type="button" class="settings-accordion-header w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
@@ -820,9 +804,9 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Al pulsar el escudo, se agranda hacia el centro mostrando lema y ciclo con resplandor temático.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer">
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
                                     <input type="checkbox" id="settings-logo-expand-toggle" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-indigo-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -906,18 +890,18 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Oculta o muestra el acceso rápido sol/luna en el encabezado.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer">
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
                                     <input type="checkbox" id="settings-header-theme-toggle" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-indigo-600"></div>
                                 </label>
                             </div>
                         </div>
 
                         <!-- PANEL SECRETO DESBLOQUEABLE: MODO GRISES Y GATITOS -->
-                        <div id="secret-theme-controls" class="hidden pt-3 border-t border-purple-200/40 dark:border-purple-800/40 bg-purple-500/5 p-3.5 rounded-2xl border space-y-3">
-                            <div class="flex items-center gap-2">
-                                <span class="text-base">🐱</span>
-                                <h4 class="text-xs font-black uppercase tracking-wider text-purple-700 dark:text-purple-300">Funciones Especiales Desbloqueadas</h4>
+                        <div id="secret-theme-controls" class="hidden pt-3 border-t border-purple-200/50 dark:border-purple-800/50 space-y-2">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/20 text-purple-700 dark:text-purple-300">
+                                <span class="text-sm">🐱</span>
+                                <h4 class="text-[11px] font-black uppercase tracking-wider">Funciones Especiales Desbloqueadas</h4>
                             </div>
 
                             <div class="settings-switch-row">
@@ -926,22 +910,22 @@
                                     <span class="text-[11px] text-slate-500 dark:text-slate-400">Estilo visual minimalista en escala de grises slate y zinc.</span>
                                 </div>
                                 <div class="settings-switch-toggle">
-                                    <label class="relative inline-flex items-center cursor-pointer">
+                                    <label class="relative inline-flex items-center cursor-pointer select-none">
                                         <input type="checkbox" id="settings-gray-mode-toggle" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-500"></div>
+                                        <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-slate-600"></div>
                                     </label>
                                 </div>
                             </div>
 
-                            <div class="settings-switch-row border-t border-purple-200/30 dark:border-purple-800/30 pt-2">
+                            <div class="settings-switch-row border-t border-purple-200/30 dark:border-purple-800/30 pt-1">
                                 <div class="settings-switch-label">
                                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Celebración con Gatitos</span>
                                     <span class="text-[11px] text-slate-500 dark:text-slate-400">Muestra gatitos festivos al completar tareas y patitas escondidas en botones.</span>
                                 </div>
                                 <div class="settings-switch-toggle">
-                                    <label class="relative inline-flex items-center cursor-pointer">
+                                    <label class="relative inline-flex items-center cursor-pointer select-none">
                                         <input type="checkbox" id="settings-cats-toggle" class="sr-only peer" checked>
-                                        <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                                        <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-purple-600"></div>
                                     </label>
                                 </div>
                             </div>
@@ -1030,9 +1014,9 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Micro-pulsos táctiles al tocar botones, completar tareas y guardar notas.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer">
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
                                     <input type="checkbox" id="settings-haptics-toggle" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-indigo-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -1106,9 +1090,9 @@
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400">Si está activa, las notas y tareas en el baúl se eliminan definitivamente pasados 60 días de archivadas.</span>
                             </div>
                             <div class="settings-switch-toggle">
-                                <label class="relative inline-flex items-center cursor-pointer">
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
                                     <input type="checkbox" id="settings-archive-purge-toggle" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                    <div class="relative w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-amber-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -1176,13 +1160,29 @@
                     </a>
                 </div>
 
+                <!-- BÓVEDA DE CÓDIGOS SECRETOS (UBICADA HASTA ABAJO DE CONFIGURACIÓN) -->
+                <button type="button" id="open-secret-codes-btn"
+                    class="tap-effect w-full p-4 rounded-2xl bg-gradient-to-r from-purple-100 via-indigo-50 to-slate-100 dark:from-purple-950/60 dark:via-indigo-950/60 dark:to-slate-900/80 hover:from-purple-200 dark:hover:from-purple-900/70 border border-purple-300/80 dark:border-purple-500/40 shadow-sm flex items-center justify-between text-left transition-all">
+                    <div class="flex items-center gap-3.5">
+                        <span class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-700 dark:text-purple-300 flex items-center justify-center text-xl shrink-0 shadow-inner">🗝️</span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-extrabold text-purple-900 dark:text-purple-200">Bóveda de Códigos Secretos</h3>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">Clasificado</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Terminal de claves y códigos del sistema.</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
                 <!-- VERSIÓN HASTA ABAJO CON NOMBRE CLAVE "PANDA" (5 TOQUES PARA DESBLOQUEAR MODO SECRETO) -->
                 <div class="text-center pt-2">
                     <button type="button" id="settings-version-pill"
                         class="tap-effect inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer select-none"
                         title="Toca 5 veces para desbloquear modo secreto">
                         <span>🐼</span>
-                        <span>Versión 1.2.4 "Panda"</span>
+                        <span>Versión 1.2.6 "Panda"</span>
                     </button>
                 </div>
             </div>
@@ -1195,26 +1195,26 @@
             <!-- Barra Superior: Botón de Regreso a Configuración -->
             <div class="flex items-center justify-between mb-4">
                 <button type="button" id="vault-back-btn" data-view-target="settings"
-                    class="tap-effect inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-800 dark:text-white font-bold text-xs border border-white/20 transition-all">
+                    class="tap-effect inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-slate-800 dark:text-white font-bold text-xs border border-slate-300 dark:border-white/20 shadow-xs transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     <span>Volver a Configuración</span>
                 </button>
-                <span class="text-xs font-mono font-bold text-purple-400/80 uppercase tracking-widest">TERMINAL SEC-08</span>
+                <span class="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-3 py-1 rounded-xl border border-purple-500/20 uppercase tracking-widest">TERMINAL SEC-08</span>
             </div>
 
             <!-- Contenedor Central con Aura de Suspenso Cinematográfica -->
             <div id="vault-card-container" class="vault-suspense-container flex-1 rounded-3xl p-6 sm:p-10 flex flex-col items-center justify-center text-center shadow-2xl relative my-auto">
                 <div class="relative z-10 max-w-md w-full space-y-6">
                     <!-- Icono o Símbolo Enigmático -->
-                    <div class="w-20 h-20 mx-auto rounded-3xl bg-purple-950/60 border border-purple-500/40 text-purple-400 flex items-center justify-center text-3xl shadow-lg shadow-purple-900/50 animate-pulse">
+                    <div class="w-20 h-20 mx-auto rounded-3xl bg-purple-950/70 border border-purple-400/40 text-purple-300 flex items-center justify-center text-3xl shadow-lg shadow-purple-950/60 animate-pulse">
                         🔒
                     </div>
 
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-widest uppercase mb-1">
+                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-widest uppercase mb-1 drop-shadow-md">
                             Bóveda Clasificada
                         </h2>
-                        <p class="text-xs text-purple-300/80 font-mono tracking-wider">
+                        <p class="text-xs text-purple-200/90 font-mono tracking-wider">
                             Introduce el código de 8 caracteres alfanuméricos
                         </p>
                     </div>
@@ -1224,13 +1224,13 @@
                         <div id="vault-inputs-wrapper" class="flex items-center justify-center gap-3">
                             <input type="text" id="vault-code-p1" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
                                 placeholder="••••"
-                                class="w-32 sm:w-36 text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-2 rounded-2xl bg-black/60 border-2 border-purple-500/40 text-purple-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/20 transition-all placeholder:text-purple-800">
+                                class="w-32 sm:w-36 text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-2 rounded-2xl bg-black/70 border-2 border-purple-400/50 text-purple-100 focus:outline-none focus:border-purple-300 focus:ring-4 focus:ring-purple-500/30 transition-all placeholder:text-purple-900/60 shadow-inner">
                             
-                            <span class="text-2xl font-bold text-purple-400/70 select-none">—</span>
+                            <span class="text-2xl font-bold text-purple-400/90 select-none">—</span>
 
                             <input type="text" id="vault-code-p2" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
                                 placeholder="••••"
-                                class="w-32 sm:w-36 text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-2 rounded-2xl bg-black/60 border-2 border-purple-500/40 text-purple-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/20 transition-all placeholder:text-purple-800">
+                                class="w-32 sm:w-36 text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-2 rounded-2xl bg-black/70 border-2 border-purple-400/50 text-purple-100 focus:outline-none focus:border-purple-300 focus:ring-4 focus:ring-purple-500/30 transition-all placeholder:text-purple-900/60 shadow-inner">
                         </div>
 
                         <!-- Mensaje de Retroalimentación de Error -->
@@ -1245,7 +1245,7 @@
                 </div>
             </div>
 
-            <div class="text-center pt-3 text-[11px] font-mono text-slate-500">
+            <div class="text-center pt-3 text-[11px] font-mono text-slate-600 dark:text-slate-400">
                 <span>ESTADO: SISTEMA ACTIVO • PROTOCOLO CRIPTOGRÁFICO v2.4</span>
             </div>
         </section>
@@ -1270,7 +1270,7 @@
             <button type="button" id="bottom-main-action-btn"
                 class="flex flex-col items-center -mt-7 tap-effect group px-2"
                 title="Atajo de Acción Rápida">
-                <div id="bottom-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center shadow-xl fab-glow ring-4 ring-white dark:ring-slate-800 transition-all">
+                <div id="bottom-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center shadow-2xl fab-glow ring-4 ring-white dark:ring-slate-900 transition-all opacity-100">
                     <span id="bottom-main-icon">
                         <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
