@@ -1,6 +1,6 @@
 {
   "name": "organizador-tareas",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Organizador Escolar Pro y Gestor Académico Offline",
   "scripts": {
     "test": "node tests/run_all_tests.js",

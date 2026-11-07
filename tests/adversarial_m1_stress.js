@@ -550,8 +550,8 @@ async function prepareReadyPage(browser) {
         );
 
         recordTest(
-            '3.4 Version pill displays updated version 1.3.2',
-            versionPillCheck.text.includes('1.3.2'),
+            '3.4 Version pill displays updated version 1.3.3',
+            versionPillCheck.text.includes('1.3.3'),
             `text=${versionPillCheck.text}`
         );
 

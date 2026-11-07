@@ -221,6 +221,20 @@
             actionLabel: 'Aplicar Orbitron Cyber 🛸',
             themeClass: null,
             supportsRockets: false
+        },
+        'KRONOS99': {
+            id: 'KRONOS99',
+            name: '⚡ Llave Maestra Universal (KRONOS99)',
+            icon: '⚡',
+            category: 'PROTOCOLO MAESTRO • ACCESO TOTAL',
+            badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
+            phrase: '«ACCESO TOTAL CONCEDIDO • 100% PROTOCOLOS Y FUENTES DESBLOQUEADOS»',
+            description: '¡Has descifrado la clave maestra universal! Se han desbloqueado simultáneamente los 11 temas de personalización, el tributo estelar 06062009 y las 5 familias tipográficas secretas en tu organizador.',
+            actionLabel: 'Explorar Bóveda Completa 🔓',
+            themeId: null,
+            themeClass: null,
+            supportsRockets: false,
+            isMasterCode: true
         }
     };
 
@@ -257,7 +271,14 @@
         // HANDNOTE (Caveat)
         'HANDNOTE': 'HANDNOTE', 'CAVEAT24': 'HANDNOTE', 'NOTEBOOK': 'HANDNOTE', 'APUNTES_': 'HANDNOTE', 'HANDMADE': 'HANDNOTE', 'CAVEAT__': 'HANDNOTE', 'CAVEAT': 'HANDNOTE',
         // ORBITRON (Orbitron)
-        'ORBITRON': 'ORBITRON', 'CYBERFNT': 'ORBITRON', 'SCIFIHUD': 'ORBITRON', 'FUTURIST': 'ORBITRON', 'KINETIC_': 'ORBITRON', 'ORBITR__': 'ORBITRON'
+        'ORBITRON': 'ORBITRON', 'CYBERFNT': 'ORBITRON', 'SCIFIHUD': 'ORBITRON', 'FUTURIST': 'ORBITRON', 'KINETIC_': 'ORBITRON', 'ORBITR__': 'ORBITRON',
+        // KRONOS99 (Master Code - Unlocks everything)
+        'KRONOS99': 'KRONOS99', 'KRONOS': 'KRONOS99', 'KRONOS__': 'KRONOS99', 'KRONOS_1': 'KRONOS99',
+        'CIPHER99': 'KRONOS99', 'CIPHER': 'KRONOS99', 'X9CIPHER': 'KRONOS99',
+        'PENGUINX': 'KRONOS99', 'PENGUIN_': 'KRONOS99',
+        'ENIGMA88': 'KRONOS99', 'ENIGMA': 'KRONOS99',
+        'OMEGA777': 'KRONOS99', 'OMEGA': 'KRONOS99',
+        'MASTERKEY': 'KRONOS99', 'OVERRIDE': 'KRONOS99', 'ALLCODES': 'KRONOS99', 'DESBLOQUEAR': 'KRONOS99', 'GODMODE8': 'KRONOS99'
     };
 
     window.VaultCatalog = VAULT_CATALOG;
@@ -682,18 +703,27 @@
             }
         }
 
+        isSpecialThemeActive() {
+            const Storage = window.StorageModule;
+            const current = Storage?.getActiveSpecialTheme ? Storage.getActiveSpecialTheme() : 'default';
+            // Únicamente el tema de felinos/monocromático ('gray') permite modo claro sin bloquearlo
+            return current && current !== 'default' && current !== 'gray' && current !== 'theme_cats' && current !== 'theme-gray';
+        }
+
         applyTheme(theme, save = true) {
             const Storage = window.StorageModule;
-            const isDark = theme === 'dark';
+            // Si hay un tema especial activo (salvo modo gatos), el modo claro no funciona y se fuerza modo oscuro
+            const effectiveTheme = this.isSpecialThemeActive() ? 'dark' : theme;
+            const isDark = effectiveTheme === 'dark';
 
             // Alternar clase dark en la etiqueta raíz <html> para Tailwind
             document.documentElement.classList.toggle('dark', isDark);
 
             if (save) {
-                Storage.setTheme(theme);
+                Storage.setTheme(effectiveTheme);
             }
 
-            this.updateThemeUI(theme, !Storage.getTheme());
+            this.updateThemeUI(effectiveTheme, !Storage.getTheme());
             this.setupBottomActionButton();
             if (window.CalendarModule?.render) {
                 window.CalendarModule.render();
@@ -704,10 +734,19 @@
             const Storage = window.StorageModule;
             window.HapticsModule?.light();
 
+            if (this.isSpecialThemeActive()) {
+                if (themeMode === 'light') {
+                    window.HapticsModule?.warning?.();
+                    this.showToast('⚠️ El Modo Claro no está disponible con este tema especial activo. Desactívalo en Bóveda para volver al modo claro.', 'warning');
+                    return;
+                }
+            }
+
             if (themeMode === 'auto') {
                 Storage.setTheme(null);
                 const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                this.applyTheme(systemPrefersDark ? 'dark' : 'light', false);
+                const effectiveMode = this.isSpecialThemeActive() ? 'dark' : (systemPrefersDark ? 'dark' : 'light');
+                this.applyTheme(effectiveMode, false);
                 this.showToast('Tema ajustado automáticamente según tu sistema.', 'info');
             } else {
                 this.applyTheme(themeMode, true);
@@ -716,6 +755,11 @@
         }
 
         toggleTheme() {
+            if (this.isSpecialThemeActive()) {
+                window.HapticsModule?.warning?.();
+                this.showToast('⚠️ El Modo Claro está bloqueado mientras este tema especial esté activo.', 'warning');
+                return;
+            }
             const isCurrentlyDark = document.documentElement.classList.contains('dark');
             const newTheme = isCurrentlyDark ? 'light' : 'dark';
             this.setTheme(newTheme);
@@ -723,6 +767,7 @@
 
         updateThemeUI(activeTheme, isAuto = false) {
             const isDark = activeTheme === 'dark';
+            const isLockedToDark = this.isSpecialThemeActive();
 
             // Sincronizar iconos de Sol y Luna en Header explícitamente
             const sunIcon = document.getElementById('theme-icon-sun');
@@ -732,7 +777,9 @@
 
             const pill = document.getElementById('settings-theme-pill');
             if (pill) {
-                if (isAuto) {
+                if (isLockedToDark) {
+                    pill.textContent = '🌙 Modo Oscuro (Bloqueado por Tema Especial)';
+                } else if (isAuto) {
                     pill.textContent = `💻 Sistema (${isDark ? 'Oscuro' : 'Claro'})`;
                 } else {
                     pill.textContent = isDark ? '🌙 Modo Oscuro' : '☀️ Modo Claro';
@@ -743,6 +790,18 @@
             const darkBtn = document.getElementById('settings-theme-dark');
             const autoBtn = document.getElementById('settings-theme-auto');
 
+            if (lightBtn) {
+                if (isLockedToDark) {
+                    lightBtn.disabled = true;
+                    lightBtn.classList.add('opacity-40', 'cursor-not-allowed');
+                    lightBtn.title = 'Modo Claro bloqueado: los temas clasificados de la bóveda requieren Modo Oscuro.';
+                } else {
+                    lightBtn.disabled = false;
+                    lightBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+                    lightBtn.title = 'Activar Modo Claro';
+                }
+            }
+
             const activeBtnClass = 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20';
             const inactiveBtnClass = 'border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700';
 
@@ -751,13 +810,13 @@
                 if (isActive) {
                     btn.className = `tap-effect p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${activeBtnClass}`;
                 } else {
-                    btn.className = `tap-effect p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${inactiveBtnClass}`;
+                    btn.className = `tap-effect p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${inactiveBtnClass}${isLockedToDark && btn === lightBtn ? ' opacity-40 cursor-not-allowed' : ''}`;
                 }
             };
 
-            updateBtn(lightBtn, !isAuto && !isDark);
-            updateBtn(darkBtn, !isAuto && isDark);
-            updateBtn(autoBtn, isAuto);
+            updateBtn(lightBtn, !isAuto && !isDark && !isLockedToDark);
+            updateBtn(darkBtn, (!isAuto && isDark) || isLockedToDark);
+            updateBtn(autoBtn, isAuto && !isLockedToDark);
         }
 
         applyGrayMode(enabled) {
@@ -2590,7 +2649,14 @@
                 }
 
                 // SUCCESS UNLOCK SEQUENCE
-                window.StorageModule.unlockCode(codeDef.id);
+                if (codeDef.isMasterCode || codeDef.id === 'KRONOS99') {
+                    Object.keys(VAULT_CATALOG).forEach(id => {
+                        window.StorageModule.unlockCode(id);
+                    });
+                    this.syncSettingsFontButtons?.();
+                } else {
+                    window.StorageModule.unlockCode(codeDef.id);
+                }
                 window.HapticsModule?.double?.();
 
                 const lockDiv = cardContainer?.querySelector('.text-3xl');
@@ -2672,49 +2738,67 @@
             };
 
             if (actionBtn) {
-                const isFont = (codeDef.type === 'font');
-                const isCurrentlyActive = isFont
-                    ? false
-                    : (codeDef.themeId && window.StorageModule.getActiveSpecialTheme() === codeDef.themeId);
-
-                actionBtn.innerHTML = `<span>${isCurrentlyActive ? 'Desactivar Tema' : (codeDef.actionLabel || 'Activar Recompensa')}</span>`;
-                actionBtn.onclick = () => {
-                    window.HapticsModule?.medium?.();
-                    if (isFont && codeDef.fontKey) {
-                        window.StorageModule.setFontFamily(codeDef.fontKey);
-                        this.applyFontFamily(codeDef.fontKey);
-                        this.showToast(`✨ ¡${codeDef.name} aplicada con éxito!`, 'success');
+                if (codeDef.isMasterCode || codeDef.id === 'KRONOS99') {
+                    actionBtn.innerHTML = `<span>Explorar Bóveda Completa 🔓</span>`;
+                    actionBtn.onclick = () => {
+                        window.HapticsModule?.medium?.();
+                        closeModal();
+                        this.renderVaultInventory();
                         this.syncSettingsFontButtons?.();
-                    } else if (codeDef.themeId) {
-                        const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
-                        if (isCurrentlyActive) {
-                            window.StorageModule.setActiveSpecialTheme('default');
-                            specialClasses.forEach(c => document.documentElement.classList.remove(c));
-                            this.showToast('Modo estándar restaurado', 'info');
-                        } else {
-                            window.StorageModule.setActiveSpecialTheme(codeDef.themeId);
-                            specialClasses.forEach(c => document.documentElement.classList.remove(c));
-                            if (codeDef.themeClass) {
-                                document.documentElement.classList.add(codeDef.themeClass);
+                        this.showToast('✨ ¡Todos los 11 temas y 5 fuentes han sido desbloqueados!', 'success');
+                    };
+                } else {
+                    const isFont = (codeDef.type === 'font');
+                    const isCurrentlyActive = isFont
+                        ? false
+                        : (codeDef.themeId && window.StorageModule.getActiveSpecialTheme() === codeDef.themeId);
+
+                    actionBtn.innerHTML = `<span>${isCurrentlyActive ? 'Desactivar Tema' : (codeDef.actionLabel || 'Activar Recompensa')}</span>`;
+                    actionBtn.onclick = () => {
+                        window.HapticsModule?.medium?.();
+                        if (isFont && codeDef.fontKey) {
+                            window.StorageModule.setFontFamily(codeDef.fontKey);
+                            this.applyFontFamily(codeDef.fontKey);
+                            this.showToast(`✨ ¡${codeDef.name} aplicada con éxito!`, 'success');
+                            this.syncSettingsFontButtons?.();
+                        } else if (codeDef.themeId) {
+                            const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
+                            if (isCurrentlyActive) {
+                                window.StorageModule.setActiveSpecialTheme('default');
+                                specialClasses.forEach(c => document.documentElement.classList.remove(c));
+                                const savedTheme = window.StorageModule.getTheme() || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                                this.applyTheme(savedTheme, false);
+                                this.showToast('Modo estándar restaurado', 'info');
+                            } else {
+                                window.StorageModule.setActiveSpecialTheme(codeDef.themeId);
+                                specialClasses.forEach(c => document.documentElement.classList.remove(c));
+                                if (codeDef.themeClass) {
+                                    document.documentElement.classList.add(codeDef.themeClass);
+                                }
+                                if (codeDef.themeId !== 'gray') {
+                                    document.documentElement.classList.add('dark');
+                                    window.StorageModule.setTheme('dark');
+                                    this.updateThemeUI('dark', false);
+                                }
+                                this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
                             }
-                            this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
                         }
-                    }
-                    if (codeDef.supportsRockets) {
-                        window.StorageModule.setApolloRocketsEnabled(!isCurrentlyActive);
-                        this.updateApolloRockets();
-                    }
-                    if (codeDef.id === 'GATITOS_') {
-                        window.StorageModule.unlockSecret();
-                        window.StorageModule.setGrayModeEnabled(true);
-                        window.StorageModule.setSecretCatsEnabled(true);
-                        document.documentElement.classList.add('theme-gray');
-                        document.body.classList.add('theme-gray');
-                        this.applySecretFeaturesUI?.();
-                    }
-                    closeModal();
-                    this.renderVaultInventory();
-                };
+                        if (codeDef.supportsRockets) {
+                            window.StorageModule.setApolloRocketsEnabled(!isCurrentlyActive);
+                            this.updateApolloRockets();
+                        }
+                        if (codeDef.id === 'GATITOS_') {
+                            window.StorageModule.unlockSecret();
+                            window.StorageModule.setGrayModeEnabled(true);
+                            window.StorageModule.setSecretCatsEnabled(true);
+                            document.documentElement.classList.add('theme-gray');
+                            document.body.classList.add('theme-gray');
+                            this.applySecretFeaturesUI?.();
+                        }
+                        closeModal();
+                        this.renderVaultInventory();
+                    };
+                }
             }
 
             if (closeBtn) closeBtn.onclick = closeModal;
@@ -2770,9 +2854,11 @@
                     : (def.themeId && currentSpecialTheme === def.themeId);
                 const buttonText = (def.id === '06062009')
                     ? 'Ver Dedicatoria'
-                    : (isFont
-                        ? (isActive ? 'Restaurar Fuente Estándar' : 'Activar Tipografía')
-                        : (isActive ? 'Desactivar' : 'Activar'));
+                    : (def.isMasterCode || def.id === 'KRONOS99'
+                        ? 'Ver Detalle'
+                        : (isFont
+                            ? (isActive ? 'Restaurar Fuente Estándar' : 'Activar Tipografía')
+                            : (isActive ? 'Desactivar' : 'Activar')));
 
                 return `
                     <div class="vault-inventory-card truncate p-3 rounded-2xl bg-slate-900/80 dark:bg-slate-950/80 border ${isActive ? 'border-emerald-400/60 shadow-lg shadow-emerald-950/40' : 'border-purple-500/20'} flex items-center justify-between gap-2.5 transition-all">
@@ -2807,6 +2893,11 @@
                     const codeId = btn.getAttribute('data-vault-toggle');
                     const def = VAULT_CATALOG[codeId];
                     if (!def) return;
+
+                    if (def.isMasterCode || def.id === 'KRONOS99') {
+                        this.openVaultRevealModal(def);
+                        return;
+                    }
 
                     if (def.id === '06062009') {
                         this.openVaultRevealModal(def);
@@ -2845,6 +2936,8 @@
                             window.StorageModule.setApolloRocketsEnabled(false);
                             this.updateApolloRockets();
                         }
+                        const savedTheme = window.StorageModule.getTheme() || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                        this.applyTheme(savedTheme, false);
                         this.showToast(`Modo estándar restaurado`, 'info');
                     } else {
                         // Activate
@@ -2864,6 +2957,10 @@
                             document.documentElement.classList.add('theme-gray');
                             document.body.classList.add('theme-gray');
                             this.applySecretFeaturesUI?.();
+                        } else {
+                            document.documentElement.classList.add('dark');
+                            window.StorageModule.setTheme('dark');
+                            this.updateThemeUI('dark', false);
                         }
                         this.showToast(`✨ ${def.name} activado`, 'success');
                     }
@@ -2914,6 +3011,11 @@
                 const found = Object.values(VAULT_CATALOG).find(c => c.themeId === current);
                 if (found && found.themeClass) {
                     document.documentElement.classList.add(found.themeClass);
+                }
+                if (current !== 'gray' && current !== 'theme_cats' && current !== 'theme-gray') {
+                    document.documentElement.classList.add('dark');
+                    Storage.setTheme('dark');
+                    this.updateThemeUI('dark', false);
                 }
             }
         }
