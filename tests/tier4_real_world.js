@@ -1,7 +1,7 @@
 /**
  * tier4_real_world.js - Tier 4: Real-World Student Application Workflows
- * 5 End-to-End comprehensive student scenarios with opaque-box DOM interactions
- * Requirement-driven test suite for Organizador_Tareas v1.3.1 Pingüino
+ * 7 End-to-End comprehensive student scenarios with opaque-box DOM interactions
+ * Requirement-driven test suite for Organizador_Tareas v1.3.4
  */
 
 const tests = [
@@ -390,6 +390,206 @@ const tests = [
             helpers.assertEqual(finalState.tasksCount, 2, '2 tasks restored');
             helpers.assertEqual(finalState.subjectsCount, 2, '2 subjects restored');
             helpers.assertEqual(finalState.period, 'Ciclo Avanzado 2026', 'Academic period restored');
+        }
+    },
+
+    // =========================================================================
+    // Scenario 6: Clean-Slate Student with Skipped School -> Later Settings Config & PWA
+    // =========================================================================
+    {
+        id: 'T4_SCENARIO_6_fresh_student_skipped_onboarding_to_configured_pwa',
+        name: 'Scenario 6: Clean-slate onboarding with "Hacerla después", view navigation, settings configuration, and PWA readiness',
+        run: async (page, helpers) => {
+            // Step 1: Clean slate application start
+            await page.evaluate(() => {
+                localStorage.clear();
+                sessionStorage.clear();
+            });
+            await page.reload({ waitUntil: 'load' });
+            await new Promise(r => setTimeout(r, 400));
+
+            // Step 2: Welcome modal is displayed, student chooses "Hacerla después"
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            await page.evaluate(() => {
+                document.getElementById('welcome-skip-school-btn')?.click();
+            });
+            await new Promise(r => setTimeout(r, 100));
+
+            // Verify period selector is locked
+            const isLocked = await page.evaluate(() => {
+                const c = document.getElementById('welcome-period-container');
+                return c ? window.getComputedStyle(c).pointerEvents === 'none' : false;
+            });
+            helpers.assertTrue(isLocked, 'Period selector must be locked when "Hacerla después" is selected');
+
+            // Step 3: Provide provisional cycle dates and submit
+            await page.evaluate(() => {
+                const start = document.getElementById('welcome-cycle-start');
+                const end = document.getElementById('welcome-cycle-end');
+                if (start) start.value = '2026-08-15';
+                if (end) end.value = '2026-12-15';
+                document.getElementById('welcome-cycle-save-btn')?.click();
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            // Step 4: Verify unconfigured defaults across header and storage
+            const unconfState = await page.evaluate(() => {
+                return {
+                    isSkipped: window.StorageModule?.isSchoolSkipped(),
+                    instId: window.StorageModule?.getInstitution(),
+                    period: window.StorageModule?.getAcademicPeriod(),
+                    headerName: document.getElementById('header-inst-name')?.textContent?.trim(),
+                    headerPeriod: document.getElementById('header-inst-period')?.textContent?.trim()
+                };
+            });
+            helpers.assertTrue(unconfState.isSkipped, 'isSchoolSkipped must be true');
+            helpers.assertEqual(unconfState.instId, 'unconfigured', 'Institution ID must be unconfigured');
+            helpers.assertEqual(unconfState.period, 'Sin periodo', 'Academic period must be Sin periodo');
+            helpers.assertEqual(unconfState.headerName, 'Sin institución', 'Header name displays Sin institución');
+            helpers.assertEqual(unconfState.headerPeriod, 'Sin periodo', 'Header period displays Sin periodo');
+
+            // Step 5: Student creates a course and task while school is unconfigured
+            await page.evaluate(() => {
+                const sub = [{ id: 'sub_web', name: 'Desarrollo Web Fullstack', color: '#6366F1' }];
+                window.StorageModule?.saveSubjects?.(sub);
+                const task = [{
+                    id: 'tsk_pwa_1',
+                    subjectId: 'sub_web',
+                    title: 'Entregable PWA & Service Worker',
+                    dueDate: '2026-11-25',
+                    completed: false
+                }];
+                window.StorageModule?.saveTasks?.(task);
+            });
+
+            // Step 6: Student navigates to Settings to configure institution
+            await page.evaluate(() => {
+                window.app?.switchView?.('settings');
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            // Student clicks UNAM card in settings
+            await page.evaluate(() => {
+                const unamBtn = document.querySelector('#settings-institution-grid [data-inst-id="unam"]');
+                if (unamBtn) unamBtn.click();
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            // Student selects "4.º Semestre" period pill
+            await page.evaluate(() => {
+                const pills = Array.from(document.querySelectorAll('#settings-period-pills button, .period-pill'));
+                const pill4 = pills.find(p => p.textContent.includes('4.º Semestre'));
+                if (pill4) pill4.click();
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            // Step 7: Verify smooth transition from unconfigured to UNAM
+            const configuredState = await page.evaluate(() => {
+                return {
+                    isSkipped: window.StorageModule?.isSchoolSkipped(),
+                    instId: window.StorageModule?.getInstitution(),
+                    period: window.StorageModule?.getAcademicPeriod(),
+                    headerName: document.getElementById('header-inst-name')?.textContent?.trim(),
+                    headerPeriod: document.getElementById('header-inst-period')?.textContent?.trim(),
+                    hasPwaCard: document.getElementById('pwa-settings-card') !== null,
+                    hasPwaBtn: document.getElementById('pwa-install-settings-btn') !== null
+                };
+            });
+
+            helpers.assertFalse(configuredState.isSkipped, 'isSchoolSkipped cleared after configuring school');
+            helpers.assertEqual(configuredState.instId, 'unam', 'Active institution is UNAM');
+            helpers.assertIncludes(configuredState.headerName, 'UNAM', 'Header reflects UNAM');
+            helpers.assertNotEqual(configuredState.headerPeriod, 'Sin periodo', 'Header period updated');
+            helpers.assertTrue(configuredState.hasPwaCard, 'PWA settings card is available');
+            helpers.assertTrue(configuredState.hasPwaBtn, 'PWA install button is available');
+        }
+    },
+
+    // =========================================================================
+    // Scenario 7: Custom Academy Student Cuatrimestral Full Lifecycle
+    // =========================================================================
+    {
+        id: 'T4_SCENARIO_7_custom_academy_student_cuatrimestre_full_lifecycle',
+        name: 'Scenario 7: Custom school creation during welcome onboarding with cuatrimestral system and persistence',
+        run: async (page, helpers) => {
+            // Step 1: Clean state
+            await page.evaluate(() => {
+                localStorage.clear();
+                sessionStorage.clear();
+            });
+            await page.reload({ waitUntil: 'load' });
+            await new Promise(r => setTimeout(r, 400));
+
+            // Step 2: Open welcome onboarding and launch custom school builder
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-create-school-btn')?.click();
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            // Step 3: Populate custom school form
+            await page.evaluate(() => {
+                document.getElementById('custom-school-name').value = 'Colegio Mayor Vanguardia';
+                document.getElementById('custom-school-shortbadge').value = 'CMV';
+                document.getElementById('custom-school-fullname').value = 'Colegio Mayor Vanguardia de Innovación';
+                document.getElementById('custom-school-slogan').value = 'Liderazgo y Saber';
+                document.getElementById('custom-school-country').value = 'MX';
+                document.getElementById('custom-school-system').value = 'Cuatrimestral';
+                document.getElementById('custom-school-color').value = '#059669';
+                document.getElementById('custom-school-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            // Step 4: Verify auto-selection in welcome modal and select 3.º Cuatrimestre
+            await page.evaluate(() => {
+                const chips = Array.from(document.querySelectorAll('.welcome-period-chip'));
+                const chip3 = chips.find(c => c.textContent.includes('3.º Cuatrimestre'));
+                if (chip3) chip3.click();
+
+                const start = document.getElementById('welcome-cycle-start');
+                const end = document.getElementById('welcome-cycle-end');
+                if (start) start.value = '2026-09-01';
+                if (end) end.value = '2026-12-31';
+                document.getElementById('welcome-cycle-save-btn')?.click();
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            // Step 5: Verify custom school active state in header and drawer
+            const customState = await page.evaluate(() => {
+                return {
+                    hName: document.getElementById('header-inst-name')?.textContent?.trim(),
+                    dName: document.getElementById('drawer-inst-name')?.textContent?.trim(),
+                    hPeriod: document.getElementById('header-inst-period')?.textContent?.trim(),
+                    dPeriod: document.getElementById('drawer-inst-period')?.textContent?.trim(),
+                    dSlogan: document.getElementById('drawer-inst-slogan')?.textContent?.trim()
+                };
+            });
+
+            helpers.assertEqual(customState.hName, customState.dName, 'Header and drawer names sync');
+            helpers.assertIncludes(customState.hName, 'Colegio Mayor Vanguardia', 'Custom school name active');
+            helpers.assertEqual(customState.hPeriod, '3.º Cuatrimestre', 'Selected custom period active');
+            helpers.assertEqual(customState.hPeriod, customState.dPeriod, 'Header and drawer periods sync');
+            helpers.assertIncludes(customState.dSlogan, 'Liderazgo y Saber', 'Drawer slogan matches custom motto');
+
+            // Step 6: Hard page reload to test complete offline persistence
+            await page.reload({ waitUntil: 'load' });
+            await new Promise(r => setTimeout(r, 400));
+
+            const postReload = await page.evaluate(() => {
+                return {
+                    hName: document.getElementById('header-inst-name')?.textContent?.trim(),
+                    hPeriod: document.getElementById('header-inst-period')?.textContent?.trim(),
+                    dName: document.getElementById('drawer-inst-name')?.textContent?.trim()
+                };
+            });
+
+            helpers.assertIncludes(postReload.hName, 'Colegio Mayor Vanguardia', 'Custom school persisted across reload');
+            helpers.assertEqual(postReload.hPeriod, '3.º Cuatrimestre', 'Custom period persisted across reload');
+            helpers.assertEqual(postReload.hName, postReload.dName, 'Drawer and header match post-reload');
         }
     }
 ];

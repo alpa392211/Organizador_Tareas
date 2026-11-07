@@ -1,7 +1,7 @@
 /**
  * tier1_feature_coverage.js - Tier 1: Feature Coverage (Equivalence Classes)
- * Features F01 through F27 (>= 5 distinct tests per feature, 135 total tests)
- * Requirement-driven and opaque-box test suite for Organizador_Tareas v1.3.1 Pingüino
+ * Features F01 through F42 (>= 5 distinct tests per feature, 210 total tests)
+ * Requirement-driven and opaque-box test suite for Organizador_Tareas v1.3.4
  */
 
 const fs = require('fs');
@@ -1988,6 +1988,1168 @@ const tests = [
                 return true;
             });
             helpers.assertTrue(validRoundtrip, 'Export/import roundtrip must maintain schema integrity');
+        }
+    },
+
+    // =========================================================================
+    // F28: Official App Logo Processing & Squaring
+    // =========================================================================
+    {
+        id: 'T1_F28_01_pwa_icon_generator_script_exists',
+        feature: 'F28',
+        name: 'Icon generation script scripts/generate_pwa_icons.py exists on disk',
+        run: async (page, helpers) => {
+            const scriptPath = path.join(helpers.PROJECT_ROOT, 'scripts', 'generate_pwa_icons.py');
+            helpers.assertTrue(fs.existsSync(scriptPath), 'generate_pwa_icons.py must exist in scripts/');
+            const stat = fs.statSync(scriptPath);
+            helpers.assertTrue(stat.size > 500, 'generate_pwa_icons.py must be non-empty');
+        }
+    },
+    {
+        id: 'T1_F28_02_pwa_icon_generator_pillow_lanczos',
+        feature: 'F28',
+        name: 'Icon generator script imports Pillow and implements Lanczos resampling',
+        run: async (page, helpers) => {
+            const scriptPath = path.join(helpers.PROJECT_ROOT, 'scripts', 'generate_pwa_icons.py');
+            const code = fs.readFileSync(scriptPath, 'utf8');
+            helpers.assertIncludes(code, 'PIL', 'Script must import PIL (Pillow)');
+            helpers.assertIncludes(code, 'LANCZOS', 'Script must use high-fidelity Lanczos resampling');
+        }
+    },
+    {
+        id: 'T1_F28_03_pwa_icon_generator_background_color_padding',
+        feature: 'F28',
+        name: 'Icon generator uses official cosmic dark background color (#0c0143) for squaring',
+        run: async (page, helpers) => {
+            const scriptPath = path.join(helpers.PROJECT_ROOT, 'scripts', 'generate_pwa_icons.py');
+            const code = fs.readFileSync(scriptPath, 'utf8');
+            helpers.assertTrue(
+                code.includes('12, 1, 67') || code.includes('0c0143'),
+                'Script must sample/pad with RGB (12, 1, 67) / #0c0143 cosmic background'
+            );
+        }
+    },
+    {
+        id: 'T1_F28_04_pwa_icon_generator_1024_squared_canvas',
+        feature: 'F28',
+        name: 'Icon generator produces 1024x1024 squared master canvas base',
+        run: async (page, helpers) => {
+            const scriptPath = path.join(helpers.PROJECT_ROOT, 'scripts', 'generate_pwa_icons.py');
+            const code = fs.readFileSync(scriptPath, 'utf8');
+            helpers.assertIncludes(code, '1024, 1024', 'Script must establish 1024x1024 squared master canvas');
+        }
+    },
+    {
+        id: 'T1_F28_05_pwa_icon_generator_python_syntax_validity',
+        feature: 'F28',
+        name: 'Icon generator script passes clean Python compilation syntax check',
+        run: async (page, helpers) => {
+            const scriptPath = path.join(helpers.PROJECT_ROOT, 'scripts', 'generate_pwa_icons.py');
+            const { execSync } = require('child_process');
+            let syntaxOk = false;
+            try {
+                execSync(`python3 -m py_compile "${scriptPath}"`, { stdio: 'pipe' });
+                syntaxOk = true;
+            } catch (e) {
+                syntaxOk = false;
+            }
+            helpers.assertTrue(syntaxOk, 'generate_pwa_icons.py must compile with clean Python 3 syntax');
+        }
+    },
+
+    // =========================================================================
+    // F29: Standard PWA Icon Asset Generation
+    // =========================================================================
+    {
+        id: 'T1_F29_01_standard_icon_192_asset_integrity',
+        feature: 'F29',
+        name: 'icon-192x192.png exists in assets/icons with non-zero size',
+        run: async (page, helpers) => {
+            const iconPath = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'icon-192x192.png');
+            helpers.assertTrue(fs.existsSync(iconPath), 'icon-192x192.png must exist');
+            const stat = fs.statSync(iconPath);
+            helpers.assertTrue(stat.size > 2000, 'icon-192x192.png must be non-empty image asset (>2KB)');
+        }
+    },
+    {
+        id: 'T1_F29_02_standard_icon_512_asset_integrity',
+        feature: 'F29',
+        name: 'icon-512x512.png exists in assets/icons with non-zero size',
+        run: async (page, helpers) => {
+            const iconPath = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'icon-512x512.png');
+            helpers.assertTrue(fs.existsSync(iconPath), 'icon-512x512.png must exist');
+            const stat = fs.statSync(iconPath);
+            helpers.assertTrue(stat.size > 10000, 'icon-512x512.png must be non-empty image asset (>10KB)');
+        }
+    },
+    {
+        id: 'T1_F29_03_apple_touch_icon_asset_integrity',
+        feature: 'F29',
+        name: 'apple-touch-icon.png exists in assets/icons with non-zero size',
+        run: async (page, helpers) => {
+            const iconPath = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'apple-touch-icon.png');
+            helpers.assertTrue(fs.existsSync(iconPath), 'apple-touch-icon.png must exist');
+            const stat = fs.statSync(iconPath);
+            helpers.assertTrue(stat.size > 2000, 'apple-touch-icon.png must be non-empty image asset (>2KB)');
+        }
+    },
+    {
+        id: 'T1_F29_04_favicon_png_assets_integrity',
+        feature: 'F29',
+        name: 'favicon-32x32.png and favicon-16x16.png exist in assets/icons',
+        run: async (page, helpers) => {
+            const fav32 = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'favicon-32x32.png');
+            const fav16 = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'favicon-16x16.png');
+            helpers.assertTrue(fs.existsSync(fav32), 'favicon-32x32.png must exist');
+            helpers.assertTrue(fs.existsSync(fav16), 'favicon-16x16.png must exist');
+        }
+    },
+    {
+        id: 'T1_F29_05_favicon_ico_and_html_link_fidelity',
+        feature: 'F29',
+        name: 'favicon.ico exists on disk and is referenced in index.html head',
+        run: async (page, helpers) => {
+            const icoPath = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'favicon.ico');
+            helpers.assertTrue(fs.existsSync(icoPath), 'favicon.ico must exist in assets/icons/');
+            const linkRelIcon = await page.evaluate(() => {
+                const link = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]');
+                return link ? link.getAttribute('href') : null;
+            });
+            helpers.assertTrue(Boolean(linkRelIcon && linkRelIcon.includes('favicon')), 'index.html head must have icon link');
+        }
+    },
+
+    // =========================================================================
+    // F30: Maskable Icon Asset Generation
+    // =========================================================================
+    {
+        id: 'T1_F30_01_maskable_192_asset_exists',
+        feature: 'F30',
+        name: 'icon-maskable-192x192.png exists in assets/icons',
+        run: async (page, helpers) => {
+            const iconPath = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'icon-maskable-192x192.png');
+            helpers.assertTrue(fs.existsSync(iconPath), 'icon-maskable-192x192.png must exist');
+            const stat = fs.statSync(iconPath);
+            helpers.assertTrue(stat.size > 2000, 'icon-maskable-192x192.png must be non-empty (>2KB)');
+        }
+    },
+    {
+        id: 'T1_F30_02_maskable_512_asset_exists',
+        feature: 'F30',
+        name: 'icon-maskable-512x512.png exists in assets/icons',
+        run: async (page, helpers) => {
+            const iconPath = path.join(helpers.PROJECT_ROOT, 'assets', 'icons', 'icon-maskable-512x512.png');
+            helpers.assertTrue(fs.existsSync(iconPath), 'icon-maskable-512x512.png must exist');
+            const stat = fs.statSync(iconPath);
+            helpers.assertTrue(stat.size > 10000, 'icon-maskable-512x512.png must be non-empty (>10KB)');
+        }
+    },
+    {
+        id: 'T1_F30_03_maskable_purpose_in_manifest',
+        feature: 'F30',
+        name: 'Web App Manifest declares purpose: maskable for icon descriptors',
+        run: async (page, helpers) => {
+            const manifestPath = path.join(helpers.PROJECT_ROOT, 'manifest.webmanifest');
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            const maskableIcons = manifest.icons.filter(i => i.purpose && i.purpose.includes('maskable'));
+            helpers.assertTrue(maskableIcons.length >= 2, 'Manifest must declare at least 2 maskable icon descriptors');
+        }
+    },
+    {
+        id: 'T1_F30_04_maskable_safe_zone_scaling_factor',
+        feature: 'F30',
+        name: 'Icon generation script applies safe-zone scaling (<= 80%) for maskable icons',
+        run: async (page, helpers) => {
+            const scriptPath = path.join(helpers.PROJECT_ROOT, 'scripts', 'generate_pwa_icons.py');
+            const code = fs.readFileSync(scriptPath, 'utf8');
+            helpers.assertTrue(code.includes('0.76') || code.includes('0.8'), 'Script must scale content to safe zone');
+        }
+    },
+    {
+        id: 'T1_F30_05_maskable_edge_feathering_filter',
+        feature: 'F30',
+        name: 'Icon generation script incorporates Gaussian edge feathering for smooth mask integration',
+        run: async (page, helpers) => {
+            const scriptPath = path.join(helpers.PROJECT_ROOT, 'scripts', 'generate_pwa_icons.py');
+            const code = fs.readFileSync(scriptPath, 'utf8');
+            helpers.assertIncludes(code, 'GaussianBlur', 'Script must use GaussianBlur for feathering mask boundaries');
+        }
+    },
+
+    // =========================================================================
+    // F31: Web App Manifest Dual Deployment
+    // =========================================================================
+    {
+        id: 'T1_F31_01_manifest_webmanifest_validity',
+        feature: 'F31',
+        name: 'manifest.webmanifest exists and parses as valid W3C JSON',
+        run: async (page, helpers) => {
+            const manifestPath = path.join(helpers.PROJECT_ROOT, 'manifest.webmanifest');
+            helpers.assertTrue(fs.existsSync(manifestPath), 'manifest.webmanifest must exist');
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            helpers.assertEqual(manifest.name, 'Organizador de Tareas', 'Manifest name must be Organizador de Tareas');
+            helpers.assertEqual(manifest.short_name, 'Organizador', 'Manifest short_name must be Organizador');
+        }
+    },
+    {
+        id: 'T1_F31_02_manifest_json_validity',
+        feature: 'F31',
+        name: 'manifest.json exists and parses as valid W3C JSON',
+        run: async (page, helpers) => {
+            const manifestPath = path.join(helpers.PROJECT_ROOT, 'manifest.json');
+            helpers.assertTrue(fs.existsSync(manifestPath), 'manifest.json must exist');
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            helpers.assertEqual(manifest.display, 'standalone', 'Manifest display must be standalone');
+        }
+    },
+    {
+        id: 'T1_F31_03_dual_manifest_field_synchronization',
+        feature: 'F31',
+        name: 'manifest.webmanifest and manifest.json match core properties identically',
+        run: async (page, helpers) => {
+            const p1 = path.join(helpers.PROJECT_ROOT, 'manifest.webmanifest');
+            const p2 = path.join(helpers.PROJECT_ROOT, 'manifest.json');
+            const m1 = JSON.parse(fs.readFileSync(p1, 'utf8'));
+            const m2 = JSON.parse(fs.readFileSync(p2, 'utf8'));
+            helpers.assertEqual(m1.name, m2.name, 'Manifest names must match');
+            helpers.assertEqual(m1.display, m2.display, 'Manifest display modes must match');
+            helpers.assertEqual(m1.theme_color, m2.theme_color, 'Theme colors must match');
+            helpers.assertEqual(m1.background_color, m2.background_color, 'Background colors must match');
+            helpers.assertEqual(m1.icons.length, m2.icons.length, 'Icon array lengths must match');
+        }
+    },
+    {
+        id: 'T1_F31_04_manifest_theme_and_bg_colors',
+        feature: 'F31',
+        name: 'Manifest colors match spec: background #0c0143 and theme #4F46E5',
+        run: async (page, helpers) => {
+            const p = path.join(helpers.PROJECT_ROOT, 'manifest.webmanifest');
+            const m = JSON.parse(fs.readFileSync(p, 'utf8'));
+            helpers.assertEqual(m.background_color.toLowerCase(), '#0c0143', 'Background color must be #0c0143');
+            helpers.assertEqual(m.theme_color.toUpperCase(), '#4F46E5', 'Theme color must be #4F46E5');
+        }
+    },
+    {
+        id: 'T1_F31_05_index_html_manifest_link',
+        feature: 'F31',
+        name: 'index.html head declares link rel="manifest" referencing manifest.webmanifest',
+        run: async (page, helpers) => {
+            const linkHref = await page.evaluate(() => {
+                const el = document.querySelector('link[rel="manifest"]');
+                return el ? el.getAttribute('href') : null;
+            });
+            helpers.assertEqual(linkHref, 'manifest.webmanifest', 'Manifest link in HTML must point to manifest.webmanifest');
+        }
+    },
+
+    // =========================================================================
+    // F32: Robust Offline Service Worker (sw.js)
+    // =========================================================================
+    {
+        id: 'T1_F32_01_sw_script_exists_and_cache_name',
+        feature: 'F32',
+        name: 'sw.js exists and declares CACHE_NAME organizador-tareas-cache-v1.3.4',
+        run: async (page, helpers) => {
+            const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
+            helpers.assertTrue(fs.existsSync(swPath), 'sw.js must exist at project root');
+            const code = fs.readFileSync(swPath, 'utf8');
+            helpers.assertIncludes(code, 'organizador-tareas-cache-v1.3.4', 'CACHE_NAME must be organizador-tareas-cache-v1.3.4');
+        }
+    },
+    {
+        id: 'T1_F32_02_sw_precache_assets_completeness',
+        feature: 'F32',
+        name: 'sw.js PRECACHE_ASSETS contains index.html, manifests, css, js modules, and icons',
+        run: async (page, helpers) => {
+            const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
+            const code = fs.readFileSync(swPath, 'utf8');
+            helpers.assertIncludes(code, 'index.html', 'Precache must include index.html');
+            helpers.assertIncludes(code, 'manifest.webmanifest', 'Precache must include manifest.webmanifest');
+            helpers.assertIncludes(code, 'css/styles.css?v=1.3.4', 'Precache must include versioned styles.css');
+            helpers.assertIncludes(code, 'js/app.js?v=1.3.4', 'Precache must include versioned app.js');
+            helpers.assertIncludes(code, 'assets/icons/icon-192x192.png', 'Precache must include icon-192x192.png');
+        }
+    },
+    {
+        id: 'T1_F32_03_sw_network_first_navigation_strategy',
+        feature: 'F32',
+        name: 'sw.js implements network-first navigation strategy with cache fallback',
+        run: async (page, helpers) => {
+            const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
+            const code = fs.readFileSync(swPath, 'utf8');
+            helpers.assertIncludes(code, 'request.mode === \'navigate\'', 'Service worker must inspect navigation requests');
+            helpers.assertIncludes(code, 'fetch(request)', 'Service worker must attempt network fetch');
+        }
+    },
+    {
+        id: 'T1_F32_04_sw_activate_event_cache_cleanup',
+        feature: 'F32',
+        name: 'sw.js activate handler purges outdated cache keys',
+        run: async (page, helpers) => {
+            const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
+            const code = fs.readFileSync(swPath, 'utf8');
+            helpers.assertIncludes(code, 'caches.keys()', 'Activate event must query cache keys');
+            helpers.assertIncludes(code, 'caches.delete', 'Activate event must delete stale caches');
+        }
+    },
+    {
+        id: 'T1_F32_05_sw_secure_context_registration_guard',
+        feature: 'F32',
+        name: 'app.js checks for secure context / localhost before registering Service Worker',
+        run: async (page, helpers) => {
+            const appPath = path.join(helpers.PROJECT_ROOT, 'js', 'app.js');
+            const code = fs.readFileSync(appPath, 'utf8');
+            helpers.assertTrue(
+                code.includes('location.protocol === \'https:\'') || code.includes('location.hostname === \'localhost\''),
+                'Registration must guard with secure context / localhost check'
+            );
+        }
+    },
+
+    // =========================================================================
+    // F33: In-App PWA Install Banner & Settings Action
+    // =========================================================================
+    {
+        id: 'T1_F33_01_pwa_settings_card_dom_structure',
+        feature: 'F33',
+        name: '#pwa-settings-card element exists in DOM inside settings view',
+        run: async (page, helpers) => {
+            const card = await page.evaluate(() => {
+                const el = document.getElementById('pwa-settings-card');
+                return el ? { found: true, id: el.id, classes: el.className } : null;
+            });
+            helpers.assertTrue(Boolean(card && card.found), '#pwa-settings-card must exist in DOM');
+        }
+    },
+    {
+        id: 'T1_F33_02_pwa_install_settings_button_dom',
+        feature: 'F33',
+        name: '#pwa-install-settings-btn exists with installation action text',
+        run: async (page, helpers) => {
+            const btn = await page.evaluate(() => {
+                const el = document.getElementById('pwa-install-settings-btn');
+                const textEl = document.getElementById('pwa-install-btn-text');
+                return el ? { found: true, text: textEl ? textEl.textContent.trim() : el.textContent.trim() } : null;
+            });
+            helpers.assertTrue(Boolean(btn && btn.found), '#pwa-install-settings-btn must exist in DOM');
+            helpers.assertIncludes(btn.text, 'Instalar', 'Install button must mention Instalar');
+        }
+    },
+    {
+        id: 'T1_F33_03_prompt_pwa_install_method_exists',
+        feature: 'F33',
+        name: 'window.app.promptPwaInstall method exists and is callable function',
+        run: async (page, helpers) => {
+            const fnType = await page.evaluate(() => {
+                return typeof window.app?.promptPwaInstall;
+            });
+            helpers.assertEqual(fnType, 'function', 'window.app.promptPwaInstall must be a function');
+        }
+    },
+    {
+        id: 'T1_F33_04_beforeinstallprompt_listener_attached',
+        feature: 'F33',
+        name: 'Synthetic beforeinstallprompt event is captured and stored without error',
+        run: async (page, helpers) => {
+            const captured = await page.evaluate(() => {
+                let eventFired = false;
+                const syntheticEvent = new Event('beforeinstallprompt', { cancelable: true });
+                syntheticEvent.prompt = () => Promise.resolve({ outcome: 'accepted' });
+                syntheticEvent.userChoice = Promise.resolve({ outcome: 'accepted' });
+                window.dispatchEvent(syntheticEvent);
+                return window.deferredInstallPrompt !== undefined;
+            });
+            helpers.assertTrue(captured, 'Synthetic beforeinstallprompt must be captured safely');
+        }
+    },
+    {
+        id: 'T1_F33_05_drawer_pwa_install_button_dom',
+        feature: 'F33',
+        name: '#drawer-pwa-install-btn exists in sidebar drawer for mobile access',
+        run: async (page, helpers) => {
+            const drawerBtn = await page.evaluate(() => {
+                const el = document.getElementById('drawer-pwa-install-btn');
+                return el !== null;
+            });
+            helpers.assertTrue(drawerBtn, '#drawer-pwa-install-btn must exist in DOM');
+        }
+    },
+
+    // =========================================================================
+    // F34: Settings School Cards Compact Redesign
+    // =========================================================================
+    {
+        id: 'T1_F34_01_settings_cards_logo_frame_dimensions',
+        feature: 'F34',
+        name: '.school-logo-frame rendered dimensions are exactly 32px by 32px',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.switchView?.('settings');
+            });
+            const frame = await page.evaluate(() => {
+                const el = document.querySelector('.inst-grid-card .school-logo-frame');
+                if (!el) return null;
+                const cs = window.getComputedStyle(el);
+                return { width: cs.width, height: cs.height };
+            });
+            helpers.assertTrue(Boolean(frame), '.school-logo-frame must exist in settings card');
+            helpers.assertEqual(frame.width, '32px', 'Logo frame width must be 32px');
+            helpers.assertEqual(frame.height, '32px', 'Logo frame height must be 32px');
+        }
+    },
+    {
+        id: 'T1_F34_02_settings_cards_height_compactness',
+        feature: 'F34',
+        name: 'Settings institution cards rendered height is within 75px-85px compact bounds',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 1280, height: 800 });
+            await page.evaluate(() => {
+                window.app?.switchView?.('settings');
+            });
+            const height = await page.evaluate(() => {
+                const card = document.querySelector('#settings-institution-grid .inst-grid-card');
+                return card ? card.getBoundingClientRect().height : null;
+            });
+            helpers.assertTrue(height !== null, 'Card must be rendered');
+            helpers.assertTrue(height >= 75 && height <= 85, `Card height (${height}px) must be within 75-85px range`);
+        }
+    },
+    {
+        id: 'T1_F34_03_settings_cards_micro_metadata_country_pill',
+        feature: 'F34',
+        name: 'Settings cards display micro-row metadata with uppercase country code pill',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.switchView?.('settings');
+            });
+            const pillText = await page.evaluate(() => {
+                const pills = Array.from(document.querySelectorAll('#settings-institution-grid .inst-grid-card span'));
+                const countryPill = pills.find(p => ['MX', 'CO', 'AR', 'PE', 'CL', 'ES', 'UY', 'VE', 'CR', 'EC'].includes(p.textContent.trim()));
+                return countryPill ? countryPill.textContent.trim() : null;
+            });
+            helpers.assertTrue(Boolean(pillText), 'Settings cards must render country code pill (e.g., MX)');
+        }
+    },
+    {
+        id: 'T1_F34_04_settings_cards_active_badge_or_ring',
+        feature: 'F34',
+        name: 'Currently active school card displays "Actual" badge or active border ring',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setInstitution('unam');
+                window.app?.switchView?.('settings');
+            });
+            const hasActiveIndicator = await page.evaluate(() => {
+                const activeCard = document.querySelector('#settings-institution-grid [data-inst-id="unam"]');
+                if (!activeCard) return false;
+                const hasBadge = activeCard.textContent.includes('Actual');
+                const hasRing = activeCard.className.includes('ring-2') || activeCard.className.includes('border-indigo');
+                return hasBadge || hasRing;
+            });
+            helpers.assertTrue(hasActiveIndicator, 'Active institution card must show "Actual" badge or active border ring');
+        }
+    },
+    {
+        id: 'T1_F34_05_settings_cards_custom_school_badge_and_edit',
+        feature: 'F34',
+        name: 'Custom school card displays "⭐ Propia" badge and edit button',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                const custom = {
+                    id: 'cust_t1_f34',
+                    name: 'Escuela Propia Test',
+                    shortBadge: 'EPT',
+                    fullName: 'Escuela Propia Test',
+                    isCustom: true,
+                    countryCode: 'PR',
+                    colors: { primary: '#4F46E5', secondary: '#818CF8', accent: '#C7D2FE', text: '#FFFFFF' },
+                    periods: ['Periodo 1', 'Periodo 2']
+                };
+                window.StorageModule?.saveCustomSchool(custom);
+                window.app?.switchView?.('settings');
+                window.app?.renderInstitutionGrid?.();
+            });
+            const customCardHasPropia = await page.evaluate(() => {
+                const card = document.querySelector('#settings-institution-grid [data-inst-id="cust_t1_f34"]');
+                return card ? card.textContent.includes('Propia') : false;
+            });
+            helpers.assertTrue(customCardHasPropia, 'Custom school card must show "Propia" badge');
+        }
+    },
+
+    // =========================================================================
+    // F35: Settings Responsive Grid & Active Ring
+    // =========================================================================
+    {
+        id: 'T1_F35_01_settings_grid_responsive_column_classes',
+        feature: 'F35',
+        name: '#settings-institution-grid declares 2 to 5 responsive columns',
+        run: async (page, helpers) => {
+            const classes = await page.evaluate(() => {
+                const grid = document.getElementById('settings-institution-grid');
+                return grid ? grid.className : '';
+            });
+            helpers.assertIncludes(classes, 'grid-cols-2', 'Grid must specify mobile 2-column (grid-cols-2)');
+            helpers.assertIncludes(classes, 'sm:grid-cols-3', 'Grid must specify sm 3-column (sm:grid-cols-3)');
+            helpers.assertIncludes(classes, 'md:grid-cols-4', 'Grid must specify md 4-column (md:grid-cols-4)');
+            helpers.assertIncludes(classes, 'lg:grid-cols-5', 'Grid must specify lg 5-column (lg:grid-cols-5)');
+        }
+    },
+    {
+        id: 'T1_F35_02_settings_grid_gap_and_scroll_classes',
+        feature: 'F35',
+        name: '#settings-institution-grid specifies compact gap-2 and overflow-y-auto',
+        run: async (page, helpers) => {
+            const classes = await page.evaluate(() => {
+                const grid = document.getElementById('settings-institution-grid');
+                return grid ? grid.className : '';
+            });
+            helpers.assertIncludes(classes, 'gap-2', 'Grid must use compact gap-2');
+            helpers.assertIncludes(classes, 'overflow-y-auto', 'Grid must specify vertical scroll overflow-y-auto');
+        }
+    },
+    {
+        id: 'T1_F35_03_settings_mobile_360_zero_overflow',
+        feature: 'F35',
+        name: 'Mobile 360px viewport has zero horizontal overflow in settings view',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 360, height: 740 });
+            await page.evaluate(() => {
+                window.app?.switchView?.('settings');
+            });
+            const overflow = await page.evaluate(() => {
+                return document.documentElement.scrollWidth <= 360;
+            });
+            helpers.assertTrue(overflow, 'Settings view at 360px mobile must have zero horizontal overflow');
+        }
+    },
+    {
+        id: 'T1_F35_04_settings_tablet_768_zero_overflow',
+        feature: 'F35',
+        name: 'Tablet 768px viewport has zero horizontal overflow in settings view',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 768, height: 1024 });
+            await page.evaluate(() => {
+                window.app?.switchView?.('settings');
+            });
+            const overflow = await page.evaluate(() => {
+                return document.documentElement.scrollWidth <= 768;
+            });
+            helpers.assertTrue(overflow, 'Settings view at 768px tablet must have zero horizontal overflow');
+        }
+    },
+    {
+        id: 'T1_F35_05_settings_desktop_1280_zero_overflow',
+        feature: 'F35',
+        name: 'Desktop 1280px viewport has zero horizontal overflow in settings view',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 1280, height: 800 });
+            await page.evaluate(() => {
+                window.app?.switchView?.('settings');
+            });
+            const overflow = await page.evaluate(() => {
+                return document.documentElement.scrollWidth <= 1280;
+            });
+            helpers.assertTrue(overflow, 'Settings view at 1280px desktop must have zero horizontal overflow');
+        }
+    },
+
+    // =========================================================================
+    // F36: Eliminate Native <select> in Welcome Modal
+    // =========================================================================
+    {
+        id: 'T1_F36_01_welcome_modal_zero_select_elements',
+        feature: 'F36',
+        name: '#cycle-setup-modal contains strictly zero <select> elements',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            const selectCount = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                return modal ? modal.querySelectorAll('select').length : -1;
+            });
+            helpers.assertEqual(selectCount, 0, '#cycle-setup-modal must contain strictly 0 <select> elements');
+        }
+    },
+    {
+        id: 'T1_F36_02_legacy_welcome_institution_select_eliminated',
+        feature: 'F36',
+        name: 'Legacy #welcome-institution-select element is completely absent from DOM',
+        run: async (page, helpers) => {
+            const exists = await page.evaluate(() => {
+                return document.getElementById('welcome-institution-select') !== null;
+            });
+            helpers.assertFalse(exists, '#welcome-institution-select must not exist in DOM');
+        }
+    },
+    {
+        id: 'T1_F36_03_legacy_welcome_period_select_eliminated',
+        feature: 'F36',
+        name: 'Legacy #welcome-period-select element is completely absent from DOM',
+        run: async (page, helpers) => {
+            const exists = await page.evaluate(() => {
+                return document.getElementById('welcome-period-select') !== null;
+            });
+            helpers.assertFalse(exists, '#welcome-period-select must not exist in DOM');
+        }
+    },
+    {
+        id: 'T1_F36_04_no_disguised_select_tags_in_welcome_form',
+        feature: 'F36',
+        name: '#cycle-setup-welcome-form contains zero select or optgroup tags',
+        run: async (page, helpers) => {
+            const elementsCount = await page.evaluate(() => {
+                const form = document.getElementById('cycle-setup-welcome-form');
+                if (!form) return -1;
+                return form.querySelectorAll('select, optgroup').length;
+            });
+            helpers.assertEqual(elementsCount, 0, 'Welcome form must contain 0 select or optgroup tags');
+        }
+    },
+    {
+        id: 'T1_F36_05_welcome_modal_renders_modern_visual_grids',
+        feature: 'F36',
+        name: 'Welcome modal renders modern interactive components (#welcome-schools-grid & #welcome-period-chips)',
+        run: async (page, helpers) => {
+            const found = await page.evaluate(() => {
+                return Boolean(document.getElementById('welcome-schools-grid')) &&
+                       Boolean(document.getElementById('welcome-period-chips'));
+            });
+            helpers.assertTrue(found, 'Welcome modal must provide modern visual grid & chip components');
+        }
+    },
+
+    // =========================================================================
+    // F37: Interactive Welcome School Selection Cards
+    // =========================================================================
+    {
+        id: 'T1_F37_01_welcome_schools_grid_renders_cards',
+        feature: 'F37',
+        name: '#welcome-schools-grid renders interactive .welcome-school-card elements (> 10)',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            const cardCount = await page.evaluate(() => {
+                return document.querySelectorAll('.welcome-school-card').length;
+            });
+            helpers.assertTrue(cardCount >= 10, `Must render at least 10 school cards (found ${cardCount})`);
+        }
+    },
+    {
+        id: 'T1_F37_02_welcome_country_pills_presence',
+        feature: 'F37',
+        name: '#welcome-country-pills renders interactive country filter pills (> 5)',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            const pillCount = await page.evaluate(() => {
+                return document.querySelectorAll('#welcome-country-pills button').length;
+            });
+            helpers.assertTrue(pillCount >= 5, `Must render at least 5 country pills (found ${pillCount})`);
+        }
+    },
+    {
+        id: 'T1_F37_03_welcome_country_pills_zero_emojis',
+        feature: 'F37',
+        name: 'Country filter pills contain zero flag emojis (clean typography requirement)',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            const pillTexts = await page.evaluate(() => {
+                const pills = Array.from(document.querySelectorAll('#welcome-country-pills button'));
+                return pills.map(p => p.textContent.trim());
+            });
+            const emojiFlagRegex = /[\uD83C][\uDDE6-\uDDFF]{2}/;
+            const hasEmoji = pillTexts.some(t => emojiFlagRegex.test(t));
+            helpers.assertFalse(hasEmoji, 'Country filter pills must contain 0 emoji flags');
+        }
+    },
+    {
+        id: 'T1_F37_04_welcome_country_pill_filtering_action',
+        feature: 'F37',
+        name: 'Clicking country filter pill dynamically filters visible cards in #welcome-schools-grid',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            const filterWorked = await page.evaluate(() => {
+                const pills = Array.from(document.querySelectorAll('#welcome-country-pills button'));
+                const colPill = pills.find(p => p.textContent.includes('Colombia'));
+                if (!colPill) return false;
+                colPill.click();
+                const visibleCards = Array.from(document.querySelectorAll('.welcome-school-card:not(.hidden)'));
+                return visibleCards.length > 0 && visibleCards.every(c => c.textContent.includes('Colombia') || c.getAttribute('data-inst-id')?.startsWith('unal') || c.getAttribute('data-inst-id')?.startsWith('uniandes') || c.getAttribute('data-inst-id')?.startsWith('udea') || c.getAttribute('data-inst-id')?.startsWith('javeriana'));
+            });
+            helpers.assertTrue(filterWorked, 'Clicking Colombia pill must filter cards to Colombian institutions');
+        }
+    },
+    {
+        id: 'T1_F37_05_welcome_school_card_selection_updates_box',
+        feature: 'F37',
+        name: 'Clicking a school card (UNAM) updates #welcome-selected-school-box with institution details',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                const unamCard = document.querySelector('.welcome-school-card[data-inst-id="unam"]');
+                if (unamCard) unamCard.click();
+            });
+            const boxText = await page.evaluate(() => {
+                const box = document.getElementById('welcome-selected-school-box');
+                return box ? box.textContent : '';
+            });
+            helpers.assertIncludes(boxText, 'UNAM', 'Selected school box must display UNAM name');
+        }
+    },
+
+    // =========================================================================
+    // F38: "Crear mi propia escuela" in Welcome Modal
+    // =========================================================================
+    {
+        id: 'T1_F38_01_welcome_create_school_button_exists',
+        feature: 'F38',
+        name: '#welcome-create-school-btn exists in DOM with "Crear mi propia escuela"',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            const btnText = await page.evaluate(() => {
+                const btn = document.getElementById('welcome-create-school-btn');
+                return btn ? btn.textContent.trim() : null;
+            });
+            helpers.assertTrue(Boolean(btnText && btnText.includes('Crear mi propia escuela')), '#welcome-create-school-btn must exist with creation text');
+        }
+    },
+    {
+        id: 'T1_F38_02_welcome_create_school_button_opens_modal',
+        feature: 'F38',
+        name: 'Clicking #welcome-create-school-btn opens #custom-school-modal',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-create-school-btn')?.click();
+            });
+            const modalOpen = await page.evaluate(() => {
+                const modal = document.getElementById('custom-school-modal');
+                return modal && !modal.classList.contains('hidden');
+            });
+            helpers.assertTrue(modalOpen, '#custom-school-modal must become visible on click');
+        }
+    },
+    {
+        id: 'T1_F38_03_custom_school_modal_z_index_elevation',
+        feature: 'F38',
+        name: '#custom-school-modal explicitly declares z-[60], stacking strictly above #cycle-setup-modal (z-50)',
+        run: async (page, helpers) => {
+            const zIndices = await page.evaluate(() => {
+                const customModal = document.getElementById('custom-school-modal');
+                const welcomeModal = document.getElementById('cycle-setup-modal');
+                return {
+                    customZ: customModal ? parseInt(window.getComputedStyle(customModal).zIndex, 10) : 0,
+                    welcomeZ: welcomeModal ? parseInt(window.getComputedStyle(welcomeModal).zIndex, 10) : 0,
+                    customHasZ60: customModal ? customModal.className.includes('z-[60]') : false
+                };
+            });
+            helpers.assertTrue(zIndices.customHasZ60 || zIndices.customZ > zIndices.welcomeZ, 'Custom modal z-index (60) must exceed welcome modal (50)');
+        }
+    },
+    {
+        id: 'T1_F38_04_canceling_custom_school_preserves_welcome_modal',
+        feature: 'F38',
+        name: 'Canceling custom school modal preserves welcome modal open state without corruption',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-create-school-btn')?.click();
+            });
+            await new Promise(r => setTimeout(r, 100));
+            await page.evaluate(() => {
+                document.getElementById('custom-school-cancel-btn')?.click();
+            });
+            await new Promise(r => setTimeout(r, 260));
+            const state = await page.evaluate(() => {
+                const welcomeModal = document.getElementById('cycle-setup-modal');
+                const customModal = document.getElementById('custom-school-modal');
+                return {
+                    welcomeVisible: welcomeModal && !welcomeModal.classList.contains('hidden'),
+                    customClosed: customModal && customModal.classList.contains('hidden')
+                };
+            });
+            helpers.assertTrue(state.welcomeVisible && state.customClosed, 'Welcome modal must remain open and custom modal closed');
+        }
+    },
+    {
+        id: 'T1_F38_05_saving_custom_school_autoselects_in_welcome',
+        feature: 'F38',
+        name: 'Saving custom school automatically selects it in welcome modal and unlocks period selector',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-create-school-btn')?.click();
+                document.getElementById('custom-school-name').value = 'Academia Tier1 Auto';
+                document.getElementById('custom-school-shortbadge').value = 'ATA';
+                document.getElementById('custom-school-fullname').value = 'Academia Tier1 Auto';
+                document.getElementById('custom-school-country').value = 'MX';
+                document.getElementById('custom-school-system').value = 'Semestral';
+                document.getElementById('custom-school-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            });
+            const autoSelected = await page.evaluate(() => {
+                const box = document.getElementById('welcome-selected-school-box');
+                const periodContainer = document.getElementById('welcome-period-container');
+                return {
+                    boxHasName: box ? box.textContent.includes('Academia Tier1 Auto') : false,
+                    isUnlocked: periodContainer ? !periodContainer.classList.contains('pointer-events-none') : false
+                };
+            });
+            helpers.assertTrue(autoSelected.boxHasName, 'Custom school must be auto-selected in welcome box');
+            helpers.assertTrue(autoSelected.isUnlocked, 'Period selector must be unlocked for custom school');
+        }
+    },
+
+    // =========================================================================
+    // F39: "Hacerla después" Skip & Period Lock Machine
+    // =========================================================================
+    {
+        id: 'T1_F39_01_welcome_skip_button_exists',
+        feature: 'F39',
+        name: '#welcome-skip-school-btn exists in DOM with "Hacerla después"',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+            });
+            const text = await page.evaluate(() => {
+                const btn = document.getElementById('welcome-skip-school-btn');
+                return btn ? btn.textContent.trim() : null;
+            });
+            helpers.assertTrue(Boolean(text && text.includes('Hacerla después')), '#welcome-skip-school-btn must display "Hacerla después"');
+        }
+    },
+    {
+        id: 'T1_F39_02_skip_button_locks_period_container',
+        feature: 'F39',
+        name: 'Clicking skip button applies pointer-events-none and opacity-40 to #welcome-period-container',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-skip-school-btn')?.click();
+            });
+            const lockState = await page.evaluate(() => {
+                const c = document.getElementById('welcome-period-container');
+                if (!c) return null;
+                const cs = window.getComputedStyle(c);
+                return {
+                    pointerEvents: cs.pointerEvents,
+                    hasPointerNoneClass: c.classList.contains('pointer-events-none'),
+                    hasOpacity40Class: c.classList.contains('opacity-40')
+                };
+            });
+            helpers.assertTrue(Boolean(lockState), 'Period container must exist');
+            helpers.assertEqual(lockState.pointerEvents, 'none', 'Computed pointer-events must be none');
+            helpers.assertTrue(lockState.hasPointerNoneClass && lockState.hasOpacity40Class, 'Must have pointer-events-none and opacity-40 classes');
+        }
+    },
+    {
+        id: 'T1_F39_03_period_lock_message_visibility',
+        feature: 'F39',
+        name: '#welcome-period-locked-msg guidance message is displayed when school is skipped',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-skip-school-btn')?.click();
+            });
+            const visible = await page.evaluate(() => {
+                const msg = document.getElementById('welcome-period-locked-msg');
+                return msg && !msg.classList.contains('hidden');
+            });
+            helpers.assertTrue(visible, '#welcome-period-locked-msg must be visible when locked');
+        }
+    },
+    {
+        id: 'T1_F39_04_period_chips_cleared_when_locked',
+        feature: 'F39',
+        name: '#welcome-period-chips renders strictly 0 chips when in locked skipped state',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-skip-school-btn')?.click();
+            });
+            const count = await page.evaluate(() => {
+                const container = document.getElementById('welcome-period-chips');
+                return container ? container.querySelectorAll('button').length : -1;
+            });
+            helpers.assertEqual(count, 0, 'Must render 0 period chips when locked');
+        }
+    },
+    {
+        id: 'T1_F39_05_school_selection_unlocks_period_state_machine',
+        feature: 'F39',
+        name: 'Selecting a school (UNAM) unlocks period container, clears lock message, and populates chips',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-skip-school-btn')?.click();
+                const unamCard = document.querySelector('.welcome-school-card[data-inst-id="unam"]');
+                if (unamCard) unamCard.click();
+            });
+            const unlocked = await page.evaluate(() => {
+                const container = document.getElementById('welcome-period-container');
+                const msg = document.getElementById('welcome-period-locked-msg');
+                const chips = document.getElementById('welcome-period-chips');
+                const cs = container ? window.getComputedStyle(container) : null;
+                return {
+                    pointerEvents: cs ? cs.pointerEvents : 'none',
+                    msgHidden: msg ? msg.classList.contains('hidden') : false,
+                    chipsCount: chips ? chips.querySelectorAll('button').length : 0
+                };
+            });
+            helpers.assertEqual(unlocked.pointerEvents, 'auto', 'Pointer events must unlock to auto');
+            helpers.assertTrue(unlocked.msgHidden, 'Lock message must be hidden');
+            helpers.assertTrue(unlocked.chipsCount > 0, 'Period chips must be rendered');
+        }
+    },
+
+    // =========================================================================
+    // F40: Storage & App Resilience for Unconfigured School
+    // =========================================================================
+    {
+        id: 'T1_F40_01_institutions_unconfigured_institution_contract',
+        feature: 'F40',
+        name: 'InstitutionsModule.UNCONFIGURED_INSTITUTION satisfies core object contract',
+        run: async (page, helpers) => {
+            const inst = await page.evaluate(() => {
+                return window.InstitutionsModule?.UNCONFIGURED_INSTITUTION;
+            });
+            helpers.assertTrue(Boolean(inst), 'UNCONFIGURED_INSTITUTION must be defined');
+            helpers.assertEqual(inst.id, 'unconfigured', 'ID must be unconfigured');
+            helpers.assertEqual(inst.name, 'Sin institución', 'Name must be Sin institución');
+            helpers.assertTrue(inst.isUnconfigured, 'isUnconfigured flag must be true');
+        }
+    },
+    {
+        id: 'T1_F40_02_storage_is_school_skipped_accessor',
+        feature: 'F40',
+        name: 'StorageModule.isSchoolSkipped and setSchoolSkipped work cleanly',
+        run: async (page, helpers) => {
+            const tested = await page.evaluate(() => {
+                window.StorageModule?.setSchoolSkipped(true);
+                const s1 = window.StorageModule?.isSchoolSkipped();
+                window.StorageModule?.setSchoolSkipped(false);
+                const s2 = window.StorageModule?.isSchoolSkipped();
+                return { s1, s2 };
+            });
+            helpers.assertTrue(tested.s1 === true, 's1 must be true');
+            helpers.assertTrue(tested.s2 === false, 's2 must be false');
+        }
+    },
+    {
+        id: 'T1_F40_03_storage_get_institution_fallback_safety',
+        feature: 'F40',
+        name: 'InstitutionsModule.getInstitution(null) returns unconfigured object without throwing',
+        run: async (page, helpers) => {
+            const safe = await page.evaluate(() => {
+                const res = window.InstitutionsModule?.getInstitution(null);
+                return res && res.name === 'Sin institución';
+            });
+            helpers.assertTrue(safe, 'InstitutionsModule.getInstitution(null) must return fallback');
+        }
+    },
+    {
+        id: 'T1_F40_04_header_unconfigured_sync_state',
+        feature: 'F40',
+        name: 'Header displays "Sin institución", "Sin periodo", and graduation cap 🎓 when unconfigured',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setSchoolSkipped(true);
+                window.StorageModule?.setInstitution('unconfigured');
+                window.StorageModule?.setAcademicPeriod('Sin periodo');
+                window.app?.setInstitution?.('unconfigured');
+            });
+            const state = await page.evaluate(() => {
+                const name = document.getElementById('header-inst-name')?.textContent?.trim();
+                const period = document.getElementById('header-inst-period')?.textContent?.trim();
+                const logo = document.getElementById('header-inst-logo')?.textContent?.trim();
+                return { name, period, logo };
+            });
+            helpers.assertEqual(state.name, 'Sin institución', 'Header name must be Sin institución');
+            helpers.assertEqual(state.period, 'Sin periodo', 'Header period must be Sin periodo');
+            helpers.assertIncludes(state.logo, '🎓', 'Header logo must contain graduation cap');
+        }
+    },
+    {
+        id: 'T1_F40_05_drawer_unconfigured_sync_parity',
+        feature: 'F40',
+        name: 'Drawer displays "Sin institución", "Sin periodo", and graduation cap 🎓 matching header',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setSchoolSkipped(true);
+                window.StorageModule?.setInstitution('unconfigured');
+                window.StorageModule?.setAcademicPeriod('Sin periodo');
+                window.app?.setInstitution?.('unconfigured');
+            });
+            const state = await page.evaluate(() => {
+                const name = document.getElementById('drawer-inst-name')?.textContent?.trim();
+                const period = document.getElementById('drawer-inst-period')?.textContent?.trim();
+                const logo = document.getElementById('drawer-inst-logo')?.textContent?.trim();
+                return { name, period, logo };
+            });
+            helpers.assertEqual(state.name, 'Sin institución', 'Drawer name must be Sin institución');
+            helpers.assertEqual(state.period, 'Sin periodo', 'Drawer period must be Sin periodo');
+            helpers.assertIncludes(state.logo, '🎓', 'Drawer logo must contain graduation cap');
+        }
+    },
+
+    // =========================================================================
+    // F41: Interactive Period Selector Chips
+    // =========================================================================
+    {
+        id: 'T1_F41_01_period_chips_rendered_on_school_select',
+        feature: 'F41',
+        name: 'Selecting school renders interactive .welcome-period-chip buttons',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                const unamCard = document.querySelector('.welcome-school-card[data-inst-id="unam"]');
+                if (unamCard) unamCard.click();
+            });
+            const chipCount = await page.evaluate(() => {
+                return document.querySelectorAll('.welcome-period-chip').length;
+            });
+            helpers.assertTrue(chipCount >= 5, `Must render at least 5 period chips (found ${chipCount})`);
+        }
+    },
+    {
+        id: 'T1_F41_02_semestral_school_chips_generation',
+        feature: 'F41',
+        name: 'Semestral school (UNAM) renders semestral period chips (1.º Semestre)',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                const unamCard = document.querySelector('.welcome-school-card[data-inst-id="unam"]');
+                if (unamCard) unamCard.click();
+            });
+            const hasSemestral = await page.evaluate(() => {
+                const chips = Array.from(document.querySelectorAll('.welcome-period-chip'));
+                return chips.some(c => c.textContent.includes('Semestre'));
+            });
+            helpers.assertTrue(hasSemestral, 'Chips must include Semestre for UNAM');
+        }
+    },
+    {
+        id: 'T1_F41_03_trimestral_school_chips_generation',
+        feature: 'F41',
+        name: 'Trimestral school (UAM) renders trimestral period chips (1.º Trimestre)',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                const uamCard = document.querySelector('.welcome-school-card[data-inst-id="uam"]');
+                if (uamCard) uamCard.click();
+            });
+            const hasTrimestral = await page.evaluate(() => {
+                const chips = Array.from(document.querySelectorAll('.welcome-period-chip'));
+                return chips.some(c => c.textContent.includes('Trimestre'));
+            });
+            helpers.assertTrue(hasTrimestral, 'Chips must include Trimestre for UAM');
+        }
+    },
+    {
+        id: 'T1_F41_04_period_chip_click_selection_state',
+        feature: 'F41',
+        name: 'Clicking period chip updates #welcome-selected-period-badge and adds active styling',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                const unamCard = document.querySelector('.welcome-school-card[data-inst-id="unam"]');
+                if (unamCard) unamCard.click();
+                const chips = Array.from(document.querySelectorAll('.welcome-period-chip'));
+                const chip3 = chips.find(c => c.textContent.includes('3.º Semestre'));
+                if (chip3) chip3.click();
+            });
+            const badgeText = await page.evaluate(() => {
+                const badge = document.getElementById('welcome-selected-period-badge');
+                return badge ? badge.textContent.trim() : null;
+            });
+            helpers.assertEqual(badgeText, '3.º Semestre', 'Badge must update to selected 3.º Semestre');
+        }
+    },
+    {
+        id: 'T1_F41_05_custom_period_chip_reveals_input',
+        feature: 'F41',
+        name: 'Clicking "✏️ Otro..." reveals #welcome-custom-period-wrapper for manual input',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                const unamCard = document.querySelector('.welcome-school-card[data-inst-id="unam"]');
+                if (unamCard) unamCard.click();
+                const chips = Array.from(document.querySelectorAll('.welcome-period-chip'));
+                const customChip = chips.find(c => c.textContent.includes('Otro'));
+                if (customChip) customChip.click();
+            });
+            const wrapperVisible = await page.evaluate(() => {
+                const wrapper = document.getElementById('welcome-custom-period-wrapper');
+                return wrapper && !wrapper.classList.contains('hidden');
+            });
+            helpers.assertTrue(wrapperVisible, '#welcome-custom-period-wrapper must become visible');
+        }
+    },
+
+    // =========================================================================
+    // F42: Version Bump to v1.3.4
+    // =========================================================================
+    {
+        id: 'T1_F42_01_package_json_version_v134',
+        feature: 'F42',
+        name: 'package.json specifies version 1.3.4 strictly',
+        run: async (page, helpers) => {
+            const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+            helpers.assertEqual(pkg.version, '1.3.4', 'package.json version must be 1.3.4');
+        }
+    },
+    {
+        id: 'T1_F42_02_index_html_query_strings_v134',
+        feature: 'F42',
+        name: 'index.html asset references include ?v=1.3.4 cache-busting parameter',
+        run: async (page, helpers) => {
+            const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
+            const html = fs.readFileSync(htmlPath, 'utf8');
+            helpers.assertIncludes(html, 'css/styles.css?v=1.3.4', 'styles.css must reference ?v=1.3.4');
+            helpers.assertIncludes(html, 'js/app.js?v=1.3.4', 'app.js must reference ?v=1.3.4');
+        }
+    },
+    {
+        id: 'T1_F42_03_settings_version_badge_displays_134',
+        feature: 'F42',
+        name: 'Settings view version pill displays "Versión 1.3.4"',
+        run: async (page, helpers) => {
+            const text = await page.evaluate(() => {
+                const pill = document.getElementById('settings-version-pill');
+                return pill ? pill.textContent.trim() : null;
+            });
+            helpers.assertIncludes(text, '1.3.4', 'Settings version pill must display 1.3.4');
+        }
+    },
+    {
+        id: 'T1_F42_04_sw_cache_name_v134',
+        feature: 'F42',
+        name: 'Service Worker cache name matches organizador-tareas-cache-v1.3.4',
+        run: async (page, helpers) => {
+            const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
+            const code = fs.readFileSync(swPath, 'utf8');
+            helpers.assertIncludes(code, 'organizador-tareas-cache-v1.3.4', 'sw.js must define cache v1.3.4');
+        }
+    },
+    {
+        id: 'T1_F42_05_sw_precache_assets_version_parameter_fidelity',
+        feature: 'F42',
+        name: 'sw.js PRECACHE_ASSETS queries are unified to v=1.3.4 across all entries',
+        run: async (page, helpers) => {
+            const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
+            const code = fs.readFileSync(swPath, 'utf8');
+            helpers.assertFalse(code.includes('v=1.3.3'), 'sw.js must contain no references to older v=1.3.3');
+            helpers.assertIncludes(code, '?v=1.3.4', 'sw.js precache must reference ?v=1.3.4');
         }
     }
 ];

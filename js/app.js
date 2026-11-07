@@ -351,6 +351,7 @@
             this.setupExitModal();
             this.setupSettingsView();
             this.setupSecretVault();
+            this.initPwa();
 
             // 8. Exponer funciones globales para interacción fluida entre módulos
             window.onDataChanged = () => this.refreshAll();
@@ -361,6 +362,7 @@
             window.navigateToCalendar = () => this.switchView('calendar');
             window.navigateToArchive = () => this.switchView('archive');
             window.navigateToSettings = () => this.switchView('settings');
+            window.promptPwaInstall = () => this.promptPwaInstall();
             window.navigateToTasksWithSubject = (subjectId) => {
                 this.switchView('tasks');
                 if (window.TasksModule) {
@@ -951,6 +953,10 @@
             this.updateCycleBadges();
         }
 
+        renderSettingsSchools() {
+            return this.renderInstitutionGrid();
+        }
+
         renderInstitutionGrid() {
             const grid = document.getElementById('settings-institution-grid');
             const pillsContainer = document.getElementById('settings-country-pills');
@@ -1009,30 +1015,43 @@
             let cardsHtml = filtered.map(inst => {
                 const isActive = inst.id === activeId;
                 const activeClasses = isActive 
-                    ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 shadow-md scale-[1.02]'
-                    : 'bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200/80 dark:border-slate-700/70 hover:scale-[1.01]';
+                    ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 shadow-sm'
+                    : 'bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200/80 dark:border-slate-700/70';
+
+                const countryTag = inst.isCustom 
+                    ? '<span class="text-[8.5px] font-extrabold text-amber-500 leading-none">⭐ Propia</span>'
+                    : (inst.countryCode ? `<span class="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tight leading-none">${inst.countryCode}</span>` : '<span></span>');
+
+                const statusBadge = isActive
+                    ? `<span class="px-1.5 py-0.5 rounded bg-indigo-600 text-[7.5px] font-black text-white uppercase tracking-wider shadow-2xs leading-none ${inst.isCustom ? 'mr-5' : ''}">Actual</span>`
+                    : '';
 
                 const editBtnHtml = inst.isCustom ? `
                     <button type="button" data-edit-custom-id="${inst.id}"
-                        class="edit-custom-school-btn absolute top-2 right-2 p-1.5 rounded-lg bg-slate-100/90 hover:bg-indigo-100 text-slate-500 hover:text-indigo-600 dark:bg-slate-700/90 dark:hover:bg-slate-600 tap-effect transition-colors z-10"
+                        class="edit-custom-school-btn absolute top-1 right-1 p-1 rounded-md bg-slate-100/90 hover:bg-indigo-100 text-slate-500 hover:text-indigo-600 dark:bg-slate-700/90 dark:hover:bg-slate-600 tap-effect transition-colors z-10"
                         title="Editar ${inst.name}">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </button>
                 ` : '';
 
                 return `
                     <div class="relative group">
                         <button type="button" data-inst-id="${inst.id}"
-                            class="inst-grid-card tap-effect w-full flex flex-col items-center text-center p-3 rounded-2xl border transition-all ${activeClasses}"
+                            class="inst-grid-card tap-effect w-full flex flex-col items-center text-center py-1 px-1.5 rounded-xl border transition-all ${activeClasses}"
                             title="Seleccionar ${inst.name}">
-                            <!-- Escudo oficial en contenedor de marco blanco permanente -->
-                            <div class="mb-2">
-                                ${InstitutionsModule.renderIconHtml(inst, 'w-12 h-12', 'w-full h-full object-contain')}
+                            <!-- Micro-cabecera con país/tipo y estado Actual -->
+                            <div class="w-full flex items-center justify-between gap-1 px-0.5 leading-none h-3">
+                                ${countryTag}
+                                ${statusBadge}
                             </div>
-                            <span class="text-xs font-black text-slate-900 dark:text-white truncate w-full block text-center">
+                            <!-- Escudo oficial en contenedor de marco blanco permanente -->
+                            <div class="my-0 flex items-center justify-center">
+                                ${InstitutionsModule.renderIconHtml(inst, 'w-8 h-8 rounded-lg p-0.5', 'w-full h-full object-contain')}
+                            </div>
+                            <span class="text-[11px] font-black text-slate-900 dark:text-white truncate w-full block text-center px-0.5 leading-tight">
                                 ${inst.name}
                             </span>
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full mt-0.5 font-medium">
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate w-full block text-center font-medium leading-tight mt-0.5">
                                 ${inst.systemType || inst.type}
                             </span>
                         </button>
@@ -1041,16 +1060,16 @@
                 `;
             }).join('');
 
-            // Agregar tarjeta interactiva "+ Crear Escuela"
+            // Agregar tarjeta interactiva "+ Crear Escuela" en formato compacto uniforme
             const createCardHtml = `
                 <button type="button" id="grid-create-school-card"
-                    class="tap-effect flex flex-col items-center justify-center text-center p-3 rounded-2xl border-2 border-dashed border-indigo-300 dark:border-indigo-700/60 hover:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/80 transition-all text-indigo-600 dark:text-indigo-400 min-h-[110px]"
+                    class="tap-effect flex flex-col items-center justify-center text-center py-1 px-1.5 rounded-xl border-2 border-dashed border-indigo-300 dark:border-indigo-700/60 hover:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/80 transition-all text-indigo-600 dark:text-indigo-400 min-h-[78px] max-h-[82px] h-[81px]"
                     title="Crear nueva escuela personalizada">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-xl mb-1.5 font-bold">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center text-xs mb-0.5 font-bold">
                         ➕
                     </div>
-                    <span class="text-xs font-black">Crear Escuela</span>
-                    <span class="text-[10px] text-indigo-500/80 font-medium">Personalizada</span>
+                    <span class="text-[11px] font-black leading-tight">Crear Escuela</span>
+                    <span class="text-[9px] text-indigo-500/80 font-medium leading-tight">Personalizada</span>
                 </button>
             `;
             grid.innerHTML = cardsHtml + createCardHtml;
@@ -1093,10 +1112,11 @@
             const drawerPeriodLabel = document.getElementById('drawer-inst-period');
             const settingsPeriodBadge = document.getElementById('settings-inst-period-badge');
 
-            // Preservar periodo válido del usuario sin sobreescribir con defaultPeriod
-            const activePeriod = (typeof currentPeriod === 'string' && currentPeriod.trim().length > 0)
+            // Preservar periodo válido del usuario sin sobreescribir con defaultPeriod (evitar arrastrar "Sin periodo")
+            const isStalePlaceholder = !currentPeriod || currentPeriod.trim() === 'Sin periodo';
+            const activePeriod = (!isStalePlaceholder && inst.periods?.includes(currentPeriod.trim()))
                 ? currentPeriod.trim()
-                : (inst?.defaultPeriod || '1.º Semestre');
+                : (inst?.defaultPeriod || inst?.periods?.[0] || '1.º Semestre');
             Storage.setAcademicPeriod(activePeriod);
 
             const optionsHtml = inst.periods.map(p => `
@@ -1253,7 +1273,7 @@
                 const builtIns = Object.values(InstitutionsModule.INSTITUTIONS);
                 const customSchools = Storage?.getCustomSchools?.() || [];
 
-                let html = '';
+                let html = '<option value="unconfigured">🎓 Sin institución</option>';
                 countries.forEach(c => {
                     const groupSchools = builtIns.filter(inst => inst.countryCode === c.code);
                     if (groupSchools.length > 0) {
@@ -1274,7 +1294,7 @@
                 }
 
                 headerInstSelect.innerHTML = html;
-                headerInstSelect.value = this.activeInstitution?.id || 'unam';
+                headerInstSelect.value = this.activeInstitution?.id || (Storage?.isSchoolSkipped?.() ? 'unconfigured' : 'unam');
                 headerInstSelect.onchange = (e) => {
                     this.setInstitution(e.target.value);
                     this.showToast(`Institución seleccionada: ${this.activeInstitution.name}`, 'info');
@@ -2008,6 +2028,7 @@
                         closeModal();
                         this.setupInstitutionAndPeriodSelectors();
                         this.renderInstitutionGrid();
+                        this.onCustomSchoolCreated?.(saved);
                         this.showToast(`Escuela "${saved.name}" guardada con éxito`, 'success');
                     } catch (err) {
                         this.showToast(err.message || 'Error al guardar la escuela', 'error');
@@ -2025,103 +2046,364 @@
             const laterBtn = document.getElementById('welcome-cycle-later-btn');
             const startInput = document.getElementById('welcome-cycle-start');
             const endInput = document.getElementById('welcome-cycle-end');
-            const instSelect = document.getElementById('welcome-institution-select');
-            const periodSelect = document.getElementById('welcome-period-select');
+
+            const createSchoolBtn = document.getElementById('welcome-create-school-btn');
+            const skipSchoolBtn = document.getElementById('welcome-skip-school-btn');
+            const selectedSchoolBox = document.getElementById('welcome-selected-school-box');
+            const countryPillsContainer = document.getElementById('welcome-country-pills');
+            const schoolsGrid = document.getElementById('welcome-schools-grid');
+
+            const periodContainer = document.getElementById('welcome-period-container');
+            const periodLockedMsg = document.getElementById('welcome-period-locked-msg');
+            const periodChipsContainer = document.getElementById('welcome-period-chips');
+            const selectedPeriodBadge = document.getElementById('welcome-selected-period-badge');
             const customPeriodWrapper = document.getElementById('welcome-custom-period-wrapper');
             const customPeriodInput = document.getElementById('welcome-custom-period-input');
-            const instPreview = document.getElementById('welcome-inst-preview');
+
             const Storage = window.StorageModule;
             const InstitutionsModule = window.InstitutionsModule;
 
             if (!modal) return;
 
-            const updatePeriodsForInst = (instId, selectedPeriod) => {
-                if (!periodSelect || !InstitutionsModule) return;
-                const inst = InstitutionsModule.getInstitution(instId);
-                periodSelect.innerHTML = '';
-                (inst.periods || []).forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p;
-                    opt.textContent = p;
-                    if (p === selectedPeriod) opt.selected = true;
-                    periodSelect.appendChild(opt);
-                });
+            let welcomeSelectedInstId = 'unam';
+            let welcomeSelectedPeriod = '1.º Semestre';
+            let welcomeCountryFilter = 'all';
 
-                // Opción para periodo personalizado libre
-                const customOpt = document.createElement('option');
-                customOpt.value = '__custom__';
-                customOpt.textContent = '✏️ Escribir otro periodo personalizado...';
-                if (selectedPeriod && !inst.periods.includes(selectedPeriod)) {
-                    customOpt.selected = true;
-                    if (customPeriodWrapper) customPeriodWrapper.classList.remove('hidden');
-                    if (customPeriodInput) customPeriodInput.value = selectedPeriod;
+            // 1. Renderiza el cuadro de selección activa (o cuadro en blanco / omitido)
+            const renderSelectedSchoolBox = () => {
+                if (!selectedSchoolBox) return;
+
+                if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
+                    selectedSchoolBox.className = 'p-3 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3 transition-all';
+                    selectedSchoolBox.innerHTML = `
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-10 h-10 rounded-2xl bg-slate-200/80 dark:bg-slate-700/80 flex items-center justify-center text-xl shrink-0">
+                                🎓
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs font-black text-slate-800 dark:text-slate-200">Sin institución</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Configuración omitida • Puedes elegir o crear una abajo</div>
+                            </div>
+                        </div>
+                        <span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+                            Omitida
+                        </span>
+                    `;
                 } else {
-                    if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
-                    if (customPeriodInput) customPeriodInput.value = '';
-                }
-                periodSelect.appendChild(customOpt);
-
-                if (instPreview) {
-                    instPreview.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-10 h-10', 'w-full h-full object-contain');
+                    const inst = InstitutionsModule.getInstitution(welcomeSelectedInstId);
+                    selectedSchoolBox.className = 'p-3 rounded-2xl border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/70 dark:bg-indigo-950/40 flex items-center justify-between gap-3 transition-all';
+                    selectedSchoolBox.innerHTML = `
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="shrink-0">
+                                ${InstitutionsModule.renderIconHtml(inst, 'w-10 h-10')}
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs font-black text-slate-900 dark:text-white truncate">${inst.name}</div>
+                                <div class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold truncate">${inst.fullName || inst.systemType || ''}</div>
+                            </div>
+                        </div>
+                        <button type="button" id="welcome-unselect-school-btn"
+                            class="tap-effect shrink-0 text-[11px] font-bold text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 px-2 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                            title="Omitir institución">
+                            ✕ Omitir
+                        </button>
+                    `;
+                    const unselectBtn = document.getElementById('welcome-unselect-school-btn');
+                    if (unselectBtn) {
+                        unselectBtn.onclick = () => {
+                            window.HapticsModule?.light();
+                            applySkipSchool();
+                        };
+                    }
                 }
             };
 
-            if (periodSelect) {
-                periodSelect.onchange = (e) => {
-                    if (e.target.value === '__custom__') {
-                        if (customPeriodWrapper) customPeriodWrapper.classList.remove('hidden');
-                        if (customPeriodInput) customPeriodInput.focus();
-                    } else {
-                        if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
+            // 2. Máquina de estados: Bloqueo / Desbloqueo del selector de periodo
+            const updatePeriodLockState = () => {
+                const isLocked = !welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured';
+                if (!periodContainer) return;
+
+                if (isLocked) {
+                    periodContainer.classList.add('opacity-40', 'pointer-events-none', 'cursor-not-allowed', 'select-none');
+                    periodContainer.setAttribute('aria-disabled', 'true');
+                    if (periodLockedMsg) periodLockedMsg.classList.remove('hidden');
+                    if (periodChipsContainer) periodChipsContainer.innerHTML = '';
+                    if (selectedPeriodBadge) selectedPeriodBadge.textContent = '🔒 Bloqueado';
+                    if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
+                } else {
+                    periodContainer.classList.remove('opacity-40', 'pointer-events-none', 'cursor-not-allowed', 'select-none');
+                    periodContainer.removeAttribute('aria-disabled');
+                    if (periodLockedMsg) periodLockedMsg.classList.add('hidden');
+                    const inst = InstitutionsModule.getInstitution(welcomeSelectedInstId);
+                    renderPeriodChips(inst);
+                }
+            };
+
+            // 3. Renderizado de chips táctiles de periodos
+            const renderPeriodChips = (inst) => {
+                if (!periodChipsContainer) return;
+
+                const periodsList = (inst && Array.isArray(inst.periods) && inst.periods.length > 0)
+                    ? [...inst.periods]
+                    : ['Periodo 1', 'Periodo 2'];
+
+                if (!welcomeSelectedPeriod || (!periodsList.includes(welcomeSelectedPeriod) && !customPeriodInput?.value)) {
+                    welcomeSelectedPeriod = inst.defaultPeriod || periodsList[0];
+                }
+
+                if (selectedPeriodBadge) {
+                    selectedPeriodBadge.textContent = welcomeSelectedPeriod || '';
+                }
+
+                let chipsHtml = periodsList.map(p => {
+                    const isSelected = p === welcomeSelectedPeriod;
+                    const chipStyle = isSelected
+                        ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-500/30'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
+                    return `
+                        <button type="button" class="welcome-period-chip tap-effect px-3 py-1.5 rounded-xl text-xs transition-all ${chipStyle}" data-period="${p}">
+                            ${p}
+                        </button>
+                    `;
+                }).join('');
+
+                // Botón interactivo para otro periodo libre
+                const isCustomSelected = welcomeSelectedPeriod && !periodsList.includes(welcomeSelectedPeriod);
+                const customChipStyle = isCustomSelected
+                    ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-500/30'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
+
+                chipsHtml += `
+                    <button type="button" id="welcome-period-custom-chip" class="welcome-period-chip tap-effect px-3 py-1.5 rounded-xl text-xs transition-all ${customChipStyle}" data-period="__custom__">
+                        ✏️ Otro...
+                    </button>
+                `;
+
+                periodChipsContainer.innerHTML = chipsHtml;
+
+                // Listeners en chips
+                periodChipsContainer.querySelectorAll('.welcome-period-chip').forEach(btn => {
+                    btn.onclick = () => {
+                        window.HapticsModule?.light();
+                        const p = btn.dataset.period;
+                        if (p === '__custom__') {
+                            if (customPeriodWrapper) customPeriodWrapper.classList.remove('hidden');
+                            if (customPeriodInput) {
+                                customPeriodInput.focus();
+                                if (customPeriodInput.value.trim()) {
+                                    welcomeSelectedPeriod = customPeriodInput.value.trim();
+                                    if (selectedPeriodBadge) selectedPeriodBadge.textContent = welcomeSelectedPeriod;
+                                }
+                            }
+                        } else {
+                            if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
+                            welcomeSelectedPeriod = p;
+                            if (selectedPeriodBadge) selectedPeriodBadge.textContent = welcomeSelectedPeriod;
+                        }
+                        renderPeriodChips(inst);
+                    };
+                });
+
+                if (isCustomSelected && customPeriodWrapper) {
+                    customPeriodWrapper.classList.remove('hidden');
+                    if (customPeriodInput) customPeriodInput.value = welcomeSelectedPeriod;
+                }
+            };
+
+            if (customPeriodInput) {
+                customPeriodInput.oninput = (e) => {
+                    const val = e.target.value.trim();
+                    if (val) {
+                        welcomeSelectedPeriod = val;
+                        if (selectedPeriodBadge) selectedPeriodBadge.textContent = val;
                     }
                 };
             }
 
-            const openWelcome = () => {
-                const currentInstId = Storage.getInstitution?.() || 'unam';
-                const currentPeriod = Storage.getAcademicPeriod?.() || '1.º Semestre';
-                const cycle = Storage.getAcademicCycle?.() || {};
+            // 4. Renderizado de píldoras de filtro por país (SIN emojis de banderas)
+            const renderCountryPills = () => {
+                if (!countryPillsContainer || !InstitutionsModule) return;
 
-                if (instSelect && InstitutionsModule) {
-                    const countries = InstitutionsModule.getCountries();
-                    const builtIns = Object.values(InstitutionsModule.INSTITUTIONS);
-                    const customSchools = Storage.getCustomSchools?.() || [];
+                const countries = InstitutionsModule.getCountries();
+                const customSchools = Storage.getCustomSchools?.() || [];
 
-                    let html = '';
-                    countries.forEach(c => {
-                        const groupSchools = builtIns.filter(inst => inst.countryCode === c.code);
-                        if (groupSchools.length > 0) {
-                            html += `<optgroup label="${c.name}">`;
-                            groupSchools.forEach(item => {
-                                html += `<option value="${item.id}">${item.name} - ${item.systemType || item.shortBadge}</option>`;
-                            });
-                            html += `</optgroup>`;
-                        }
-                    });
+                const options = [
+                    { id: 'all', label: 'Todas' },
+                    ...countries.map(c => ({ id: c.code, label: c.name })),
+                    ...(customSchools.length > 0 ? [{ id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }] : [])
+                ];
 
-                    if (customSchools.length > 0) {
-                        html += `<optgroup label="⭐ Mis Escuelas Personalizadas">`;
-                        customSchools.forEach(cs => {
-                            html += `<option value="${cs.id}">⭐ ${cs.name} - ${cs.systemType || 'Personalizada'}</option>`;
-                        });
-                        html += `</optgroup>`;
-                    }
+                countryPillsContainer.innerHTML = options.map(opt => {
+                    const isSelected = opt.id === welcomeCountryFilter;
+                    const pillStyle = isSelected
+                        ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
+                    return `
+                        <button type="button" class="welcome-country-pill tap-effect shrink-0 px-3 py-1 rounded-xl text-xs transition-all whitespace-nowrap ${pillStyle}" data-country="${opt.id}">
+                            ${opt.label}
+                        </button>
+                    `;
+                }).join('');
 
-                    instSelect.innerHTML = html;
-                    instSelect.value = currentInstId;
-
-                    instSelect.onchange = (e) => {
-                        const newInstId = e.target.value;
-                        const newInst = InstitutionsModule.getInstitution(newInstId);
-                        updatePeriodsForInst(newInstId, newInst.defaultPeriod || '1.º Semestre');
+                countryPillsContainer.querySelectorAll('.welcome-country-pill').forEach(btn => {
+                    btn.onclick = () => {
                         window.HapticsModule?.light();
+                        welcomeCountryFilter = btn.dataset.country;
+                        renderCountryPills();
+                        renderSchoolsGrid();
                     };
+                });
+            };
 
-                    updatePeriodsForInst(currentInstId, currentPeriod);
+            // 5. Renderizado de rejilla compacta de escuelas
+            const renderSchoolsGrid = () => {
+                if (!schoolsGrid || !InstitutionsModule) return;
+
+                const allInstitutions = InstitutionsModule.getAllInstitutions();
+                let filtered = [];
+                if (welcomeCountryFilter === 'all') {
+                    filtered = allInstitutions;
+                } else if (welcomeCountryFilter === 'custom') {
+                    filtered = allInstitutions.filter(inst => inst.isCustom);
+                } else {
+                    filtered = allInstitutions.filter(inst => inst.countryCode === welcomeCountryFilter);
                 }
 
-                if (startInput && cycle.startDate) startInput.value = cycle.startDate;
-                if (endInput && cycle.endDate) endInput.value = cycle.endDate;
+                let cardsHtml = filtered.map(inst => {
+                    const isSelected = inst.id === welcomeSelectedInstId;
+                    const activeClasses = isSelected
+                        ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 shadow-xs'
+                        : 'bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200/80 dark:border-slate-700/70';
+
+                    return `
+                        <button type="button" class="welcome-school-card tap-effect text-left p-2 rounded-xl border transition-all flex items-center gap-2 ${activeClasses}" data-inst-id="${inst.id}">
+                            <div class="shrink-0">
+                                ${InstitutionsModule.renderIconHtml(inst, 'w-8 h-8')}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[11px] font-black text-slate-900 dark:text-white truncate">${inst.name}</div>
+                                <div class="text-[9px] text-slate-500 dark:text-slate-400 truncate">${inst.systemType || inst.shortBadge || ''}</div>
+                            </div>
+                            ${isSelected ? '<span class="text-indigo-600 dark:text-indigo-400 text-xs shrink-0 font-bold">✓</span>' : ''}
+                        </button>
+                    `;
+                }).join('');
+
+                // Botón interactivo dentro de la cuadrícula para crear escuela
+                cardsHtml += `
+                    <button type="button" id="welcome-grid-create-btn"
+                        class="welcome-create-card tap-effect text-left p-2 rounded-xl border-2 border-dashed border-indigo-300/80 dark:border-indigo-700/80 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-all flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0 shadow-xs">
+                            ➕
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 truncate">Crear mi Escuela</div>
+                            <div class="text-[9px] text-slate-500 dark:text-slate-400 truncate">Personalizada</div>
+                        </div>
+                    </button>
+                `;
+
+                schoolsGrid.innerHTML = cardsHtml;
+
+                // Listeners de selección de tarjeta
+                schoolsGrid.querySelectorAll('.welcome-school-card').forEach(card => {
+                    card.onclick = () => {
+                        window.HapticsModule?.light();
+                        const schoolId = card.dataset.instId;
+                        selectSchool(schoolId);
+                    };
+                });
+
+                const gridCreate = document.getElementById('welcome-grid-create-btn');
+                if (gridCreate) {
+                    gridCreate.onclick = () => {
+                        this.openCustomSchoolModal?.();
+                    };
+                }
+            };
+
+            const selectSchool = (schoolId) => {
+                welcomeSelectedInstId = schoolId;
+                const inst = InstitutionsModule.getInstitution(schoolId);
+                welcomeSelectedPeriod = inst.defaultPeriod || inst.periods?.[0] || '1.º Semestre';
+                renderSelectedSchoolBox();
+                updatePeriodLockState();
+                renderSchoolsGrid();
+            };
+
+            const applySkipSchool = () => {
+                welcomeSelectedInstId = 'unconfigured';
+                welcomeSelectedPeriod = 'Sin periodo';
+                renderSelectedSchoolBox();
+                updatePeriodLockState();
+                renderSchoolsGrid();
+            };
+
+            // Wiring de botones explícitos: Crear y Omitir
+            if (createSchoolBtn) {
+                createSchoolBtn.onclick = () => {
+                    this.openCustomSchoolModal?.();
+                };
+            }
+
+            if (skipSchoolBtn) {
+                skipSchoolBtn.onclick = () => {
+                    window.HapticsModule?.light();
+                    applySkipSchool();
+                };
+            }
+
+            // Hook para cuando una escuela personalizada es creada y guardada
+            this.onCustomSchoolCreated = (saved) => {
+                if (modal && !modal.classList.contains('hidden') && saved) {
+                    welcomeSelectedInstId = saved.id;
+                    welcomeSelectedPeriod = saved.defaultPeriod || saved.periods?.[0] || '1.º Semestre';
+                    renderCountryPills();
+                    renderSchoolsGrid();
+                    renderSelectedSchoolBox();
+                    updatePeriodLockState();
+                    // Preservar overflow hidden en el cuerpo ya que cycle-setup-modal sigue abierto
+                    document.body.classList.add('overflow-hidden');
+                }
+            };
+
+            this.refreshWelcomeSchoolsGrid = () => {
+                renderCountryPills();
+                renderSchoolsGrid();
+                renderSelectedSchoolBox();
+                updatePeriodLockState();
+            };
+
+            window.addEventListener('custom-schools-updated', () => {
+                this.refreshWelcomeSchoolsGrid?.();
+            });
+
+            const openWelcome = () => {
+                const isSkipped = Storage.isSchoolSkipped?.();
+                const currentInstId = Storage.getInstitution?.();
+                if (isSkipped || currentInstId === 'unconfigured') {
+                    welcomeSelectedInstId = 'unconfigured';
+                    welcomeSelectedPeriod = 'Sin periodo';
+                } else {
+                    welcomeSelectedInstId = currentInstId || 'unam';
+                    welcomeSelectedPeriod = Storage.getAcademicPeriod?.() || '1.º Semestre';
+                }
+
+                welcomeCountryFilter = 'all';
+
+                const cycle = Storage.getAcademicCycle?.() || {};
+                if (startInput) startInput.value = cycle.startDate || '';
+                if (endInput) endInput.value = cycle.endDate || '';
+                if ((!startInput?.value || !endInput?.value) && Storage.getDefaultCycleDates) {
+                    const def = Storage.getDefaultCycleDates();
+                    if (startInput && !startInput.value) startInput.value = def.startDate;
+                    if (endInput && !endInput.value) endInput.value = def.endDate;
+                }
+
+                renderSelectedSchoolBox();
+                renderCountryPills();
+                renderSchoolsGrid();
+                updatePeriodLockState();
 
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
@@ -2143,17 +2425,11 @@
             this.openCycleWelcomeModal = openWelcome;
             this.closeCycleWelcomeModal = closeWelcome;
 
+            // Submit del formulario
             if (form) {
                 form.onsubmit = (e) => {
                     e.preventDefault();
                     window.HapticsModule?.double();
-
-                    const chosenInst = instSelect ? instSelect.value : Storage.getInstitution();
-                    let chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
-                    if (chosenPeriod === '__custom__') {
-                        const customVal = customPeriodInput?.value?.trim();
-                        chosenPeriod = customVal || '1.º Semestre';
-                    }
 
                     const s = startInput ? startInput.value : '';
                     const end = endInput ? endInput.value : '';
@@ -2167,14 +2443,24 @@
                         return;
                     }
 
-                    if (chosenInst) {
-                        Storage.setInstitution(chosenInst);
-                        this.setInstitution(chosenInst);
-                    }
-                    if (chosenPeriod) {
-                        Storage.setAcademicPeriod(chosenPeriod);
+                    if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
+                        Storage.setSchoolSkipped(true);
+                        Storage.setAcademicPeriod('Sin periodo');
+                        Storage.setInstitution('unconfigured');
+                        this.setInstitution('unconfigured');
                         const headerPeriod = document.getElementById('header-inst-period');
-                        if (headerPeriod) headerPeriod.textContent = chosenPeriod;
+                        if (headerPeriod) headerPeriod.textContent = 'Sin periodo';
+                        const drawerPeriod = document.getElementById('drawer-inst-period');
+                        if (drawerPeriod) drawerPeriod.textContent = 'Sin periodo';
+                    } else {
+                        Storage.setSchoolSkipped(false);
+                        Storage.setAcademicPeriod(welcomeSelectedPeriod || '1.º Semestre');
+                        Storage.setInstitution(welcomeSelectedInstId);
+                        this.setInstitution(welcomeSelectedInstId);
+                        const headerPeriod = document.getElementById('header-inst-period');
+                        if (headerPeriod) headerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
+                        const drawerPeriod = document.getElementById('drawer-inst-period');
+                        if (drawerPeriod) drawerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
                     }
 
                     Storage.setAcademicCycle(s, end);
@@ -2182,36 +2468,48 @@
                     Storage.setOnboardingCompleted(true);
                     closeWelcome();
                     this.refreshAll();
-                    this.showToast('¡Perfil escolar e institución configurados exitosamente!', 'success');
+                    if (welcomeSelectedInstId === 'unconfigured') {
+                        this.showToast('¡Bienvenido! Podrás configurar tu institución en Ajustes cuando gustes.', 'info');
+                    } else {
+                        this.showToast('¡Perfil escolar e institución configurados exitosamente!', 'success');
+                    }
                 };
             }
 
+            // Guardar con ciclo provisional
             if (laterBtn) {
                 laterBtn.onclick = () => {
                     window.HapticsModule?.light();
 
-                    const chosenInst = instSelect ? instSelect.value : Storage.getInstitution();
-                    let chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
-                    if (chosenPeriod === '__custom__') {
-                        const customVal = customPeriodInput?.value?.trim();
-                        chosenPeriod = customVal || '1.º Semestre';
-                    }
-
-                    if (chosenInst) {
-                        Storage.setInstitution(chosenInst);
-                        this.setInstitution(chosenInst);
-                    }
-                    if (chosenPeriod) {
-                        Storage.setAcademicPeriod(chosenPeriod);
+                    if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
+                        Storage.setSchoolSkipped(true);
+                        Storage.setAcademicPeriod('Sin periodo');
+                        Storage.setInstitution('unconfigured');
+                        this.setInstitution('unconfigured');
                         const headerPeriod = document.getElementById('header-inst-period');
-                        if (headerPeriod) headerPeriod.textContent = chosenPeriod;
+                        if (headerPeriod) headerPeriod.textContent = 'Sin periodo';
+                        const drawerPeriod = document.getElementById('drawer-inst-period');
+                        if (drawerPeriod) drawerPeriod.textContent = 'Sin periodo';
+                    } else {
+                        Storage.setSchoolSkipped(false);
+                        Storage.setAcademicPeriod(welcomeSelectedPeriod || '1.º Semestre');
+                        Storage.setInstitution(welcomeSelectedInstId);
+                        this.setInstitution(welcomeSelectedInstId);
+                        const headerPeriod = document.getElementById('header-inst-period');
+                        if (headerPeriod) headerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
+                        const drawerPeriod = document.getElementById('drawer-inst-period');
+                        if (drawerPeriod) drawerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
                     }
 
                     Storage.setProvisionalCycle();
                     Storage.setOnboardingCompleted(true);
                     closeWelcome();
                     this.refreshAll();
-                    this.showToast('Institución guardada. Ciclo asignado en modo provisional para actualizar después.', 'warning');
+                    if (welcomeSelectedInstId === 'unconfigured') {
+                        this.showToast('Bienvenido. Configuración completada con ciclo provisional.', 'info');
+                    } else {
+                        this.showToast('Institución guardada. Ciclo asignado en modo provisional.', 'info');
+                    }
                 };
             }
         }
@@ -3067,6 +3365,171 @@
                 toast.classList.add('opacity-0', 'translate-x-full');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
+        }
+
+        // =========================================================================
+        // PWA & Service Worker Registration & Installation Manager
+        // =========================================================================
+
+        initPwa() {
+            this.initPWA();
+        }
+
+        initPWA() {
+            window.deferredInstallPrompt = null;
+
+            // 1. Guard Service Worker registration to secure contexts (HTTPS or localhost)
+            // Under file://, navigator.serviceWorker.register throws a SecurityError, so skip gracefully
+            const isSecureContext = (
+                (window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                && window.location.protocol !== 'file:'
+            );
+
+            if ('serviceWorker' in navigator && isSecureContext) {
+                const registerSw = () => {
+                    navigator.serviceWorker.register('./sw.js', { scope: './' })
+                        .then(reg => {
+                            console.log('[PWA] Service Worker registered with scope:', reg.scope);
+                            reg.addEventListener('updatefound', () => {
+                                const newWorker = reg.installing;
+                                if (newWorker) {
+                                    newWorker.addEventListener('statechange', () => {
+                                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                            this.showUpdateToast(newWorker);
+                                        }
+                                    });
+                                }
+                            });
+                        })
+                        .catch(err => {
+                            console.warn('[PWA] Service Worker registration failed:', err.message);
+                        });
+                };
+
+                if (document.readyState === 'complete') {
+                    registerSw();
+                } else {
+                    window.addEventListener('load', registerSw);
+                }
+            } else {
+                console.log('[PWA] Service Worker registration skipped (running in local file:// or non-secure context).');
+            }
+
+            // 2. Check standalone display mode
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                                 window.navigator.standalone === true ||
+                                 (typeof document.referrer === 'string' && document.referrer.includes('android-app://'));
+            this.updatePWAStatusUI(isStandalone);
+
+            // 3. Capture beforeinstallprompt event
+            window.addEventListener('beforeinstallprompt', e => {
+                e.preventDefault();
+                window.deferredInstallPrompt = e;
+                console.log('[PWA] beforeinstallprompt event captured and deferred.');
+
+                if (!isStandalone) {
+                    this.showPWAInstallTriggers();
+                }
+            });
+
+            // 4. Handle successful installation
+            window.addEventListener('appinstalled', () => {
+                console.log('[PWA] Application successfully installed.');
+                window.deferredInstallPrompt = null;
+                this.updatePWAStatusUI(true);
+                this.hidePwaFloatingBanner();
+                this.showToast('¡Organizador de Tareas se instaló exitosamente en tu dispositivo! 🎉', 'success');
+            });
+
+            // 5. Attach click listeners to install triggers
+            const installBtns = [
+                document.getElementById('pwa-install-settings-btn'),
+                document.getElementById('pwa-floating-install-btn'),
+                document.getElementById('drawer-pwa-install-btn')
+            ];
+
+            installBtns.forEach(btn => {
+                if (!btn) return;
+                btn.addEventListener('click', () => {
+                    this.promptPwaInstall();
+                });
+            });
+
+            // 6. Floating banner dismissal handler
+            const dismissBtn = document.getElementById('pwa-floating-dismiss-btn');
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', () => {
+                    this.hidePwaFloatingBanner();
+                    localStorage.setItem('pwa_prompt_dismissed', Date.now().toString());
+                });
+            }
+        }
+
+        async promptPwaInstall() {
+            if (window.deferredInstallPrompt) {
+                try {
+                    window.deferredInstallPrompt.prompt();
+                    const choice = await window.deferredInstallPrompt.userChoice;
+                    console.log('[PWA] User install choice:', choice ? choice.outcome : 'unknown');
+                    window.deferredInstallPrompt = null;
+                    if (choice && choice.outcome === 'accepted') {
+                        this.hidePwaFloatingBanner();
+                    }
+                    return choice;
+                } catch (err) {
+                    console.warn('[PWA] promptPwaInstall error:', err);
+                    return null;
+                }
+            } else {
+                this.showToast('Para instalar: usa la opción "Instalar app" o el menú de tu navegador.', 'info');
+                return null;
+            }
+        }
+
+        showPWAInstallTriggers() {
+            const drawerBtn = document.getElementById('drawer-pwa-install-btn');
+            if (drawerBtn) drawerBtn.classList.remove('hidden');
+
+            const dismissedTime = parseInt(localStorage.getItem('pwa_prompt_dismissed') || '0', 10);
+            const oneDayMs = 24 * 60 * 60 * 1000;
+            if (Date.now() - dismissedTime > oneDayMs) {
+                const floatingBanner = document.getElementById('pwa-floating-banner');
+                if (floatingBanner) floatingBanner.classList.remove('hidden');
+            }
+        }
+
+        hidePwaFloatingBanner() {
+            const floatingBanner = document.getElementById('pwa-floating-banner');
+            if (floatingBanner) floatingBanner.classList.add('hidden');
+        }
+
+        updatePWAStatusUI(isInstalled) {
+            const statusPill = document.getElementById('pwa-status-pill');
+            const btnText = document.getElementById('pwa-install-btn-text');
+            const settingsBtn = document.getElementById('pwa-install-settings-btn');
+            const drawerBtn = document.getElementById('drawer-pwa-install-btn');
+
+            if (isInstalled) {
+                if (statusPill) {
+                    statusPill.textContent = 'Instalada';
+                    statusPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300';
+                }
+                if (btnText) btnText.textContent = '✓ Aplicación Instalada';
+                if (settingsBtn) {
+                    settingsBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                    settingsBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'cursor-default');
+                    settingsBtn.disabled = true;
+                }
+                if (drawerBtn) drawerBtn.classList.add('hidden');
+                this.hidePwaFloatingBanner();
+            }
+        }
+
+        showUpdateToast(worker) {
+            this.showToast('Nueva versión de Organizador disponible. Pulsa para actualizar.', 'info');
+            if (worker) {
+                worker.postMessage({ type: 'SKIP_WAITING' });
+            }
         }
     }
 

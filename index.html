@@ -7,12 +7,26 @@
     
     <!-- Meta tags Mobile-First & Orientación -->
     <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Organizador de Tareas">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Organizador">
     <meta name="screen-orientation" content="portrait">
     <meta name="x5-orientation" content="portrait">
     <meta name="x5-page-mode" content="app">
     <meta name="browsermode" content="application">
+
+    <!-- PWA Web App Manifest -->
+    <link rel="manifest" href="manifest.webmanifest">
+
+    <!-- Favicons & App Icons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,8 +56,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.3.3">
-    <link rel="stylesheet" href="css/styles.css?v=1.3.3">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.3.4">
+    <link rel="stylesheet" href="css/styles.css?v=1.3.4">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -302,6 +316,18 @@
                         </span>
                         <span>Configuración</span>
                     </div>
+                </button>
+
+                <!-- Opción PWA en Drawer -->
+                <button type="button" id="drawer-pwa-install-btn"
+                    class="nav-link-btn hidden w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50/70 dark:bg-indigo-950/40 hover:bg-indigo-100/70 tap-effect transition-all text-left">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        </span>
+                        <span>Instalar Aplicación</span>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-600 text-white">PWA</span>
                 </button>
             </nav>
         </div>
@@ -790,7 +816,7 @@
                             <svg class="settings-accordion-chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </button>
-                    <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-4 bg-slate-50/40 dark:bg-slate-800/40">
+                    <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-3 sm:p-5 space-y-3.5 bg-slate-50/40 dark:bg-slate-800/40">
                         <!-- Tarjeta Activa -->
                         <div class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 shadow-xs">
                             <div id="settings-inst-logo-container" class="shrink-0 flex items-center justify-center"></div>
@@ -823,7 +849,7 @@
                                 <!-- Generado por JS -->
                             </div>
 
-                            <div id="settings-institution-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+                            <div id="settings-institution-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-96 overflow-y-auto pr-1"></div>
                         </div>
 
                         <!-- Semestre o Periodo con Botones Píldora -->
@@ -1303,12 +1329,37 @@
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"/></svg>
                 </button>
 
-                <!-- VERSIÓN HASTA ABAJO v1.3.3 -->
+                <!-- Tarjeta: Instalación de la Aplicación (PWA) -->
+                <div id="pwa-settings-card" class="settings-accordion-card rounded-2xl border border-indigo-200/80 dark:border-indigo-900/60 overflow-hidden bg-gradient-to-r from-indigo-50/60 via-purple-50/40 to-white dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-800 p-4 sm:p-5 shadow-xs">
+                    <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <img src="assets/icons/icon-192x192.png" alt="Logo Organizador" class="w-12 h-12 rounded-2xl shadow-md border border-indigo-200/60 dark:border-indigo-800 shrink-0 object-cover">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Instalar Aplicación</h3>
+                                    <span id="pwa-status-pill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">Navegador</span>
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Instala el organizador como acceso directo para abrirlo a pantalla completa y sin conexión a internet.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+                            <button type="button" id="pwa-install-settings-btn"
+                                class="tap-effect w-full sm:w-auto px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <span id="pwa-install-btn-text">Instalar Aplicación</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VERSIÓN HASTA ABAJO v1.3.4 -->
                 <div class="text-center pt-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none">
                         <span>🐧</span>
-                        <span>Versión 1.3.3</span>
+                        <span>Versión 1.3.4</span>
                     </div>
                 </div>
             </div>
@@ -1892,7 +1943,7 @@
     <!-- ========================================================= -->
     <!-- MODAL CONSTRUCTOR DE ESCUELA PERSONALIZADA               -->
     <!-- ========================================================= -->
-    <div id="custom-school-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div id="custom-school-modal" class="modal-overlay fixed inset-0 z-[60] hidden items-center justify-center p-4">
         <div id="custom-school-backdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"></div>
 
         <div class="modal-dialog relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
@@ -2141,31 +2192,63 @@
             </p>
 
             <form id="cycle-setup-welcome-form" class="space-y-3.5 pt-1">
-                <!-- 1. Selección de Institución Educativa con Vista Previa de Escudo -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                        Institución Educativa *
-                    </label>
-                    <div class="flex items-center gap-2.5">
-                        <div id="welcome-inst-preview" class="shrink-0 flex items-center justify-center">
-                            <!-- Logo inyectado dinámicamente -->
-                        </div>
-                        <select id="welcome-institution-select" required
-                            class="flex-1 px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
-                            <!-- Opciones cargadas por JS -->
-                        </select>
+                <!-- 1. Selección Interactiva de Institución Educativa -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            Institución Educativa *
+                        </label>
+                    </div>
+
+                    <!-- Botones de Acción: Crear o Omitir -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" id="welcome-create-school-btn"
+                            class="tap-effect py-2 px-2.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80 transition-colors flex items-center justify-center gap-1.5 text-center">
+                            <span>➕ Crear mi propia escuela</span>
+                        </button>
+                        <button type="button" id="welcome-skip-school-btn"
+                            class="tap-effect py-2 px-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center gap-1.5 text-center">
+                            <span>⏭️ Hacerla después</span>
+                        </button>
+                    </div>
+
+                    <!-- Cuadro de Selección Activa / Omitida -->
+                    <div id="welcome-selected-school-box"
+                        class="p-2.5 rounded-2xl border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/50 dark:bg-indigo-950/30 flex items-center justify-between gap-2.5 transition-all">
+                        <!-- Inyectado por JS -->
+                    </div>
+
+                    <!-- Píldoras de Filtro por País (Sin emojis de bandera) -->
+                    <div id="welcome-country-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                        <!-- Generado por JS: Todas, México, Colombia, etc. -->
+                    </div>
+
+                    <!-- Rejilla Compacta de Escuelas -->
+                    <div id="welcome-schools-grid"
+                        class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 sm:max-h-52 overflow-y-auto pr-1">
+                        <!-- Tarjetas de escuelas generadas por JS -->
                     </div>
                 </div>
 
-                <!-- 2. Selección Dinámica de Semestre / Periodo Lectivo -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                        Semestre / Periodo Activo *
-                    </label>
-                    <select id="welcome-period-select" required
-                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none focus:border-indigo-500 cursor-pointer">
-                        <!-- Opciones adaptadas según institución -->
-                    </select>
+                <!-- 2. Selección Interactiva de Semestre / Periodo Lectivo -->
+                <div id="welcome-period-container" class="space-y-2 transition-all duration-200">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            Semestre / Periodo Activo *
+                        </label>
+                        <span id="welcome-selected-period-badge" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400"></span>
+                    </div>
+
+                    <!-- Mensaje de Periodo Bloqueado -->
+                    <div id="welcome-period-locked-msg" class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-medium flex items-center gap-2">
+                        <span class="text-sm">🔒</span>
+                        <span>Selecciona o crea una institución para configurar el periodo lectivo</span>
+                    </div>
+
+                    <!-- Chips Interactivos de Periodos -->
+                    <div id="welcome-period-chips" class="flex flex-wrap gap-1.5 pt-0.5">
+                        <!-- Generado por JS -->
+                    </div>
 
                     <!-- Wrapper para escribir periodo personalizado en Onboarding -->
                     <div id="welcome-custom-period-wrapper" class="hidden pt-1.5 space-y-1">
@@ -2285,6 +2368,27 @@
         </div>
     </div>
 
+    <!-- ========================================================= -->
+    <!-- BANNER FLOTANTE SUTIL DE INSTALACIÓN PWA                  -->
+    <!-- ========================================================= -->
+    <div id="pwa-floating-banner" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-40 hidden transform transition-all duration-300">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-indigo-100 dark:border-indigo-900/80 p-3.5 flex items-center gap-3">
+            <img src="assets/icons/icon-192x192.png" alt="Logo" class="w-10 h-10 rounded-xl shadow-xs shrink-0 object-cover">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">Organizador de Tareas</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Accede más rápido desde tu pantalla de inicio.</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" id="pwa-floating-install-btn" class="tap-effect px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold text-xs shadow-xs hover:bg-indigo-700 transition-colors">
+                    Instalar
+                </button>
+                <button type="button" id="pwa-floating-dismiss-btn" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" title="Descartar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========================================== -->
     <!-- CONTENEDOR DE TOASTS NOTIFICACIONES       -->
     <!-- ========================================== -->
@@ -2293,16 +2397,16 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js?v=1.3.3"></script>
-    <script src="js/storage.js?v=1.3.3"></script>
-    <script src="js/haptics.js?v=1.3.3"></script>
-    <script src="js/notifications.js?v=1.3.3"></script>
-    <script src="js/widgets.js?v=1.3.3"></script>
-    <script src="js/subjects.js?v=1.3.3"></script>
-    <script src="js/tasks.js?v=1.3.3"></script>
-    <script src="js/notes.js?v=1.3.3"></script>
-    <script src="js/calendar.js?v=1.3.3"></script>
-    <script src="js/archive.js?v=1.3.3"></script>
-    <script src="js/app.js?v=1.3.3"></script>
+    <script src="js/institutions.js?v=1.3.4"></script>
+    <script src="js/storage.js?v=1.3.4"></script>
+    <script src="js/haptics.js?v=1.3.4"></script>
+    <script src="js/notifications.js?v=1.3.4"></script>
+    <script src="js/widgets.js?v=1.3.4"></script>
+    <script src="js/subjects.js?v=1.3.4"></script>
+    <script src="js/tasks.js?v=1.3.4"></script>
+    <script src="js/notes.js?v=1.3.4"></script>
+    <script src="js/calendar.js?v=1.3.4"></script>
+    <script src="js/archive.js?v=1.3.4"></script>
+    <script src="js/app.js?v=1.3.4"></script>
 </body>
 </html>

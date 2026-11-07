@@ -809,13 +809,45 @@ window.InstitutionsModule = (() => {
         return [...builtIn, ...custom];
     }
 
+    const UNCONFIGURED_INSTITUTION = {
+        id: 'unconfigured',
+        name: 'Sin institución',
+        shortName: 'Sin institución',
+        fullName: 'Sin institución configurada',
+        shortBadge: 'Sin Escuela',
+        country: 'Global',
+        countryCode: 'GL',
+        countryFlag: '',
+        systemType: 'Por configurar',
+        slogan: 'Organiza tus metas escolares',
+        icon: null,
+        colors: {
+            primary: '#4F46E5',
+            secondary: '#818CF8',
+            accent: '#C7D2FE',
+            text: '#FFFFFF',
+            aura: '#4F46E5',
+            badgeBg: 'bg-slate-200 dark:bg-slate-700',
+            badgeText: 'text-slate-700 dark:text-slate-300'
+        },
+        periods: ['Periodo 1', 'Periodo 2'],
+        defaultPeriod: 'Sin periodo',
+        isCustom: false,
+        isUnconfigured: true
+    };
+
     /**
-     * Obtiene una institución por su ID con fallback seguro a UNAM
-     * Si el ID es 'general' o vacío, migra/retorna UNAM.
+     * Obtiene una institución por su ID con fallback seguro
+     * Si no se especifica ID o es 'unconfigured', retorna UNCONFIGURED_INSTITUTION.
+     * Si es 'general', retorna UNAM.
      * Busca primero en instituciones oficiales y luego en personalizadas.
      */
     function getInstitution(id) {
-        if (!id || id === 'general') {
+        if (!id || id === 'unconfigured') {
+            return UNCONFIGURED_INSTITUTION;
+        }
+
+        if (id === 'general') {
             return INSTITUTIONS.unam;
         }
 
@@ -846,6 +878,12 @@ window.InstitutionsModule = (() => {
         const rounded = containerClass.includes('rounded-') ? '' : 'rounded-2xl';
         const padding = containerClass.includes('p-') ? '' : 'p-1';
 
+        if (item.isUnconfigured || !item.icon) {
+            return `<div class="school-logo-frame ${containerClass} ${rounded} ${padding} bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 shadow-xs flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105" style="background-color: #ffffff !important;">` +
+                   `<span class="text-xl">🎓</span>` +
+                   `</div>`;
+        }
+
         const iconSrc = item.icon || 'assets/unam.svg';
 
         return `<div class="school-logo-frame ${containerClass} ${rounded} ${padding} bg-white border border-slate-200/90 dark:border-slate-700 shadow-xs flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105" style="background-color: #ffffff !important;">` +
@@ -867,6 +905,7 @@ window.InstitutionsModule = (() => {
     return {
         COUNTRIES,
         INSTITUTIONS,
+        UNCONFIGURED_INSTITUTION,
         getCountries,
         getAllInstitutions,
         getInstitution,

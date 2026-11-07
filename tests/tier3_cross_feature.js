@@ -1,7 +1,7 @@
 /**
  * tier3_cross_feature.js - Tier 3: Pairwise Cross-Feature Combinations
- * Minimum 30 comprehensive integration tests validating feature interoperability
- * Requirement-driven test suite for Organizador_Tareas v1.3.1 Pingüino
+ * 38 comprehensive integration tests validating feature interoperability
+ * Requirement-driven test suite for Organizador_Tareas v1.3.4
  */
 
 const tests = [
@@ -495,6 +495,191 @@ const tests = [
                 return codes.includes('APOLLO11') && theme === 'apollo';
             });
             helpers.assertTrue(preserved, 'Unlocked codes and active special theme preserved across reload');
+        }
+    },
+    {
+        id: 'T3_COMB_33_unconfigured_school_all_7_views_switching',
+        name: 'Unconfigured school state + view switching across all 7 views with zero errors',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setSchoolSkipped(true);
+                window.StorageModule?.setInstitution('unconfigured');
+                window.StorageModule?.setAcademicPeriod('Sin periodo');
+                window.app?.setInstitution?.('unconfigured');
+            });
+            const views = ['tasks', 'subjects', 'calendar', 'notes', 'archive', 'settings', 'secret-codes'];
+            for (const viewId of views) {
+                await page.evaluate((vid) => {
+                    window.app?.switchView?.(vid);
+                }, viewId);
+                const isViewVisible = await page.evaluate((vid) => {
+                    const sec = document.getElementById(`view-${vid}`);
+                    return sec ? !sec.classList.contains('hidden') : false;
+                }, viewId);
+                helpers.assertTrue(isViewVisible, `View "${viewId}" must be active and visible in unconfigured state`);
+            }
+            const headerState = await page.evaluate(() => {
+                return {
+                    name: document.getElementById('header-inst-name')?.textContent?.trim(),
+                    period: document.getElementById('header-inst-period')?.textContent?.trim()
+                };
+            });
+            helpers.assertEqual(headerState.name, 'Sin institución', 'Header name remains Sin institución across all views');
+            helpers.assertEqual(headerState.period, 'Sin periodo', 'Header period remains Sin periodo across all views');
+        }
+    },
+    {
+        id: 'T3_COMB_34_custom_school_cuatrimestral_welcome_header_drawer_sync',
+        name: 'Custom school cuatrimestral system + welcome modal + header/drawer live sync',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-create-school-btn')?.click();
+                document.getElementById('custom-school-name').value = 'Politécnico Andes';
+                document.getElementById('custom-school-shortbadge').value = 'POLI';
+                document.getElementById('custom-school-fullname').value = 'Politécnico de los Andes';
+                document.getElementById('custom-school-slogan').value = 'Excelencia sin límites';
+                document.getElementById('custom-school-country').value = 'CO';
+                document.getElementById('custom-school-system').value = 'Cuatrimestral';
+                document.getElementById('custom-school-color').value = '#059669';
+                document.getElementById('custom-school-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            // Select 2.º Cuatrimestre chip
+            await page.evaluate(() => {
+                const chips = Array.from(document.querySelectorAll('.welcome-period-chip'));
+                const chip = chips.find(c => c.textContent.includes('2.º Cuatrimestre'));
+                if (chip) chip.click();
+                const start = document.getElementById('welcome-cycle-start');
+                const end = document.getElementById('welcome-cycle-end');
+                if (start) start.value = '2026-09-01';
+                if (end) end.value = '2026-12-20';
+                document.getElementById('welcome-cycle-save-btn')?.click();
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            const syncResult = await page.evaluate(() => {
+                const hName = document.getElementById('header-inst-name')?.textContent?.trim();
+                const dName = document.getElementById('drawer-inst-name')?.textContent?.trim();
+                const hPeriod = document.getElementById('header-inst-period')?.textContent?.trim();
+                const dPeriod = document.getElementById('drawer-inst-period')?.textContent?.trim();
+                return { hName, dName, hPeriod, dPeriod };
+            });
+
+            helpers.assertEqual(syncResult.hName, syncResult.dName, 'Header and drawer institution names match for custom school');
+            helpers.assertIncludes(syncResult.hName, 'Politécnico Andes', 'Institution name contains custom school name');
+            helpers.assertEqual(syncResult.hPeriod, syncResult.dPeriod, 'Header and drawer periods match for custom school');
+            helpers.assertEqual(syncResult.hPeriod, '2.º Cuatrimestre', 'Period reflects selected custom cuatrimestre');
+        }
+    },
+    {
+        id: 'T3_COMB_35_settings_school_change_after_skipped_onboarding',
+        name: 'Settings school change after skipped onboarding with clean period adaptation',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setSchoolSkipped(true);
+                window.StorageModule?.setInstitution('unconfigured');
+                window.StorageModule?.setAcademicPeriod('Sin periodo');
+                window.app?.setInstitution?.('unconfigured');
+                window.app?.switchView?.('settings');
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            await page.evaluate(() => {
+                const ipnBtn = document.querySelector('#settings-institution-grid [data-inst-id="ipn"]');
+                if (ipnBtn) ipnBtn.click();
+            });
+            await new Promise(r => setTimeout(r, 200));
+
+            const stateAfter = await page.evaluate(() => {
+                return {
+                    isSkipped: window.StorageModule?.isSchoolSkipped(),
+                    instId: window.StorageModule?.getInstitution(),
+                    period: window.StorageModule?.getAcademicPeriod(),
+                    headerName: document.getElementById('header-inst-name')?.textContent?.trim(),
+                    headerPeriod: document.getElementById('header-inst-period')?.textContent?.trim()
+                };
+            });
+
+            helpers.assertFalse(stateAfter.isSkipped, 'isSchoolSkipped must reset to false upon school selection');
+            helpers.assertEqual(stateAfter.instId, 'ipn', 'Storage institution updated to ipn');
+            helpers.assertNotEqual(stateAfter.period, 'Sin periodo', 'Period must automatically adapt away from Sin periodo');
+            helpers.assertIncludes(stateAfter.headerName, 'IPN', 'Header displays IPN');
+            helpers.assertNotEqual(stateAfter.headerPeriod, 'Sin periodo', 'Header period is updated');
+        }
+    },
+    {
+        id: 'T3_COMB_36_pwa_settings_card_theme_apollo_tablet',
+        name: 'PWA Settings Card + Apollo Space Theme on 768px Tablet Viewport',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 768, height: 1024 });
+            await page.evaluate(() => {
+                document.documentElement.classList.add('theme-apollo');
+                window.app?.switchView?.('settings');
+            });
+            const pwaCardVisible = await page.evaluate(() => {
+                const card = document.getElementById('pwa-settings-card');
+                return card ? !card.classList.contains('hidden') : false;
+            });
+            helpers.assertTrue(pwaCardVisible, '#pwa-settings-card must be rendered and visible on tablet');
+            const noHorizontalScroll = await page.evaluate(() => {
+                return document.documentElement.scrollWidth <= 768;
+            });
+            helpers.assertTrue(noHorizontalScroll, '768px tablet with Apollo theme must have zero horizontal overflow');
+        }
+    },
+    {
+        id: 'T3_COMB_37_unconfigured_school_task_and_subject_widget_sync',
+        name: 'Unconfigured school + subject creation + task addition + widget sync',
+        run: async (page, helpers) => {
+            const widgetPayload = await page.evaluate(() => {
+                window.StorageModule?.setSchoolSkipped(true);
+                window.StorageModule?.setInstitution('unconfigured');
+                window.StorageModule?.setAcademicPeriod('Sin periodo');
+                const sub = [{ id: 'sub_unconf', name: 'Biología Básica', color: '#10B981' }];
+                window.StorageModule?.saveSubjects?.(sub);
+                const task = [{
+                    id: 'task_unconf',
+                    title: 'Investigación Células',
+                    subjectId: 'sub_unconf',
+                    dueDate: new Date().toISOString().split('T')[0],
+                    completed: false
+                }];
+                window.StorageModule?.saveTasks?.(task);
+                window.WidgetSyncModule?.sync?.();
+                const raw = localStorage.getItem('org_escolar_widget_payload');
+                return raw ? JSON.parse(raw) : null;
+            });
+            helpers.assertTrue(widgetPayload !== null && typeof widgetPayload === 'object', 'WidgetSyncModule must generate valid payload without crashing');
+            helpers.assertTrue(widgetPayload.quickTask !== undefined, 'Widget payload must contain quickTask data');
+        }
+    },
+    {
+        id: 'T3_COMB_38_welcome_modal_tablet_responsive_modal_stacking',
+        name: 'Welcome modal on 820px tablet viewport + custom school modal z-stacking',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 820, height: 1180 });
+            await page.evaluate(() => {
+                window.app?.openCycleWelcomeModal?.();
+                document.getElementById('welcome-create-school-btn')?.click();
+            });
+            const zCheck = await page.evaluate(() => {
+                const welcome = document.getElementById('cycle-setup-modal');
+                const custom = document.getElementById('custom-school-modal');
+                return {
+                    welcomeVisible: welcome && !welcome.classList.contains('hidden'),
+                    customVisible: custom && !custom.classList.contains('hidden'),
+                    customZ: custom ? parseInt(window.getComputedStyle(custom).zIndex, 10) : 0,
+                    welcomeZ: welcome ? parseInt(window.getComputedStyle(welcome).zIndex, 10) : 0,
+                    noScroll: document.documentElement.scrollWidth <= 820
+                };
+            });
+            helpers.assertTrue(zCheck.welcomeVisible && zCheck.customVisible, 'Both modals present in stacking hierarchy');
+            helpers.assertTrue(zCheck.customZ > zCheck.welcomeZ, 'Custom school modal stacks on top of welcome modal');
+            helpers.assertTrue(zCheck.noScroll, 'Tablet 820px has zero horizontal overflow');
         }
     }
 ];

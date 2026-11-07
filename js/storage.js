@@ -30,7 +30,8 @@ window.StorageModule = (() => {
         INITIALIZED: 'org_escolar_initialized_v3',
         VAULT_UNLOCKED: 'org_escolar_vault_unlocked_codes_v2',
         ACTIVE_SPECIAL_THEME: 'org_escolar_active_special_theme_v1',
-        APOLLO_ROCKETS_ENABLED: 'org_escolar_apollo_rockets_v1'
+        APOLLO_ROCKETS_ENABLED: 'org_escolar_apollo_rockets_v1',
+        SCHOOL_SKIPPED: 'org_escolar_school_skipped_v1'
     };
 
     const MAX_SUBJECTS = 16;
@@ -147,15 +148,34 @@ window.StorageModule = (() => {
         MAX_SUBJECTS,
 
         // --- Institución y Grado/Periodo ---
+        isSchoolSkipped() {
+            return localStorage.getItem(KEYS.SCHOOL_SKIPPED) === 'true';
+        },
+        setSchoolSkipped(skipped) {
+            localStorage.setItem(KEYS.SCHOOL_SKIPPED, skipped ? 'true' : 'false');
+            if (skipped) {
+                localStorage.setItem(KEYS.INSTITUTION, 'unconfigured');
+            }
+        },
+
         getInstitution() {
+            if (this.isSchoolSkipped?.()) {
+                return 'unconfigured';
+            }
             const stored = localStorage.getItem(KEYS.INSTITUTION);
             if (stored === 'general') {
                 localStorage.setItem(KEYS.INSTITUTION, 'unam');
                 return 'unam';
             }
+            if (stored === 'unconfigured' || stored === '') {
+                return 'unconfigured';
+            }
             return stored || 'unam';
         },
         setInstitution(id) {
+            if (id && id !== 'unconfigured') {
+                this.setSchoolSkipped(false);
+            }
             localStorage.setItem(KEYS.INSTITUTION, id);
         },
 
@@ -165,6 +185,9 @@ window.StorageModule = (() => {
             const savedPeriod = localStorage.getItem(KEYS.ACADEMIC_PERIOD);
             if (typeof savedPeriod === 'string' && savedPeriod.length > 0) {
                 return savedPeriod;
+            }
+            if (this.isSchoolSkipped?.() || instId === 'unconfigured') {
+                return 'Sin periodo';
             }
             return inst?.defaultPeriod || '1.º Semestre';
         },

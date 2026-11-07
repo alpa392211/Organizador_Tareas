@@ -9,6 +9,7 @@
  *   node tests/run_all_tests.js --tier=2
  *   node tests/run_all_tests.js --tier=3
  *   node tests/run_all_tests.js --tier=4
+ *   node tests/run_all_tests.js --tier=5
  *   node tests/run_all_tests.js --filter="F01"
  *   npm test
  */
@@ -22,6 +23,7 @@ const tier1Module = require('./tier1_feature_coverage');
 const tier2Module = require('./tier2_boundary_corner');
 const tier3Module = require('./tier3_cross_feature');
 const tier4Module = require('./tier4_real_world');
+const tier5Module = require('./tier5_adversarial_stress');
 
 // ANSI Color Formatting
 const colors = {
@@ -47,7 +49,7 @@ function parseArgs() {
     for (const arg of args) {
         if (arg.startsWith('--tier=')) {
             const val = parseInt(arg.split('=')[1], 10);
-            if ([1, 2, 3, 4].includes(val)) {
+            if ([1, 2, 3, 4, 5].includes(val)) {
                 options.tier = val;
             } else {
                 console.warn(`${colors.yellow}Warning: Unknown tier "${val}". Running all tiers.${colors.reset}`);
@@ -68,7 +70,7 @@ async function main() {
     const options = parseArgs();
 
     console.log(`${colors.bold}${colors.cyan}========================================================================${colors.reset}`);
-    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.3.3 - End-to-End Headless Test Suite           ${colors.reset}`);
+    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.3.4 - End-to-End Headless Test Suite           ${colors.reset}`);
     console.log(`${colors.cyan}========================================================================${colors.reset}`);
     console.log(`${colors.dim}Target:  ${helpers.TARGET_URL}${colors.reset}`);
     console.log(`${colors.dim}Binary:  ${helpers.CHROME_PATH}${colors.reset}`);
@@ -81,13 +83,14 @@ async function main() {
     if (!options.tier || options.tier === 2) tierModules.push(tier2Module);
     if (!options.tier || options.tier === 3) tierModules.push(tier3Module);
     if (!options.tier || options.tier === 4) tierModules.push(tier4Module);
+    if (!options.tier || options.tier === 5) tierModules.push(tier5Module);
 
     let browser;
     let page;
 
     const summary = {
         timestamp: new Date().toISOString(),
-        version: '1.3.3',
+        version: '1.3.4',
         total: 0,
         passed: 0,
         failed: 0,

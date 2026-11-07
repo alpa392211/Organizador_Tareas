@@ -369,8 +369,10 @@ section.hidden, .modal-overlay.hidden {
 }
 
 .inst-grid-card .school-logo-frame {
-    width: 3rem !important;
-    height: 3rem !important;
+    width: 2rem !important;       /* 32px (down from 48px) */
+    height: 2rem !important;      /* 32px (down from 48px) */
+    border-radius: 0.5rem !important; /* rounded-lg */
+    padding: 0.125rem !important; /* p-0.5 */
 }
 
 
