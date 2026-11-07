@@ -30,9 +30,9 @@
             themeId: 'starlight',
             badgeClass: 'bg-pink-500/20 text-pink-300 border-pink-400/30',
             phrase: 'Tu eres alguien especial por conocer esta fecha...',
-            description: 'Bajo el manto de las estrellas del 6 de junio de 2009, este protocolo conmemorativo rinde homenaje a un lazo eterno que trasciende el tiempo y el espacio. Gracias por custodiar este instante inolvidable.',
-            actionLabel: 'Guardar en mi Memoria ✨',
-            themeClass: null,
+            description: 'Bajo el manto de las estrellas del 6 de junio de 2009, este protocolo conmemorativo rinde homenaje a un lazo eterno que trasciende el tiempo y el espacio. Activa el diseño cósmico Starlight con acentos celestiales y violeta nocturno.',
+            actionLabel: 'Activar Tema Starlight ✨',
+            themeClass: 'theme-starlight',
             supportsRockets: false
         },
         'EDUARDO': {
@@ -50,13 +50,13 @@
         },
         'PINGUINO': {
             id: 'PINGUINO',
-            name: 'Edición Glacial v1.3.1 Pingüino',
+            name: 'Edición Glacial Pingüino',
             icon: '🐧',
             category: 'VERSIÓN MAESTRA',
             themeId: 'penguin',
             badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
             phrase: '«Elegancia polar, resistencia bajo cero y concentración absoluta»',
-            description: 'Tema conmemorativo oficial de la versión 1.3.1 "Pingüino". Acentos en cian polar glacial, pingüinos vigilando tus metas y escarcha visual en recordatorios.',
+            description: 'Tema conmemorativo polar glacial. Acentos en cian polar glacial, pingüinos vigilando tus metas y escarcha visual en recordatorios.',
             actionLabel: 'Activar Modo Polar Pingüino 🐧',
             themeClass: 'theme-penguin',
             supportsRockets: false
@@ -151,6 +151,76 @@
             actionLabel: 'Activar Gatitos y Modo Gris 🐱',
             themeClass: 'theme-gray',
             supportsRockets: false
+        },
+        'READABLE': {
+            id: 'READABLE',
+            name: 'Tipografía Lexend Hiperlegible',
+            icon: '📖',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'readable',
+            badgeClass: 'bg-teal-500/20 text-teal-300 border-teal-400/30',
+            phrase: '«Claridad sin esfuerzo para cada palabra y cada examen»',
+            description: 'Desbloquea la tipografía Lexend, diseñada para reducir la fatiga ocular y facilitar la lectura fluida en sesiones maratónicas de estudio.',
+            actionLabel: 'Aplicar Tipografía Lexend 📖',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'FIRACODE': {
+            id: 'FIRACODE',
+            name: 'Tipografía Fira Code Hacker',
+            icon: '💻',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'firacode',
+            badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+            phrase: '«01000011 01001111 01000100 01000101 — Todo bajo control»',
+            description: 'Convierte toda la interfaz en una terminal de desarrollo con Fira Code. Para estudiantes de ingeniería y devoradores de código.',
+            actionLabel: 'Aplicar Fira Code Mono 💻',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'PLAYFAIR': {
+            id: 'PLAYFAIR',
+            name: 'Tipografía Playfair Imperial',
+            icon: '🖋️',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'playfair',
+            badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
+            phrase: '«La excelencia académica escrita con remates de alta distinción»',
+            description: 'Tipografía con serifa editorial de alto contraste, inspirada en las imprentas europeas del siglo XVIII. Dale a tu horario el porte de un manuscrito de honor.',
+            actionLabel: 'Aplicar Playfair Imperial 🖋️',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'HANDNOTE': {
+            id: 'HANDNOTE',
+            name: 'Tipografía Caveat Cuaderno',
+            icon: '📝',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'caveat',
+            badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+            phrase: '«Como los mejores apuntes en la libreta de tu compañero estrella»',
+            description: 'Aura manuscrita casual y cálida con la fuente Caveat. Hace que cada tarea y apunte se sienta auténtico, cercano y libre de estrés.',
+            actionLabel: 'Aplicar Caveat Cuaderno 📝',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'ORBITRON': {
+            id: 'ORBITRON',
+            name: 'Tipografía Orbitron Cyber HUD',
+            icon: '🛸',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'orbitron',
+            badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
+            phrase: '«SISTEMAS ACADÉMICOS 100% OPERATIVOS • COORDENADAS FIJADAS»',
+            description: 'Diseño geométrico cibernético angular. Transforma tu organizador en el panel de control táctico de una nave de exploración espacial.',
+            actionLabel: 'Aplicar Orbitron Cyber 🛸',
+            themeClass: null,
+            supportsRockets: false
         }
     };
 
@@ -177,7 +247,17 @@
         // STUDYMAX
         'STUDYMAX': 'STUDYMAX', 'EINSTEIN': 'STUDYMAX', 'HYPERFOC': 'STUDYMAX', 'STUDY___': 'STUDYMAX', 'STUDY': 'STUDYMAX',
         // GATITOS_
-        'GATITOS_': 'GATITOS_', 'GATITOS': 'GATITOS_', 'NEKOLUCK': 'GATITOS_', 'MEOWMEOW': 'GATITOS_', 'GATITO': 'GATITOS_'
+        'GATITOS_': 'GATITOS_', 'GATITOS': 'GATITOS_', 'NEKOLUCK': 'GATITOS_', 'MEOWMEOW': 'GATITOS_', 'GATITO': 'GATITOS_',
+        // READABLE (Lexend)
+        'READABLE': 'READABLE', 'LEXEND24': 'READABLE', 'DYSLEXIC': 'READABLE', 'LEXEND__': 'READABLE', 'READWELL': 'READABLE', 'LECTURA_': 'READABLE', 'LEXEND': 'READABLE',
+        // FIRACODE (Fira Code)
+        'FIRACODE': 'FIRACODE', 'FIRA____': 'FIRACODE', 'HACKER88': 'FIRACODE', 'DEVSPACE': 'FIRACODE', 'MONOCODE': 'FIRACODE', 'TERMINAL': 'FIRACODE', 'FIRA': 'FIRACODE',
+        // PLAYFAIR (Playfair Display)
+        'PLAYFAIR': 'PLAYFAIR', 'CINZEL99': 'PLAYFAIR', 'ROYALFNT': 'PLAYFAIR', 'ELEGANCE': 'PLAYFAIR', 'IMPERIAL': 'PLAYFAIR', 'PLAYFA__': 'PLAYFAIR',
+        // HANDNOTE (Caveat)
+        'HANDNOTE': 'HANDNOTE', 'CAVEAT24': 'HANDNOTE', 'NOTEBOOK': 'HANDNOTE', 'APUNTES_': 'HANDNOTE', 'HANDMADE': 'HANDNOTE', 'CAVEAT__': 'HANDNOTE', 'CAVEAT': 'HANDNOTE',
+        // ORBITRON (Orbitron)
+        'ORBITRON': 'ORBITRON', 'CYBERFNT': 'ORBITRON', 'SCIFIHUD': 'ORBITRON', 'FUTURIST': 'ORBITRON', 'KINETIC_': 'ORBITRON', 'ORBITR__': 'ORBITRON'
     };
 
     window.VaultCatalog = VAULT_CATALOG;
@@ -249,7 +329,6 @@
             this.setupCycleWelcomeModal();
             this.setupExitModal();
             this.setupSettingsView();
-            this.setupSecretVersionTrigger();
             this.setupSecretVault();
 
             // 8. Exponer funciones globales para interacción fluida entre módulos
@@ -400,12 +479,100 @@
         }
 
         /* ========================================================
-           SISTEMA DE TIPOGRAFÍAS (5 OPCIONES: Calibri, Times New Roman, Montserrat, Lora, Poppins)
+           SISTEMA DE TIPOGRAFÍAS (5 Estándar + 5 Desbloqueables Bóveda)
            ======================================================== */
         initFontFamily() {
             const Storage = window.StorageModule;
             const font = Storage.getFontFamily?.() || 'calibri';
+            this.syncSettingsFontButtons();
             this.applyFontFamily(font);
+        }
+
+        syncSettingsFontButtons() {
+            const grid = document.getElementById('settings-font-buttons-grid');
+            if (!grid) return;
+
+            const Storage = window.StorageModule;
+            const fontDefs = [
+                {
+                    codeId: 'READABLE',
+                    fontKey: 'readable',
+                    name: 'Lexend (Accesible)',
+                    icon: '📖',
+                    desc: 'Hiperlegible, lectura descansada y máxima accesibilidad.',
+                    fontClass: ''
+                },
+                {
+                    codeId: 'FIRACODE',
+                    fontKey: 'firacode',
+                    name: 'Fira Code (Hacker)',
+                    icon: '💻',
+                    desc: 'Monoespaciada hacker terminal para código.',
+                    fontClass: 'font-mono'
+                },
+                {
+                    codeId: 'PLAYFAIR',
+                    fontKey: 'playfair',
+                    name: 'Playfair Display',
+                    icon: '🖋️',
+                    desc: 'Editorial serif clásica de alta distinción académica.',
+                    fontClass: 'font-serif'
+                },
+                {
+                    codeId: 'HANDNOTE',
+                    fontKey: 'caveat',
+                    name: 'Caveat (Cuaderno)',
+                    icon: '📝',
+                    desc: 'Manuscrita casual, como notas en libreta.',
+                    fontClass: ''
+                },
+                {
+                    codeId: 'ORBITRON',
+                    fontKey: 'orbitron',
+                    name: 'Orbitron (Cyber HUD)',
+                    icon: '🛸',
+                    desc: 'Futurista angular con display cibernético táctico.',
+                    fontClass: ''
+                }
+            ];
+
+            const currentFont = Storage.getFontFamily ? Storage.getFontFamily() : 'calibri';
+
+            fontDefs.forEach(item => {
+                const isUnlocked = Storage.isCodeUnlocked ? Storage.isCodeUnlocked(item.codeId) : false;
+                let btn = grid.querySelector(`[data-font-btn="${item.fontKey}"]`);
+
+                if (isUnlocked) {
+                    if (!btn) {
+                        btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.setAttribute('data-font-btn', item.fontKey);
+                        btn.setAttribute('data-vault-font', 'true');
+                        btn.className = `font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 ${item.fontClass}`;
+                        btn.innerHTML = `
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <span>${item.icon}</span>
+                                    <span>${item.name}</span>
+                                </span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-300 font-bold border border-purple-500/30">✨ Secreto</span>
+                            </div>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 font-sans">${item.desc}</span>
+                        `;
+                        btn.onclick = () => {
+                            Storage.setFontFamily(item.fontKey);
+                            this.applyFontFamily(item.fontKey);
+                            window.HapticsModule?.light?.();
+                            this.showToast(`Tipografía secreta aplicada: ${item.name}`, 'success');
+                        };
+                        grid.appendChild(btn);
+                    }
+                } else if (btn) {
+                    btn.remove();
+                }
+            });
+
+            this.applyFontFamily(currentFont);
         }
 
         initOrientationLock() {
@@ -417,7 +584,10 @@
         }
 
         applyFontFamily(fontKey) {
-            const valid = ['calibri', 'times', 'montserrat', 'lora', 'poppins'];
+            const valid = [
+                'calibri', 'times', 'montserrat', 'lora', 'poppins',
+                'readable', 'firacode', 'playfair', 'caveat', 'orbitron'
+            ];
             const activeFont = valid.includes(fontKey) ? fontKey : 'calibri';
 
             // Aplicar data-font en la etiqueta raíz y body
@@ -429,7 +599,12 @@
                 times: 'Times New Roman',
                 montserrat: 'Montserrat',
                 lora: 'Lora',
-                poppins: 'Poppins'
+                poppins: 'Poppins',
+                readable: 'Lexend (Accesible)',
+                firacode: 'Fira Code (Hacker)',
+                playfair: 'Playfair Display (Imperial)',
+                caveat: 'Caveat (Cuaderno)',
+                orbitron: 'Orbitron (Cyber HUD)'
             };
 
             const descs = {
@@ -437,7 +612,12 @@
                 times: 'Serif formal y tradicional para estilo académico formal.',
                 montserrat: 'Geométrica estilizada con excelente legibilidad en títulos.',
                 lora: 'Serif literaria cálida, sofisticada y con estilo editorial.',
-                poppins: 'Moderna, geométrica y amigable con proporciones equilibradas.'
+                poppins: 'Moderna, geométrica y amigable con proporciones equilibradas.',
+                readable: 'Diseño hiperlegible de máxima claridad visual para reducir la fatiga en sesiones largas.',
+                firacode: 'Monoespaciada de desarrollo estilo terminal, ideal para futuros ingenieros y programadores.',
+                playfair: 'Serif editorial de alto contraste con remates clásicos y aura de prestigio académico.',
+                caveat: 'Estilo manuscrito fluido y cálido que emula los mejores apuntes en tu libreta de estudio.',
+                orbitron: 'Geométrica futurista HUD con estética cibernética de panel táctico espacial.'
             };
 
             const fontPill = document.getElementById('settings-font-pill');
@@ -450,17 +630,16 @@
                 previewDesc.textContent = descs[activeFont] || '';
             }
 
-            // Sincronizar estilo visual de los 5 botones de selección directa
+            // Sincronizar estilo visual de los botones de selección directa
             document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]').forEach(btn => {
                 const isSelected = btn.dataset.fontBtn === activeFont;
+                const fontType = btn.dataset.fontBtn;
+                const fontClass = (fontType === 'times' || fontType === 'playfair') ? 'font-serif' : (fontType === 'firacode' ? 'font-mono' : '');
+
                 if (isSelected) {
-                    btn.className = `font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all ring-2 ring-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/50 border-indigo-500 shadow-xs ${
-                        btn.dataset.fontBtn === 'times' ? 'font-serif' : ''
-                    }`;
+                    btn.className = `font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all ring-2 ring-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/50 border-indigo-500 shadow-xs ${fontClass}`;
                 } else {
-                    btn.className = `font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-indigo-400 ${
-                        btn.dataset.fontBtn === 'times' ? 'font-serif' : ''
-                    }`;
+                    btn.className = `font-choice-btn tap-effect p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-indigo-400 ${fontClass}`;
                 }
             });
         }
@@ -729,8 +908,8 @@
             // 1. Renderizar píldoras horizontales de filtro por país y Mis Escuelas
             if (pillsContainer) {
                 const filterOptions = [
-                    { id: 'all', label: '🌐 Todas' },
-                    ...countries.map(c => ({ id: c.code, label: `${c.flag} ${c.name}` })),
+                    { id: 'all', label: 'Todas' },
+                    ...countries.map(c => ({ id: c.code, label: c.name })),
                     { id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }
                 ];
 
@@ -791,9 +970,8 @@
                             <div class="mb-2">
                                 ${InstitutionsModule.renderIconHtml(inst, 'w-12 h-12', 'w-full h-full object-contain')}
                             </div>
-                            <span class="text-xs font-black text-slate-900 dark:text-white truncate w-full flex items-center justify-center gap-1">
-                                <span class="text-xs">${inst.countryFlag || '🎓'}</span>
-                                <span class="truncate">${inst.name}</span>
+                            <span class="text-xs font-black text-slate-900 dark:text-white truncate w-full block text-center">
+                                ${inst.name}
                             </span>
                             <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full mt-0.5 font-medium">
                                 ${inst.systemType || inst.type}
@@ -1020,7 +1198,7 @@
                 countries.forEach(c => {
                     const groupSchools = builtIns.filter(inst => inst.countryCode === c.code);
                     if (groupSchools.length > 0) {
-                        html += `<optgroup label="${c.flag} ${c.name}">`;
+                        html += `<optgroup label="${c.name}">`;
                         groupSchools.forEach(inst => {
                             html += `<option value="${inst.id}">🎓 ${inst.name} - ${inst.systemType || inst.shortBadge}</option>`;
                         });
@@ -1107,7 +1285,10 @@
             if (viewName === 'notes') window.NotesModule?.render?.();
             if (viewName === 'calendar') window.CalendarModule?.render?.();
             if (viewName === 'archive') window.ArchiveModule?.render?.();
-            if (viewName === 'settings') this.updateStorageMetrics();
+            if (viewName === 'settings') {
+                this.updateStorageMetrics();
+                this.syncSettingsFontButtons();
+            }
             if (viewName === 'secret-codes') this.renderVaultInventory();
 
             // Scroll suave hacia la parte superior
@@ -1458,7 +1639,7 @@
             // Población de países en el selector
             if (countrySelect && InstitutionsModule) {
                 countrySelect.innerHTML = InstitutionsModule.getCountries().map(c => `
-                    <option value="${c.code}">${c.flag} ${c.name}</option>
+                    <option value="${c.code}">${c.name}</option>
                 `).join('');
             }
 
@@ -1849,7 +2030,7 @@
                     countries.forEach(c => {
                         const groupSchools = builtIns.filter(inst => inst.countryCode === c.code);
                         if (groupSchools.length > 0) {
-                            html += `<optgroup label="${c.flag} ${c.name}">`;
+                            html += `<optgroup label="${c.name}">`;
                             groupSchools.forEach(item => {
                                 html += `<option value="${item.id}">${item.name} - ${item.systemType || item.shortBadge}</option>`;
                             });
@@ -2151,7 +2332,8 @@
                 };
             }
 
-            // 6. Tipografía Mediante Botones Interactivos (5 Opciones - Sin Menú Desplegable)
+            // 6. Tipografía Mediante Botones Interactivos (5 Opciones Estándar + Desbloqueables Bóveda)
+            this.syncSettingsFontButtons();
             document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]').forEach(btn => {
                 btn.onclick = () => {
                     const font = btn.dataset.fontBtn;
@@ -2163,7 +2345,12 @@
                         times: 'Times New Roman',
                         montserrat: 'Montserrat',
                         lora: 'Lora',
-                        poppins: 'Poppins'
+                        poppins: 'Poppins',
+                        readable: 'Lexend (Accesible)',
+                        firacode: 'Fira Code (Hacker)',
+                        playfair: 'Playfair Display (Imperial)',
+                        caveat: 'Caveat (Cuaderno)',
+                        orbitron: 'Orbitron (Cyber HUD)'
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
                 };
@@ -2294,33 +2481,7 @@
         }
 
         setupSecretVersionTrigger() {
-            const versionPill = document.getElementById('settings-version-pill');
-            if (!versionPill) return;
-
-            let clickCount = 0;
-            let resetTimer = null;
-
-            versionPill.addEventListener('click', () => {
-                clickCount++;
-                window.HapticsModule?.light?.();
-
-                clearTimeout(resetTimer);
-                resetTimer = setTimeout(() => {
-                    clickCount = 0;
-                }, 2200);
-
-                if (clickCount >= 5) {
-                    clickCount = 0;
-                    clearTimeout(resetTimer);
-                    const Storage = window.StorageModule;
-                    Storage.unlockSecret();
-                    Storage.setGrayModeEnabled(true);
-                    Storage.setSecretCatsEnabled(true);
-                    window.HapticsModule?.double?.();
-                    this.applySecretFeaturesUI();
-                    this.showToast('🐱 ¡Modo Secreto Desbloqueado! Modo Gris y Gatitos activados.', 'success');
-                }
-            });
+            // Desactivado en v1.3.2 por solicitud: el modo secreto ahora se gestiona exclusivamente por la bóveda
         }
 
         setupSecretVault() {
@@ -2495,26 +2656,52 @@
             if (phraseEl) phraseEl.textContent = codeDef.phrase || '';
             if (descEl) descEl.textContent = codeDef.description || '';
 
+            // Estilo conmemorativo especial para la dedicatoria 06062009
+            if (codeDef.id === '06062009') {
+                if (titleEl) titleEl.innerHTML = `✨ Starlight Tribute <span class="block text-xs font-serif text-pink-300 font-normal mt-1">06 · 06 · 2009</span>`;
+                if (phraseEl) phraseEl.className = 'text-sm font-serif italic text-pink-100 leading-relaxed px-4 py-3 bg-pink-500/15 rounded-2xl border border-pink-400/30 shadow-lg shadow-pink-950/50 block text-center';
+            } else {
+                if (phraseEl) phraseEl.className = 'text-xs font-serif italic text-purple-200/90 leading-relaxed px-2';
+            }
+
             const closeModal = () => {
                 window.HapticsModule?.light?.();
+                modal.classList.remove('active');
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
             };
 
             if (actionBtn) {
-                actionBtn.innerHTML = `<span>${codeDef.actionLabel || 'Activar Recompensa'}</span>`;
+                const isFont = (codeDef.type === 'font');
+                const isCurrentlyActive = isFont
+                    ? false
+                    : (codeDef.themeId && window.StorageModule.getActiveSpecialTheme() === codeDef.themeId);
+
+                actionBtn.innerHTML = `<span>${isCurrentlyActive ? 'Desactivar Tema' : (codeDef.actionLabel || 'Activar Recompensa')}</span>`;
                 actionBtn.onclick = () => {
                     window.HapticsModule?.medium?.();
-                    if (codeDef.themeId) {
-                        window.StorageModule.setActiveSpecialTheme(codeDef.themeId);
-                        const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-gray'];
-                        specialClasses.forEach(c => document.documentElement.classList.remove(c));
-                        if (codeDef.themeClass) {
-                            document.documentElement.classList.add(codeDef.themeClass);
+                    if (isFont && codeDef.fontKey) {
+                        window.StorageModule.setFontFamily(codeDef.fontKey);
+                        this.applyFontFamily(codeDef.fontKey);
+                        this.showToast(`✨ ¡${codeDef.name} aplicada con éxito!`, 'success');
+                        this.syncSettingsFontButtons?.();
+                    } else if (codeDef.themeId) {
+                        const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
+                        if (isCurrentlyActive) {
+                            window.StorageModule.setActiveSpecialTheme('default');
+                            specialClasses.forEach(c => document.documentElement.classList.remove(c));
+                            this.showToast('Modo estándar restaurado', 'info');
+                        } else {
+                            window.StorageModule.setActiveSpecialTheme(codeDef.themeId);
+                            specialClasses.forEach(c => document.documentElement.classList.remove(c));
+                            if (codeDef.themeClass) {
+                                document.documentElement.classList.add(codeDef.themeClass);
+                            }
+                            this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
                         }
                     }
                     if (codeDef.supportsRockets) {
-                        window.StorageModule.setApolloRocketsEnabled(true);
+                        window.StorageModule.setApolloRocketsEnabled(!isCurrentlyActive);
                         this.updateApolloRockets();
                     }
                     if (codeDef.id === 'GATITOS_') {
@@ -2527,7 +2714,6 @@
                     }
                     closeModal();
                     this.renderVaultInventory();
-                    this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
                 };
             }
 
@@ -2545,17 +2731,16 @@
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            requestAnimationFrame(() => {
+                modal.classList.add('active');
+            });
         }
 
         renderVaultInventory() {
             const grid = document.getElementById('vault-unlocked-grid');
-            const counter = document.getElementById('vault-unlocked-counter');
             if (!grid) return;
 
             const unlocked = window.StorageModule.getUnlockedCodes();
-            if (counter) {
-                counter.textContent = `${unlocked.length} / 11`;
-            }
 
             if (unlocked.length === 0) {
                 grid.innerHTML = `
@@ -2569,6 +2754,7 @@
             }
 
             const currentSpecialTheme = window.StorageModule.getActiveSpecialTheme ? window.StorageModule.getActiveSpecialTheme() : 'default';
+            const currentFont = window.StorageModule.getFontFamily ? window.StorageModule.getFontFamily() : 'calibri';
 
             grid.innerHTML = unlocked.map(codeId => {
                 const def = VAULT_CATALOG[codeId] || {
@@ -2578,8 +2764,15 @@
                     category: 'CLASIFICADO',
                     themeId: codeId.toLowerCase()
                 };
-                const isActive = (def.themeId && currentSpecialTheme === def.themeId);
-                const buttonText = (def.id === '06062009') ? 'Ver Dedicatoria' : (isActive ? 'Desactivar' : 'Activar');
+                const isFont = (def.type === 'font');
+                const isActive = isFont
+                    ? (def.fontKey && currentFont === def.fontKey)
+                    : (def.themeId && currentSpecialTheme === def.themeId);
+                const buttonText = (def.id === '06062009')
+                    ? 'Ver Dedicatoria'
+                    : (isFont
+                        ? (isActive ? 'Restaurar Fuente Estándar' : 'Activar Tipografía')
+                        : (isActive ? 'Desactivar' : 'Activar'));
 
                 return `
                     <div class="vault-inventory-card truncate p-3 rounded-2xl bg-slate-900/80 dark:bg-slate-950/80 border ${isActive ? 'border-emerald-400/60 shadow-lg shadow-emerald-950/40' : 'border-purple-500/20'} flex items-center justify-between gap-2.5 transition-all">
@@ -2620,12 +2813,29 @@
                         return;
                     }
 
+                    if (def.type === 'font' && def.fontKey) {
+                        const isCurrentlyActive = (window.StorageModule.getFontFamily() === def.fontKey);
+                        window.HapticsModule?.light?.();
+                        if (isCurrentlyActive) {
+                            window.StorageModule.setFontFamily('calibri');
+                            this.applyFontFamily('calibri');
+                            this.showToast('Fuente estándar Calibri restaurada', 'info');
+                        } else {
+                            window.StorageModule.setFontFamily(def.fontKey);
+                            this.applyFontFamily(def.fontKey);
+                            this.showToast(`✨ ${def.name} aplicada`, 'success');
+                        }
+                        this.syncSettingsFontButtons?.();
+                        this.renderVaultInventory();
+                        return;
+                    }
+
                     if (!def.themeId) return;
 
                     const isCurrentlyActive = (window.StorageModule.getActiveSpecialTheme() === def.themeId);
                     window.HapticsModule?.light?.();
 
-                    const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-gray'];
+                    const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
 
                     if (isCurrentlyActive) {
                         // Deactivate
@@ -2697,7 +2907,7 @@
             const Storage = window.StorageModule;
             if (!Storage?.getActiveSpecialTheme) return;
             const current = Storage.getActiveSpecialTheme();
-            const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus'];
+            const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
             specialClasses.forEach(c => document.documentElement.classList.remove(c));
 
             if (current && current !== 'default') {
@@ -2753,6 +2963,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const app = new App();
         window.App = app;
+        window.app = app;
         window.AppInstance = app;
         window.OrganizadorApp = app;
         app.init();

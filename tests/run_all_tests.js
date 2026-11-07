@@ -68,7 +68,7 @@ async function main() {
     const options = parseArgs();
 
     console.log(`${colors.bold}${colors.cyan}========================================================================${colors.reset}`);
-    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.3.1 Pingüino - End-to-End Headless Test Suite   ${colors.reset}`);
+    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.3.2 - End-to-End Headless Test Suite           ${colors.reset}`);
     console.log(`${colors.cyan}========================================================================${colors.reset}`);
     console.log(`${colors.dim}Target:  ${helpers.TARGET_URL}${colors.reset}`);
     console.log(`${colors.dim}Binary:  ${helpers.CHROME_PATH}${colors.reset}`);
@@ -87,7 +87,7 @@ async function main() {
 
     const summary = {
         timestamp: new Date().toISOString(),
-        version: '1.3.1',
+        version: '1.3.2',
         total: 0,
         passed: 0,
         failed: 0,

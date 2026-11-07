@@ -591,7 +591,10 @@ window.StorageModule = (() => {
             return localStorage.getItem(KEYS.FONT_FAMILY) || 'calibri';
         },
         setFontFamily(font) {
-            const valid = ['calibri', 'times', 'montserrat', 'lora', 'poppins'];
+            const valid = [
+                'calibri', 'times', 'montserrat', 'lora', 'poppins',
+                'readable', 'firacode', 'playfair', 'caveat', 'orbitron'
+            ];
             const chosen = valid.includes(font) ? font : 'calibri';
             localStorage.setItem(KEYS.FONT_FAMILY, chosen);
             return chosen;

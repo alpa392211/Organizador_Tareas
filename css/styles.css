@@ -3,7 +3,7 @@
    Mobile-First & Android Hybrid Ready
    ======================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
     --inst-primary: #002B7A;
@@ -50,6 +50,39 @@
     font-family: var(--font-sans);
 }
 
+/* ========================================================
+   TIPOGRAFÍAS SECRETAS DESBLOQUEABLES (v1.3.2)
+   1. Lexend (Hiperlegible / Accesible) - code: READABLE
+   2. Fira Code (Monospace Hacker) - code: FIRACODE
+   3. Playfair Display (Editorial Serif) - code: PLAYFAIR
+   4. Caveat (Cuaderno / Manuscrito) - code: HANDNOTE
+   5. Orbitron (Cyberpunk HUD / Futurista) - code: ORBITRON
+   ======================================================== */
+:root[data-font="readable"], body[data-font="readable"] {
+    --font-sans: 'Lexend', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="firacode"], body[data-font="firacode"] {
+    --font-sans: 'Fira Code', 'Courier New', Consolas, monospace;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="playfair"], body[data-font="playfair"] {
+    --font-sans: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="caveat"], body[data-font="caveat"] {
+    --font-sans: 'Caveat', 'Comic Sans MS', cursive, sans-serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="orbitron"], body[data-font="orbitron"] {
+    --font-sans: 'Orbitron', 'Trebuchet MS', 'Arial Black', sans-serif;
+    font-family: var(--font-sans);
+}
+
 /* Modo Claro: Fondo gris suave relajante para evitar deslumbramientos */
 body {
     background-color: #eaeff5;
@@ -59,24 +92,24 @@ body {
     transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth);
 }
 
-/* Modo Claro: Contraste diferenciado para clases, tareas y tarjetas para que no se pierdan con el fondo (cuando NO es modo gris) */
-html:not(.dark):not(.theme-gray) .stagger-card,
-html:not(.dark):not(.theme-gray) .card-hover,
-html:not(.dark):not(.theme-gray) #view-subjects > div.bg-white,
-html:not(.dark):not(.theme-gray) #view-tasks > div.bg-white,
-html:not(.dark):not(.theme-gray) #view-notes > div.bg-white,
-html:not(.dark):not(.theme-gray) #view-archive > div.bg-white,
-html:not(.dark):not(.theme-gray) #archive-empty-state,
-html:not(.dark):not(.theme-gray) #view-settings > div.bg-white,
-html:not(.dark):not(.theme-gray) .settings-accordion-card {
+/* Modo Claro: Contraste diferenciado para clases, tareas y tarjetas para que no se pierdan con el fondo (cuando NO es tema especial) */
+html:not(.dark):not([class*="theme-"]) .stagger-card,
+html:not(.dark):not([class*="theme-"]) .card-hover,
+html:not(.dark):not([class*="theme-"]) #view-subjects > div.bg-white,
+html:not(.dark):not([class*="theme-"]) #view-tasks > div.bg-white,
+html:not(.dark):not([class*="theme-"]) #view-notes > div.bg-white,
+html:not(.dark):not([class*="theme-"]) #view-archive > div.bg-white,
+html:not(.dark):not([class*="theme-"]) #archive-empty-state,
+html:not(.dark):not([class*="theme-"]) #view-settings > div.bg-white,
+html:not(.dark):not([class*="theme-"]) .settings-accordion-card {
     background-color: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
     box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03) !important;
 }
 
-/* Modo Claro Estándar: Encabezado y Barra Inferior Limpios (cuando NO es modo gris) */
-html:not(.dark):not(.theme-gray) header,
-html:not(.dark):not(.theme-gray) #bottom-nav {
+/* Modo Claro Estándar: Encabezado y Barra Inferior Limpios (cuando NO es tema especial) */
+html:not(.dark):not([class*="theme-"]) header,
+html:not(.dark):not([class*="theme-"]) #bottom-nav {
     background-color: #ffffff !important;
     border-color: #e2e8f0 !important;
 }
@@ -91,9 +124,9 @@ html.dark body {
     color: #f8fafc;
 }
 
-/* Modo Oscuro Estándar: Encabezado y Barra Inferior Azul Marino Elegante (cuando NO es modo gris) */
-html.dark:not(.theme-gray) header,
-html.dark:not(.theme-gray) #bottom-nav {
+/* Modo Oscuro Estándar: Encabezado y Barra Inferior Azul Marino Elegante (cuando NO es tema especial) */
+html.dark:not([class*="theme-"]) header,
+html.dark:not([class*="theme-"]) #bottom-nav {
     background-color: #0f172a !important;
     border-color: #1e293b !important;
 }
@@ -1209,17 +1242,40 @@ html:not(.dark).theme-gray #cal-days-grid button span {
 }
 
 /* ========================================================
-   TEMAS ESPECIALES CLASIFICADOS DE LA BÓVEDA (M2)
+   TEMAS ESPECIALES CLASIFICADOS DE LA BÓVEDA (v1.3.2)
+   Visibilidad y transformación total en Modo Claro y Oscuro
    ======================================================== */
 
-/* Apollo 11: Cósmico Interestelar */
+/* 1. Apollo 11: Cósmico Interestelar */
 html.theme-apollo body {
     background: radial-gradient(circle at 50% 20%, #0d122b 0%, #060914 70%, #020308 100%) !important;
+    color: #f1f5f9 !important;
 }
 html.theme-apollo header,
-html.theme-apollo #bottom-nav {
-    background: rgba(10, 15, 35, 0.95) !important;
+html.theme-apollo #bottom-nav,
+html.theme-apollo #sidebar-drawer {
+    background: rgba(10, 15, 35, 0.96) !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+html.theme-apollo .stagger-card,
+html.theme-apollo .card-hover,
+html.theme-apollo .settings-accordion-card,
+html.theme-apollo #view-subjects > div.bg-white,
+html.theme-apollo #view-tasks > div.bg-white,
+html.theme-apollo #view-notes > div.bg-white,
+html.theme-apollo #view-archive > div.bg-white,
+html.theme-apollo #view-settings > div.bg-white {
+    background-color: rgba(13, 20, 48, 0.92) !important;
     border-color: rgba(99, 102, 241, 0.3) !important;
+    color: #f8fafc !important;
+}
+html.theme-apollo .text-slate-900,
+html.theme-apollo .text-slate-800 {
+    color: #f8fafc !important;
+}
+html.theme-apollo .text-slate-600,
+html.theme-apollo .text-slate-700 {
+    color: #cbd5e1 !important;
 }
 html.theme-apollo .fab-gradient-action,
 html.theme-apollo #bottom-main-circle {
@@ -1227,14 +1283,36 @@ html.theme-apollo #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(249, 115, 22, 0.5) !important;
 }
 
-/* Eduardo VIP: Tema Maestro Dorado */
+/* 2. Eduardo VIP: Tema Maestro Dorado */
 html.theme-eduardo-gold body {
     background: radial-gradient(circle at 50% 20%, #231908 0%, #130d04 70%, #080501 100%) !important;
+    color: #fef3c7 !important;
 }
 html.theme-eduardo-gold header,
-html.theme-eduardo-gold #bottom-nav {
-    background: rgba(28, 20, 6, 0.95) !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
+html.theme-eduardo-gold #bottom-nav,
+html.theme-eduardo-gold #sidebar-drawer {
+    background: rgba(28, 20, 6, 0.96) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+}
+html.theme-eduardo-gold .stagger-card,
+html.theme-eduardo-gold .card-hover,
+html.theme-eduardo-gold .settings-accordion-card,
+html.theme-eduardo-gold #view-subjects > div.bg-white,
+html.theme-eduardo-gold #view-tasks > div.bg-white,
+html.theme-eduardo-gold #view-notes > div.bg-white,
+html.theme-eduardo-gold #view-archive > div.bg-white,
+html.theme-eduardo-gold #view-settings > div.bg-white {
+    background-color: rgba(36, 26, 8, 0.92) !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+    color: #fef9c3 !important;
+}
+html.theme-eduardo-gold .text-slate-900,
+html.theme-eduardo-gold .text-slate-800 {
+    color: #fef3c7 !important;
+}
+html.theme-eduardo-gold .text-slate-600,
+html.theme-eduardo-gold .text-slate-700 {
+    color: #fde68a !important;
 }
 html.theme-eduardo-gold .fab-gradient-action,
 html.theme-eduardo-gold #bottom-main-circle {
@@ -1242,14 +1320,36 @@ html.theme-eduardo-gold #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.5) !important;
 }
 
-/* Pingüino: Glacial Polar v1.3.1 */
+/* 3. Pingüino: Glacial Polar */
 html.theme-penguin body {
     background: radial-gradient(circle at 50% 20%, #081d2e 0%, #030d17 70%, #01060b 100%) !important;
+    color: #ecfeff !important;
 }
 html.theme-penguin header,
-html.theme-penguin #bottom-nav {
-    background: rgba(5, 21, 35, 0.95) !important;
-    border-color: rgba(6, 182, 212, 0.35) !important;
+html.theme-penguin #bottom-nav,
+html.theme-penguin #sidebar-drawer {
+    background: rgba(5, 21, 35, 0.96) !important;
+    border-color: rgba(6, 182, 212, 0.4) !important;
+}
+html.theme-penguin .stagger-card,
+html.theme-penguin .card-hover,
+html.theme-penguin .settings-accordion-card,
+html.theme-penguin #view-subjects > div.bg-white,
+html.theme-penguin #view-tasks > div.bg-white,
+html.theme-penguin #view-notes > div.bg-white,
+html.theme-penguin #view-archive > div.bg-white,
+html.theme-penguin #view-settings > div.bg-white {
+    background-color: rgba(6, 28, 46, 0.92) !important;
+    border-color: rgba(6, 182, 212, 0.3) !important;
+    color: #f0fdfa !important;
+}
+html.theme-penguin .text-slate-900,
+html.theme-penguin .text-slate-800 {
+    color: #ecfeff !important;
+}
+html.theme-penguin .text-slate-600,
+html.theme-penguin .text-slate-700 {
+    color: #a5f3fc !important;
 }
 html.theme-penguin .fab-gradient-action,
 html.theme-penguin #bottom-main-circle {
@@ -1257,14 +1357,36 @@ html.theme-penguin #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.45) !important;
 }
 
-/* Synthwave Neon 1984 */
+/* 4. Synthwave Neon 1984 */
 html.theme-synthwave body {
     background: radial-gradient(circle at 50% 20%, #240a33 0%, #12041c 70%, #07010a 100%) !important;
+    color: #fdf4ff !important;
 }
 html.theme-synthwave header,
-html.theme-synthwave #bottom-nav {
-    background: rgba(26, 7, 38, 0.95) !important;
-    border-color: rgba(236, 72, 153, 0.35) !important;
+html.theme-synthwave #bottom-nav,
+html.theme-synthwave #sidebar-drawer {
+    background: rgba(26, 7, 38, 0.96) !important;
+    border-color: rgba(236, 72, 153, 0.4) !important;
+}
+html.theme-synthwave .stagger-card,
+html.theme-synthwave .card-hover,
+html.theme-synthwave .settings-accordion-card,
+html.theme-synthwave #view-subjects > div.bg-white,
+html.theme-synthwave #view-tasks > div.bg-white,
+html.theme-synthwave #view-notes > div.bg-white,
+html.theme-synthwave #view-archive > div.bg-white,
+html.theme-synthwave #view-settings > div.bg-white {
+    background-color: rgba(35, 10, 50, 0.92) !important;
+    border-color: rgba(236, 72, 153, 0.3) !important;
+    color: #fae8ff !important;
+}
+html.theme-synthwave .text-slate-900,
+html.theme-synthwave .text-slate-800 {
+    color: #fdf4ff !important;
+}
+html.theme-synthwave .text-slate-600,
+html.theme-synthwave .text-slate-700 {
+    color: #f0abfc !important;
 }
 html.theme-synthwave .fab-gradient-action,
 html.theme-synthwave #bottom-main-circle {
@@ -1272,15 +1394,37 @@ html.theme-synthwave #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(236, 72, 153, 0.5) !important;
 }
 
-/* Terminal Matrix: Verde Fósforo Cyberspace */
+/* 5. Terminal Matrix: Verde Fósforo Cyberspace */
 html.theme-matrix body {
     background: #020804 !important;
     color: #10b981 !important;
 }
 html.theme-matrix header,
-html.theme-matrix #bottom-nav {
-    background: rgba(2, 12, 5, 0.95) !important;
-    border-color: rgba(16, 185, 129, 0.4) !important;
+html.theme-matrix #bottom-nav,
+html.theme-matrix #sidebar-drawer {
+    background: rgba(2, 12, 5, 0.96) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+}
+html.theme-matrix .stagger-card,
+html.theme-matrix .card-hover,
+html.theme-matrix .settings-accordion-card,
+html.theme-matrix #view-subjects > div.bg-white,
+html.theme-matrix #view-tasks > div.bg-white,
+html.theme-matrix #view-notes > div.bg-white,
+html.theme-matrix #view-archive > div.bg-white,
+html.theme-matrix #view-settings > div.bg-white {
+    background-color: rgba(4, 20, 10, 0.92) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    color: #6ee7b7 !important;
+}
+html.theme-matrix .text-slate-900,
+html.theme-matrix .text-slate-800,
+html.theme-matrix .text-slate-700 {
+    color: #10b981 !important;
+}
+html.theme-matrix .text-slate-600,
+html.theme-matrix .text-slate-500 {
+    color: #34d399 !important;
 }
 html.theme-matrix .fab-gradient-action,
 html.theme-matrix #bottom-main-circle {
@@ -1288,14 +1432,36 @@ html.theme-matrix #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.45) !important;
 }
 
-/* Jardín Zen / Sakura Cerezo */
+/* 6. Jardín Zen / Sakura Cerezo */
 html.theme-sakura body {
     background: radial-gradient(circle at 50% 20%, #261118 0%, #16080d 70%, #090204 100%) !important;
+    color: #fff1f2 !important;
 }
 html.theme-sakura header,
-html.theme-sakura #bottom-nav {
-    background: rgba(30, 13, 19, 0.95) !important;
-    border-color: rgba(244, 63, 94, 0.35) !important;
+html.theme-sakura #bottom-nav,
+html.theme-sakura #sidebar-drawer {
+    background: rgba(30, 13, 19, 0.96) !important;
+    border-color: rgba(244, 63, 94, 0.4) !important;
+}
+html.theme-sakura .stagger-card,
+html.theme-sakura .card-hover,
+html.theme-sakura .settings-accordion-card,
+html.theme-sakura #view-subjects > div.bg-white,
+html.theme-sakura #view-tasks > div.bg-white,
+html.theme-sakura #view-notes > div.bg-white,
+html.theme-sakura #view-archive > div.bg-white,
+html.theme-sakura #view-settings > div.bg-white {
+    background-color: rgba(38, 17, 24, 0.92) !important;
+    border-color: rgba(244, 63, 94, 0.3) !important;
+    color: #ffe4e6 !important;
+}
+html.theme-sakura .text-slate-900,
+html.theme-sakura .text-slate-800 {
+    color: #fff1f2 !important;
+}
+html.theme-sakura .text-slate-600,
+html.theme-sakura .text-slate-700 {
+    color: #fecdd3 !important;
 }
 html.theme-sakura .fab-gradient-action,
 html.theme-sakura #bottom-main-circle {
@@ -1303,14 +1469,36 @@ html.theme-sakura #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(244, 63, 94, 0.45) !important;
 }
 
-/* Modo Barista / Dark Roast Coffee */
+/* 7. Modo Barista / Dark Roast Coffee */
 html.theme-coffee body {
     background: radial-gradient(circle at 50% 20%, #24140b 0%, #150b06 70%, #080402 100%) !important;
+    color: #fef3c7 !important;
 }
 html.theme-coffee header,
-html.theme-coffee #bottom-nav {
-    background: rgba(28, 15, 8, 0.95) !important;
-    border-color: rgba(217, 119, 6, 0.35) !important;
+html.theme-coffee #bottom-nav,
+html.theme-coffee #sidebar-drawer {
+    background: rgba(28, 15, 8, 0.96) !important;
+    border-color: rgba(217, 119, 6, 0.4) !important;
+}
+html.theme-coffee .stagger-card,
+html.theme-coffee .card-hover,
+html.theme-coffee .settings-accordion-card,
+html.theme-coffee #view-subjects > div.bg-white,
+html.theme-coffee #view-tasks > div.bg-white,
+html.theme-coffee #view-notes > div.bg-white,
+html.theme-coffee #view-archive > div.bg-white,
+html.theme-coffee #view-settings > div.bg-white {
+    background-color: rgba(36, 20, 11, 0.92) !important;
+    border-color: rgba(217, 119, 6, 0.3) !important;
+    color: #fef3c7 !important;
+}
+html.theme-coffee .text-slate-900,
+html.theme-coffee .text-slate-800 {
+    color: #fef3c7 !important;
+}
+html.theme-coffee .text-slate-600,
+html.theme-coffee .text-slate-700 {
+    color: #fde68a !important;
 }
 html.theme-coffee .fab-gradient-action,
 html.theme-coffee #bottom-main-circle {
@@ -1318,14 +1506,36 @@ html.theme-coffee #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.45) !important;
 }
 
-/* Arcade Gamer 8-Bit */
+/* 8. Arcade Gamer 8-Bit */
 html.theme-arcade body {
     background: radial-gradient(circle at 50% 20%, #171126 0%, #0c0817 70%, #040209 100%) !important;
+    color: #fef08a !important;
 }
 html.theme-arcade header,
-html.theme-arcade #bottom-nav {
-    background: rgba(20, 14, 33, 0.95) !important;
-    border-color: rgba(234, 179, 8, 0.4) !important;
+html.theme-arcade #bottom-nav,
+html.theme-arcade #sidebar-drawer {
+    background: rgba(20, 14, 33, 0.96) !important;
+    border-color: rgba(234, 179, 8, 0.45) !important;
+}
+html.theme-arcade .stagger-card,
+html.theme-arcade .card-hover,
+html.theme-arcade .settings-accordion-card,
+html.theme-arcade #view-subjects > div.bg-white,
+html.theme-arcade #view-tasks > div.bg-white,
+html.theme-arcade #view-notes > div.bg-white,
+html.theme-arcade #view-archive > div.bg-white,
+html.theme-arcade #view-settings > div.bg-white {
+    background-color: rgba(26, 18, 43, 0.92) !important;
+    border-color: rgba(234, 179, 8, 0.35) !important;
+    color: #fef9c3 !important;
+}
+html.theme-arcade .text-slate-900,
+html.theme-arcade .text-slate-800 {
+    color: #fef08a !important;
+}
+html.theme-arcade .text-slate-600,
+html.theme-arcade .text-slate-700 {
+    color: #fde047 !important;
 }
 html.theme-arcade .fab-gradient-action,
 html.theme-arcade #bottom-main-circle {
@@ -1333,19 +1543,78 @@ html.theme-arcade #bottom-main-circle {
     box-shadow: 0 8px 24px -4px rgba(234, 179, 8, 0.5) !important;
 }
 
-/* Hiperenfoque / Modo Einstein */
+/* 9. Hiperenfoque / Modo Einstein */
 html.theme-hyperfocus body {
     background: radial-gradient(circle at 50% 20%, #091729 0%, #040c17 70%, #010408 100%) !important;
+    color: #eff6ff !important;
 }
 html.theme-hyperfocus header,
-html.theme-hyperfocus #bottom-nav {
-    background: rgba(7, 19, 36, 0.95) !important;
-    border-color: rgba(59, 130, 246, 0.4) !important;
+html.theme-hyperfocus #bottom-nav,
+html.theme-hyperfocus #sidebar-drawer {
+    background: rgba(7, 19, 36, 0.96) !important;
+    border-color: rgba(59, 130, 246, 0.45) !important;
+}
+html.theme-hyperfocus .stagger-card,
+html.theme-hyperfocus .card-hover,
+html.theme-hyperfocus .settings-accordion-card,
+html.theme-hyperfocus #view-subjects > div.bg-white,
+html.theme-hyperfocus #view-tasks > div.bg-white,
+html.theme-hyperfocus #view-notes > div.bg-white,
+html.theme-hyperfocus #view-archive > div.bg-white,
+html.theme-hyperfocus #view-settings > div.bg-white {
+    background-color: rgba(10, 26, 50, 0.92) !important;
+    border-color: rgba(59, 130, 246, 0.35) !important;
+    color: #dbeafe !important;
+}
+html.theme-hyperfocus .text-slate-900,
+html.theme-hyperfocus .text-slate-800 {
+    color: #eff6ff !important;
+}
+html.theme-hyperfocus .text-slate-600,
+html.theme-hyperfocus .text-slate-700 {
+    color: #bfdbfe !important;
 }
 html.theme-hyperfocus .fab-gradient-action,
 html.theme-hyperfocus #bottom-main-circle {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* 10. Starlight Tribute 06-06-2009: Dedicatoria Celestial */
+html.theme-starlight body {
+    background: radial-gradient(circle at 50% 20%, #1e0c2b 0%, #0d0517 70%, #05020a 100%) !important;
+    color: #fce7f3 !important;
+}
+html.theme-starlight header,
+html.theme-starlight #bottom-nav,
+html.theme-starlight #sidebar-drawer {
+    background: rgba(22, 9, 32, 0.96) !important;
+    border-color: rgba(236, 72, 153, 0.4) !important;
+}
+html.theme-starlight .stagger-card,
+html.theme-starlight .card-hover,
+html.theme-starlight .settings-accordion-card,
+html.theme-starlight #view-subjects > div.bg-white,
+html.theme-starlight #view-tasks > div.bg-white,
+html.theme-starlight #view-notes > div.bg-white,
+html.theme-starlight #view-archive > div.bg-white,
+html.theme-starlight #view-settings > div.bg-white {
+    background-color: rgba(29, 12, 42, 0.92) !important;
+    border-color: rgba(236, 72, 153, 0.3) !important;
+    color: #fdf2f8 !important;
+}
+html.theme-starlight .text-slate-900,
+html.theme-starlight .text-slate-800 {
+    color: #fce7f3 !important;
+}
+html.theme-starlight .text-slate-600,
+html.theme-starlight .text-slate-700 {
+    color: #fbcfe8 !important;
+}
+html.theme-starlight .fab-gradient-action,
+html.theme-starlight #bottom-main-circle {
+    background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(236, 72, 153, 0.5) !important;
 }
 
 

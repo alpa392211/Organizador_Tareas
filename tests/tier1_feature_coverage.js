@@ -51,13 +51,20 @@ const tests = [
     {
         id: 'T1_F01_04_version_tap_trigger_title',
         feature: 'F01',
-        name: 'Version pill has 5-tap trigger tooltip / title attribute',
+        name: 'Version pill does not have 5-tap secret trigger in v1.3.2',
         run: async (page, helpers) => {
-            const titleAttr = await page.evaluate(() => {
+            const check = await page.evaluate(async () => {
+                localStorage.removeItem('org_escolar_secret_unlocked');
                 const pill = document.getElementById('settings-version-pill');
-                return pill ? pill.getAttribute('title') : '';
+                const titleAttr = pill ? (pill.getAttribute('title') || '') : '';
+                if (pill) {
+                    for (let i = 0; i < 7; i++) pill.click();
+                }
+                const secretUnlocked = localStorage.getItem('org_escolar_secret_unlocked') === 'true';
+                return { titleAttr, secretUnlocked };
             });
-            helpers.assert(titleAttr && titleAttr.toLowerCase().includes('5'), 'Version pill must advertise 5 taps trigger in title attribute');
+            helpers.assertFalse(Boolean(check.titleAttr && check.titleAttr.toLowerCase().includes('5')), 'Version pill must not advertise 5 taps trigger in title attribute');
+            helpers.assertFalse(check.secretUnlocked, '5 taps on version pill must NOT trigger secret mode in v1.3.2');
         }
     },
     {
@@ -1134,6 +1141,120 @@ const tests = [
         run: async (page, helpers) => {
             const codes = ['ZENPEACE', 'COFFEE42'];
             helpers.assertTrue(codes.every(c => c.length >= 7), 'All codes must be formatted valid strings');
+        }
+    },
+    {
+        id: 'T1_F16_06_font_secret_codes_unlock_and_apply',
+        feature: 'F16',
+        name: 'Unlocking and live application of 5 typography secret codes (READABLE, FIRACODE, PLAYFAIR, HANDNOTE, ORBITRON)',
+        run: async (page, helpers) => {
+            const fontSpecs = [
+                {
+                    code: 'READABLE',
+                    alias: 'LEXEND24',
+                    fontKey: 'readable'
+                },
+                {
+                    code: 'FIRACODE',
+                    alias: 'HACKER88',
+                    fontKey: 'firacode'
+                },
+                {
+                    code: 'PLAYFAIR',
+                    alias: 'ROYALFNT',
+                    fontKey: 'playfair'
+                },
+                {
+                    code: 'HANDNOTE',
+                    alias: 'CAVEAT24',
+                    fontKey: 'caveat'
+                },
+                {
+                    code: 'ORBITRON',
+                    alias: 'CYBERFNT',
+                    fontKey: 'orbitron'
+                }
+            ];
+
+            const evaluation = await page.evaluate(async (specs) => {
+                const results = [];
+                const Storage = window.StorageModule;
+                const app = window.app || window.OrganizadorApp;
+
+                // 1. Verify all 5 codes exist in VaultCatalog and aliases resolve
+                for (const spec of specs) {
+                    const def = window.VaultCatalog?.[spec.code];
+                    const aliasTarget = window.VaultAliases?.[spec.alias];
+                    if (!def || def.type !== 'font' || def.fontKey !== spec.fontKey) {
+                        return { error: `VaultCatalog entry missing or invalid for ${spec.code}` };
+                    }
+                    if (aliasTarget !== spec.code) {
+                        return { error: `Alias ${spec.alias} does not map to ${spec.code}` };
+                    }
+
+                    // Unlock code
+                    Storage.unlockCode(spec.code);
+                    if (!Storage.isCodeUnlocked(spec.code)) {
+                        return { error: `Failed to unlock ${spec.code} in StorageModule` };
+                    }
+
+                    // Apply font family directly through Storage & App
+                    Storage.setFontFamily(spec.fontKey);
+                    app.applyFontFamily(spec.fontKey);
+                    app.syncSettingsFontButtons?.();
+
+                    const htmlFont = document.documentElement.getAttribute('data-font');
+                    const bodyFont = document.body.getAttribute('data-font');
+                    if (htmlFont !== spec.fontKey || bodyFont !== spec.fontKey) {
+                        return { error: `data-font mismatch for ${spec.fontKey}: html=${htmlFont}, body=${bodyFont}` };
+                    }
+
+                    // Verify dynamic button in Settings font grid
+                    const btn = document.querySelector(`#settings-font-buttons-grid [data-font-btn="${spec.fontKey}"]`);
+                    if (!btn) {
+                        return { error: `Dynamic button missing in #settings-font-buttons-grid for ${spec.fontKey}` };
+                    }
+                    const hasSecretBadge = btn.textContent.includes('Secreto');
+                    if (!hasSecretBadge) {
+                        return { error: `Secret badge missing on button for ${spec.fontKey}` };
+                    }
+
+                    results.push({
+                        code: spec.code,
+                        fontKey: spec.fontKey,
+                        htmlFont,
+                        bodyFont,
+                        btnFound: true
+                    });
+                }
+
+                // Verify Vault Inventory toggle behavior
+                app.renderVaultInventory();
+                const orbitronBtn = document.querySelector('[data-vault-toggle="ORBITRON"]');
+                if (!orbitronBtn) {
+                    return { error: 'ORBITRON toggle button missing in vault inventory' };
+                }
+                const activeLabel = orbitronBtn.textContent.trim();
+                orbitronBtn.click(); // deactivates to calibri
+                const deactivatedFont = document.documentElement.getAttribute('data-font');
+
+                orbitronBtn.click(); // reactivates to orbitron
+                const reactivatedFont = document.documentElement.getAttribute('data-font');
+
+                return {
+                    success: true,
+                    results,
+                    activeLabel,
+                    deactivatedFont,
+                    reactivatedFont
+                };
+            }, fontSpecs);
+
+            helpers.assert(!evaluation.error, evaluation.error || 'Evaluation succeeded');
+            helpers.assertTrue(evaluation.success, 'All 5 typography codes unlocked and applied');
+            helpers.assertEqual(evaluation.results.length, 5, 'Must have verified all 5 font codes');
+            helpers.assertEqual(evaluation.deactivatedFont, 'calibri', 'Deactivating font in inventory restores calibri');
+            helpers.assertEqual(evaluation.reactivatedFont, 'orbitron', 'Reactivating font in inventory sets orbitron');
         }
     },
 
