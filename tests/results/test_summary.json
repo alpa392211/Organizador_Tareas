@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-07T09:25:17.735Z",
+  "timestamp": "2026-11-07T09:39:36.473Z",
   "version": "1.3.4",
   "total": 410,
   "passed": 410,
   "failed": 0,
   "skipped": 0,
-  "durationMs": 18669,
+  "durationMs": 19661,
   "tiers": {
     "tier1": {
       "name": "Tier 1: Feature Coverage (Equivalence Classes)",
@@ -45,7 +45,7 @@
       "name": "Package.json contains version specification",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -54,7 +54,7 @@
       "name": "Settings version pill or indicator exists in DOM",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -63,7 +63,7 @@
       "name": "Index.html assets use query parameter versioning or relative paths",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -72,7 +72,7 @@
       "name": "Version pill does not have 5-tap secret trigger in v1.3.2",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -90,7 +90,7 @@
       "name": "Institutions catalog contains Mexican universities (UNAM, IPN, UAM)",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -108,7 +108,7 @@
       "name": "Institutions catalog or schema supports Argentina entries (UBA/UTN)",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -117,7 +117,7 @@
       "name": "Institutions catalog or schema supports Chile entries (UCH/PUC)",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -126,7 +126,7 @@
       "name": "Catalog institutions adhere to standard schema attributes",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -135,7 +135,7 @@
       "name": "Institutions or custom institutions carry country metadata",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -171,7 +171,7 @@
       "name": "Selected institution persists in StorageModule",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -198,7 +198,7 @@
       "name": "InstitutionsModule renderIconHtml handles fallback safely",
       "feature": "F04",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -243,7 +243,7 @@
       "name": "Saved custom school retains isCustom: true flag",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -252,7 +252,7 @@
       "name": "InstitutionsModule merges or handles custom school lookups",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -270,7 +270,7 @@
       "name": "HTML5 Canvas is available in browser context for downsampling",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -288,7 +288,7 @@
       "name": "Downsampled canvas Base64 payload is compact (<30KB)",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -333,7 +333,7 @@
       "name": "Header or subheader element exists to host institutional context",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -360,7 +360,7 @@
       "name": "Period selection supports arbitrary or custom text input",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -369,7 +369,7 @@
       "name": "Setting free-form custom period string succeeds in StorageModule",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -378,7 +378,7 @@
       "name": "Custom period is persisted directly in org_escolar_period key",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -414,7 +414,7 @@
       "name": "Storage.getAcademicPeriod does NOT revert to defaultPeriod when valid period is set",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -423,7 +423,7 @@
       "name": "Storage.setAcademicPeriod stores trimmed exact string",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -432,7 +432,7 @@
       "name": "Custom period survives page reload without resetting",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 101,
+      "durationMs": 123,
       "error": null
     },
     {
@@ -441,7 +441,7 @@
       "name": "Standard school with custom period retains the custom string across institution lookups",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -450,7 +450,7 @@
       "name": "Code comparison is case-insensitive (apollo11 == APOLLO11)",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 17,
+      "durationMs": 21,
       "error": null
     },
     {
@@ -468,7 +468,7 @@
       "name": "Creator code alias normalizer recognizes EDUARDO and variations",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -486,7 +486,7 @@
       "name": "Parser supports variable length codes without rigid 8-character truncation",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -495,7 +495,7 @@
       "name": "Vault view contains locked padlock element 🔒",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -504,7 +504,7 @@
       "name": "Vault card container supports animation / aura classes",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -549,7 +549,7 @@
       "name": "Modals use transition or animation classes on enter",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -558,7 +558,7 @@
       "name": "Dynamic notifications/toasts can present secret reveal message",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -567,7 +567,7 @@
       "name": "Badges and icon wrappers exist for celebrating unlocks",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -576,7 +576,7 @@
       "name": "Modals feature standard close/dismiss triggers",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -585,7 +585,7 @@
       "name": "Apollo 11 code can be persisted in unlocked codes array",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -594,7 +594,7 @@
       "name": "Activating Apollo theme adds theme-apollo class to documentElement",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -603,7 +603,7 @@
       "name": "Apollo rocket badge class is applied to action buttons or nav",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -612,7 +612,7 @@
       "name": "Apollo rockets can be toggled off via StorageModule setter",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 9,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -639,7 +639,7 @@
       "name": "Tribute text contains \"Tu eres alguien especial por conocer esta fecha...\"",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 9,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -666,7 +666,7 @@
       "name": "Dismissing tribute restores normal view without throwing",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -675,7 +675,7 @@
       "name": "Code EDUARDO persists in unlocked secret codes",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -684,7 +684,7 @@
       "name": "theme-eduardo-gold class can be applied to html element",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -702,7 +702,7 @@
       "name": "Gold theme defines distinct gold styling parameters",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -711,7 +711,7 @@
       "name": "theme-eduardo-gold class cleanly removable from document root",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -765,7 +765,7 @@
       "name": "Unlocking and live application of 5 typography secret codes (READABLE, FIRACODE, PLAYFAIR, HANDNOTE, ORBITRON)",
       "feature": "F16",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 9,
       "error": null
     },
     {
@@ -774,7 +774,7 @@
       "name": "Vault view section view-secret-codes exists in DOM",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 8,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -783,7 +783,7 @@
       "name": "Unlocked codes array can be rendered or mapped into UI items",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -801,7 +801,7 @@
       "name": "Inventory toggle persists active special theme in Storage",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -810,7 +810,7 @@
       "name": "When no codes unlocked, vault displays default prompt",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -819,7 +819,7 @@
       "name": "Apollo theme deactivation restores default styling",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -828,7 +828,7 @@
       "name": "Eduardo Gold theme deactivation cleanses class",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -846,7 +846,7 @@
       "name": "Special theme deactivation sets root class back to default",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -855,7 +855,7 @@
       "name": "Storage tracks active special theme as default when none active",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -864,7 +864,7 @@
       "name": "Settings section view-settings exists in DOM",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -873,7 +873,7 @@
       "name": "Settings contains institution and period settings",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -900,7 +900,7 @@
       "name": "Settings contains data storage / backup export import controls",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -945,7 +945,7 @@
       "name": "Special theme switches persist across reload",
       "feature": "F20",
       "status": "PASS",
-      "durationMs": 114,
+      "durationMs": 118,
       "error": null
     },
     {
@@ -954,7 +954,7 @@
       "name": "At 768px tablet width, zero horizontal scrollbar (scrollWidth <= innerWidth)",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 31,
+      "durationMs": 34,
       "error": null
     },
     {
@@ -963,7 +963,7 @@
       "name": "At 820px tablet width (iPad Air), zero horizontal scrollbar",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -972,7 +972,7 @@
       "name": "At 1024px tablet width (iPad Pro), zero horizontal scrollbar",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 16,
+      "durationMs": 27,
       "error": null
     },
     {
@@ -981,7 +981,7 @@
       "name": "Header container bounds elements within viewport width on tablet",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 20,
+      "durationMs": 27,
       "error": null
     },
     {
@@ -990,7 +990,7 @@
       "name": "Header school badge and identity fit comfortably on tablet",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 8,
       "error": null
     },
     {
@@ -1008,7 +1008,7 @@
       "name": "Calendar modal or view renders calendar grid cells",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1017,7 +1017,7 @@
       "name": "Main content containers enforce max-width constraint",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1026,7 +1026,7 @@
       "name": "Modals use flex centering (items-center justify-center)",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1035,7 +1035,7 @@
       "name": "Key action buttons provide adequate touch targets (>= 40px)",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -1044,7 +1044,7 @@
       "name": "At 375px width, bottom navigation bar #bottom-nav is visible and fixed",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 20,
+      "durationMs": 24,
       "error": null
     },
     {
@@ -1053,7 +1053,7 @@
       "name": "At 375px width, zero horizontal overflow (scrollWidth <= innerWidth)",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1062,7 +1062,7 @@
       "name": "Mobile FAB button #bottom-main-action-btn is clickable",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1080,7 +1080,7 @@
       "name": "Main content allows vertical scrolling on mobile",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 8,
+      "durationMs": 11,
       "error": null
     },
     {
@@ -1089,7 +1089,7 @@
       "name": "WidgetsModule payload specifies pendingTodayCount number property",
       "feature": "F24",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1098,7 +1098,7 @@
       "name": "WidgetsModule payload specifies nextTaskTitle property",
       "feature": "F24",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1107,7 +1107,7 @@
       "name": "WidgetsModule payload specifies nextTaskSubject property",
       "feature": "F24",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1143,7 +1143,7 @@
       "name": "Progress bar or cycle setup modal exists in DOM",
       "feature": "F25",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1179,7 +1179,7 @@
       "name": "package.json defines \"test\": \"node tests/run_all_tests.js\"",
       "feature": "F26",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1233,7 +1233,7 @@
       "name": "Corrupted localStorage JSON falls back gracefully without unhandled error",
       "feature": "F27",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1251,7 +1251,7 @@
       "name": "Switching views in rapid succession does not duplicate active sections",
       "feature": "F27",
       "status": "PASS",
-      "durationMs": 46,
+      "durationMs": 51,
       "error": null
     },
     {
@@ -1305,7 +1305,7 @@
       "name": "Icon generator script passes clean Python compilation syntax check",
       "feature": "F28",
       "status": "PASS",
-      "durationMs": 47,
+      "durationMs": 38,
       "error": null
     },
     {
@@ -1314,7 +1314,7 @@
       "name": "icon-192x192.png exists in assets/icons with non-zero size",
       "feature": "F29",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1323,7 +1323,7 @@
       "name": "icon-512x512.png exists in assets/icons with non-zero size",
       "feature": "F29",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1341,7 +1341,7 @@
       "name": "favicon-32x32.png and favicon-16x16.png exist in assets/icons",
       "feature": "F29",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1350,7 +1350,7 @@
       "name": "favicon.ico exists on disk and is referenced in index.html head",
       "feature": "F29",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 14,
       "error": null
     },
     {
@@ -1359,7 +1359,7 @@
       "name": "icon-maskable-192x192.png exists in assets/icons",
       "feature": "F30",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1368,7 +1368,7 @@
       "name": "icon-maskable-512x512.png exists in assets/icons",
       "feature": "F30",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1377,7 +1377,7 @@
       "name": "Web App Manifest declares purpose: maskable for icon descriptors",
       "feature": "F30",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1386,7 +1386,7 @@
       "name": "Icon generation script applies safe-zone scaling (<= 80%) for maskable icons",
       "feature": "F30",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1404,7 +1404,7 @@
       "name": "manifest.webmanifest exists and parses as valid W3C JSON",
       "feature": "F31",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1422,7 +1422,7 @@
       "name": "manifest.webmanifest and manifest.json match core properties identically",
       "feature": "F31",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1431,7 +1431,7 @@
       "name": "Manifest colors match spec: background #0c0143 and theme #4F46E5",
       "feature": "F31",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1440,7 +1440,7 @@
       "name": "index.html head declares link rel=\"manifest\" referencing manifest.webmanifest",
       "feature": "F31",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1449,7 +1449,7 @@
       "name": "sw.js exists and declares CACHE_NAME organizador-tareas-cache-v1.3.4",
       "feature": "F32",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1458,7 +1458,7 @@
       "name": "sw.js PRECACHE_ASSETS contains index.html, manifests, css, js modules, and icons",
       "feature": "F32",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1467,7 +1467,7 @@
       "name": "sw.js implements network-first navigation strategy with cache fallback",
       "feature": "F32",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1485,7 +1485,7 @@
       "name": "app.js checks for secure context / localhost before registering Service Worker",
       "feature": "F32",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1494,7 +1494,7 @@
       "name": "#pwa-settings-card element exists in DOM inside settings view",
       "feature": "F33",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1503,7 +1503,7 @@
       "name": "#pwa-install-settings-btn exists with installation action text",
       "feature": "F33",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1530,7 +1530,7 @@
       "name": "#drawer-pwa-install-btn exists in sidebar drawer for mobile access",
       "feature": "F33",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1539,7 +1539,7 @@
       "name": ".school-logo-frame rendered dimensions are exactly 32px by 32px",
       "feature": "F34",
       "status": "PASS",
-      "durationMs": 41,
+      "durationMs": 40,
       "error": null
     },
     {
@@ -1548,7 +1548,7 @@
       "name": "Settings institution cards rendered height is within 75px-85px compact bounds",
       "feature": "F34",
       "status": "PASS",
-      "durationMs": 79,
+      "durationMs": 94,
       "error": null
     },
     {
@@ -1557,7 +1557,7 @@
       "name": "Settings cards display micro-row metadata with uppercase country code pill",
       "feature": "F34",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 13,
       "error": null
     },
     {
@@ -1566,7 +1566,7 @@
       "name": "Currently active school card displays \"Actual\" badge or active border ring",
       "feature": "F34",
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 8,
       "error": null
     },
     {
@@ -1575,7 +1575,7 @@
       "name": "Custom school card displays \"⭐ Propia\" badge and edit button",
       "feature": "F34",
       "status": "PASS",
-      "durationMs": 14,
+      "durationMs": 25,
       "error": null
     },
     {
@@ -1584,7 +1584,7 @@
       "name": "#settings-institution-grid declares 2 to 5 responsive columns",
       "feature": "F35",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1602,7 +1602,7 @@
       "name": "Mobile 360px viewport has zero horizontal overflow in settings view",
       "feature": "F35",
       "status": "PASS",
-      "durationMs": 95,
+      "durationMs": 129,
       "error": null
     },
     {
@@ -1611,7 +1611,7 @@
       "name": "Tablet 768px viewport has zero horizontal overflow in settings view",
       "feature": "F35",
       "status": "PASS",
-      "durationMs": 44,
+      "durationMs": 41,
       "error": null
     },
     {
@@ -1620,7 +1620,7 @@
       "name": "Desktop 1280px viewport has zero horizontal overflow in settings view",
       "feature": "F35",
       "status": "PASS",
-      "durationMs": 70,
+      "durationMs": 38,
       "error": null
     },
     {
@@ -1629,7 +1629,7 @@
       "name": "#cycle-setup-modal contains strictly zero <select> elements",
       "feature": "F36",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -1656,7 +1656,7 @@
       "name": "#cycle-setup-welcome-form contains zero select or optgroup tags",
       "feature": "F36",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1683,7 +1683,7 @@
       "name": "#welcome-country-pills renders interactive country filter pills (> 5)",
       "feature": "F37",
       "status": "PASS",
-      "durationMs": 16,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1692,7 +1692,7 @@
       "name": "Country filter pills contain zero flag emojis (clean typography requirement)",
       "feature": "F37",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1701,7 +1701,7 @@
       "name": "Clicking country filter pill dynamically filters visible cards in #welcome-schools-grid",
       "feature": "F37",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 8,
       "error": null
     },
     {
@@ -1710,7 +1710,7 @@
       "name": "Clicking a school card (UNAM) updates #welcome-selected-school-box with institution details",
       "feature": "F37",
       "status": "PASS",
-      "durationMs": 8,
+      "durationMs": 25,
       "error": null
     },
     {
@@ -1719,7 +1719,7 @@
       "name": "#welcome-create-school-btn exists in DOM with \"Crear mi propia escuela\"",
       "feature": "F38",
       "status": "PASS",
-      "durationMs": 17,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -1728,7 +1728,7 @@
       "name": "Clicking #welcome-create-school-btn opens #custom-school-modal",
       "feature": "F38",
       "status": "PASS",
-      "durationMs": 18,
+      "durationMs": 20,
       "error": null
     },
     {
@@ -1746,7 +1746,7 @@
       "name": "Canceling custom school modal preserves welcome modal open state without corruption",
       "feature": "F38",
       "status": "PASS",
-      "durationMs": 370,
+      "durationMs": 371,
       "error": null
     },
     {
@@ -1755,7 +1755,7 @@
       "name": "Saving custom school automatically selects it in welcome modal and unlocks period selector",
       "feature": "F38",
       "status": "PASS",
-      "durationMs": 75,
+      "durationMs": 56,
       "error": null
     },
     {
@@ -1773,7 +1773,7 @@
       "name": "Clicking skip button applies pointer-events-none and opacity-40 to #welcome-period-container",
       "feature": "F39",
       "status": "PASS",
-      "durationMs": 21,
+      "durationMs": 22,
       "error": null
     },
     {
@@ -1782,7 +1782,7 @@
       "name": "#welcome-period-locked-msg guidance message is displayed when school is skipped",
       "feature": "F39",
       "status": "PASS",
-      "durationMs": 12,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -1791,7 +1791,7 @@
       "name": "#welcome-period-chips renders strictly 0 chips when in locked skipped state",
       "feature": "F39",
       "status": "PASS",
-      "durationMs": 11,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -1800,7 +1800,7 @@
       "name": "Selecting a school (UNAM) unlocks period container, clears lock message, and populates chips",
       "feature": "F39",
       "status": "PASS",
-      "durationMs": 23,
+      "durationMs": 29,
       "error": null
     },
     {
@@ -1818,7 +1818,7 @@
       "name": "StorageModule.isSchoolSkipped and setSchoolSkipped work cleanly",
       "feature": "F40",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1836,7 +1836,7 @@
       "name": "Header displays \"Sin institución\", \"Sin periodo\", and graduation cap 🎓 when unconfigured",
       "feature": "F40",
       "status": "PASS",
-      "durationMs": 66,
+      "durationMs": 45,
       "error": null
     },
     {
@@ -1845,7 +1845,7 @@
       "name": "Drawer displays \"Sin institución\", \"Sin periodo\", and graduation cap 🎓 matching header",
       "feature": "F40",
       "status": "PASS",
-      "durationMs": 25,
+      "durationMs": 39,
       "error": null
     },
     {
@@ -1854,7 +1854,7 @@
       "name": "Selecting school renders interactive .welcome-period-chip buttons",
       "feature": "F41",
       "status": "PASS",
-      "durationMs": 9,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -1863,7 +1863,7 @@
       "name": "Semestral school (UNAM) renders semestral period chips (1.º Semestre)",
       "feature": "F41",
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 8,
       "error": null
     },
     {
@@ -1890,7 +1890,7 @@
       "name": "Clicking \"✏️ Otro...\" reveals #welcome-custom-period-wrapper for manual input",
       "feature": "F41",
       "status": "PASS",
-      "durationMs": 20,
+      "durationMs": 18,
       "error": null
     },
     {
@@ -1908,7 +1908,7 @@
       "name": "index.html asset references include ?v=1.3.4 cache-busting parameter",
       "feature": "F42",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1917,7 +1917,7 @@
       "name": "Settings view version pill displays \"Versión 1.3.4\"",
       "feature": "F42",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1935,7 +1935,7 @@
       "name": "sw.js PRECACHE_ASSETS queries are unified to v=1.3.4 across all entries",
       "feature": "F42",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1944,7 +1944,7 @@
       "name": "package.json version matches strict semver pattern",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1953,7 +1953,7 @@
       "name": "Rapidly clicking version pill 20 times does not throw or crash",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1962,7 +1962,7 @@
       "name": "Version pill does not break layout at 320x480 extreme small screen",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 74,
+      "durationMs": 37,
       "error": null
     },
     {
@@ -2007,7 +2007,7 @@
       "name": "Lookup with 10,000 character string does not cause buffer panic",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2034,7 +2034,7 @@
       "name": "Filtering by empty string country returns all institutions or safe subset",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2043,7 +2043,7 @@
       "name": "Filtering with unknown country code like \"XX\" handles empty match safely",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2052,7 +2052,7 @@
       "name": "Filtering with script tags is sanitized and does not execute XSS",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2061,7 +2061,7 @@
       "name": "Rapidly switching country filters does not crash DOM or leak listeners",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -2070,7 +2070,7 @@
       "name": "Filter pills container wraps cleanly at 320px width without horizontal blowout",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -2088,7 +2088,7 @@
       "name": "Missing or corrupt fallback image path does not throw JS error",
       "feature": "F04",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -2106,7 +2106,7 @@
       "name": "renderIconHtml(null) returns empty string without throwing",
       "feature": "F04",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2124,7 +2124,7 @@
       "name": "Saving custom school with empty name does not create empty catalog ghost",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -2142,7 +2142,7 @@
       "name": "Custom school with 10,000 char name does not crash storage serialization",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2178,7 +2178,7 @@
       "name": "Massive 4000x4000 image downsampling bounds strictly to <= 256x256",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2187,7 +2187,7 @@
       "name": "Malformed Base64 string does not throw unhandled exception",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2196,7 +2196,7 @@
       "name": "Canvas uses image/png or preserve transparency to prevent black fill",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2205,7 +2205,7 @@
       "name": "Resized 256x256 image Base64 consumes under 30KB of LocalStorage quota",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2232,7 +2232,7 @@
       "name": "10,000 char extreme slogan does not break UI layout",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -2268,7 +2268,7 @@
       "name": "Setting whitespace-only period string handles trimming cleanly",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2277,7 +2277,7 @@
       "name": "5000 character period string handled without crash",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -2286,7 +2286,7 @@
       "name": "Period string with special symbols persists accurately",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2322,7 +2322,7 @@
       "name": "Storage.setAcademicPeriod with number coerces to string",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2349,7 +2349,7 @@
       "name": "Submitting empty code in vault triggers error feedback without crashing",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2358,7 +2358,7 @@
       "name": "Submitting whitespace-only code is handled gracefully",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2385,7 +2385,7 @@
       "name": "Malicious injections like \"' OR 1=1\" do not unlock vault",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2394,7 +2394,7 @@
       "name": "Clicking unlock trigger 30 times quickly triggers animation without race condition",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2448,7 +2448,7 @@
       "name": "Escape key event dispatched to window is tolerated without error",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 16,
+      "durationMs": 13,
       "error": null
     },
     {
@@ -2457,7 +2457,7 @@
       "name": "Clicking outside active modals preserves layout stability",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 12,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -2466,7 +2466,7 @@
       "name": "Modals at 320px width remain within viewport boundaries",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 20,
       "error": null
     },
     {
@@ -2475,7 +2475,7 @@
       "name": "Reward title with 500 characters wraps cleanly inside card",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -2484,7 +2484,7 @@
       "name": "Code \"\nAPOLLO11\n\" normalizes cleanly to \"APOLLO11\"",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 11,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -2493,7 +2493,7 @@
       "name": "Toggling rockets enabled on and off 20 times maintains consistency",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -2502,7 +2502,7 @@
       "name": "Apollo theme coexists with dark mode class",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 85,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2511,7 +2511,7 @@
       "name": "Apollo theme coexists when dark class is removed (light mode)",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 27,
       "error": null
     },
     {
@@ -2538,7 +2538,7 @@
       "name": "Date formatting like \"06/06/2009\" normalizes to \"06062009\"",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2547,7 +2547,7 @@
       "name": "Tribute modal remains legible at compact 640x360 dimensions",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 101,
+      "durationMs": 74,
       "error": null
     },
     {
@@ -2556,7 +2556,7 @@
       "name": "Unlocking 06062009 does not overwrite active custom school or period",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -2583,7 +2583,7 @@
       "name": "Alias EDUARDO1 resolves to EDUARDO creator unlock",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -2601,7 +2601,7 @@
       "name": "Crown badge 👑 does not break surrounding element alignment",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -2610,7 +2610,7 @@
       "name": "Toggling Eduardo Gold theme 10 times leaves DOM in clean state",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 10,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2619,7 +2619,7 @@
       "name": "Looking up garbage string \"XYZ_RANDOM_999!\" returns invalid cleanly",
       "feature": "F16",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2664,7 +2664,7 @@
       "name": "Inventory handles empty array [] without crashing",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2673,7 +2673,7 @@
       "name": "Corrupted non-array string in unlocked codes recovers safely",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2682,7 +2682,7 @@
       "name": "Protocol with 200 character name truncates safely inside card",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 10,
       "error": null
     },
     {
@@ -2709,7 +2709,7 @@
       "name": "Setting special theme to unknown id falls back safely to \"default\"",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2745,7 +2745,7 @@
       "name": "Special themes do not clobber the \"dark\" class from documentElement",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2754,7 +2754,7 @@
       "name": "Rapidly opening and closing settings sections 20 times does not hang",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2763,7 +2763,7 @@
       "name": "UI remains stable and visible when all settings sections are collapsed",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2772,7 +2772,7 @@
       "name": "UI remains stable when all settings sections are expanded simultaneously",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2781,7 +2781,7 @@
       "name": "Settings elements remain within 320px viewport without horizontal blowout",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 35,
+      "durationMs": 22,
       "error": null
     },
     {
@@ -2790,7 +2790,7 @@
       "name": "Nested interactive elements maintain >= 36px touch targets",
       "feature": "F19",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2799,7 +2799,7 @@
       "name": "Switchboard renders cleanly when no special codes are unlocked",
       "feature": "F20",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2817,7 +2817,7 @@
       "name": "Locked switch cannot be activated when disabled attribute is present",
       "feature": "F20",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -2826,7 +2826,7 @@
       "name": "Tampered theme value in storage resets safely to default on load",
       "feature": "F20",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -2835,7 +2835,7 @@
       "name": "When all themes are switched off, default clean theme is active",
       "feature": "F20",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2844,7 +2844,7 @@
       "name": "Viewport 767px (mobile-tablet breakpoint boundary) has zero horizontal overflow",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 37,
+      "durationMs": 39,
       "error": null
     },
     {
@@ -2862,7 +2862,7 @@
       "name": "Tablet landscape orientation (1024x768) has zero horizontal overflow",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 35,
+      "durationMs": 37,
       "error": null
     },
     {
@@ -2871,7 +2871,7 @@
       "name": "Tablet portrait orientation (768x1024) has zero horizontal overflow",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 27,
+      "durationMs": 42,
       "error": null
     },
     {
@@ -2880,7 +2880,7 @@
       "name": "Header interactive buttons remain aligned and visible on tablet",
       "feature": "F21",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 12,
       "error": null
     },
     {
@@ -2889,7 +2889,7 @@
       "name": "Settings grid renders without element overlap at 768px",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 10,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2898,7 +2898,7 @@
       "name": "Calendar navigation buttons and days fit cleanly inside tablet width",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2907,7 +2907,7 @@
       "name": "Task cards do not stretch awkwardly across screen on tablet",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -2916,7 +2916,7 @@
       "name": "Modals on 768px tablet occupy <= 95% of viewport width",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 11,
       "error": null
     },
     {
@@ -2925,7 +2925,7 @@
       "name": "Large text scaling does not push buttons off screen on tablet",
       "feature": "F22",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 11,
       "error": null
     },
     {
@@ -2934,7 +2934,7 @@
       "name": "At 320px minimum screen width, zero horizontal scrollbar",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 35,
+      "durationMs": 36,
       "error": null
     },
     {
@@ -2943,7 +2943,7 @@
       "name": "At 480px large phone width, bottom nav remains aligned",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 8,
+      "durationMs": 14,
       "error": null
     },
     {
@@ -2952,7 +2952,7 @@
       "name": "Bottom nav provides clearance for fixed FAB button",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 13,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -2961,7 +2961,7 @@
       "name": "Task card with 500-char title wraps text without horizontal stretching",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 11,
       "error": null
     },
     {
@@ -2970,7 +2970,7 @@
       "name": "Drawer backdrop handles click/touch events without crashing",
       "feature": "F23",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -2979,7 +2979,7 @@
       "name": "Payload with 0 tasks computes pendingTodayCount: 0",
       "feature": "F24",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -2988,7 +2988,7 @@
       "name": "Payload with 100 tasks computes correctly without performance lag",
       "feature": "F24",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -3006,7 +3006,7 @@
       "name": "Task title of 1000 characters is preserved safely in payload",
       "feature": "F24",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -3015,7 +3015,7 @@
       "name": "Widget payload serializes cleanly to JSON without circular reference error",
       "feature": "F24",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3033,7 +3033,7 @@
       "name": "When 100% tasks are completed, pending counter shows 0",
       "feature": "F25",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -3042,7 +3042,7 @@
       "name": "Cycle progress percentage returns 0% when cycle starts today",
       "feature": "F25",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -3069,7 +3069,7 @@
       "name": "Passing invalid tier argument handled safely",
       "feature": "F26",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -3087,7 +3087,7 @@
       "name": "Unmatched filter regex matches zero tests without error",
       "feature": "F26",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3096,7 +3096,7 @@
       "name": "Results directory is creatable without throwing",
       "feature": "F26",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -3132,7 +3132,7 @@
       "name": "JSON payload containing __proto__ does not pollute Object prototype",
       "feature": "F27",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -3186,7 +3186,7 @@
       "name": "Zero horizontal overflow at 320px ultra-compact viewport in settings grid",
       "feature": "F34",
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 17,
       "error": null
     },
     {
@@ -3195,7 +3195,7 @@
       "name": "Extreme compact viewport (320px) keeps settings school cards height within <= 85px",
       "feature": "F35",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -3204,7 +3204,7 @@
       "name": "Modal stacking and cancellation preserves welcome modal state without corruption",
       "feature": "F36",
       "status": "PASS",
-      "durationMs": 386,
+      "durationMs": 379,
       "error": null
     },
     {
@@ -3213,7 +3213,7 @@
       "name": "Rapid clicking across country filter pills does not desync visible cards or throw errors",
       "feature": "F37",
       "status": "PASS",
-      "durationMs": 9,
+      "durationMs": 11,
       "error": null
     },
     {
@@ -3222,7 +3222,7 @@
       "name": "Custom school modal computed z-index (60) is strictly greater than welcome modal (50)",
       "feature": "F38",
       "status": "PASS",
-      "durationMs": 15,
+      "durationMs": 30,
       "error": null
     },
     {
@@ -3231,7 +3231,7 @@
       "name": "Rapid toggle between schools and \"Hacerla después\" does not corrupt period lock state machine",
       "feature": "F39",
       "status": "PASS",
-      "durationMs": 61,
+      "durationMs": 66,
       "error": null
     },
     {
@@ -3258,7 +3258,7 @@
       "name": "Custom free-form period with emojis, whitespace, and special characters stored safely",
       "feature": "F41",
       "status": "PASS",
-      "durationMs": 9,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3267,7 +3267,7 @@
       "name": "Custom free-form period empty string input recovers cleanly without crashing",
       "feature": "F41",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -3285,7 +3285,7 @@
       "name": "Custom School + Apollo Space Theme on Tablet Viewport (768px)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 120,
+      "durationMs": 228,
       "error": null
     },
     {
@@ -3294,7 +3294,7 @@
       "name": "Canvas Downsampled Logo + JSON Export/Import Roundtrip",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -3303,7 +3303,7 @@
       "name": "Normalized EDUARDO Code + Gold Theme + Mobile 375px + Widget Payload",
       "feature": null,
       "status": "PASS",
-      "durationMs": 70,
+      "durationMs": 124,
       "error": null
     },
     {
@@ -3312,7 +3312,7 @@
       "name": "Padlock Unlock Code -> Theme Activation -> Switchboard Deactivation",
       "feature": null,
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -3321,7 +3321,7 @@
       "name": "06062009 Tribute Unlock + Free-Form Custom Period Retention",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -3348,7 +3348,7 @@
       "name": "Tablet 768px 2-Column Settings + Themes Switchboard Interaction",
       "feature": null,
       "status": "PASS",
-      "durationMs": 75,
+      "durationMs": 96,
       "error": null
     },
     {
@@ -3357,7 +3357,7 @@
       "name": "Mobile 375px + Free-Form Period + Dashboard Quick Glance Sync",
       "feature": null,
       "status": "PASS",
-      "durationMs": 45,
+      "durationMs": 130,
       "error": null
     },
     {
@@ -3384,7 +3384,7 @@
       "name": "Apollo Cosmic Space Theme + Dark Mode State Interoperability",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3393,7 +3393,7 @@
       "name": "Eduardo Gold Theme + Custom Slogan in School Identity Modal",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3429,7 +3429,7 @@
       "name": "Padlock Unlock 06062009 -> Tribute Display -> Back Button Navigation",
       "feature": null,
       "status": "PASS",
-      "durationMs": 59,
+      "durationMs": 137,
       "error": null
     },
     {
@@ -3438,7 +3438,7 @@
       "name": "Multiple Unlocked Themes Swapped via Switchboard with Mutual Exclusion",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -3447,7 +3447,7 @@
       "name": "Tablet 820px Viewport + Calendar Modal Open + Custom Academic Period",
       "feature": null,
       "status": "PASS",
-      "durationMs": 188,
+      "durationMs": 131,
       "error": null
     },
     {
@@ -3456,7 +3456,7 @@
       "name": "Mobile 375px + Drawer Navigation + Secret Codes Trigger",
       "feature": null,
       "status": "PASS",
-      "durationMs": 87,
+      "durationMs": 102,
       "error": null
     },
     {
@@ -3465,7 +3465,7 @@
       "name": "5 Custom Schools with Downsampled Logos Consume < 150KB LocalStorage",
       "feature": null,
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3474,7 +3474,7 @@
       "name": "Multi-Format eduardo Input + Founder Badge Near Bottom FAB",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 10,
       "error": null
     },
     {
@@ -3483,7 +3483,7 @@
       "name": "Task with Deadline Linked to Custom Period Displays in Widget",
       "feature": null,
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -3492,7 +3492,7 @@
       "name": "Rocket Badge Toggle on Mobile FAB at 360px Viewport",
       "feature": null,
       "status": "PASS",
-      "durationMs": 17,
+      "durationMs": 14,
       "error": null
     },
     {
@@ -3501,7 +3501,7 @@
       "name": "Full State JSON Backup -> LocalStorage Purge -> State Restore Roundtrip",
       "feature": null,
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -3510,7 +3510,7 @@
       "name": "Selecting School -> Free-Form Period -> School Switch Retains Custom Period",
       "feature": null,
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3519,7 +3519,7 @@
       "name": "Custom School + Course Subject + Task Assignment + Widget Payload Sync",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3528,7 +3528,7 @@
       "name": "Tablet 820px Viewport Displays Dashboard Glance Without Overflow",
       "feature": null,
       "status": "PASS",
-      "durationMs": 72,
+      "durationMs": 67,
       "error": null
     },
     {
@@ -3537,7 +3537,7 @@
       "name": "Secret Vault Padlock Unlock Triggers Haptic Feedback Without Error",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -3546,7 +3546,7 @@
       "name": "Full Theme Cycle: Default -> Apollo -> Eduardo Gold -> Synthwave -> Default",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -3564,7 +3564,7 @@
       "name": "Offline Page Reload Preserves Custom School, Theme, and Unlocked Codes",
       "feature": null,
       "status": "PASS",
-      "durationMs": 479,
+      "durationMs": 515,
       "error": null
     },
     {
@@ -3573,7 +3573,7 @@
       "name": "Unconfigured school state + view switching across all 7 views with zero errors",
       "feature": null,
       "status": "PASS",
-      "durationMs": 211,
+      "durationMs": 216,
       "error": null
     },
     {
@@ -3582,7 +3582,7 @@
       "name": "Custom school cuatrimestral system + welcome modal + header/drawer live sync",
       "feature": null,
       "status": "PASS",
-      "durationMs": 531,
+      "durationMs": 527,
       "error": null
     },
     {
@@ -3591,7 +3591,7 @@
       "name": "Settings school change after skipped onboarding with clean period adaptation",
       "feature": null,
       "status": "PASS",
-      "durationMs": 440,
+      "durationMs": 437,
       "error": null
     },
     {
@@ -3600,7 +3600,7 @@
       "name": "PWA Settings Card + Apollo Space Theme on 768px Tablet Viewport",
       "feature": null,
       "status": "PASS",
-      "durationMs": 49,
+      "durationMs": 48,
       "error": null
     },
     {
@@ -3609,7 +3609,7 @@
       "name": "Unconfigured school + subject creation + task addition + widget sync",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -3618,7 +3618,7 @@
       "name": "Welcome modal on 820px tablet viewport + custom school modal z-stacking",
       "feature": null,
       "status": "PASS",
-      "durationMs": 86,
+      "durationMs": 93,
       "error": null
     },
     {
@@ -3627,7 +3627,7 @@
       "name": "Scenario 1: New International Student Onboarding (UBA -> Custom Period -> Task Addition -> DOM Render -> Widget Sync)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 505,
+      "durationMs": 597,
       "error": null
     },
     {
@@ -3636,7 +3636,7 @@
       "name": "Scenario 2: Private Academy Scholar (Custom School -> Canvas Logo -> Free-Form Period -> Slogan Display)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 16,
+      "durationMs": 17,
       "error": null
     },
     {
@@ -3645,7 +3645,7 @@
       "name": "Scenario 3: Secret Hunter Journey (Padlock Unlock -> Apollo11 -> 06062009 -> Eduardo Gold -> Switchboard Deactivation)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 176,
+      "durationMs": 190,
       "error": null
     },
     {
@@ -3654,7 +3654,7 @@
       "name": "Scenario 4: Cross-Device Responsiveness (Mobile 375px -> Tablet 768px -> Desktop 1280px)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 463,
+      "durationMs": 324,
       "error": null
     },
     {
@@ -3663,7 +3663,7 @@
       "name": "Scenario 5: Disaster Recovery & Migration Cycle (Full Data -> JSON Export -> Purge -> Import -> Restore)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 489,
+      "durationMs": 602,
       "error": null
     },
     {
@@ -3672,7 +3672,7 @@
       "name": "Scenario 6: Clean-slate onboarding with \"Hacerla después\", view navigation, settings configuration, and PWA readiness",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2116,
+      "durationMs": 2422,
       "error": null
     },
     {
@@ -3681,7 +3681,7 @@
       "name": "Scenario 7: Custom school creation during welcome onboarding with cuatrimestral system and persistence",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2505,
+      "durationMs": 2543,
       "error": null
     },
     {
@@ -3690,7 +3690,7 @@
       "name": "25 Rapid Jitter School Transitions preserve header, drawer, and storage synchronization",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1092,
+      "durationMs": 1358,
       "error": null
     },
     {
@@ -3699,7 +3699,7 @@
       "name": "Live Mobile Drawer DOM Mutation while drawer is open updates smoothly without desync",
       "feature": null,
       "status": "PASS",
-      "durationMs": 891,
+      "durationMs": 887,
       "error": null
     },
     {
@@ -3708,7 +3708,7 @@
       "name": "Modal stacking context: z-[60] custom school modal isolates clicks over z-50 welcome modal",
       "feature": null,
       "status": "PASS",
-      "durationMs": 514,
+      "durationMs": 527,
       "error": null
     },
     {
@@ -3717,7 +3717,7 @@
       "name": "Hard page reload preserves unconfigured and custom states with zero state drift",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1895,
+      "durationMs": 1763,
       "error": null
     },
     {
@@ -3726,7 +3726,7 @@
       "name": "Fail-closed runtime error audit: comprehensive DOM mutations with zero uncaught errors",
       "feature": null,
       "status": "PASS",
-      "durationMs": 79,
+      "durationMs": 94,
       "error": null
     }
   ]

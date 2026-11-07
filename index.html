@@ -706,17 +706,25 @@
         <section id="view-archive" class="hidden space-y-6">
             <!-- Banner Temático con Detalle Decorativo de Telarañas (Cajón Olvidado) -->
             <div class="relative overflow-hidden bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
-                <!-- Telaraña esquina superior izquierda (SVG sutil decorativo) -->
-                <svg class="cobweb-corner top-0 left-0" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                    <path d="M0,0 L100,0 C80,30 50,50 0,50 Z" stroke-width="0.8" class="text-slate-400 dark:text-slate-500"></path>
-                    <path d="M0,0 L70,70 M0,0 L35,85 M0,0 L85,35" stroke-width="0.6" stroke-dasharray="2 2" class="text-slate-400 dark:text-slate-500"></path>
-                    <path d="M20,0 C18,15 12,25 0,28 M45,0 C40,30 25,48 0,55 M75,0 C65,48 40,75 0,85" stroke-width="0.8" class="text-slate-400 dark:text-slate-500"></path>
+                <!-- Telaraña esquina superior izquierda (SVG decorativo con orientación natural) -->
+                <svg class="cobweb-corner top-0 left-0" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.8">
+                    <!-- Radios estructurales desde el vértice (0,0) -->
+                    <path d="M0,0 L100,0 M0,0 L90,32 M0,0 L70,70 M0,0 L32,90 M0,0 L0,100" class="text-slate-400 dark:text-slate-500"></path>
+                    <!-- Anillos concéntricos con curvatura cóncava tensada hacia el vértice -->
+                    <path d="M25,0 Q22,3 23.5,8.5 Q18.5,11 17.7,17.7 Q11,18.5 8.5,23.5 Q3,22 0,25" class="text-slate-400 dark:text-slate-500"></path>
+                    <path d="M50,0 Q44,6 47,17 Q37,22 35.4,35.4 Q22,37 17,47 Q6,44 0,50" class="text-slate-400 dark:text-slate-500"></path>
+                    <path d="M75,0 Q66,9 70.5,25.5 Q55.5,33 53,53 Q33,55.5 25.5,70.5 Q9,66 0,75" class="text-slate-400 dark:text-slate-500"></path>
+                    <path d="M98,0 Q86,12 92,33.5 Q72.5,43 69.3,69.3 Q43,72.5 33.5,92 Q12,86 0,98" stroke-dasharray="3 2" class="text-slate-400 dark:text-slate-500"></path>
                 </svg>
-                <!-- Telaraña esquina superior derecha (SVG sutil decorativo) -->
-                <svg class="cobweb-corner top-0 right-0 scale-x-[-1]" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                    <path d="M0,0 L100,0 C80,30 50,50 0,50 Z" stroke-width="0.8" class="text-slate-400 dark:text-slate-500"></path>
-                    <path d="M0,0 L70,70 M0,0 L35,85 M0,0 L85,35" stroke-width="0.6" stroke-dasharray="2 2" class="text-slate-400 dark:text-slate-500"></path>
-                    <path d="M20,0 C18,15 12,25 0,28 M45,0 C40,30 25,48 0,55 M75,0 C65,48 40,75 0,85" stroke-width="0.8" class="text-slate-400 dark:text-slate-500"></path>
+                <!-- Telaraña esquina superior derecha (SVG decorativo con vértice nativo en 100,0 hacia el interior) -->
+                <svg class="cobweb-corner top-0 right-0" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.8">
+                    <!-- Radios estructurales desde el vértice (100,0) -->
+                    <path d="M100,0 L0,0 M100,0 L10,32 M100,0 L30,70 M100,0 L68,90 M100,0 L100,100" class="text-slate-400 dark:text-slate-500"></path>
+                    <!-- Anillos concéntricos con curvatura cóncava tensada hacia el vértice -->
+                    <path d="M75,0 Q78,3 76.5,8.5 Q81.5,11 82.3,17.7 Q89,18.5 91.5,23.5 Q97,22 100,25" class="text-slate-400 dark:text-slate-500"></path>
+                    <path d="M50,0 Q56,6 53,17 Q63,22 64.6,35.4 Q78,37 83,47 Q94,44 100,50" class="text-slate-400 dark:text-slate-500"></path>
+                    <path d="M25,0 Q34,9 29.5,25.5 Q44.5,33 47,53 Q67,55.5 74.5,70.5 Q91,66 100,75" class="text-slate-400 dark:text-slate-500"></path>
+                    <path d="M2,0 Q14,12 8,33.5 Q27.5,43 30.7,69.3 Q57,72.5 66.5,92 Q88,86 100,98" stroke-dasharray="3 2" class="text-slate-400 dark:text-slate-500"></path>
                 </svg>
 
                 <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
