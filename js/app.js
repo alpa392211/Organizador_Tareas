@@ -1449,6 +1449,8 @@
                     window.TasksModule?.openAddModal?.();
                 };
             }
+
+            this.updateApolloRockets?.();
         }
 
         setupModalsAndShortcuts() {
@@ -2785,8 +2787,10 @@
                         }
                         if (codeDef.supportsRockets) {
                             window.StorageModule.setApolloRocketsEnabled(!isCurrentlyActive);
-                            this.updateApolloRockets();
+                        } else if (codeDef.themeId) {
+                            window.StorageModule.setApolloRocketsEnabled(false);
                         }
+                        this.updateApolloRockets();
                         if (codeDef.id === 'GATITOS_') {
                             window.StorageModule.unlockSecret();
                             window.StorageModule.setGrayModeEnabled(true);
@@ -2934,8 +2938,8 @@
                         specialClasses.forEach(c => document.documentElement.classList.remove(c));
                         if (def.supportsRockets) {
                             window.StorageModule.setApolloRocketsEnabled(false);
-                            this.updateApolloRockets();
                         }
+                        this.updateApolloRockets();
                         const savedTheme = window.StorageModule.getTheme() || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                         this.applyTheme(savedTheme, false);
                         this.showToast(`Modo estándar restaurado`, 'info');
@@ -2948,8 +2952,10 @@
                         }
                         if (def.supportsRockets) {
                             window.StorageModule.setApolloRocketsEnabled(true);
-                            this.updateApolloRockets();
+                        } else {
+                            window.StorageModule.setApolloRocketsEnabled(false);
                         }
+                        this.updateApolloRockets();
                         if (def.id === 'GATITOS_') {
                             window.StorageModule.unlockSecret();
                             window.StorageModule.setGrayModeEnabled(true);
@@ -2973,31 +2979,32 @@
             const Storage = window.StorageModule;
             const isApolloUnlocked = Storage?.isCodeUnlocked ? Storage.isCodeUnlocked('APOLLO11') : false;
             const rocketsEnabled = Storage?.getApolloRocketsEnabled ? Storage.getApolloRocketsEnabled() : false;
-            const useRockets = isApolloUnlocked && rocketsEnabled;
+            const activeTheme = Storage?.getActiveSpecialTheme ? Storage.getActiveSpecialTheme() : 'default';
+            const isApolloActive = (activeTheme === 'apollo' || activeTheme === 'theme_apollo' || activeTheme === 'theme-apollo');
+            const useRockets = isApolloUnlocked && rocketsEnabled && isApolloActive;
 
-            const targets = [
-                document.getElementById('bottom-main-action-btn'),
-                document.getElementById('bottom-main-circle'),
-                document.getElementById('add-task-btn'),
-                document.getElementById('add-note-btn'),
-                document.getElementById('add-subject-btn')
-            ];
+            // Limpieza absoluta de todo cohete existente en cualquier elemento para evitar duplicados y residuos
+            document.querySelectorAll('.apollo-rocket-badge').forEach(badge => badge.remove());
 
-            targets.forEach(btn => {
-                if (!btn) return;
-                let badge = btn.querySelector('.apollo-rocket-badge');
-                if (useRockets) {
-                    if (!badge) {
-                        badge = document.createElement('span');
-                        badge.className = 'apollo-rocket-badge select-none';
-                        badge.textContent = '🚀';
-                        btn.style.position = 'relative';
-                        btn.appendChild(badge);
-                    }
-                } else {
-                    if (badge) badge.remove();
-                }
-            });
+            if (useRockets) {
+                // Solo colocar un cohete en el botón central inferior (bottom-main-action-btn) y en los botones de añadir
+                const targets = [
+                    document.getElementById('bottom-main-action-btn'),
+                    document.getElementById('add-task-btn'),
+                    document.getElementById('add-note-btn'),
+                    document.getElementById('add-subject-btn')
+                ];
+
+                targets.forEach(btn => {
+                    if (!btn) return;
+                    btn.querySelectorAll('.apollo-rocket-badge').forEach(b => b.remove());
+                    const badge = document.createElement('span');
+                    badge.className = 'apollo-rocket-badge select-none';
+                    badge.textContent = '🚀';
+                    btn.style.position = 'relative';
+                    btn.appendChild(badge);
+                });
+            }
         }
 
         applySpecialThemeFromStorage() {
@@ -3018,6 +3025,7 @@
                     this.updateThemeUI('dark', false);
                 }
             }
+            this.updateApolloRockets();
         }
 
         showToast(message, type = 'info') {
