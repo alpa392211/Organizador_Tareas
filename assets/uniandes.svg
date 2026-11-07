@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="uniandes-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1A1A"/>
+      <stop offset="100%" stop-color="#0A0A0A"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#uniandes-bg)" stroke="#FDB813" stroke-width="3"/>
+  <!-- Círculo dorado con Séneca / Sabiduría -->
+  <circle cx="100" cy="95" r="50" fill="#FDB813" stroke="#FFFFFF" stroke-width="2"/>
+  <!-- Perfil clásico del filósofo Séneca -->
+  <path d="M92 65 C96 62 108 62 112 68 C115 72 112 78 116 80 C120 82 122 86 118 89 C114 91 118 94 116 98 C114 102 108 106 102 108 C96 110 90 120 86 124 H76 C78 116 82 108 84 100 C80 94 80 84 84 76 C86 70 88 66 92 65 Z" fill="#1A1A1A"/>
+  <!-- Cordillera de los Andes detrás -->
+  <path d="M56 125 L75 105 L92 120 L115 95 L144 125 Z" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="100" y="38" fill="#FDB813" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="900" text-anchor="middle" letter-spacing="2">UNIANDES</text>
+  <text x="100" y="172" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">UNIVERSIDAD DE LOS ANDES</text>
+</svg>

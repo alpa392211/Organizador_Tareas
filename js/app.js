@@ -8,10 +8,186 @@
  */
 
 (() => {
+    const VAULT_CATALOG = {
+        'APOLLO11': {
+            id: 'APOLLO11',
+            name: 'Misión Espacial Apollo 11',
+            icon: '🚀',
+            category: 'PROTOCOLO CÓSMICO',
+            themeId: 'apollo',
+            badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-400/30',
+            phrase: '«Un pequeño paso para el estudiante, un gran salto para tu semestre»',
+            description: 'Has desbloqueado el diseño cósmico interestelar. Despliega fondos galácticos profundos, propulsores 🚀 en botones principales y lluvia de cohetes espaciales al completar asignaciones.',
+            actionLabel: 'Activar Tema Apollo 11 🚀',
+            themeClass: 'theme-apollo',
+            supportsRockets: true
+        },
+        '06062009': {
+            id: '06062009',
+            name: 'Starlight Tribute 06-06-2009',
+            icon: '✨',
+            category: 'DEDICATORIA PRIVADA',
+            themeId: 'starlight',
+            badgeClass: 'bg-pink-500/20 text-pink-300 border-pink-400/30',
+            phrase: 'Tu eres alguien especial por conocer esta fecha...',
+            description: 'Bajo el manto de las estrellas del 6 de junio de 2009, este protocolo conmemorativo rinde homenaje a un lazo eterno que trasciende el tiempo y el espacio. Gracias por custodiar este instante inolvidable.',
+            actionLabel: 'Guardar en mi Memoria ✨',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'EDUARDO': {
+            id: 'EDUARDO',
+            name: 'Protocolo Creador Eduardo VIP',
+            icon: '👑',
+            category: 'CREDENCIAL DE FUNDADOR',
+            themeId: 'eduardo-gold',
+            badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
+            phrase: '«Reconocimiento de Autoría y Excelencia al Creador»',
+            description: '¡Bienvenido, Eduardo! Has activado la credencial de Fundador y el Tema Maestro Dorado, reservado con acabados en oro pulido, acentos de corona VIP 👑 y bordes de máxima distinción estudiantil.',
+            actionLabel: 'Activar Tema Maestro Dorado 👑',
+            themeClass: 'theme-eduardo-gold',
+            supportsRockets: false
+        },
+        'PINGUINO': {
+            id: 'PINGUINO',
+            name: 'Edición Glacial v1.3.1 Pingüino',
+            icon: '🐧',
+            category: 'VERSIÓN MAESTRA',
+            themeId: 'penguin',
+            badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
+            phrase: '«Elegancia polar, resistencia bajo cero y concentración absoluta»',
+            description: 'Tema conmemorativo oficial de la versión 1.3.1 "Pingüino". Acentos en cian polar glacial, pingüinos vigilando tus metas y escarcha visual en recordatorios.',
+            actionLabel: 'Activar Modo Polar Pingüino 🐧',
+            themeClass: 'theme-penguin',
+            supportsRockets: false
+        },
+        'RETRO80S': {
+            id: 'RETRO80S',
+            name: 'Synthwave Neon 1984',
+            icon: '🌆',
+            category: 'RETROFUTURISMO',
+            themeId: 'synthwave',
+            badgeClass: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-400/30',
+            phrase: '«Conduciendo por la autopista digital bajo el sol poniente de neón»',
+            description: 'Estética cyberpunk retro con degradados en magenta electrizante, violeta y cian brillante. Perfecto para sesiones de programación o estudio con música lo-fi.',
+            actionLabel: 'Activar Synthwave Neón 🌆',
+            themeClass: 'theme-synthwave',
+            supportsRockets: false
+        },
+        'MATRIX99': {
+            id: 'MATRIX99',
+            name: 'Terminal Matrix / Cyberspace',
+            icon: '🟢',
+            category: 'HACKER PROTOCOL',
+            themeId: 'matrix',
+            badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+            phrase: '«Despierta, estudiante... Matrix tiene tus materias»',
+            description: 'Modo consola monocromática verde fósforo sobre negro azabache puro. Tipografía monoespaciada con aura de terminal UNIX y cero distracciones.',
+            actionLabel: 'Entrar a la Matrix 🟢',
+            themeClass: 'theme-matrix',
+            supportsRockets: false
+        },
+        'ZENPEACE': {
+            id: 'ZENPEACE',
+            name: 'Jardín Zen / Cerezo Sakura',
+            icon: '🌸',
+            category: 'BIENESTAR Y PAZ',
+            themeId: 'sakura',
+            badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-400/30',
+            phrase: '«Calma mental y serenidad ante los exámenes finales»',
+            description: 'Paleta pastel inspirada en la flor de cerezo y jardines tradicionales de Kioto. Suaviza la fatiga visual con tonos rosa tenue y verde salvia pacífico.',
+            actionLabel: 'Activar Jardín Zen 🌸',
+            themeClass: 'theme-sakura',
+            supportsRockets: false
+        },
+        'COFFEE42': {
+            id: 'COFFEE42',
+            name: 'Modo Barista / Dark Roast',
+            icon: '☕',
+            category: 'ESTUDIO NOCTURNO',
+            themeId: 'coffee',
+            badgeClass: 'bg-amber-600/20 text-amber-300 border-amber-600/30',
+            phrase: '«La respuesta a la vida, el universo y una taza de café perfecta»',
+            description: 'Gama aromática de moka, caramelo y café tostado profundo. Diseñado para acompañar tus largas noches de lecturas académicas con una sensación cálida y acogedora.',
+            actionLabel: 'Servir Café Tostado ☕',
+            themeClass: 'theme-coffee',
+            supportsRockets: false
+        },
+        'ARCADE90': {
+            id: 'ARCADE90',
+            name: 'Arcade Gamer 8-Bit',
+            icon: '👾',
+            category: 'NOSTALGIA RETRO',
+            themeId: 'arcade',
+            badgeClass: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+            phrase: '«INSERT COIN TO STUDY • HIGH SCORE: 10.0 EN CÁLCULO»',
+            description: 'Viaja a los salones recreativos de los 90. Insignias pixeladas, bordes llamativos retro y efectos de gamificación en el seguimiento de tus metas.',
+            actionLabel: 'Start Game 8-Bit 👾',
+            themeClass: 'theme-arcade',
+            supportsRockets: false
+        },
+        'STUDYMAX': {
+            id: 'STUDYMAX',
+            name: 'Hiperenfoque / Modo Einstein',
+            icon: '⚡',
+            category: 'ALTO RENDIMIENTO',
+            themeId: 'hyperfocus',
+            badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
+            phrase: '«Estado de flujo puro: 100% productividad, 0% procrastinación»',
+            description: 'Tema azul marino profundo de alto contraste optimizado para máxima legibilidad científica. Elimina elementos superfluos para entrar en sesión de estudio profundo.',
+            actionLabel: 'Activar Hiperenfoque ⚡',
+            themeClass: 'theme-hyperfocus',
+            supportsRockets: false
+        },
+        'GATITOS_': {
+            id: 'GATITOS_',
+            name: 'Felinos & Escala de Grises',
+            icon: '🐱',
+            category: 'EASTER EGG CLÁSICO',
+            themeId: 'gray',
+            badgeClass: 'bg-slate-500/20 text-slate-300 border-slate-400/30',
+            phrase: '«Miau... El modo secreto original del organizador»',
+            description: 'Desbloquea directamente desde la bóveda el clásico modo escala de grises monocromático y la celebración con gatitos juguetones 🐾 en cada tarea cumplida.',
+            actionLabel: 'Activar Gatitos y Modo Gris 🐱',
+            themeClass: 'theme-gray',
+            supportsRockets: false
+        }
+    };
+
+    const VAULT_ALIASES = {
+        // APOLLO11
+        'APOLLO11': 'APOLLO11', 'APOLLO': 'APOLLO11', 'APOLO11': 'APOLLO11', 'APOL-LO11': 'APOLLO11', 'APOLLO_1': 'APOLLO11',
+        // 06062009
+        '06062009': '06062009', '6062009': '06062009', '0606-2009': '06062009', '0606/2009': '06062009', '060609': '06062009', '06-06-2009': '06062009', '06/06/2009': '06062009',
+        // EDUARDO (7 letters!)
+        'EDUARDO': 'EDUARDO', 'EDUARDO1': 'EDUARDO', 'EDUARDO_': 'EDUARDO', 'EDUARD0': 'EDUARDO',
+        '0EDUARDO': 'EDUARDO', 'EDWARD00': 'EDUARDO', 'EDUARD': 'EDUARDO', 'EDWARDO': 'EDUARDO', 'EDUARDOO': 'EDUARDO',
+        // PINGUINO
+        'PINGUINO': 'PINGUINO', 'PENGUIN1': 'PINGUINO', 'PINGUIN0': 'PINGUINO', 'PENGUIN': 'PINGUINO', 'PINGUIN': 'PINGUINO',
+        // RETRO80S
+        'RETRO80S': 'RETRO80S', 'SYNTHWAV': 'RETRO80S', 'NEON1984': 'RETRO80S', 'RETRO80_': 'RETRO80S', 'RETRO80': 'RETRO80S',
+        // MATRIX99
+        'MATRIX99': 'MATRIX99', 'NEOHACKR': 'MATRIX99', 'CYBERNET': 'MATRIX99', 'MATRIX_1': 'MATRIX99', 'MATRIX': 'MATRIX99',
+        // ZENPEACE
+        'ZENPEACE': 'ZENPEACE', 'SAKURA01': 'ZENPEACE', 'MINIMAL_': 'ZENPEACE', 'ZENPEAC_': 'ZENPEACE', 'ZENPEAC': 'ZENPEACE',
+        // COFFEE42
+        'COFFEE42': 'COFFEE42', 'CAFECITO': 'COFFEE42', 'ESPRESSO': 'COFFEE42', 'COFFEE__': 'COFFEE42', 'COFFEE': 'COFFEE42',
+        // ARCADE90
+        'ARCADE90': 'ARCADE90', 'PIXEL8BT': 'ARCADE90', 'GAMEBOY_': 'ARCADE90', 'ARCADE__': 'ARCADE90', 'ARCADE': 'ARCADE90',
+        // STUDYMAX
+        'STUDYMAX': 'STUDYMAX', 'EINSTEIN': 'STUDYMAX', 'HYPERFOC': 'STUDYMAX', 'STUDY___': 'STUDYMAX', 'STUDY': 'STUDYMAX',
+        // GATITOS_
+        'GATITOS_': 'GATITOS_', 'GATITOS': 'GATITOS_', 'NEKOLUCK': 'GATITOS_', 'MEOWMEOW': 'GATITOS_', 'GATITO': 'GATITOS_'
+    };
+
+    window.VaultCatalog = VAULT_CATALOG;
+    window.VaultAliases = VAULT_ALIASES;
+
     class App {
         constructor() {
             this.currentView = 'subjects'; // 'subjects' | 'tasks' | 'notes' | 'calendar' | 'archive' | 'settings'
             this.activeInstitution = null;
+            this.selectedCountryFilter = 'all';
         }
 
         init() {
@@ -41,6 +217,8 @@
             this.initTheme();
             this.applyHeaderThemeBtnVisibility();
             this.applySecretFeaturesUI();
+            this.applySpecialThemeFromStorage();
+            this.updateApolloRockets();
 
             // 4. Inicializar y aplicar tipografía seleccionada (5 opciones con botones)
             this.initFontFamily();
@@ -67,6 +245,7 @@
             this.setupBottomActionButton();
             this.setupModalsAndShortcuts();
             this.setupSchoolIdentityModal();
+            this.setupCustomSchoolModal();
             this.setupCycleWelcomeModal();
             this.setupExitModal();
             this.setupSettingsView();
@@ -104,7 +283,7 @@
             // 10. Soporte para parámetros URL (Widgets de Android y Deep Linking)
             const urlParams = new URLSearchParams(window.location.search);
             const initialView = urlParams.get('view');
-            if (initialView && ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings'].includes(initialView)) {
+            if (initialView && ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'].includes(initialView)) {
                 this.switchView(initialView);
             }
             if (urlParams.get('openDrawer') === '1') {
@@ -536,37 +715,110 @@
 
         renderInstitutionGrid() {
             const grid = document.getElementById('settings-institution-grid');
-            if (!grid) return;
-
+            const pillsContainer = document.getElementById('settings-country-pills');
             const InstitutionsModule = window.InstitutionsModule;
-            const institutions = Object.values(InstitutionsModule.INSTITUTIONS);
-            const activeId = this.activeInstitution?.id || 'unam';
+            const Storage = window.StorageModule;
+            if (!grid || !InstitutionsModule) return;
 
-            grid.innerHTML = institutions.map(inst => {
+            const countries = InstitutionsModule.getCountries();
+            const allInstitutions = InstitutionsModule.getAllInstitutions();
+            const customSchools = Storage?.getCustomSchools?.() || [];
+            const activeId = this.activeInstitution?.id || 'unam';
+            const currentFilter = this.selectedCountryFilter || 'all';
+
+            // 1. Renderizar píldoras horizontales de filtro por país y Mis Escuelas
+            if (pillsContainer) {
+                const filterOptions = [
+                    { id: 'all', label: '🌐 Todas' },
+                    ...countries.map(c => ({ id: c.code, label: `${c.flag} ${c.name}` })),
+                    { id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }
+                ];
+
+                pillsContainer.innerHTML = filterOptions.map(opt => {
+                    const isSelected = opt.id === currentFilter;
+                    const pillClass = isSelected
+                        ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                        : 'bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
+
+                    return `
+                        <button type="button" data-country-filter="${opt.id}"
+                            class="tap-effect shrink-0 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap ${pillClass}">
+                            ${opt.label}
+                        </button>
+                    `;
+                }).join('');
+
+                pillsContainer.querySelectorAll('[data-country-filter]').forEach(btn => {
+                    btn.onclick = () => {
+                        this.selectedCountryFilter = btn.dataset.countryFilter;
+                        window.HapticsModule?.light();
+                        this.renderInstitutionGrid();
+                    };
+                });
+            }
+
+            // 2. Filtrar instituciones según selección activa
+            let filtered = [];
+            if (currentFilter === 'all') {
+                filtered = allInstitutions;
+            } else if (currentFilter === 'custom') {
+                filtered = allInstitutions.filter(inst => inst.isCustom);
+            } else {
+                filtered = allInstitutions.filter(inst => inst.countryCode === currentFilter);
+            }
+
+            // 3. Renderizar tarjetas en la rejilla
+            let cardsHtml = filtered.map(inst => {
                 const isActive = inst.id === activeId;
                 const activeClasses = isActive 
                     ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 shadow-md scale-[1.02]'
                     : 'bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200/80 dark:border-slate-700/70 hover:scale-[1.01]';
 
-                return `
-                    <button type="button" data-inst-id="${inst.id}"
-                        class="inst-grid-card tap-effect flex flex-col items-center text-center p-3 rounded-2xl border transition-all ${activeClasses}"
-                        title="Seleccionar ${inst.name}">
-                        <!-- Escudo oficial en contenedor de marco blanco permanente -->
-                        <div class="mb-2">
-                            ${InstitutionsModule.renderIconHtml(inst, 'w-12 h-12', 'w-full h-full object-contain')}
-                        </div>
-                        <span class="text-xs font-black text-slate-900 dark:text-white truncate w-full">
-                            ${inst.name}
-                        </span>
-                        <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full mt-0.5 font-medium">
-                            ${inst.systemType || inst.type}
-                        </span>
+                const editBtnHtml = inst.isCustom ? `
+                    <button type="button" data-edit-custom-id="${inst.id}"
+                        class="edit-custom-school-btn absolute top-2 right-2 p-1.5 rounded-lg bg-slate-100/90 hover:bg-indigo-100 text-slate-500 hover:text-indigo-600 dark:bg-slate-700/90 dark:hover:bg-slate-600 tap-effect transition-colors z-10"
+                        title="Editar ${inst.name}">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </button>
+                ` : '';
+
+                return `
+                    <div class="relative group">
+                        <button type="button" data-inst-id="${inst.id}"
+                            class="inst-grid-card tap-effect w-full flex flex-col items-center text-center p-3 rounded-2xl border transition-all ${activeClasses}"
+                            title="Seleccionar ${inst.name}">
+                            <!-- Escudo oficial en contenedor de marco blanco permanente -->
+                            <div class="mb-2">
+                                ${InstitutionsModule.renderIconHtml(inst, 'w-12 h-12', 'w-full h-full object-contain')}
+                            </div>
+                            <span class="text-xs font-black text-slate-900 dark:text-white truncate w-full flex items-center justify-center gap-1">
+                                <span class="text-xs">${inst.countryFlag || '🎓'}</span>
+                                <span class="truncate">${inst.name}</span>
+                            </span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full mt-0.5 font-medium">
+                                ${inst.systemType || inst.type}
+                            </span>
+                        </button>
+                        ${editBtnHtml}
+                    </div>
                 `;
             }).join('');
 
-            // Agregar manejadores de eventos a cada tarjeta del selector
+            // Agregar tarjeta interactiva "+ Crear Escuela"
+            const createCardHtml = `
+                <button type="button" id="grid-create-school-card"
+                    class="tap-effect flex flex-col items-center justify-center text-center p-3 rounded-2xl border-2 border-dashed border-indigo-300 dark:border-indigo-700/60 hover:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/80 transition-all text-indigo-600 dark:text-indigo-400 min-h-[110px]"
+                    title="Crear nueva escuela personalizada">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-xl mb-1.5 font-bold">
+                        ➕
+                    </div>
+                    <span class="text-xs font-black">Crear Escuela</span>
+                    <span class="text-[10px] text-indigo-500/80 font-medium">Personalizada</span>
+                </button>
+            `;
+            grid.innerHTML = cardsHtml + createCardHtml;
+
+            // Manejadores de eventos a cada tarjeta del selector
             grid.querySelectorAll('.inst-grid-card').forEach(card => {
                 card.onclick = () => {
                     const instId = card.dataset.instId;
@@ -575,6 +827,21 @@
                     this.showToast(`Institución seleccionada: ${this.activeInstitution.name}`, 'success');
                 };
             });
+
+            // Manejadores para editar escuelas personalizadas
+            grid.querySelectorAll('.edit-custom-school-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const schoolId = btn.dataset.editCustomId;
+                    this.openCustomSchoolModal(schoolId);
+                };
+            });
+
+            // Manejador botón crear en cuadrícula
+            const gridCreateBtn = document.getElementById('grid-create-school-card');
+            if (gridCreateBtn) {
+                gridCreateBtn.onclick = () => this.openCustomSchoolModal();
+            }
         }
 
         updatePeriodSelectors(inst) {
@@ -583,11 +850,16 @@
             const headerPeriodSelect = document.getElementById('header-period-select');
             const settingsPeriodSelect = document.getElementById('settings-period-select');
             const periodPillsContainer = document.getElementById('settings-period-pills');
+            const customPeriodInput = document.getElementById('custom-period-input');
+            const saveCustomPeriodBtn = document.getElementById('save-custom-period-btn');
             const headerPeriodLabel = document.getElementById('header-inst-period');
             const drawerPeriodLabel = document.getElementById('drawer-inst-period');
             const settingsPeriodBadge = document.getElementById('settings-inst-period-badge');
 
-            const activePeriod = inst.periods.includes(currentPeriod) ? currentPeriod : inst.defaultPeriod;
+            // Preservar periodo válido del usuario sin sobreescribir con defaultPeriod
+            const activePeriod = (typeof currentPeriod === 'string' && currentPeriod.trim().length > 0)
+                ? currentPeriod.trim()
+                : (inst?.defaultPeriod || '1.º Semestre');
             Storage.setAcademicPeriod(activePeriod);
 
             const optionsHtml = inst.periods.map(p => `
@@ -596,35 +868,66 @@
 
             if (headerPeriodSelect) {
                 headerPeriodSelect.innerHTML = optionsHtml;
+                if (!inst.periods.includes(activePeriod)) {
+                    const opt = document.createElement('option');
+                    opt.value = activePeriod;
+                    opt.textContent = activePeriod;
+                    headerPeriodSelect.appendChild(opt);
+                }
                 headerPeriodSelect.value = activePeriod;
             }
 
             if (settingsPeriodSelect) {
                 settingsPeriodSelect.innerHTML = optionsHtml;
+                if (!inst.periods.includes(activePeriod)) {
+                    const opt = document.createElement('option');
+                    opt.value = activePeriod;
+                    opt.textContent = activePeriod;
+                    settingsPeriodSelect.appendChild(opt);
+                }
                 settingsPeriodSelect.value = activePeriod;
             }
 
             // Renderizar grupo de botones tipo píldora para selección táctil hermosa
             if (periodPillsContainer) {
-                periodPillsContainer.innerHTML = inst.periods.map(p => {
-                    const isSelected = p === activePeriod;
-                    return `
-                        <button type="button" data-period-btn="${p}"
-                            class="period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                                isSelected
-                                    ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
-                                    : 'bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent'
-                            }">
-                            ${p}
-                        </button>
-                    `;
-                }).join('');
+                let pillsList = [...inst.periods];
+                if (!pillsList.includes(activePeriod)) {
+                    pillsList.push(activePeriod);
+                }
 
-                periodPillsContainer.querySelectorAll('.period-pill-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        this.setAcademicPeriod(btn.dataset.periodBtn);
-                    };
+                periodPillsContainer.innerHTML = '';
+                pillsList.forEach(p => {
+                    const isSelected = p === activePeriod;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.dataset.periodBtn = p;
+                    btn.className = `period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                        isSelected
+                            ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
+                            : 'bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent'
+                    }`;
+                    btn.textContent = p;
+                    btn.onclick = () => this.setAcademicPeriod(p);
+                    periodPillsContainer.appendChild(btn);
                 });
+            }
+
+            // Sincronizar input de periodo personalizado
+            if (customPeriodInput) {
+                customPeriodInput.value = inst.periods.includes(activePeriod) ? '' : activePeriod;
+                customPeriodInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = customPeriodInput.value.trim();
+                        if (val) this.setAcademicPeriod(val);
+                    }
+                };
+            }
+            if (saveCustomPeriodBtn) {
+                saveCustomPeriodBtn.onclick = () => {
+                    const val = customPeriodInput?.value?.trim();
+                    if (val) this.setAcademicPeriod(val);
+                };
             }
 
             if (headerPeriodLabel) headerPeriodLabel.textContent = activePeriod;
@@ -639,25 +942,65 @@
 
             const headerPeriodSelect = document.getElementById('header-period-select');
             const settingsPeriodSelect = document.getElementById('settings-period-select');
+            const customPeriodInput = document.getElementById('custom-period-input');
             const headerPeriodLabel = document.getElementById('header-inst-period');
             const drawerPeriodLabel = document.getElementById('drawer-inst-period');
             const settingsPeriodBadge = document.getElementById('settings-inst-period-badge');
 
-            if (headerPeriodSelect) headerPeriodSelect.value = period;
-            if (settingsPeriodSelect) settingsPeriodSelect.value = period;
+            if (headerPeriodSelect) {
+                const exists = Array.from(headerPeriodSelect.options).some(o => o.value === period);
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = period;
+                    opt.textContent = period;
+                    headerPeriodSelect.appendChild(opt);
+                }
+                headerPeriodSelect.value = period;
+            }
+            if (settingsPeriodSelect) {
+                const exists = Array.from(settingsPeriodSelect.options).some(o => o.value === period);
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = period;
+                    opt.textContent = period;
+                    settingsPeriodSelect.appendChild(opt);
+                }
+                settingsPeriodSelect.value = period;
+            }
             if (headerPeriodLabel) headerPeriodLabel.textContent = period;
             if (drawerPeriodLabel) drawerPeriodLabel.textContent = period;
             if (settingsPeriodBadge) settingsPeriodBadge.textContent = period;
 
-            // Actualizar estilo visual de los botones píldora en Ajustes
-            document.querySelectorAll('#settings-period-pills button[data-period-btn]').forEach(btn => {
-                const isSelected = btn.dataset.periodBtn === period;
-                if (isSelected) {
-                    btn.className = 'period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20';
-                } else {
-                    btn.className = 'period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent';
+            // Re-renderizar píldoras para que la personalizada o seleccionada aparezca y esté activa
+            const inst = this.activeInstitution || window.InstitutionsModule?.getInstitution('unam');
+            if (inst) {
+                const periodPillsContainer = document.getElementById('settings-period-pills');
+                if (periodPillsContainer) {
+                    let pillsList = [...inst.periods];
+                    if (!pillsList.includes(period)) {
+                        pillsList.push(period);
+                    }
+                    periodPillsContainer.innerHTML = '';
+                    pillsList.forEach(p => {
+                        const isSelected = p === period;
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.dataset.periodBtn = p;
+                        btn.className = `period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                            isSelected
+                                ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
+                                : 'bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent'
+                        }`;
+                        btn.textContent = p;
+                        btn.onclick = () => this.setAcademicPeriod(p);
+                        periodPillsContainer.appendChild(btn);
+                    });
                 }
-            });
+            }
+
+            if (customPeriodInput) {
+                customPeriodInput.value = (inst && inst.periods.includes(period)) ? '' : period;
+            }
 
             this.showToast(`Periodo actualizado: ${period}`, 'info');
         }
@@ -666,12 +1009,35 @@
             const headerInstSelect = document.getElementById('header-institution-select');
             const headerPeriodSelect = document.getElementById('header-period-select');
             const InstitutionsModule = window.InstitutionsModule;
+            const Storage = window.StorageModule;
 
-            if (headerInstSelect) {
-                headerInstSelect.innerHTML = Object.values(InstitutionsModule.INSTITUTIONS).map(inst => `
-                    <option value="${inst.id}">🎓 ${inst.name} - ${inst.systemType || inst.type}</option>
-                `).join('');
-                headerInstSelect.value = this.activeInstitution.id;
+            if (headerInstSelect && InstitutionsModule) {
+                const countries = InstitutionsModule.getCountries();
+                const builtIns = Object.values(InstitutionsModule.INSTITUTIONS);
+                const customSchools = Storage?.getCustomSchools?.() || [];
+
+                let html = '';
+                countries.forEach(c => {
+                    const groupSchools = builtIns.filter(inst => inst.countryCode === c.code);
+                    if (groupSchools.length > 0) {
+                        html += `<optgroup label="${c.flag} ${c.name}">`;
+                        groupSchools.forEach(inst => {
+                            html += `<option value="${inst.id}">🎓 ${inst.name} - ${inst.systemType || inst.shortBadge}</option>`;
+                        });
+                        html += `</optgroup>`;
+                    }
+                });
+
+                if (customSchools.length > 0) {
+                    html += `<optgroup label="⭐ Mis Escuelas Personalizadas">`;
+                    customSchools.forEach(cs => {
+                        html += `<option value="${cs.id}">⭐ ${cs.name} - ${cs.systemType || 'Personalizada'}</option>`;
+                    });
+                    html += `</optgroup>`;
+                }
+
+                headerInstSelect.innerHTML = html;
+                headerInstSelect.value = this.activeInstitution?.id || 'unam';
                 headerInstSelect.onchange = (e) => {
                     this.setInstitution(e.target.value);
                     this.showToast(`Institución seleccionada: ${this.activeInstitution.name}`, 'info');
@@ -742,6 +1108,7 @@
             if (viewName === 'calendar') window.CalendarModule?.render?.();
             if (viewName === 'archive') window.ArchiveModule?.render?.();
             if (viewName === 'settings') this.updateStorageMetrics();
+            if (viewName === 'secret-codes') this.renderVaultInventory();
 
             // Scroll suave hacia la parte superior
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1058,6 +1425,356 @@
         }
 
         /* ========================================================
+           MODAL CONSTRUCTOR DE ESCUELAS PERSONALIZADAS
+           ======================================================== */
+        setupCustomSchoolModal() {
+            const modal = document.getElementById('custom-school-modal');
+            const backdrop = document.getElementById('custom-school-backdrop');
+            const closeBtn = document.getElementById('custom-school-close-btn');
+            const cancelBtn = document.getElementById('custom-school-cancel-btn');
+            const form = document.getElementById('custom-school-form');
+            const openBtn = document.getElementById('open-create-school-btn');
+            const deleteBtn = document.getElementById('custom-school-delete-btn');
+            const titleEl = document.getElementById('custom-school-modal-title');
+
+            const idInput = document.getElementById('custom-school-id');
+            const nameInput = document.getElementById('custom-school-name');
+            const shortbadgeInput = document.getElementById('custom-school-shortbadge');
+            const fullnameInput = document.getElementById('custom-school-fullname');
+            const sloganInput = document.getElementById('custom-school-slogan');
+            const countrySelect = document.getElementById('custom-school-country');
+            const systemSelect = document.getElementById('custom-school-system');
+            const colorInput = document.getElementById('custom-school-color');
+            const colorPresets = document.getElementById('custom-school-color-presets');
+            const logoInput = document.getElementById('custom-school-logo-input');
+            const logoPreview = document.getElementById('custom-school-logo-preview');
+            const canvas = document.getElementById('custom-school-canvas') || document.createElement('canvas');
+
+            const Storage = window.StorageModule;
+            const InstitutionsModule = window.InstitutionsModule;
+
+            if (!modal) return;
+
+            // Población de países en el selector
+            if (countrySelect && InstitutionsModule) {
+                countrySelect.innerHTML = InstitutionsModule.getCountries().map(c => `
+                    <option value="${c.code}">${c.flag} ${c.name}</option>
+                `).join('');
+            }
+
+            // Población de presets de colores institucionales
+            if (colorPresets) {
+                const presets = [
+                    '#4F46E5', '#002B7A', '#6C1D45', '#E84D0E', '#006847',
+                    '#0039A6', '#0F6938', '#003A70', '#781D22', '#D32F2F', '#0083CA'
+                ];
+                colorPresets.innerHTML = presets.map(color => `
+                    <button type="button" data-preset-color="${color}"
+                        class="w-6 h-6 rounded-lg transition-transform hover:scale-110 border border-black/10 dark:border-white/10 shadow-2xs"
+                        style="background-color: ${color};" title="${color}"></button>
+                `).join('');
+
+                colorPresets.querySelectorAll('[data-preset-color]').forEach(btn => {
+                    btn.onclick = () => {
+                        if (colorInput) {
+                            colorInput.value = btn.dataset.presetColor;
+                            updatePreviewDefaultLogo();
+                        }
+                    };
+                });
+            }
+
+            const updatePreviewDefaultLogo = () => {
+                if (logoPreview && !logoPreview.dataset.customUploaded) {
+                    const initials = (shortbadgeInput?.value || nameInput?.value || 'ESC').trim().substring(0, 4).toUpperCase();
+                    const color = colorInput?.value || '#4F46E5';
+                    logoPreview.innerHTML = `
+                        <div class="w-full h-full rounded-xl flex items-center justify-center font-black text-sm text-white shadow-2xs"
+                            style="background-color: ${color};">
+                            ${initials || 'ESC'}
+                        </div>
+                    `;
+                }
+            };
+
+            if (nameInput) {
+                nameInput.oninput = () => {
+                    if (!shortbadgeInput.value || shortbadgeInput.dataset.auto) {
+                        shortbadgeInput.value = nameInput.value.substring(0, 6).toUpperCase();
+                        shortbadgeInput.dataset.auto = 'true';
+                    }
+                    updatePreviewDefaultLogo();
+                };
+            }
+            if (shortbadgeInput) {
+                shortbadgeInput.oninput = () => {
+                    delete shortbadgeInput.dataset.auto;
+                    updatePreviewDefaultLogo();
+                };
+            }
+            if (colorInput) {
+                colorInput.oninput = () => updatePreviewDefaultLogo();
+            }
+
+            // Manejo de archivo y downsampling con Canvas (max 256x256 px, <30 KB)
+            const downsampleAndPreviewLogo = (file) => {
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onerror = () => {
+                    window.AppInstance?.showToast?.('Error al leer el archivo seleccionado', 'error');
+                };
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onerror = () => {
+                        if (logoPreview) {
+                            delete logoPreview.dataset.customUploaded;
+                            delete logoPreview.dataset.logoBase64;
+                        }
+                        updatePreviewDefaultLogo();
+                        window.AppInstance?.showToast?.('Archivo de imagen no válido o dañado', 'error');
+                    };
+                    img.onload = () => {
+                        let maxDim = 256;
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) {
+                                h = Math.round((h * maxDim) / w);
+                                w = maxDim;
+                            } else {
+                                w = Math.round((w * maxDim) / h);
+                                h = maxDim;
+                            }
+                        }
+                        canvas.width = w;
+                        canvas.height = h;
+                        let ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, w, h);
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        // Probar compresión progresiva para garantizar < 30KB (~35,000 caracteres DataURI)
+                        let dataUrl = canvas.toDataURL('image/png');
+                        if (dataUrl.length > 35000) {
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        }
+                        if (dataUrl.length > 35000) {
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                        }
+                        if (dataUrl.length > 35000) {
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.45);
+                        }
+
+                        // Si aún excede 35,000 caracteres, reducir dimensiones a max 180x180 px
+                        if (dataUrl.length > 35000) {
+                            maxDim = 180;
+                            w = img.width;
+                            h = img.height;
+                            if (w > maxDim || h > maxDim) {
+                                if (w > h) {
+                                    h = Math.round((h * maxDim) / w);
+                                    w = maxDim;
+                                } else {
+                                    w = Math.round((w * maxDim) / h);
+                                    h = maxDim;
+                                }
+                            }
+                            canvas.width = w;
+                            canvas.height = h;
+                            ctx.clearRect(0, 0, w, h);
+                            ctx.drawImage(img, 0, 0, w, h);
+
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                            if (dataUrl.length > 35000) {
+                                dataUrl = canvas.toDataURL('image/jpeg', 0.45);
+                            }
+                        }
+
+                        if (logoPreview) {
+                            logoPreview.dataset.customUploaded = 'true';
+                            logoPreview.dataset.logoBase64 = dataUrl;
+                            logoPreview.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-contain">`;
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            if (logoInput) {
+                logoInput.onchange = (e) => {
+                    const file = e?.target?.files?.[0] || logoInput.files?.[0];
+                    if (file) {
+                        downsampleAndPreviewLogo(file);
+                    }
+                };
+            }
+
+            const openModal = (schoolId = null) => {
+                window.HapticsModule?.light();
+                delete logoPreview.dataset.customUploaded;
+                delete logoPreview.dataset.logoBase64;
+                if (logoInput) logoInput.value = '';
+
+                if (schoolId) {
+                    // Modo Edición
+                    const school = InstitutionsModule.getInstitution(schoolId);
+                    if (titleEl) titleEl.textContent = 'Editar Escuela Personalizada';
+                    if (idInput) idInput.value = school.id;
+                    if (nameInput) nameInput.value = school.name;
+                    if (shortbadgeInput) shortbadgeInput.value = school.shortBadge || school.name;
+                    if (fullnameInput) fullnameInput.value = school.fullName;
+                    if (sloganInput) sloganInput.value = school.slogan || '';
+                    if (countrySelect) countrySelect.value = school.countryCode || 'MX';
+                    if (systemSelect) systemSelect.value = school.systemType || 'Semestral';
+                    if (colorInput) colorInput.value = school.colors?.primary || '#4F46E5';
+                    if (deleteBtn) deleteBtn.classList.remove('hidden');
+
+                    if (logoPreview) {
+                        if (school.icon) {
+                            logoPreview.dataset.customUploaded = 'true';
+                            logoPreview.dataset.logoBase64 = school.icon;
+                            logoPreview.innerHTML = `<img src="${school.icon}" class="w-full h-full object-contain">`;
+                        } else {
+                            updatePreviewDefaultLogo();
+                        }
+                    }
+                } else {
+                    // Modo Creación
+                    if (titleEl) titleEl.textContent = 'Constructor de Escuela Personalizada';
+                    if (idInput) idInput.value = '';
+                    if (nameInput) nameInput.value = '';
+                    if (shortbadgeInput) shortbadgeInput.value = '';
+                    if (fullnameInput) fullnameInput.value = '';
+                    if (sloganInput) sloganInput.value = '';
+                    if (countrySelect) countrySelect.value = 'MX';
+                    if (systemSelect) systemSelect.value = 'Semestral';
+                    if (colorInput) colorInput.value = '#4F46E5';
+                    if (deleteBtn) deleteBtn.classList.add('hidden');
+                    updatePreviewDefaultLogo();
+                }
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+                requestAnimationFrame(() => modal.classList.add('active'));
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.classList.remove('overflow-hidden');
+                }, 200);
+            };
+
+            this.openCustomSchoolModal = openModal;
+            this.closeCustomSchoolModal = closeModal;
+            this.downsampleAndPreviewLogo = downsampleAndPreviewLogo;
+
+            if (openBtn) openBtn.onclick = () => openModal();
+            if (closeBtn) closeBtn.onclick = closeModal;
+            if (cancelBtn) cancelBtn.onclick = closeModal;
+            if (backdrop) backdrop.onclick = closeModal;
+
+            // Eliminar escuela personalizada
+            if (deleteBtn) {
+                deleteBtn.onclick = () => {
+                    const schoolId = idInput?.value;
+                    if (!schoolId) return;
+
+                    const school = InstitutionsModule.getInstitution(schoolId);
+                    const name = school ? school.name : 'esta escuela';
+                    if (confirm(`¿Estás seguro de que deseas eliminar la escuela "${name}"?`)) {
+                        window.HapticsModule?.medium();
+                        Storage.deleteCustomSchool(schoolId);
+                        closeModal();
+                        this.setInstitution(Storage.getInstitution());
+                        this.setupInstitutionAndPeriodSelectors();
+                        this.renderInstitutionGrid();
+                        this.showToast(`Escuela "${name}" eliminada`, 'info');
+                    }
+                };
+            }
+
+            // Guardar escuela personalizada
+            if (form) {
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    window.HapticsModule?.double();
+
+                    const name = nameInput.value.trim();
+                    const shortBadge = shortbadgeInput.value.trim() || name.substring(0, 6).toUpperCase();
+                    const fullName = fullnameInput.value.trim() || name;
+                    const slogan = sloganInput.value.trim() || 'Construyendo el futuro';
+                    const countryCode = countrySelect.value;
+                    const countries = InstitutionsModule.getCountries();
+                    const countryObj = countries.find(c => c.code === countryCode) || { name: 'México', code: 'MX', flag: '🇲🇽' };
+                    const systemType = systemSelect.value;
+                    const primaryColor = colorInput.value || '#4F46E5';
+
+                    // Generar lista de periodos según el sistema seleccionado
+                    let periodsList = [];
+                    if (systemType === 'Cuatrimestral') {
+                        periodsList = ['1.º Cuatrimestre', '2.º Cuatrimestre', '3.º Cuatrimestre', '4.º Cuatrimestre', '5.º Cuatrimestre', '6.º Cuatrimestre', '7.º Cuatrimestre', '8.º Cuatrimestre', '9.º Cuatrimestre', '10.º Cuatrimestre'];
+                    } else if (systemType === 'Trimestral') {
+                        periodsList = ['1.º Trimestre', '2.º Trimestre', '3.º Trimestre', '4.º Trimestre', '5.º Trimestre', '6.º Trimestre', '7.º Trimestre', '8.º Trimestre', '9.º Trimestre', '10.º Trimestre', '11.º Trimestre', '12.º Trimestre'];
+                    } else if (systemType === 'Anual') {
+                        periodsList = ['1.º Año', '2.º Año', '3.º Año', '4.º Año', '5.º Año'];
+                    } else if (systemType === 'Modular') {
+                        periodsList = ['Módulo 1', 'Módulo 2', 'Módulo 3', 'Módulo 4', 'Módulo 5', 'Módulo 6', 'Módulo 7', 'Módulo 8'];
+                    } else {
+                        periodsList = ['1.º Semestre', '2.º Semestre', '3.º Semestre', '4.º Semestre', '5.º Semestre', '6.º Semestre', '7.º Semestre', '8.º Semestre', '9.º Semestre', '10.º Semestre'];
+                    }
+
+                    // Determinar icono (logo subido o SVG autogenerado con siglas)
+                    let iconUrl = logoPreview?.dataset?.logoBase64;
+                    if (!iconUrl) {
+                        const initials = shortBadge.substring(0, 4).toUpperCase();
+                        const safeColor = encodeURIComponent(primaryColor);
+                        iconUrl = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" rx="44" fill="${safeColor}"/><text x="100" y="118" fill="%23FFFFFF" font-family="system-ui, sans-serif" font-size="44" font-weight="900" text-anchor="middle">${encodeURIComponent(initials)}</text></svg>`;
+                    }
+
+                    const schoolData = {
+                        id: idInput.value || undefined,
+                        name: name,
+                        shortBadge: shortBadge,
+                        fullName: fullName,
+                        slogan: slogan,
+                        country: countryObj.name,
+                        countryCode: countryObj.code,
+                        countryFlag: countryObj.flag,
+                        systemType: systemType,
+                        icon: iconUrl,
+                        colors: {
+                            primary: primaryColor,
+                            secondary: '#FFFFFF',
+                            accent: primaryColor,
+                            aura: primaryColor,
+                            badgeBg: `bg-[${primaryColor}]`,
+                            badgeText: 'text-white'
+                        },
+                        periods: periodsList,
+                        defaultPeriod: periodsList[0],
+                        isCustom: true
+                    };
+
+                    try {
+                        const saved = Storage.saveCustomSchool(schoolData);
+                        this.setInstitution(saved.id);
+                        closeModal();
+                        this.setupInstitutionAndPeriodSelectors();
+                        this.renderInstitutionGrid();
+                        this.showToast(`Escuela "${saved.name}" guardada con éxito`, 'success');
+                    } catch (err) {
+                        this.showToast(err.message || 'Error al guardar la escuela', 'error');
+                    }
+                };
+            }
+        }
+
+        /* ========================================================
            MODAL DE BIENVENIDA / CONFIGURACIÓN OBLIGATORIA DEL CICLO
            ======================================================== */
         setupCycleWelcomeModal() {
@@ -1068,6 +1785,8 @@
             const endInput = document.getElementById('welcome-cycle-end');
             const instSelect = document.getElementById('welcome-institution-select');
             const periodSelect = document.getElementById('welcome-period-select');
+            const customPeriodWrapper = document.getElementById('welcome-custom-period-wrapper');
+            const customPeriodInput = document.getElementById('welcome-custom-period-input');
             const instPreview = document.getElementById('welcome-inst-preview');
             const Storage = window.StorageModule;
             const InstitutionsModule = window.InstitutionsModule;
@@ -1085,10 +1804,36 @@
                     if (p === selectedPeriod) opt.selected = true;
                     periodSelect.appendChild(opt);
                 });
+
+                // Opción para periodo personalizado libre
+                const customOpt = document.createElement('option');
+                customOpt.value = '__custom__';
+                customOpt.textContent = '✏️ Escribir otro periodo personalizado...';
+                if (selectedPeriod && !inst.periods.includes(selectedPeriod)) {
+                    customOpt.selected = true;
+                    if (customPeriodWrapper) customPeriodWrapper.classList.remove('hidden');
+                    if (customPeriodInput) customPeriodInput.value = selectedPeriod;
+                } else {
+                    if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
+                    if (customPeriodInput) customPeriodInput.value = '';
+                }
+                periodSelect.appendChild(customOpt);
+
                 if (instPreview) {
                     instPreview.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-10 h-10', 'w-full h-full object-contain');
                 }
             };
+
+            if (periodSelect) {
+                periodSelect.onchange = (e) => {
+                    if (e.target.value === '__custom__') {
+                        if (customPeriodWrapper) customPeriodWrapper.classList.remove('hidden');
+                        if (customPeriodInput) customPeriodInput.focus();
+                    } else {
+                        if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
+                    }
+                };
+            }
 
             const openWelcome = () => {
                 const currentInstId = Storage.getInstitution?.() || 'unam';
@@ -1096,14 +1841,32 @@
                 const cycle = Storage.getAcademicCycle?.() || {};
 
                 if (instSelect && InstitutionsModule) {
-                    instSelect.innerHTML = '';
-                    Object.values(InstitutionsModule.INSTITUTIONS).forEach(item => {
-                        const opt = document.createElement('option');
-                        opt.value = item.id;
-                        opt.textContent = `${item.name} - ${item.systemType || item.shortBadge}`;
-                        if (item.id === currentInstId) opt.selected = true;
-                        instSelect.appendChild(opt);
+                    const countries = InstitutionsModule.getCountries();
+                    const builtIns = Object.values(InstitutionsModule.INSTITUTIONS);
+                    const customSchools = Storage.getCustomSchools?.() || [];
+
+                    let html = '';
+                    countries.forEach(c => {
+                        const groupSchools = builtIns.filter(inst => inst.countryCode === c.code);
+                        if (groupSchools.length > 0) {
+                            html += `<optgroup label="${c.flag} ${c.name}">`;
+                            groupSchools.forEach(item => {
+                                html += `<option value="${item.id}">${item.name} - ${item.systemType || item.shortBadge}</option>`;
+                            });
+                            html += `</optgroup>`;
+                        }
                     });
+
+                    if (customSchools.length > 0) {
+                        html += `<optgroup label="⭐ Mis Escuelas Personalizadas">`;
+                        customSchools.forEach(cs => {
+                            html += `<option value="${cs.id}">⭐ ${cs.name} - ${cs.systemType || 'Personalizada'}</option>`;
+                        });
+                        html += `</optgroup>`;
+                    }
+
+                    instSelect.innerHTML = html;
+                    instSelect.value = currentInstId;
 
                     instSelect.onchange = (e) => {
                         const newInstId = e.target.value;
@@ -1144,7 +1907,12 @@
                     window.HapticsModule?.double();
 
                     const chosenInst = instSelect ? instSelect.value : Storage.getInstitution();
-                    const chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
+                    let chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
+                    if (chosenPeriod === '__custom__') {
+                        const customVal = customPeriodInput?.value?.trim();
+                        chosenPeriod = customVal || '1.º Semestre';
+                    }
+
                     const s = startInput ? startInput.value : '';
                     const end = endInput ? endInput.value : '';
 
@@ -1181,7 +1949,11 @@
                     window.HapticsModule?.light();
 
                     const chosenInst = instSelect ? instSelect.value : Storage.getInstitution();
-                    const chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
+                    let chosenPeriod = periodSelect ? periodSelect.value : Storage.getAcademicPeriod();
+                    if (chosenPeriod === '__custom__') {
+                        const customVal = customPeriodInput?.value?.trim();
+                        chosenPeriod = customVal || '1.º Semestre';
+                    }
 
                     if (chosenInst) {
                         Storage.setInstitution(chosenInst);
@@ -1576,6 +2348,29 @@
             }
 
             if (p1 && p2) {
+                // Paste Handler on p1: Splits clipboard text into p1 (0-4) and p2 (4-8)
+                p1.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pasted = ((e.clipboardData || window.clipboardData)?.getData('text') || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    p1.value = pasted.slice(0, 4);
+                    p2.value = pasted.slice(4, 8);
+                    if (p2.value.length > 0) {
+                        p2.focus();
+                    } else {
+                        p1.focus();
+                    }
+                });
+
+                p2.addEventListener('paste', (e) => {
+                    const pasted = ((e.clipboardData || window.clipboardData)?.getData('text') || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    if (!p1.value && pasted.length > 4) {
+                        e.preventDefault();
+                        p1.value = pasted.slice(0, 4);
+                        p2.value = pasted.slice(4, 8);
+                        p2.focus();
+                    }
+                });
+
                 p1.addEventListener('input', () => {
                     p1.value = p1.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
                     if (p1.value.length >= 4) {
@@ -1607,30 +2402,309 @@
             }
 
             const verifyCode = () => {
-                const code = ((p1?.value || '') + (p2?.value || '')).trim().toUpperCase();
-                window.HapticsModule?.error?.();
+                const raw = ((p1?.value || '') + (p2?.value || '')).trim().toUpperCase();
+                const cleaned = raw.replace(/[^A-Z0-9]/g, '');
 
-                // Requerimiento: Cualquier código alfanumérico es erróneo y despliega aura de suspenso y sacudida
+                // Resolve alias or direct match
+                const matchedId = VAULT_ALIASES[raw] || VAULT_ALIASES[cleaned] || (VAULT_CATALOG[raw] ? raw : (VAULT_CATALOG[cleaned] ? cleaned : null));
+                const codeDef = matchedId ? VAULT_CATALOG[matchedId] : null;
+
+                if (!codeDef) {
+                    window.HapticsModule?.error?.();
+                    if (cardContainer) {
+                        cardContainer.classList.remove('vault-shake');
+                        void cardContainer.offsetWidth; // Force reflow
+                        cardContainer.classList.add('vault-shake');
+                    }
+                    if (statusMsg) {
+                        statusMsg.className = 'min-h-[24px] text-xs font-mono font-bold text-rose-400 animate-pulse';
+                        statusMsg.textContent = '⚠️ Acceso denegado: Código no reconocido o credencial inválida.';
+                    }
+                    setTimeout(() => {
+                        if (p1) p1.value = '';
+                        if (p2) p2.value = '';
+                        p1?.focus();
+                    }, 1500);
+                    return;
+                }
+
+                // SUCCESS UNLOCK SEQUENCE
+                window.StorageModule.unlockCode(codeDef.id);
+                window.HapticsModule?.double?.();
+
+                const lockDiv = cardContainer?.querySelector('.text-3xl');
+                if (lockDiv) {
+                    lockDiv.classList.remove('animate-pulse');
+                    lockDiv.classList.remove('vault-lock-unlocked');
+                    lockDiv.classList.add('vault-lock-unlocking');
+                    lockDiv.textContent = '🔓';
+                }
+
                 if (cardContainer) {
                     cardContainer.classList.remove('vault-shake');
-                    void cardContainer.offsetWidth; // Forzar reflow
-                    cardContainer.classList.add('vault-shake');
+                    cardContainer.classList.remove('vault-aura-burst');
+                    void cardContainer.offsetWidth; // Reflow
+                    cardContainer.classList.add('vault-aura-burst');
                 }
 
                 if (statusMsg) {
-                    statusMsg.className = 'min-h-[24px] text-xs font-mono font-bold text-rose-400 animate-pulse';
-                    statusMsg.textContent = '⚠️ Acceso denegado: Código no reconocido o credencial inválida.';
+                    statusMsg.className = 'min-h-[24px] text-xs font-mono font-bold text-emerald-400 animate-bounce';
+                    statusMsg.textContent = '🔓 ¡ACCESO CONCEDIDO! Descifrando protocolo...';
                 }
 
                 setTimeout(() => {
+                    if (lockDiv) {
+                        lockDiv.classList.remove('vault-lock-unlocking');
+                        lockDiv.classList.add('vault-lock-unlocked');
+                    }
                     if (p1) p1.value = '';
                     if (p2) p2.value = '';
-                    p1?.focus();
-                }, 1500);
+
+                    this.openVaultRevealModal(codeDef);
+                    this.renderVaultInventory();
+                }, 850);
             };
 
             if (submitBtn) {
                 submitBtn.onclick = verifyCode;
+            }
+
+            this.renderVaultInventory();
+        }
+
+        openVaultRevealModal(codeDef) {
+            const modal = document.getElementById('vault-reveal-modal');
+            if (!modal || !codeDef) return;
+
+            const iconEl = document.getElementById('vault-reveal-icon');
+            const badgeEl = document.getElementById('vault-reveal-badge');
+            const titleEl = document.getElementById('vault-reveal-title');
+            const phraseEl = document.getElementById('vault-reveal-phrase');
+            const descEl = document.getElementById('vault-reveal-desc');
+            const actionBtn = document.getElementById('vault-reveal-action-btn');
+            const dismissBtn = document.getElementById('vault-reveal-dismiss-btn');
+            const closeBtn = document.getElementById('close-vault-reveal-modal');
+            const backdrop = document.getElementById('vault-reveal-backdrop');
+
+            if (iconEl) iconEl.textContent = codeDef.icon || '🗝️';
+            if (badgeEl) {
+                badgeEl.textContent = codeDef.category || 'PROTOCOLO CLASIFICADO';
+                badgeEl.className = `text-[10px] font-mono font-extrabold uppercase tracking-widest px-3 py-1 rounded-full border ${codeDef.badgeClass || 'bg-purple-500/20 text-purple-300 border-purple-400/30'}`;
+            }
+            if (titleEl) titleEl.textContent = codeDef.name || codeDef.id;
+            if (phraseEl) phraseEl.textContent = codeDef.phrase || '';
+            if (descEl) descEl.textContent = codeDef.description || '';
+
+            const closeModal = () => {
+                window.HapticsModule?.light?.();
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            if (actionBtn) {
+                actionBtn.innerHTML = `<span>${codeDef.actionLabel || 'Activar Recompensa'}</span>`;
+                actionBtn.onclick = () => {
+                    window.HapticsModule?.medium?.();
+                    if (codeDef.themeId) {
+                        window.StorageModule.setActiveSpecialTheme(codeDef.themeId);
+                        const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-gray'];
+                        specialClasses.forEach(c => document.documentElement.classList.remove(c));
+                        if (codeDef.themeClass) {
+                            document.documentElement.classList.add(codeDef.themeClass);
+                        }
+                    }
+                    if (codeDef.supportsRockets) {
+                        window.StorageModule.setApolloRocketsEnabled(true);
+                        this.updateApolloRockets();
+                    }
+                    if (codeDef.id === 'GATITOS_') {
+                        window.StorageModule.unlockSecret();
+                        window.StorageModule.setGrayModeEnabled(true);
+                        window.StorageModule.setSecretCatsEnabled(true);
+                        document.documentElement.classList.add('theme-gray');
+                        document.body.classList.add('theme-gray');
+                        this.applySecretFeaturesUI?.();
+                    }
+                    closeModal();
+                    this.renderVaultInventory();
+                    this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
+                };
+            }
+
+            if (closeBtn) closeBtn.onclick = closeModal;
+            if (dismissBtn) dismissBtn.onclick = closeModal;
+            if (backdrop) backdrop.onclick = closeModal;
+
+            const handleEsc = (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeModal();
+                    window.removeEventListener('keydown', handleEsc);
+                }
+            };
+            window.addEventListener('keydown', handleEsc);
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        renderVaultInventory() {
+            const grid = document.getElementById('vault-unlocked-grid');
+            const counter = document.getElementById('vault-unlocked-counter');
+            if (!grid) return;
+
+            const unlocked = window.StorageModule.getUnlockedCodes();
+            if (counter) {
+                counter.textContent = `${unlocked.length} / 11`;
+            }
+
+            if (unlocked.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-6 px-4 rounded-2xl bg-black/40 border border-purple-500/20 text-center">
+                        <span class="text-2xl mb-1 block opacity-60 select-none">🔒</span>
+                        <p class="text-xs font-mono font-bold text-purple-300/80">Ningún protocolo descifrado aún</p>
+                        <p class="text-[11px] text-purple-400/60 mt-0.5">Ingresa códigos válidos en la terminal para desbloquear personalizaciones clasificadas.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const currentSpecialTheme = window.StorageModule.getActiveSpecialTheme ? window.StorageModule.getActiveSpecialTheme() : 'default';
+
+            grid.innerHTML = unlocked.map(codeId => {
+                const def = VAULT_CATALOG[codeId] || {
+                    id: codeId,
+                    name: `Protocolo ${codeId}`,
+                    icon: '🗝️',
+                    category: 'CLASIFICADO',
+                    themeId: codeId.toLowerCase()
+                };
+                const isActive = (def.themeId && currentSpecialTheme === def.themeId);
+                const buttonText = (def.id === '06062009') ? 'Ver Dedicatoria' : (isActive ? 'Desactivar' : 'Activar');
+
+                return `
+                    <div class="vault-inventory-card truncate p-3 rounded-2xl bg-slate-900/80 dark:bg-slate-950/80 border ${isActive ? 'border-emerald-400/60 shadow-lg shadow-emerald-950/40' : 'border-purple-500/20'} flex items-center justify-between gap-2.5 transition-all">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-400/20 flex items-center justify-center text-lg shrink-0">
+                                ${def.icon}
+                            </span>
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-extrabold text-white truncate" title="${def.name}">
+                                    ${def.name}
+                                </h4>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">
+                                        ${def.category || 'SECRETO'}
+                                    </span>
+                                    ${isActive ? '<span class="text-[9px] font-bold text-emerald-400">● ACTIVO</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" data-vault-toggle="${def.id}"
+                            class="tap-effect shrink-0 px-2.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30' : 'bg-purple-600/30 text-purple-200 border border-purple-500/30 hover:bg-purple-600/50'}">
+                            ${buttonText}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            // Attach toggle listeners
+            grid.querySelectorAll('[data-vault-toggle]').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const codeId = btn.getAttribute('data-vault-toggle');
+                    const def = VAULT_CATALOG[codeId];
+                    if (!def) return;
+
+                    if (def.id === '06062009') {
+                        this.openVaultRevealModal(def);
+                        return;
+                    }
+
+                    if (!def.themeId) return;
+
+                    const isCurrentlyActive = (window.StorageModule.getActiveSpecialTheme() === def.themeId);
+                    window.HapticsModule?.light?.();
+
+                    const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-gray'];
+
+                    if (isCurrentlyActive) {
+                        // Deactivate
+                        window.StorageModule.setActiveSpecialTheme('default');
+                        specialClasses.forEach(c => document.documentElement.classList.remove(c));
+                        if (def.supportsRockets) {
+                            window.StorageModule.setApolloRocketsEnabled(false);
+                            this.updateApolloRockets();
+                        }
+                        this.showToast(`Modo estándar restaurado`, 'info');
+                    } else {
+                        // Activate
+                        window.StorageModule.setActiveSpecialTheme(def.themeId);
+                        specialClasses.forEach(c => document.documentElement.classList.remove(c));
+                        if (def.themeClass) {
+                            document.documentElement.classList.add(def.themeClass);
+                        }
+                        if (def.supportsRockets) {
+                            window.StorageModule.setApolloRocketsEnabled(true);
+                            this.updateApolloRockets();
+                        }
+                        if (def.id === 'GATITOS_') {
+                            window.StorageModule.unlockSecret();
+                            window.StorageModule.setGrayModeEnabled(true);
+                            window.StorageModule.setSecretCatsEnabled(true);
+                            document.documentElement.classList.add('theme-gray');
+                            document.body.classList.add('theme-gray');
+                            this.applySecretFeaturesUI?.();
+                        }
+                        this.showToast(`✨ ${def.name} activado`, 'success');
+                    }
+                    this.renderVaultInventory();
+                };
+            });
+        }
+
+        updateApolloRockets() {
+            const Storage = window.StorageModule;
+            const isApolloUnlocked = Storage?.isCodeUnlocked ? Storage.isCodeUnlocked('APOLLO11') : false;
+            const rocketsEnabled = Storage?.getApolloRocketsEnabled ? Storage.getApolloRocketsEnabled() : false;
+            const useRockets = isApolloUnlocked && rocketsEnabled;
+
+            const targets = [
+                document.getElementById('bottom-main-action-btn'),
+                document.getElementById('bottom-main-circle'),
+                document.getElementById('add-task-btn'),
+                document.getElementById('add-note-btn'),
+                document.getElementById('add-subject-btn')
+            ];
+
+            targets.forEach(btn => {
+                if (!btn) return;
+                let badge = btn.querySelector('.apollo-rocket-badge');
+                if (useRockets) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'apollo-rocket-badge select-none';
+                        badge.textContent = '🚀';
+                        btn.style.position = 'relative';
+                        btn.appendChild(badge);
+                    }
+                } else {
+                    if (badge) badge.remove();
+                }
+            });
+        }
+
+        applySpecialThemeFromStorage() {
+            const Storage = window.StorageModule;
+            if (!Storage?.getActiveSpecialTheme) return;
+            const current = Storage.getActiveSpecialTheme();
+            const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus'];
+            specialClasses.forEach(c => document.documentElement.classList.remove(c));
+
+            if (current && current !== 'default') {
+                const found = Object.values(VAULT_CATALOG).find(c => c.themeId === current);
+                if (found && found.themeClass) {
+                    document.documentElement.classList.add(found.themeClass);
+                }
             }
         }
 
@@ -1656,10 +2730,11 @@
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             `;
 
-            toast.innerHTML = `
-                ${iconSvg}
-                <span class="flex-1">${message}</span>
-            `;
+            toast.innerHTML = iconSvg;
+            const msgSpan = document.createElement('span');
+            msgSpan.className = 'flex-1';
+            msgSpan.textContent = message;
+            toast.appendChild(msgSpan);
 
             container.appendChild(toast);
 
@@ -1679,6 +2754,7 @@
         const app = new App();
         window.App = app;
         window.AppInstance = app;
+        window.OrganizadorApp = app;
         app.init();
     });
 })();

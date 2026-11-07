@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="itesm-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0039A6"/>
+      <stop offset="100%" stop-color="#001F5C"/>
+    </linearGradient>
+    <linearGradient id="itesm-flame" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#EF4444"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#itesm-blue)" stroke="#3B82F6" stroke-width="3"/>
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="3 3"/>
+  <!-- Antorcha del saber -->
+  <path d="M92 110 L94 145 H106 L108 110 Z" fill="#D4AF37" stroke="#FFFFFF" stroke-width="1.5"/>
+  <path d="M86 108 H114 L110 114 H90 Z" fill="#F59E0B"/>
+  <!-- Llamas de la antorcha -->
+  <path d="M100 62 C88 78 88 92 96 106 C102 96 106 90 100 84 C110 92 112 100 106 106 C116 94 114 80 100 62 Z" fill="url(#itesm-flame)"/>
+  <circle cx="100" cy="88" r="4" fill="#FDE047"/>
+  <!-- Libro abierto de sabiduría -->
+  <path d="M60 148 C75 142 90 144 100 148 C110 142 125 142 140 148 V156 C125 150 110 150 100 156 C90 150 75 150 60 156 Z" fill="#FFFFFF"/>
+  <text x="100" y="52" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="900" text-anchor="middle" letter-spacing="3">TEC</text>
+  <text x="100" y="174" fill="#93C5FD" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">MONTERREY</text>
+</svg>

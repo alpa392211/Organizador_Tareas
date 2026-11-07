@@ -1085,4 +1085,269 @@ html:not(.dark).theme-gray #cal-days-grid button span {
     color: #0f172a !important;
 }
 
+/* Feature 21: Tablet Header Overflow Fix (<1210px) */
+@media (min-width: 768px) and (max-width: 1210px) {
+    header nav {
+        display: none !important;
+    }
+}
+
+/* ========================================================
+   ANIMACIONES DE BÓVEDA SECRETA Y DESBLOQUEO (M2)
+   ======================================================== */
+
+@keyframes vaultPadlockUnlock {
+    0% {
+        transform: scale(1) rotate(0deg);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+    25% {
+        transform: scale(0.88) rotate(-15deg);
+    }
+    55% {
+        transform: scale(1.35) rotate(18deg);
+        box-shadow: 0 0 60px 25px rgba(16, 185, 129, 0.75), 0 0 90px 40px rgba(245, 158, 11, 0.45);
+    }
+    75% {
+        transform: scale(1.05) rotate(-6deg);
+    }
+    100% {
+        transform: scale(1.15) rotate(0deg);
+        box-shadow: 0 0 45px 15px rgba(16, 185, 129, 0.55);
+    }
+}
+
+@keyframes vaultAuraBurst {
+    0% {
+        box-shadow: inset 0 0 120px 40px rgba(88, 28, 135, 0.5), 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+    40% {
+        box-shadow: inset 0 0 220px 100px rgba(16, 185, 129, 0.7), 0 0 140px 60px rgba(16, 185, 129, 0.65), 0 0 200px 90px rgba(245, 158, 11, 0.5);
+    }
+    100% {
+        box-shadow: inset 0 0 140px 50px rgba(16, 185, 129, 0.35), 0 0 60px 20px rgba(16, 185, 129, 0.3);
+    }
+}
+
+@keyframes vaultWindowPopEnter {
+    0% {
+        opacity: 0;
+        transform: scale(0.4) translateY(60px) rotateX(15deg);
+    }
+    70% {
+        opacity: 1;
+        transform: scale(1.04) translateY(-6px) rotateX(0deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes vaultCascadeFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vault-lock-unlocking {
+    animation: vaultPadlockUnlock 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+    background-color: rgba(6, 78, 59, 0.9) !important;
+    border-color: rgba(52, 211, 153, 0.8) !important;
+    color: #34d399 !important;
+}
+
+.vault-lock-unlocked {
+    transform: scale(1.15) !important;
+    background-color: rgba(6, 78, 59, 0.9) !important;
+    border-color: rgba(52, 211, 153, 0.8) !important;
+    color: #6ee7b7 !important;
+    box-shadow: 0 0 45px 15px rgba(16, 185, 129, 0.55) !important;
+}
+
+.vault-aura-burst {
+    animation: vaultAuraBurst 1.2s ease-out forwards !important;
+}
+
+.vault-window-pop {
+    animation: vaultWindowPopEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.vault-cascade-1 {
+    animation: vaultCascadeFadeUp 0.4s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.vault-cascade-2 {
+    animation: vaultCascadeFadeUp 0.4s 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.vault-cascade-3 {
+    animation: vaultCascadeFadeUp 0.4s 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.vault-cascade-4 {
+    animation: vaultCascadeFadeUp 0.4s 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vault-inventory-card {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.vault-inventory-card:hover {
+    transform: translateY(-2px);
+}
+
+.apollo-rocket-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    animation: pulse 2s infinite ease-in-out;
+    filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.8));
+}
+
+/* ========================================================
+   TEMAS ESPECIALES CLASIFICADOS DE LA BÓVEDA (M2)
+   ======================================================== */
+
+/* Apollo 11: Cósmico Interestelar */
+html.theme-apollo body {
+    background: radial-gradient(circle at 50% 20%, #0d122b 0%, #060914 70%, #020308 100%) !important;
+}
+html.theme-apollo header,
+html.theme-apollo #bottom-nav {
+    background: rgba(10, 15, 35, 0.95) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+}
+html.theme-apollo .fab-gradient-action,
+html.theme-apollo #bottom-main-circle {
+    background: linear-gradient(135deg, #f97316 0%, #4f46e5 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* Eduardo VIP: Tema Maestro Dorado */
+html.theme-eduardo-gold body {
+    background: radial-gradient(circle at 50% 20%, #231908 0%, #130d04 70%, #080501 100%) !important;
+}
+html.theme-eduardo-gold header,
+html.theme-eduardo-gold #bottom-nav {
+    background: rgba(28, 20, 6, 0.95) !important;
+    border-color: rgba(245, 158, 11, 0.4) !important;
+}
+html.theme-eduardo-gold .fab-gradient-action,
+html.theme-eduardo-gold #bottom-main-circle {
+    background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.5) !important;
+}
+
+/* Pingüino: Glacial Polar v1.3.1 */
+html.theme-penguin body {
+    background: radial-gradient(circle at 50% 20%, #081d2e 0%, #030d17 70%, #01060b 100%) !important;
+}
+html.theme-penguin header,
+html.theme-penguin #bottom-nav {
+    background: rgba(5, 21, 35, 0.95) !important;
+    border-color: rgba(6, 182, 212, 0.35) !important;
+}
+html.theme-penguin .fab-gradient-action,
+html.theme-penguin #bottom-main-circle {
+    background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.45) !important;
+}
+
+/* Synthwave Neon 1984 */
+html.theme-synthwave body {
+    background: radial-gradient(circle at 50% 20%, #240a33 0%, #12041c 70%, #07010a 100%) !important;
+}
+html.theme-synthwave header,
+html.theme-synthwave #bottom-nav {
+    background: rgba(26, 7, 38, 0.95) !important;
+    border-color: rgba(236, 72, 153, 0.35) !important;
+}
+html.theme-synthwave .fab-gradient-action,
+html.theme-synthwave #bottom-main-circle {
+    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(236, 72, 153, 0.5) !important;
+}
+
+/* Terminal Matrix: Verde Fósforo Cyberspace */
+html.theme-matrix body {
+    background: #020804 !important;
+    color: #10b981 !important;
+}
+html.theme-matrix header,
+html.theme-matrix #bottom-nav {
+    background: rgba(2, 12, 5, 0.95) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+html.theme-matrix .fab-gradient-action,
+html.theme-matrix #bottom-main-circle {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.45) !important;
+}
+
+/* Jardín Zen / Sakura Cerezo */
+html.theme-sakura body {
+    background: radial-gradient(circle at 50% 20%, #261118 0%, #16080d 70%, #090204 100%) !important;
+}
+html.theme-sakura header,
+html.theme-sakura #bottom-nav {
+    background: rgba(30, 13, 19, 0.95) !important;
+    border-color: rgba(244, 63, 94, 0.35) !important;
+}
+html.theme-sakura .fab-gradient-action,
+html.theme-sakura #bottom-main-circle {
+    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(244, 63, 94, 0.45) !important;
+}
+
+/* Modo Barista / Dark Roast Coffee */
+html.theme-coffee body {
+    background: radial-gradient(circle at 50% 20%, #24140b 0%, #150b06 70%, #080402 100%) !important;
+}
+html.theme-coffee header,
+html.theme-coffee #bottom-nav {
+    background: rgba(28, 15, 8, 0.95) !important;
+    border-color: rgba(217, 119, 6, 0.35) !important;
+}
+html.theme-coffee .fab-gradient-action,
+html.theme-coffee #bottom-main-circle {
+    background: linear-gradient(135deg, #d97706 0%, #78350f 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.45) !important;
+}
+
+/* Arcade Gamer 8-Bit */
+html.theme-arcade body {
+    background: radial-gradient(circle at 50% 20%, #171126 0%, #0c0817 70%, #040209 100%) !important;
+}
+html.theme-arcade header,
+html.theme-arcade #bottom-nav {
+    background: rgba(20, 14, 33, 0.95) !important;
+    border-color: rgba(234, 179, 8, 0.4) !important;
+}
+html.theme-arcade .fab-gradient-action,
+html.theme-arcade #bottom-main-circle {
+    background: linear-gradient(135deg, #eab308 0%, #ef4444 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(234, 179, 8, 0.5) !important;
+}
+
+/* Hiperenfoque / Modo Einstein */
+html.theme-hyperfocus body {
+    background: radial-gradient(circle at 50% 20%, #091729 0%, #040c17 70%, #010408 100%) !important;
+}
+html.theme-hyperfocus header,
+html.theme-hyperfocus #bottom-nav {
+    background: rgba(7, 19, 36, 0.95) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+}
+html.theme-hyperfocus .fab-gradient-action,
+html.theme-hyperfocus #bottom-main-circle {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.5) !important;
+}
+
+
+
 

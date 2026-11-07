@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="uba-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003A70"/>
+      <stop offset="100%" stop-color="#001F3D"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#uba-bg)" stroke="#75AADB" stroke-width="3"/>
+  <!-- Sol de Mayo UBA -->
+  <circle cx="100" cy="92" r="26" fill="#F59E0B" stroke="#FFFFFF" stroke-width="1.5"/>
+  <!-- Rayos flamígeros del Sol de Mayo -->
+  <g stroke="#F59E0B" stroke-width="3" stroke-linecap="round">
+    <line x1="100" y1="56" x2="100" y2="62"/>
+    <line x1="100" y1="122" x2="100" y2="128"/>
+    <line x1="64" y1="92" x2="70" y2="92"/>
+    <line x1="130" y1="92" x2="136" y2="92"/>
+    <line x1="75" y1="67" x2="80" y2="72"/>
+    <line x1="125" y1="117" x2="120" y2="112"/>
+    <line x1="75" y1="117" x2="80" y2="112"/>
+    <line x1="125" y1="67" x2="120" y2="72"/>
+  </g>
+  <!-- Rostro sereno del Sol -->
+  <circle cx="93" cy="88" r="2" fill="#78350F"/>
+  <circle cx="107" cy="88" r="2" fill="#78350F"/>
+  <path d="M94 99 Q100 104 106 99" stroke="#78350F" stroke-width="2" fill="none"/>
+  <!-- Libro abierto UBA -->
+  <path d="M65 136 C80 130 95 132 100 136 C105 132 120 130 135 136 V145 C120 139 105 141 100 145 C95 141 80 139 65 145 Z" fill="#FFFFFF"/>
+  <text x="100" y="42" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="900" text-anchor="middle" letter-spacing="3">UBA</text>
+  <text x="100" y="172" fill="#93C5FD" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">BUENOS AIRES • 1821</text>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="usach-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002F6C"/>
+      <stop offset="100%" stop-color="#001838"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#usach-bg)" stroke="#E05A10" stroke-width="3"/>
+  <!-- Sol naciente y rueda industrial de la USACH -->
+  <circle cx="100" cy="94" r="44" fill="#E05A10" stroke="#FFFFFF" stroke-width="2"/>
+  <!-- Sol amarillo -->
+  <path d="M70 94 A30 30 0 0 1 130 94 Z" fill="#FACC15"/>
+  <!-- Engranaje base -->
+  <path d="M60 94 H140 V106 C140 124 100 134 100 134 C100 134 60 124 60 106 Z" fill="#002F6C"/>
+  <line x1="80" y1="102" x2="80" y2="114" stroke="#FFFFFF" stroke-width="3"/>
+  <line x1="100" y1="104" x2="100" y2="120" stroke="#FFFFFF" stroke-width="3"/>
+  <line x1="120" y1="102" x2="120" y2="114" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="100" y="40" fill="#E05A10" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="3">USACH</text>
+  <text x="100" y="172" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">LABOR ET SCIENTIA</text>
+</svg>

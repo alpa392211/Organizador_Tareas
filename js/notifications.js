@@ -57,6 +57,17 @@ window.NotificationsModule = (() => {
         return val === 0 ? 1 : val;
     }
 
+    function getActiveInstitutionIcon() {
+        try {
+            const instId = window.StorageModule?.getInstitution?.();
+            const inst = window.InstitutionsModule?.getInstitution?.(instId);
+            if (inst && inst.icon) return inst.icon;
+        } catch {
+            // Ignorar y usar fallback seguro
+        }
+        return 'assets/general.svg';
+    }
+
     const Notifications = {
         /**
          * Inicializa permisos y el verificador en segundo plano
@@ -97,7 +108,9 @@ window.NotificationsModule = (() => {
         /**
          * Dispara una notificación inmediata enriquecida en la plataforma activa
          */
-        displayNotification(title, body, iconUrl = 'assets/general.svg', tag = 'general') {
+        displayNotification(title, body, iconUrl = null, tag = 'general') {
+            const resolvedIcon = iconUrl || getActiveInstitutionIcon();
+
             // Disparar háptica
             if (window.HapticsModule) {
                 window.HapticsModule.double();
@@ -108,9 +121,9 @@ window.NotificationsModule = (() => {
                 try {
                     new Notification(title, {
                         body: body,
-                        icon: iconUrl,
+                        icon: resolvedIcon,
                         tag: tag,
-                        badge: iconUrl
+                        badge: resolvedIcon
                     });
                     return;
                 } catch {
@@ -292,7 +305,7 @@ window.NotificationsModule = (() => {
                             this.displayNotification(
                                 `[TAREA] ${t.title}`,
                                 `Materia: ${subName} • Urgencia: ${priorityText} (Fecha límite: ${t.dueDate.replace('T', ' ')})`,
-                                'assets/general.svg',
+                                getActiveInstitutionIcon(),
                                 'task_' + t.id
                             );
                         }
@@ -318,7 +331,7 @@ window.NotificationsModule = (() => {
                             this.displayNotification(
                                 `[NOTA - ${typeLabel}] ${n.title}`,
                                 n.content ? n.content.substring(0, 120) : 'Recordatorio programado',
-                                'assets/general.svg',
+                                getActiveInstitutionIcon(),
                                 'note_' + n.id
                             );
                         }

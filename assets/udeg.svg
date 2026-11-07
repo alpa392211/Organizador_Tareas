@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="udeg-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003366"/>
+      <stop offset="100%" stop-color="#001A33"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#udeg-bg)" stroke="#C59B27" stroke-width="3"/>
+  <!-- Escudo heráldico UdeG -->
+  <path d="M60 48 H140 V105 C140 135 100 155 100 155 C100 155 60 135 60 105 Z" fill="#002244" stroke="#C59B27" stroke-width="3"/>
+  <!-- Cruz y leones heráldicos -->
+  <line x1="100" y1="52" x2="100" y2="148" stroke="#C59B27" stroke-width="2"/>
+  <line x1="64" y1="95" x2="136" y2="95" stroke="#C59B27" stroke-width="2"/>
+  <!-- Cuadrantes: libro y cruz roja -->
+  <path d="M72 68 H88 V82 H72 Z" fill="#FFFFFF" opacity="0.9"/>
+  <path d="M116 68 H124 V82 H116 Z M112 72 H128 V78 H112 Z" fill="#DC2626"/>
+  <path d="M74 108 L86 122 M86 108 L74 122" stroke="#C59B27" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="120" cy="115" r="7" fill="#C59B27"/>
+  <!-- Texto institucional -->
+  <text x="100" y="40" fill="#C59B27" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="900" text-anchor="middle" letter-spacing="2">UDEG</text>
+  <text x="100" y="174" fill="#F3F4F6" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">PIENSA Y TRABAJA</text>
+</svg>

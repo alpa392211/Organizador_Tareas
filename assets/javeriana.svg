@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="jav-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003087"/>
+      <stop offset="100%" stop-color="#001C52"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#jav-bg)" stroke="#FCC200" stroke-width="3"/>
+  <!-- Escudo Javeriano -->
+  <path d="M62 50 H138 V105 C138 135 100 154 100 154 C100 154 62 135 62 105 Z" fill="#002366" stroke="#FCC200" stroke-width="2.5"/>
+  <!-- Radiante sol jesuita IHS -->
+  <circle cx="100" cy="85" r="22" fill="#FCC200"/>
+  <!-- Cruz y monograma central -->
+  <path d="M100 70 V92 M90 77 H110" stroke="#003087" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="100" cy="120" r="10" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  <path d="M96 116 L104 124 M104 116 L96 124" stroke="#FFFFFF" stroke-width="2"/>
+  <!-- Lises doradas -->
+  <circle cx="78" cy="70" r="3" fill="#FCC200"/>
+  <circle cx="122" cy="70" r="3" fill="#FCC200"/>
+  <text x="100" y="40" fill="#FCC200" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="900" text-anchor="middle" letter-spacing="2">JAVERIANA</text>
+  <text x="100" y="174" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">PONTIFICIA • 1623</text>
+</svg>

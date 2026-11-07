@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="unc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7A1C20"/>
+      <stop offset="100%" stop-color="#450D10"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#unc-bg)" stroke="#B8860B" stroke-width="3"/>
+  <!-- Escudo jesuita colonial UNC -->
+  <path d="M64 52 H136 V105 C136 135 100 152 100 152 C100 152 64 135 64 105 Z" fill="#581316" stroke="#B8860B" stroke-width="2.5"/>
+  <!-- Cruz y halo de Córdoba -->
+  <path d="M100 66 V115 M86 78 H114" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="100" cy="78" r="16" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="2 2"/>
+  <!-- Libro abierto y lema -->
+  <path d="M76 122 C88 118 100 120 100 126 C100 120 112 118 124 122 V132 C112 128 100 130 100 136 C100 130 88 128 76 132 Z" fill="#FFFFFF"/>
+  <text x="100" y="42" fill="#FBBF24" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="3">UNC</text>
+  <text x="100" y="174" fill="#FDE68A" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">CÓRDOBA • 1613</text>
+</svg>

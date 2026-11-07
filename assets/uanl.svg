@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="uanl-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003B71"/>
+      <stop offset="100%" stop-color="#001E3D"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#uanl-bg)" stroke="#F1A80A" stroke-width="3"/>
+  <!-- Flama de la Verdad UANL -->
+  <path d="M100 45 C78 72 75 92 86 115 C92 102 98 96 100 86 C105 98 114 105 110 116 C125 96 122 72 100 45 Z" fill="#F1A80A"/>
+  <path d="M100 65 C90 82 90 94 96 108 C100 100 104 96 101 88 C106 96 110 102 106 110 C114 98 112 82 100 65 Z" fill="#FFFFFF"/>
+  <!-- Pebetero / Base -->
+  <path d="M72 120 H128 L122 134 H78 Z" fill="#D97706" stroke="#FFFFFF" stroke-width="1.5"/>
+  <rect x="86" y="134" width="28" height="14" fill="#F1A80A" rx="2"/>
+  <!-- Letras UANL -->
+  <text x="100" y="38" fill="#F1A80A" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="3">UANL</text>
+  <text x="100" y="168" fill="#FCD34D" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7.5" font-weight="700" text-anchor="middle" letter-spacing="1">ALERE FLAMMAM VERITATIS</text>
+</svg>

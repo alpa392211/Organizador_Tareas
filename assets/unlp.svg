@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="unlp-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#004F71"/>
+      <stop offset="100%" stop-color="#002A3D"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#unlp-bg)" stroke="#94A3B8" stroke-width="3"/>
+  <!-- Estrella de La Plata y roble de sabiduría -->
+  <circle cx="100" cy="94" r="50" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4 4"/>
+  <polygon points="100,54 112,82 142,82 118,100 127,128 100,110 73,128 82,100 58,82 88,82" fill="#FFFFFF" opacity="0.95"/>
+  <circle cx="100" cy="94" r="14" fill="#004F71" stroke="#F1F5F9" stroke-width="2"/>
+  <path d="M96 90 L100 84 L104 90 L100 102 Z" fill="#38BDF8"/>
+  <!-- Hojas de roble estilizadas -->
+  <path d="M68 140 C80 134 95 135 100 142 C105 135 120 134 132 140" fill="none" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+  <text x="100" y="40" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="3">UNLP</text>
+  <text x="100" y="172" fill="#BAE6FD" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">POR LA CIENCIA Y LA PATRIA</text>
+</svg>

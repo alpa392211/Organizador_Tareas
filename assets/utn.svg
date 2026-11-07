@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="utn-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002C6C"/>
+      <stop offset="100%" stop-color="#001438"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#utn-bg)" stroke="#0070BA" stroke-width="3"/>
+  <!-- Engranaje tecnológico central -->
+  <g transform="translate(100, 94)">
+    <circle cx="0" cy="0" r="42" fill="#0070BA"/>
+    <!-- Dientes del engranaje -->
+    <path d="M-8 -48 H8 V-38 H-8 Z M-8 38 H8 V48 H-8 Z M-48 -8 V8 H-38 V-8 Z M38 -8 V8 H48 V-8 Z" fill="#0070BA"/>
+    <g transform="rotate(45)">
+      <path d="M-8 -48 H8 V-38 H-8 Z M-8 38 H8 V48 H-8 Z M-48 -8 V8 H-38 V-8 Z M38 -8 V8 H48 V-8 Z" fill="#0070BA"/>
+    </g>
+    <circle cx="0" cy="0" r="28" fill="#002C6C" stroke="#FFFFFF" stroke-width="2"/>
+    <!-- Rayo de energía e ingenio -->
+    <polygon points="4,-18 -10,0 -2,0 -6,18 12,-2 2,-2" fill="#FACC15"/>
+  </g>
+  <text x="100" y="40" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="900" text-anchor="middle" letter-spacing="3">UTN</text>
+  <text x="100" y="172" fill="#7DD3FC" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">TECNOLÓGICA NACIONAL</text>
+</svg>

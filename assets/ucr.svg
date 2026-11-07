@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="ucr-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0083CA"/>
+      <stop offset="100%" stop-color="#004A73"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#ucr-bg)" stroke="#FFD100" stroke-width="3"/>
+  <!-- Girasol y sol de la UCR "Lucem Aspicio" -->
+  <circle cx="100" cy="94" r="46" fill="#005A8C" stroke="#FFFFFF" stroke-width="2"/>
+  <!-- Cordillera y Sol de Costa Rica -->
+  <path d="M60 115 L80 95 L100 110 L120 90 L140 115 Z" fill="#15803D"/>
+  <circle cx="100" cy="80" r="14" fill="#FFD100"/>
+  <!-- Rayos solares -->
+  <path d="M100 58 V64 M84 66 L88 71 M116 66 L112 71" stroke="#FFD100" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Libro abierto -->
+  <path d="M72 124 C85 119 100 120 100 126 C100 120 115 119 128 124 V134 C115 129 100 130 100 136 C100 130 85 129 72 134 Z" fill="#FFFFFF"/>
+  <text x="100" y="40" fill="#FFD100" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="900" text-anchor="middle" letter-spacing="3">UCR</text>
+  <text x="100" y="172" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">LUCEM ASPICIO • 1940</text>
+</svg>

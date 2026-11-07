@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="uccl-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003366"/>
+      <stop offset="100%" stop-color="#001A38"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#uccl-bg)" stroke="#D99B00" stroke-width="3"/>
+  <!-- Escudo UC Chile -->
+  <path d="M64 52 H136 V100 C136 130 100 150 100 150 C100 150 64 130 64 100 Z" fill="#002244" stroke="#D99B00" stroke-width="2.5"/>
+  <!-- Cruz central roja bordeada en blanco -->
+  <path d="M92 56 H108 V140 H92 Z" fill="#DC2626" stroke="#FFFFFF" stroke-width="1.5"/>
+  <path d="M68 84 H132 V98 H68 Z" fill="#DC2626" stroke="#FFFFFF" stroke-width="1.5"/>
+  <!-- Llaves cruzadas pontificias en oro -->
+  <circle cx="82" cy="72" r="5" fill="#D99B00"/>
+  <circle cx="118" cy="72" r="5" fill="#D99B00"/>
+  <text x="100" y="40" fill="#D99B00" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="2">UC CHILE</text>
+  <text x="100" y="172" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">PONTIFICIA • 1888</text>
+</svg>

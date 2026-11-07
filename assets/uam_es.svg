@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="uames-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#004B49"/>
+      <stop offset="100%" stop-color="#002423"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#uames-bg)" stroke="#5EEAD4" stroke-width="3"/>
+  <!-- Emblema UAM Madrid -->
+  <circle cx="100" cy="94" r="48" fill="#003533" stroke="#FFFFFF" stroke-width="2"/>
+  <!-- Madroño / Árbol de la ciencia con estrellas -->
+  <path d="M96 90 L96 126 H104 L104 90 Z" fill="#8A9EA7"/>
+  <circle cx="100" cy="80" r="22" fill="#14B8A6"/>
+  <circle cx="86" cy="84" r="14" fill="#0D9488"/>
+  <circle cx="114" cy="84" r="14" fill="#0D9488"/>
+  <!-- Estrellas de Madrid -->
+  <polygon points="100,50 102,54 106,54 103,57 104,61 100,58 96,61 97,57 94,54 98,54" fill="#FACC15"/>
+  <text x="100" y="38" fill="#5EEAD4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="900" text-anchor="middle" letter-spacing="2">UAM</text>
+  <text x="100" y="172" fill="#CCFBF1" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1">AUTÓNOMA DE MADRID</text>
+</svg>

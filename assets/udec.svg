@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="udec-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002B49"/>
+      <stop offset="100%" stop-color="#001424"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#udec-bg)" stroke="#F2A900" stroke-width="3"/>
+  <!-- El emblemático Campanil de la UdeC -->
+  <g fill="#FFFFFF">
+    <rect x="94" y="62" width="12" height="68"/>
+    <polygon points="100,48 91,62 109,62"/>
+    <rect x="88" y="130" width="24" height="12"/>
+    <circle cx="100" cy="74" r="3.5" fill="#002B49"/>
+  </g>
+  <!-- Rayos dorados de sabiduría alrededor del campanil -->
+  <line x1="72" y1="68" x2="82" y2="76" stroke="#F2A900" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="128" y1="68" x2="118" y2="76" stroke="#F2A900" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="68" y1="92" x2="80" y2="92" stroke="#F2A900" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="132" y1="92" x2="120" y2="92" stroke="#F2A900" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="100" y="38" fill="#F2A900" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="3">UDEC</text>
+  <text x="100" y="172" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">CONCEPCIÓN • 1919</text>
+</svg>

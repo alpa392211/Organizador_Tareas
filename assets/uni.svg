@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="uni-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#800000"/>
+      <stop offset="100%" stop-color="#420000"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#uni-bg)" stroke="#FFFFFF" stroke-width="3"/>
+  <!-- Triángulo de la Ingeniería UNI -->
+  <polygon points="100,50 148,136 52,136" fill="#5E0000" stroke="#FFFFFF" stroke-width="3"/>
+  <!-- Antorcha y engranaje del conocimiento técnico -->
+  <circle cx="100" cy="104" r="18" fill="none" stroke="#F59E0B" stroke-width="3"/>
+  <path d="M96 92 L98 120 H102 L104 92 Z" fill="#FFFFFF"/>
+  <polygon points="100,78 94,92 106,92" fill="#F59E0B"/>
+  <!-- Texto UNI -->
+  <text x="100" y="38" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="900" text-anchor="middle" letter-spacing="3">UNI</text>
+  <text x="100" y="168" fill="#FCA5A5" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">INGENIERÍA • PERÚ</text>
+</svg>

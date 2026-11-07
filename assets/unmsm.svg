@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="unmsm-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#781D22"/>
+      <stop offset="100%" stop-color="#3D0B0E"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#unmsm-bg)" stroke="#D4AF37" stroke-width="3"/>
+  <!-- León Alado de San Marcos con Halo -->
+  <circle cx="100" cy="92" r="48" fill="#521013" stroke="#D4AF37" stroke-width="2"/>
+  <!-- Corona Real Imperial -->
+  <path d="M84 56 L88 64 L100 58 L112 64 L116 56 L112 68 H88 Z" fill="#D4AF37"/>
+  <!-- Silueta heráldica del León de San Marcos -->
+  <path d="M82 108 C80 94 90 84 100 84 C110 84 118 92 118 102 C118 112 110 118 100 118 C90 118 82 114 82 108 Z" fill="#D4AF37"/>
+  <path d="M102 78 C115 75 128 85 130 98 Q118 96 112 104 Z" fill="#FFFFFF" opacity="0.9"/>
+  <!-- Libro abierto con cruz -->
+  <rect x="88" y="112" width="24" height="14" rx="2" fill="#FFFFFF"/>
+  <line x1="100" y1="112" x2="100" y2="126" stroke="#781D22" stroke-width="1.5"/>
+  <text x="100" y="38" fill="#D4AF37" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="900" text-anchor="middle" letter-spacing="2">UNMSM</text>
+  <text x="100" y="172" fill="#FDE68A" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">DECANA DE AMÉRICA • 1551</text>
+</svg>

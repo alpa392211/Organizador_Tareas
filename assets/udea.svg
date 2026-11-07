@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="udea-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F6938"/>
+      <stop offset="100%" stop-color="#073B1F"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#udea-bg)" stroke="#FFFFFF" stroke-width="3"/>
+  <!-- Escudo oval UdeA -->
+  <ellipse cx="100" cy="98" rx="46" ry="54" fill="#0A4C27" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Estrella radiante de sabiduría -->
+  <polygon points="100,56 103,68 115,68 105,75 109,87 100,80 91,87 95,75 85,68 97,68" fill="#FACC15"/>
+  <!-- Libro abierto y corona de laurel -->
+  <path d="M72 108 Q100 100 100 114 Q100 100 128 108 L126 128 Q100 120 100 132 Q100 120 74 128 Z" fill="#FFFFFF"/>
+  <line x1="100" y1="114" x2="100" y2="132" stroke="#0F6938" stroke-width="2"/>
+  <text x="100" y="38" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="3">UDEA</text>
+  <text x="100" y="172" fill="#86EFAC" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">ANTIOQUIA • 1803</text>
+</svg>

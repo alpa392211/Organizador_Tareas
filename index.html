@@ -42,8 +42,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.2.11">
-    <link rel="stylesheet" href="css/styles.css?v=1.2.11">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.3.1">
+    <link rel="stylesheet" href="css/styles.css?v=1.3.1">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -805,12 +805,25 @@
                             </div>
                         </div>
 
-                        <!-- Selector Rápido de Institución (8 Casas de Estudios) -->
-                        <div class="space-y-2 pt-1">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                Selector de Casa de Estudios (con Escudo Oficial)
-                            </label>
-                            <div id="settings-institution-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+                        <!-- Selector Rápido de Institución (con Filtro por País y Creador) -->
+                        <div class="space-y-2.5 pt-1">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                    Selector de Casa de Estudios (con Escudo Oficial)
+                                </label>
+                                <button type="button" id="open-create-school-btn"
+                                    class="tap-effect inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                    <span>+ Crear Escuela</span>
+                                </button>
+                            </div>
+
+                            <!-- Píldoras de Filtro por País y Mis Escuelas -->
+                            <div id="settings-country-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar scroll-smooth">
+                                <!-- Generado por JS -->
+                            </div>
+
+                            <div id="settings-institution-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
                         </div>
 
                         <!-- Semestre o Periodo con Botones Píldora -->
@@ -820,6 +833,21 @@
                             </label>
                             <div id="settings-period-pills" class="flex flex-wrap gap-2 pt-0.5"></div>
                             <select id="settings-period-select" class="hidden"></select>
+
+                            <!-- Entrada manual de periodo personalizado -->
+                            <div class="pt-2">
+                                <label for="custom-period-input" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                                    ¿Tu grado o periodo no está en la lista? Escríbelo aquí (ej. 3.er Cuatrimestre, Módulo 2):
+                                </label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="custom-period-input" placeholder="Ej: 3.er Cuatrimestre, Trimestre 5, Módulo 2..."
+                                        class="flex-1 px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                                    <button type="button" id="save-custom-period-btn"
+                                        class="tap-effect px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all">
+                                        Aplicar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Toggle de Efecto Dinámico al Tocar Logo (Alineado con settings-switch-row) -->
@@ -1275,13 +1303,13 @@
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"/></svg>
                 </button>
 
-                <!-- VERSIÓN HASTA ABAJO CON NOMBRE CLAVE "PANDA" (5 TOQUES PARA DESBLOQUEAR MODO SECRETO) -->
+                <!-- VERSIÓN HASTA ABAJO CON NOMBRE CLAVE "PINGÜINO" (5 TOQUES PARA DESBLOQUEAR MODO SECRETO) -->
                 <div class="text-center pt-2">
                     <button type="button" id="settings-version-pill"
                         class="tap-effect inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 transition-all cursor-pointer select-none"
                         title="Toca 5 veces para desbloquear modo secreto">
-                        <span>🐼</span>
-                        <span>Versión 1.2.11 "Panda"</span>
+                        <span>🐧</span>
+                        <span>Versión 1.3.1 "Pingüino"</span>
                     </button>
                 </div>
             </div>
@@ -1314,7 +1342,7 @@
                             Bóveda Clasificada
                         </h2>
                         <p class="text-xs text-purple-200/90 font-mono tracking-wider">
-                            Introduce el código de 8 caracteres alfanuméricos
+                            Introduce la clave de acceso o protocolo alfanumérico
                         </p>
                     </div>
 
@@ -1341,6 +1369,28 @@
                             Verificar Código
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- INVENTARIO DE PROTOCOLOS DESCUBIERTOS (M2)               -->
+            <!-- ========================================================= -->
+            <div id="vault-inventory-wrapper" class="w-full max-w-lg mx-auto mt-6 px-2 space-y-3">
+                <div class="flex items-center justify-between border-b border-purple-500/20 pb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base select-none">🗝️</span>
+                        <h3 class="text-xs sm:text-sm font-black text-purple-900 dark:text-purple-200 uppercase tracking-widest">
+                            Protocolos Descubiertos
+                        </h3>
+                        <span id="vault-unlocked-counter" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                            0 / 11
+                        </span>
+                    </div>
+                    <span class="text-[10px] font-mono text-purple-400 dark:text-purple-400 uppercase tracking-wider select-none">Catálogo Clasificado</span>
+                </div>
+                
+                <div id="vault-unlocked-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[38vh] overflow-y-auto overflow-x-hidden pr-1">
+                    <!-- Tarjetas renderizadas dinámicamente mediante App.renderVaultInventory() -->
                 </div>
             </div>
 
@@ -1844,6 +1894,155 @@
     </div>
 
     <!-- ========================================================= -->
+    <!-- MODAL CONSTRUCTOR DE ESCUELA PERSONALIZADA               -->
+    <!-- ========================================================= -->
+    <div id="custom-school-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div id="custom-school-backdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"></div>
+
+        <div class="modal-dialog relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
+            <!-- Encabezado del modal -->
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl shrink-0">
+                        🎨
+                    </span>
+                    <div>
+                        <h2 id="custom-school-modal-title" class="text-base font-black text-slate-900 dark:text-white">
+                            Constructor de Escuela Personalizada
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            Crea o edita la identidad de tu institución escolar.
+                        </p>
+                    </div>
+                </div>
+                <button type="button" id="custom-school-close-btn" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 tap-effect">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Formulario de la escuela -->
+            <form id="custom-school-form" class="space-y-4">
+                <input type="hidden" id="custom-school-id" value="">
+
+                <!-- 1. Nombre Corto y Siglas -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="custom-school-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                            Nombre Corto / Siglas *
+                        </label>
+                        <input type="text" id="custom-school-name" required placeholder="Ej: ITSON, TecMilenio..."
+                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="custom-school-shortbadge" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                            Insignia (Badge) *
+                        </label>
+                        <input type="text" id="custom-school-shortbadge" required placeholder="Ej: ITSON" maxlength="10"
+                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- 2. Nombre Completo -->
+                <div>
+                    <label for="custom-school-fullname" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Nombre Completo Oficial *
+                    </label>
+                    <input type="text" id="custom-school-fullname" required placeholder="Ej: Instituto Tecnológico de Sonora"
+                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <!-- 3. Lema o Slogan -->
+                <div>
+                    <label for="custom-school-slogan" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Lema o Slogan Institucional
+                    </label>
+                    <input type="text" id="custom-school-slogan" placeholder="Ej: Educar para Trascender"
+                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <!-- 4. País y Sistema Académico -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="custom-school-country" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                            País *
+                        </label>
+                        <select id="custom-school-country" required
+                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+                            <!-- Opciones inyectadas por JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="custom-school-system" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                            Sistema Académico *
+                        </label>
+                        <select id="custom-school-system" required
+                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
+                            <option value="Semestral">Semestral (10 Semestres)</option>
+                            <option value="Cuatrimestral">Cuatrimestral (10 Cuatrimestres)</option>
+                            <option value="Trimestral">Trimestral (12 Trimestres)</option>
+                            <option value="Anual">Anual (5 Años)</option>
+                            <option value="Modular">Modular (8 Módulos)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 5. Color Institucional Principal con Paleta Rápida -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                        Color Institucional y Resplandor *
+                    </label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" id="custom-school-color" value="#4F46E5"
+                            class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer p-0.5 bg-white">
+                        <div id="custom-school-color-presets" class="flex flex-wrap gap-1.5 items-center">
+                            <!-- Botones preset de color -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Logo / Escudo (Subida con Downsampling Canvas) -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                        Escudo o Logo Oficial (PNG, JPG, SVG)
+                    </label>
+                    <div class="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                        <div id="custom-school-logo-preview" class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center p-1 overflow-hidden shrink-0">
+                            <!-- Preview de imagen -->
+                            <span class="text-2xl text-slate-400">🏫</span>
+                        </div>
+                        <div class="flex-1 min-w-0 space-y-1">
+                            <input type="file" id="custom-school-logo-input" accept="image/png, image/jpeg, image/svg+xml, image/webp"
+                                class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500">
+                                Se optimiza automáticamente en el navegador a máximo 256×256 px (&lt;30 KB).
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Canvas oculto para downsampling -->
+                    <canvas id="custom-school-canvas" class="hidden"></canvas>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 gap-2">
+                    <button type="button" id="custom-school-delete-btn" class="hidden py-2.5 px-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 font-bold text-xs tap-effect transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        <span>Eliminar</span>
+                    </button>
+                    <div class="flex items-center gap-2 ml-auto">
+                        <button type="button" id="custom-school-cancel-btn" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs tap-effect transition-all">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="custom-school-save-btn" class="py-2.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 tap-effect transition-all flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span>Guardar Escuela</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
     <!-- MODAL DE IDENTIDAD INSTITUCIONAL (LOGO DINÁMICO ZOOM & GLOW) -->
     <!-- ========================================================= -->
     <div id="school-identity-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
@@ -1971,6 +2170,15 @@
                         class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none focus:border-indigo-500 cursor-pointer">
                         <!-- Opciones adaptadas según institución -->
                     </select>
+
+                    <!-- Wrapper para escribir periodo personalizado en Onboarding -->
+                    <div id="welcome-custom-period-wrapper" class="hidden pt-1.5 space-y-1">
+                        <label for="welcome-custom-period-input" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                            O escribe tu periodo lectivo personalizado:
+                        </label>
+                        <input type="text" id="welcome-custom-period-input" placeholder="Ej: 3.er Cuatrimestre, Módulo 2..."
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                    </div>
                 </div>
 
                 <!-- 3. Fechas del Ciclo Escolar -->
@@ -2010,6 +2218,63 @@
     </div>
 
     <!-- ========================================================= -->
+    <!-- MODAL DINÁMICO DE REVELACIÓN DE SECRETOS (M2)             -->
+    <!-- ========================================================= -->
+    <div id="vault-reveal-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div id="vault-reveal-backdrop" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md transition-opacity"></div>
+        
+        <div class="modal-dialog relative w-full max-w-md bg-gradient-to-b from-slate-900 via-purple-950/90 to-slate-950 border border-purple-500/50 rounded-3xl p-6 sm:p-8 shadow-2xl text-white overflow-hidden vault-window-pop text-center space-y-4">
+            <!-- Decoración de destellos o estrellas flotantes -->
+            <div id="vault-reveal-particles" class="absolute inset-0 pointer-events-none opacity-40 overflow-hidden"></div>
+            
+            <!-- Botón de Cerrar Modal -->
+            <button type="button" id="close-vault-reveal-modal" aria-label="Cerrar modal"
+                class="tap-effect absolute top-4 right-4 text-purple-300 hover:text-white p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer z-10">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Icono / Símbolo Enigmático Desbloqueado (Cascada 1) -->
+            <div class="vault-cascade-1 flex flex-col items-center">
+                <div id="vault-reveal-icon" class="w-20 h-20 rounded-3xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-4xl shadow-xl shadow-purple-950/80 mb-2">
+                    🚀
+                </div>
+                <span id="vault-reveal-badge" class="text-[10px] font-mono font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">
+                    PROTOCOLO CLASIFICADO
+                </span>
+            </div>
+
+            <!-- Título y Frase Conmemorativa (Cascada 2) -->
+            <div class="vault-cascade-2 space-y-1.5">
+                <h2 id="vault-reveal-title" class="text-xl font-black text-white tracking-tight leading-snug drop-shadow-md">
+                    Misión Espacial Apollo 11
+                </h2>
+                <p id="vault-reveal-phrase" class="text-xs font-serif italic text-purple-200/90 leading-relaxed px-2">
+                    «Un pequeño paso para el estudiante, un gran salto para tu semestre»
+                </p>
+            </div>
+
+            <!-- Descripción del Desbloqueo (Cascada 3) -->
+            <div class="vault-cascade-3">
+                <p id="vault-reveal-desc" class="text-xs text-slate-300 leading-relaxed bg-black/40 border border-purple-500/20 p-3.5 rounded-2xl text-left">
+                    Has desbloqueado el diseño cósmico interestelar.
+                </p>
+            </div>
+
+            <!-- Acciones de Activación y Cierre (Cascada 4) -->
+            <div class="vault-cascade-4 pt-1 space-y-2">
+                <button type="button" id="vault-reveal-action-btn"
+                    class="tap-effect w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-purple-900/50 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Activar Tema Ahora 🚀</span>
+                </button>
+                <button type="button" id="vault-reveal-dismiss-btn"
+                    class="tap-effect w-full py-2.5 px-4 rounded-2xl bg-white/10 hover:bg-white/15 text-purple-200 font-bold text-xs transition-colors cursor-pointer">
+                    <span>Permanecer en la Bóveda</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
     <!-- BLOQUEO DINÁMICO DE ORIENTACIÓN HORIZONTAL EN CELULARES   -->
     <!-- ========================================================= -->
     <div id="mobile-orientation-blocker" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md text-white text-center select-none">
@@ -2032,16 +2297,16 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js?v=1.2.11"></script>
-    <script src="js/storage.js?v=1.2.11"></script>
-    <script src="js/haptics.js?v=1.2.11"></script>
-    <script src="js/notifications.js?v=1.2.11"></script>
-    <script src="js/widgets.js?v=1.2.11"></script>
-    <script src="js/subjects.js?v=1.2.11"></script>
-    <script src="js/tasks.js?v=1.2.11"></script>
-    <script src="js/notes.js?v=1.2.11"></script>
-    <script src="js/calendar.js?v=1.2.11"></script>
-    <script src="js/archive.js?v=1.2.11"></script>
-    <script src="js/app.js?v=1.2.11"></script>
+    <script src="js/institutions.js?v=1.3.1"></script>
+    <script src="js/storage.js?v=1.3.1"></script>
+    <script src="js/haptics.js?v=1.3.1"></script>
+    <script src="js/notifications.js?v=1.3.1"></script>
+    <script src="js/widgets.js?v=1.3.1"></script>
+    <script src="js/subjects.js?v=1.3.1"></script>
+    <script src="js/tasks.js?v=1.3.1"></script>
+    <script src="js/notes.js?v=1.3.1"></script>
+    <script src="js/calendar.js?v=1.3.1"></script>
+    <script src="js/archive.js?v=1.3.1"></script>
+    <script src="js/app.js?v=1.3.1"></script>
 </body>
 </html>

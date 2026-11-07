@@ -1,0 +1,2800 @@
+{
+  "timestamp": "2026-11-07T01:28:24.314Z",
+  "version": "1.3.1",
+  "total": 307,
+  "passed": 307,
+  "failed": 0,
+  "skipped": 0,
+  "durationMs": 4247,
+  "tiers": {
+    "tier1": {
+      "name": "Tier 1: Feature Coverage (Equivalence Classes)",
+      "total": 135,
+      "passed": 135,
+      "failed": 0
+    },
+    "tier2": {
+      "name": "Tier 2: Boundary & Corner Cases",
+      "total": 135,
+      "passed": 135,
+      "failed": 0
+    },
+    "tier3": {
+      "name": "Tier 3: Pairwise Cross-Feature Combinations",
+      "total": 32,
+      "passed": 32,
+      "failed": 0
+    },
+    "tier4": {
+      "name": "Tier 4: Real-World Student Application Workflows",
+      "total": 5,
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "results": [
+    {
+      "tier": 1,
+      "id": "T1_F01_01_package_json_version",
+      "name": "Package.json contains version specification",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F01_02_settings_version_pill_exists",
+      "name": "Settings version pill or indicator exists in DOM",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F01_03_cache_buster_query_parameter",
+      "name": "Index.html assets use query parameter versioning or relative paths",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F01_04_version_tap_trigger_title",
+      "name": "Version pill has 5-tap trigger tooltip / title attribute",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F01_05_version_meta_or_app_identity",
+      "name": "Application title or metadata references Organizador Escolar",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F02_01_mexico_catalog_entries",
+      "name": "Institutions catalog contains Mexican universities (UNAM, IPN, UAM)",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F02_02_colombia_catalog_entries",
+      "name": "Institutions catalog or schema supports Colombia entries or standard catalog",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F02_03_argentina_catalog_entries",
+      "name": "Institutions catalog or schema supports Argentina entries (UBA/UTN)",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F02_04_chile_catalog_entries",
+      "name": "Institutions catalog or schema supports Chile entries (UCH/PUC)",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F02_05_institution_standard_schema",
+      "name": "Catalog institutions adhere to standard schema attributes",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F03_01_country_metadata_fields",
+      "name": "Institutions or custom institutions carry country metadata",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F03_02_country_filter_pills_in_dom",
+      "name": "Country filter or school identity selector exists in DOM",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F03_03_institution_select_optgroups",
+      "name": "Institution select options exist and are organized",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F03_04_country_filtering_filters_institutions",
+      "name": "InstitutionsModule provides lookup helper returning valid institution",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F03_05_selected_institution_preserves_country",
+      "name": "Selected institution persists in StorageModule",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F04_01_general_removed_from_selectable_catalog",
+      "name": "General school is removed from primary selection or replaced by custom schools",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F04_02_general_svg_asset_exists",
+      "name": "assets/general.svg is preserved as fallback icon asset",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F04_03_fallback_notification_icon",
+      "name": "InstitutionsModule renderIconHtml handles fallback safely",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F04_04_legacy_general_migration",
+      "name": "Legacy general institution ID resolves safely without throwing",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F04_05_active_schools_have_distinct_assets",
+      "name": "Active standard institutions have non-empty SVG or PNG asset paths",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F05_01_custom_school_modal_or_button_present",
+      "name": "School identity modal or custom school builder button is present in DOM",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F05_02_save_custom_school_storage_contract",
+      "name": "Storage or helper accepts saving custom school definition",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F05_03_custom_school_isCustom_flag",
+      "name": "Saved custom school retains isCustom: true flag",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F05_04_custom_school_appears_in_getAllInstitutions",
+      "name": "InstitutionsModule merges or handles custom school lookups",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F05_05_custom_school_retrieval_by_id",
+      "name": "Custom school can be retrieved or referenced without throwing",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F06_01_canvas_downsample_helper_available",
+      "name": "HTML5 Canvas is available in browser context for downsampling",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F06_02_downsample_bounds_max_256px",
+      "name": "Canvas downsample logic enforces 256x256 max bounding box",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F06_03_downsampled_payload_size_under_30kb",
+      "name": "Downsampled canvas Base64 payload is compact (<30KB)",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F06_04_custom_school_stores_base64_icon",
+      "name": "Custom school supports storing base64 data URI icon",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F06_05_render_icon_html_renders_custom_base64",
+      "name": "InstitutionsModule renderIconHtml correctly renders base64 image",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F07_01_custom_motto_field_available",
+      "name": "School identity modal or builder supports slogan/motto attribute",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F07_02_custom_motto_stored_in_school_data",
+      "name": "Custom slogan persists in custom school object",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F07_03_custom_motto_rendered_in_header",
+      "name": "Header or subheader element exists to host institutional context",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F07_04_custom_motto_rendered_in_drawer",
+      "name": "Side navigation drawer exists for institutional profile display",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F07_05_custom_motto_rendered_in_identity_modal",
+      "name": "School identity modal exists in DOM",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F08_01_free_form_period_input_exists",
+      "name": "Period selection supports arbitrary or custom text input",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F08_02_arbitrary_period_string_entry",
+      "name": "Setting free-form custom period string succeeds in StorageModule",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F08_03_custom_period_persists_in_storage",
+      "name": "Custom period is persisted directly in org_escolar_period key",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F08_04_custom_period_rendered_in_header",
+      "name": "Header badge or text contains period or institution identifier",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F08_05_custom_period_not_clobbered_by_standard_list",
+      "name": "Custom period is preserved even when institution is queried",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F09_01_getAcademicPeriod_returns_saved_string",
+      "name": "Storage.getAcademicPeriod returns saved string",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F09_02_getAcademicPeriod_no_default_fallback_reversion",
+      "name": "Storage.getAcademicPeriod does NOT revert to defaultPeriod when valid period is set",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F09_03_setAcademicPeriod_exact_string_retention",
+      "name": "Storage.setAcademicPeriod stores trimmed exact string",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F09_04_reload_maintains_custom_school_period",
+      "name": "Custom period survives page reload without resetting",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 102,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F09_05_standard_school_custom_period_retention",
+      "name": "Standard school with custom period retains the custom string across institution lookups",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F10_01_case_insensitive_code_resolution",
+      "name": "Code comparison is case-insensitive (apollo11 == APOLLO11)",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 18,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F10_02_trimmed_code_resolution",
+      "name": "Code comparison strips leading/trailing whitespace",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 5,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F10_03_alias_normalization_eduardo",
+      "name": "Creator code alias normalizer recognizes EDUARDO and variations",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F10_04_numeric_code_parsing",
+      "name": "Numeric code 06062009 is parsed correctly without character filtering",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F10_05_parser_supports_non_8char_lengths",
+      "name": "Parser supports variable length codes without rigid 8-character truncation",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 9,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F11_01_vault_padlock_initial_locked_state",
+      "name": "Vault view contains locked padlock element 🔒",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F11_02_unlock_animation_class_applied",
+      "name": "Vault card container supports animation / aura classes",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F11_03_padlock_icon_transforms_to_unlocked",
+      "name": "Padlock icon or lock container is dynamically updatable",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F11_04_radial_aura_glow_burst",
+      "name": "Vault CSS defines shake and suspense animation styling",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F11_05_vault_status_message_success_transition",
+      "name": "Vault status message container exists to provide feedback",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F12_01_reveal_modal_container_in_dom",
+      "name": "Modal infrastructure exists for dynamic rewards emergence",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F12_02_dynamic_pop_enter_animation_class",
+      "name": "Modals use transition or animation classes on enter",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F12_03_reveal_modal_displays_unlocked_title",
+      "name": "Dynamic notifications/toasts can present secret reveal message",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F12_04_reveal_modal_displays_reward_badge",
+      "name": "Badges and icon wrappers exist for celebrating unlocks",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F12_05_reveal_modal_dismissal",
+      "name": "Modals feature standard close/dismiss triggers",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F13_01_apollo_unlock_adds_to_storage",
+      "name": "Apollo 11 code can be persisted in unlocked codes array",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F13_02_theme_apollo_root_class",
+      "name": "Activating Apollo theme adds theme-apollo class to documentElement",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F13_03_apollo_rocket_badges_rendered",
+      "name": "Apollo rocket badge class is applied to action buttons or nav",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 6,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F13_04_apollo_rockets_toggle_off",
+      "name": "Apollo rockets can be toggled off via StorageModule setter",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F13_05_apollo_theme_color_palette",
+      "name": "Apollo theme class can be cleanly removed from document root",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F14_01_06062009_unlock_persists_in_storage",
+      "name": "Code 06062009 persists in unlocked vault codes",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F14_02_starlight_tribute_phrase_rendered",
+      "name": "Tribute text contains \"Tu eres alguien especial por conocer esta fecha...\"",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F14_03_starlight_visual_styling",
+      "name": "Starlight tribute styling supports celestial/starlight theme indicators",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F14_04_06062009_accessible_from_inventory",
+      "name": "Code 06062009 is retained in unlocked vault state",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F14_05_starlight_modal_dismissal",
+      "name": "Dismissing tribute restores normal view without throwing",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F15_01_eduardo_code_unlocks_in_storage",
+      "name": "Code EDUARDO persists in unlocked secret codes",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F15_02_theme_eduardo_gold_root_class",
+      "name": "theme-eduardo-gold class can be applied to html element",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F15_03_founder_crown_badge_rendered",
+      "name": "Creator code supports Founder VIP crown 👑 badge presentation",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F15_04_eduardo_gold_css_properties",
+      "name": "Gold theme defines distinct gold styling parameters",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F15_05_eduardo_theme_deactivation",
+      "name": "theme-eduardo-gold class cleanly removable from document root",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F16_01_catalog_contains_minimum_10_codes",
+      "name": "Secret code catalog includes at least 10 predefined protocols",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F16_02_pinguino_code_recognized",
+      "name": "Code PINGUINO is recognized in catalog",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F16_03_retro80s_code_recognized",
+      "name": "Code RETRO80S is recognized in catalog",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F16_04_matrix99_code_recognized",
+      "name": "Code MATRIX99 is recognized in catalog",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F16_05_zenpeace_and_coffee42_recognized",
+      "name": "Additional codes ZENPEACE and COFFEE42 are recognized",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F17_01_inventory_grid_container_exists",
+      "name": "Vault view section view-secret-codes exists in DOM",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F17_02_unlocked_items_appear_as_cards",
+      "name": "Unlocked codes array can be rendered or mapped into UI items",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F17_03_inventory_cards_show_badge_and_name",
+      "name": "Inventory items contain protocol name and status indicator",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F17_04_inventory_toggle_action_switches_theme",
+      "name": "Inventory toggle persists active special theme in Storage",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F17_05_empty_inventory_placeholder",
+      "name": "When no codes unlocked, vault displays default prompt",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F18_01_apollo_theme_toggle_deactivation",
+      "name": "Apollo theme deactivation restores default styling",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F18_02_eduardo_gold_toggle_deactivation",
+      "name": "Eduardo Gold theme deactivation cleanses class",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F18_03_rocket_badges_independent_deactivation",
+      "name": "Rocket badges can be removed independently from DOM",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F18_04_deactivation_restores_default_classes",
+      "name": "Special theme deactivation sets root class back to default",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F18_05_active_special_theme_storage_sync",
+      "name": "Storage tracks active special theme as default when none active",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 5,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F19_01_settings_four_categories_structure",
+      "name": "Settings section view-settings exists in DOM",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F19_02_academic_identity_section_present",
+      "name": "Settings contains institution and period settings",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F19_03_appearance_section_present",
+      "name": "Settings contains appearance / theme configuration",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F19_04_interaction_section_present",
+      "name": "Settings contains interaction / haptics preferences",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F19_05_storage_section_present",
+      "name": "Settings contains data storage / backup export import controls",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F20_01_switchboard_container_in_settings",
+      "name": "Settings contains theme controls container or secret switchboard",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F20_02_switchboard_renders_unlocked_theme_switches",
+      "name": "Switchboard or theme controls allow toggling themes",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F20_03_switchboard_mutual_exclusion_active_theme",
+      "name": "Activating one special theme switches from previous theme",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F20_04_switchboard_rocket_badge_switch",
+      "name": "Independent switch exists for rocket badges or visual decorations",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F20_05_switchboard_persistence_on_reload",
+      "name": "Special theme switches persist across reload",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 102,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F21_01_tablet_768px_zero_horizontal_scroll",
+      "name": "At 768px tablet width, zero horizontal scrollbar (scrollWidth <= innerWidth)",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 26,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F21_02_tablet_820px_zero_horizontal_scroll",
+      "name": "At 820px tablet width (iPad Air), zero horizontal scrollbar",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 5,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F21_03_tablet_1024px_zero_horizontal_scroll",
+      "name": "At 1024px tablet width (iPad Pro), zero horizontal scrollbar",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 20,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F21_04_tablet_header_redundant_items_collapsed",
+      "name": "Header container bounds elements within viewport width on tablet",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 21,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F21_05_tablet_header_school_badge_fit",
+      "name": "Header school badge and identity fit comfortably on tablet",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F22_01_tablet_settings_two_column_grid",
+      "name": "Responsive grid classes applied in settings or dashboard",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F22_02_tablet_calendar_grid_proportions",
+      "name": "Calendar modal or view renders calendar grid cells",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F22_03_tablet_task_cards_bounded_width",
+      "name": "Main content containers enforce max-width constraint",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F22_04_tablet_modals_centered",
+      "name": "Modals use flex centering (items-center justify-center)",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F22_05_tablet_touch_targets_adequate",
+      "name": "Key action buttons provide adequate touch targets (>= 40px)",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F23_01_mobile_375px_bottom_nav_fixed",
+      "name": "At 375px width, bottom navigation bar #bottom-nav is visible and fixed",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 19,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F23_02_mobile_375px_zero_horizontal_scroll",
+      "name": "At 375px width, zero horizontal overflow (scrollWidth <= innerWidth)",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F23_03_mobile_fab_button_visible_and_clickable",
+      "name": "Mobile FAB button #bottom-main-action-btn is clickable",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F23_04_mobile_drawer_opens_and_closes",
+      "name": "Side drawer navigation element exists in DOM",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F23_05_mobile_views_vertical_scroll",
+      "name": "Main content allows vertical scrolling on mobile",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 5,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F24_01_widget_payload_has_pendingTodayCount",
+      "name": "WidgetsModule payload specifies pendingTodayCount number property",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F24_02_widget_payload_has_nextTaskTitle",
+      "name": "WidgetsModule payload specifies nextTaskTitle property",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F24_03_widget_payload_has_nextTaskSubject",
+      "name": "WidgetsModule payload specifies nextTaskSubject property",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F24_04_widget_payload_has_institution_name",
+      "name": "WidgetsModule payload specifies institution.name property",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F24_05_widget_payload_has_cycleProgress",
+      "name": "WidgetsModule payload specifies cycleProgress object",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F25_01_quick_glance_widget_in_dom",
+      "name": "Dashboard quick glance widget or summary exists in tasks view",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F25_02_semester_progress_bar_in_dom",
+      "name": "Progress bar or cycle setup modal exists in DOM",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F25_03_upcoming_deadlines_widget_in_dom",
+      "name": "Upcoming deadlines or tasks container exists in DOM",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F25_04_quick_glance_reflects_task_changes",
+      "name": "Storage task counts update dynamically when tasks are saved",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F25_05_progress_bar_percentage_calculation",
+      "name": "Cycle progress percentage returns bounded 0-100 number",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F26_01_package_json_test_script_configured",
+      "name": "package.json defines \"test\": \"node tests/run_all_tests.js\"",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F26_02_zero_remote_network_dependency",
+      "name": "Target URL is local file:// with zero remote network calls",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F26_03_test_helpers_module_exports",
+      "name": "test_helpers.js exports required browser and assertion utilities",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F26_04_test_results_summary_path",
+      "name": "Test harness results path resolves under tests/results",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F26_05_clean_cli_exit_code_contract",
+      "name": "Test harness process contract: success returns 0",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F27_01_xss_prevention_in_user_inputs",
+      "name": "DOM sanitization escapes <script> tags injected in task titles",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F27_02_storage_corrupt_json_resilience",
+      "name": "Corrupted localStorage JSON falls back gracefully without unhandled error",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F27_03_missing_school_asset_fallback",
+      "name": "Nonexistent school icon falls back safely without unhandled error",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F27_04_rapid_navigation_stability",
+      "name": "Switching views in rapid succession does not duplicate active sections",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 47,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F27_05_backup_export_import_schema_fidelity",
+      "name": "JSON export/import preserves schema fields across roundtrip",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F01_01_package_json_semver_syntax",
+      "name": "package.json version matches strict semver pattern",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F01_02_version_pill_rapid_click_stress",
+      "name": "Rapidly clicking version pill 20 times does not throw or crash",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 9,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F01_03_version_pill_extreme_zoom_tolerance",
+      "name": "Version pill does not break layout at 320x480 extreme small screen",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 12,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F01_04_cache_buster_query_missing_tolerance",
+      "name": "App loads and operates safely without cache query parameter",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F01_05_version_pill_double_tap_idempotence",
+      "name": "Rapid tapping on version trigger does not open duplicate secret views",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F02_01_institution_lookup_empty_string",
+      "name": "Lookup with empty string \"\" falls back to safe default institution",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F02_02_institution_lookup_nonexistent_slug",
+      "name": "Lookup with nonexistent slug returns fallback institution without null error",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F02_03_institution_lookup_extreme_10k_string",
+      "name": "Lookup with 10,000 character string does not cause buffer panic",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F02_04_institution_lookup_special_chars_and_emojis",
+      "name": "Lookup with special symbols and emojis handled gracefully",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F02_05_institution_lookup_null_and_undefined",
+      "name": "Lookup with null or undefined returns safe default institution",
+      "feature": "F02",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F03_01_country_code_empty_string",
+      "name": "Filtering by empty string country returns all institutions or safe subset",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F03_02_country_code_unknown_region",
+      "name": "Filtering with unknown country code like \"XX\" handles empty match safely",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F03_03_country_code_sql_or_xss_injection",
+      "name": "Filtering with script tags is sanitized and does not execute XSS",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F03_04_country_filter_rapid_toggling_stress",
+      "name": "Rapidly switching country filters does not crash DOM or leak listeners",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F03_05_country_pills_wrapping_at_320px",
+      "name": "Filter pills container wraps cleanly at 320px width without horizontal blowout",
+      "feature": "F03",
+      "status": "PASS",
+      "durationMs": 6,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F04_01_legacy_general_saved_in_localstorage",
+      "name": "LocalStorage containing legacy \"general\" value resolves safely",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F04_02_missing_general_svg_handled_gracefully",
+      "name": "Missing or corrupt fallback image path does not throw JS error",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F04_03_icon_html_empty_object_param",
+      "name": "renderIconHtml({}) handles empty object safely",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F04_04_icon_html_null_param",
+      "name": "renderIconHtml(null) returns empty string without throwing",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F04_05_icon_html_extreme_class_string",
+      "name": "renderIconHtml with 5000 character CSS class string does not panic",
+      "feature": "F04",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F05_01_custom_school_empty_name",
+      "name": "Saving custom school with empty name does not create empty catalog ghost",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F05_02_custom_school_whitespace_only_name",
+      "name": "Saving custom school with whitespace name is rejected or trimmed",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F05_03_custom_school_10000_char_extreme_name",
+      "name": "Custom school with 10,000 char name does not crash storage serialization",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F05_04_custom_school_xss_in_fullname",
+      "name": "Custom school full name containing script tag is escaped",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F05_05_custom_school_duplicate_id_idempotence",
+      "name": "Saving school with existing ID updates in-place without duplicating",
+      "feature": "F05",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F06_01_canvas_downsample_zero_dimensions",
+      "name": "Canvas downsample logic handles 0x0 image bounds without division by zero",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F06_02_canvas_downsample_extreme_4000x4000_image",
+      "name": "Massive 4000x4000 image downsampling bounds strictly to <= 256x256",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F06_03_canvas_downsample_corrupted_data_uri",
+      "name": "Malformed Base64 string does not throw unhandled exception",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F06_04_canvas_downsample_transparent_alpha_preservation",
+      "name": "Canvas uses image/png or preserve transparency to prevent black fill",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F06_05_canvas_downsample_storage_quota_defense",
+      "name": "Resized 256x256 image Base64 consumes under 30KB of LocalStorage quota",
+      "feature": "F06",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F07_01_custom_motto_empty_string",
+      "name": "Empty slogan input is tolerated without null pointer exception",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F07_02_custom_motto_whitespace_only",
+      "name": "Whitespace-only slogan trims safely to empty string",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F07_03_custom_motto_10000_char_length",
+      "name": "10,000 char extreme slogan does not break UI layout",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 6,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F07_04_custom_motto_html_injection",
+      "name": "Slogan containing HTML tags is escaped in DOM",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F07_05_custom_motto_special_unicode_emojis",
+      "name": "Slogan containing special Unicode emojis renders cleanly without corrupting",
+      "feature": "F07",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F08_01_free_form_period_empty_string",
+      "name": "Setting empty period string handled safely",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F08_02_free_form_period_whitespace_only",
+      "name": "Setting whitespace-only period string handles trimming cleanly",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F08_03_free_form_period_5000_char_string",
+      "name": "5000 character period string handled without crash",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F08_04_free_form_period_special_symbols",
+      "name": "Period string with special symbols persists accurately",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F08_05_free_form_period_rapid_consecutive_edits",
+      "name": "Rapid consecutive period updates retain the latest value cleanly",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 11,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F09_01_period_storage_null_argument",
+      "name": "Storage.setAcademicPeriod(null) handles null safely",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 6,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F09_02_period_storage_undefined_argument",
+      "name": "Storage.setAcademicPeriod(undefined) handles undefined safely",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F09_03_period_storage_numeric_argument",
+      "name": "Storage.setAcademicPeriod with number coerces to string",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F09_04_period_storage_tampered_localstorage_value",
+      "name": "Tampered empty key in LocalStorage returns safe fallback string",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F09_05_period_storage_preserves_custom_when_storage_has_demo",
+      "name": "Explicitly configured period is preserved across catalog reads",
+      "feature": "F09",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F10_01_vault_code_empty_submission",
+      "name": "Submitting empty code in vault triggers error feedback without crashing",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F10_02_vault_code_spaces_only",
+      "name": "Submitting whitespace-only code is handled gracefully",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F10_03_vault_code_10000_char_overflow",
+      "name": "Submitting 10,000 char string in vault inputs is rejected or bounded",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F10_04_vault_code_repeated_submissions",
+      "name": "Submitting invalid code 10 times in 1 second does not stack unhandled timers",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F10_05_vault_code_sql_and_script_injection",
+      "name": "Malicious injections like \"' OR 1=1\" do not unlock vault",
+      "feature": "F10",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F11_01_padlock_rapid_clicks_stress",
+      "name": "Clicking unlock trigger 30 times quickly triggers animation without race condition",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F11_02_padlock_missing_element_resilience",
+      "name": "If padlock element were missing, unlock handler does not throw unhandled error",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F11_03_padlock_view_switch_during_animation",
+      "name": "Switching view immediately after unlock attempt does not break app state",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 18,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F11_04_padlock_already_unlocked_idempotence",
+      "name": "Submitting an already unlocked code behaves idempotently without glitching",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F11_05_padlock_animation_class_cleanup",
+      "name": "Shake animation class can be removed and reflow forced without error",
+      "feature": "F11",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F12_01_reveal_modal_rapid_trigger",
+      "name": "Triggering reveal modal repeatedly does not stack multiple duplicate backdrops",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F12_02_reveal_modal_escape_key",
+      "name": "Escape key event dispatched to window is tolerated without error",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 10,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F12_03_reveal_modal_backdrop_click",
+      "name": "Clicking outside active modals preserves layout stability",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 7,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F12_04_reveal_modal_viewport_320px",
+      "name": "Modals at 320px width remain within viewport boundaries",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 30,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F12_05_reveal_modal_extreme_content_length",
+      "name": "Reward title with 500 characters wraps cleanly inside card",
+      "feature": "F12",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F13_01_apollo_code_with_leading_trailing_newlines",
+      "name": "Code \"\nAPOLLO11\n\" normalizes cleanly to \"APOLLO11\"",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F13_02_apollo_rockets_rapid_flapping",
+      "name": "Toggling rockets enabled on and off 20 times maintains consistency",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 5,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F13_03_apollo_theme_dark_mode_interop",
+      "name": "Apollo theme coexists with dark mode class",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F13_04_apollo_theme_light_mode_interop",
+      "name": "Apollo theme coexists when dark class is removed (light mode)",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F13_05_apollo_rocket_badge_missing_container_resilience",
+      "name": "Rocket badge updater does not throw if action button is absent",
+      "feature": "F13",
+      "status": "PASS",
+      "durationMs": 10,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F14_01_06062009_code_retention_of_leading_zero",
+      "name": "Code retains leading zero (does not parse as numeric 6062009)",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F14_02_06062009_code_with_slashes_or_dashes",
+      "name": "Date formatting like \"06/06/2009\" normalizes to \"06062009\"",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F14_03_06062009_tribute_modal_extreme_zoom",
+      "name": "Tribute modal remains legible at compact 640x360 dimensions",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 40,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F14_04_06062009_unlock_does_not_reset_custom_school",
+      "name": "Unlocking 06062009 does not overwrite active custom school or period",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F14_05_06062009_repeated_unlock_no_duplicate",
+      "name": "Unlocking 06062009 multiple times stores exactly 1 entry in unlocked codes",
+      "feature": "F14",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F15_01_eduardo_code_accented_variation",
+      "name": "Accented variation normalizes cleanly to EDUARDO",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F15_02_eduardo_code_with_suffix_number",
+      "name": "Alias EDUARDO1 resolves to EDUARDO creator unlock",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F15_03_eduardo_gold_palette_contrast_ratio",
+      "name": "Gold theme palette satisfies contrast readability in DOM",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F15_04_eduardo_crown_badge_no_layout_break",
+      "name": "Crown badge 👑 does not break surrounding element alignment",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F15_05_eduardo_theme_rapid_toggle",
+      "name": "Toggling Eduardo Gold theme 10 times leaves DOM in clean state",
+      "feature": "F15",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F16_01_vault_catalog_lookup_garbage_string",
+      "name": "Looking up garbage string \"XYZ_RANDOM_999!\" returns invalid cleanly",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F16_02_vault_catalog_lookup_empty_string",
+      "name": "Looking up empty string in catalog returns false",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F16_03_vault_catalog_lookup_null",
+      "name": "Looking up null code in catalog returns false safely",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F16_04_vault_catalog_all_11_codes_unlocked_storage_size",
+      "name": "Storing all 11 unlocked secret codes consumes < 5KB of LocalStorage",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F16_05_vault_catalog_idempotent_bulk_unlock",
+      "name": "Unlocking entire catalog twice does not duplicate array entries",
+      "feature": "F16",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F17_01_vault_inventory_empty_array_state",
+      "name": "Inventory handles empty array [] without crashing",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F17_02_vault_inventory_corrupted_storage_array",
+      "name": "Corrupted non-array string in unlocked codes recovers safely",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 6,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F17_03_vault_inventory_item_with_long_name",
+      "name": "Protocol with 200 character name truncates safely inside card",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F17_04_vault_inventory_rapid_switch_clicks",
+      "name": "Clicking inventory toggle switches 15 times quickly maintains consistent state",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F17_05_vault_inventory_overflow_scroll_mobile",
+      "name": "At 360px mobile width, inventory list scrolls vertically without horizontal overflow",
+      "feature": "F17",
+      "status": "PASS",
+      "durationMs": 49,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F18_01_special_theme_unknown_theme_id",
+      "name": "Setting special theme to unknown id falls back safely to \"default\"",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F18_02_special_theme_deactivate_when_already_default",
+      "name": "Deactivating theme when already default is a clean no-op",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F18_03_special_theme_simultaneous_toggle_stress",
+      "name": "Cycling through 5 themes rapidly leaves only the final theme class active",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F18_04_special_theme_root_class_no_duplicates",
+      "name": "Root element never accumulates duplicate class names",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F18_05_special_theme_preserves_dark_mode_preference",
+      "name": "Special themes do not clobber the \"dark\" class from documentElement",
+      "feature": "F18",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F19_01_settings_accordion_rapid_open_close",
+      "name": "Rapidly opening and closing settings sections 20 times does not hang",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F19_02_settings_all_sections_collapsed",
+      "name": "UI remains stable and visible when all settings sections are collapsed",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 15,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F19_03_settings_all_sections_expanded",
+      "name": "UI remains stable when all settings sections are expanded simultaneously",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F19_04_settings_viewport_320px_containment",
+      "name": "Settings elements remain within 320px viewport without horizontal blowout",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 19,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F19_05_settings_nested_controls_hit_targets",
+      "name": "Nested interactive elements maintain >= 36px touch targets",
+      "feature": "F19",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F20_01_switchboard_empty_unlocked_themes",
+      "name": "Switchboard renders cleanly when no special codes are unlocked",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F20_02_switchboard_toggle_rapid_clicking",
+      "name": "Rapid clicking on switchboard toggles does not desync storage from DOM",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F20_03_switchboard_disabled_switch_no_activation",
+      "name": "Locked switch cannot be activated when disabled attribute is present",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F20_04_switchboard_storage_key_tampering",
+      "name": "Tampered theme value in storage resets safely to default on load",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F20_05_switchboard_all_themes_switched_off",
+      "name": "When all themes are switched off, default clean theme is active",
+      "feature": "F20",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F21_01_tablet_viewport_767px_boundary",
+      "name": "Viewport 767px (mobile-tablet breakpoint boundary) has zero horizontal overflow",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 39,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F21_02_tablet_viewport_1023px_boundary",
+      "name": "Viewport 1023px (tablet-desktop breakpoint boundary) has zero horizontal overflow",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 38,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F21_03_tablet_landscape_1024x768",
+      "name": "Tablet landscape orientation (1024x768) has zero horizontal overflow",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 29,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F21_04_tablet_portrait_768x1024",
+      "name": "Tablet portrait orientation (768x1024) has zero horizontal overflow",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 37,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F21_05_tablet_header_buttons_alignment",
+      "name": "Header interactive buttons remain aligned and visible on tablet",
+      "feature": "F21",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F22_01_tablet_settings_grid_at_768px",
+      "name": "Settings grid renders without element overlap at 768px",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F22_02_tablet_calendar_overflow_prevention",
+      "name": "Calendar navigation buttons and days fit cleanly inside tablet width",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F22_03_tablet_task_cards_max_width_768px",
+      "name": "Task cards do not stretch awkwardly across screen on tablet",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F22_04_tablet_modals_width_bounding",
+      "name": "Modals on 768px tablet occupy <= 95% of viewport width",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F22_05_tablet_font_scaling_large_text",
+      "name": "Large text scaling does not push buttons off screen on tablet",
+      "feature": "F22",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F23_01_mobile_320px_minimum_viewport",
+      "name": "At 320px minimum screen width, zero horizontal scrollbar",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 37,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F23_02_mobile_480px_screen_width",
+      "name": "At 480px large phone width, bottom nav remains aligned",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 12,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F23_03_mobile_bottom_nav_safe_area",
+      "name": "Bottom nav provides clearance for fixed FAB button",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 13,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F23_04_mobile_long_title_task_card",
+      "name": "Task card with 500-char title wraps text without horizontal stretching",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F23_05_mobile_drawer_touch_outside",
+      "name": "Drawer backdrop handles click/touch events without crashing",
+      "feature": "F23",
+      "status": "PASS",
+      "durationMs": 8,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F24_01_widget_payload_zero_tasks",
+      "name": "Payload with 0 tasks computes pendingTodayCount: 0",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F24_02_widget_payload_100_tasks",
+      "name": "Payload with 100 tasks computes correctly without performance lag",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F24_03_widget_payload_missing_cycle_dates",
+      "name": "Payload handles missing cycle start/end dates with safe fallback",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F24_04_widget_payload_extreme_task_title",
+      "name": "Task title of 1000 characters is preserved safely in payload",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F24_05_widget_payload_valid_json_serialization",
+      "name": "Widget payload serializes cleanly to JSON without circular reference error",
+      "feature": "F24",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F25_01_dashboard_widget_empty_tasks",
+      "name": "Dashboard widget handles empty tasks list with zero state",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F25_02_dashboard_widget_all_tasks_completed",
+      "name": "When 100% tasks are completed, pending counter shows 0",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F25_03_dashboard_widget_cycle_progress_0_percent",
+      "name": "Cycle progress percentage returns 0% when cycle starts today",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F25_04_dashboard_widget_cycle_progress_100_percent",
+      "name": "Cycle progress percentage clamps to 100% when cycle has ended",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F25_05_dashboard_widget_inverted_cycle_dates",
+      "name": "Inverted cycle dates (end < start) handles safely without NaN",
+      "feature": "F25",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F26_01_test_runner_nonexistent_tier_argument",
+      "name": "Passing invalid tier argument handled safely",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F26_02_test_runner_empty_filter_regex",
+      "name": "Empty filter regex matches all tests safely",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F26_03_test_runner_unmatched_filter_regex",
+      "name": "Unmatched filter regex matches zero tests without error",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F26_04_test_summary_directory_creation",
+      "name": "Results directory is creatable without throwing",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F26_05_test_helpers_timeout_rejection",
+      "name": "waitSelector rejects properly on missing element",
+      "feature": "F26",
+      "status": "PASS",
+      "durationMs": 202,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F27_01_localstorage_quota_exceeded_mock",
+      "name": "LocalStorage quota exceeded is handled without uncaught fatal exception",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F27_02_malformed_json_import_recovery",
+      "name": "Importing malformed JSON string throws descriptive error without corrupting state",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F27_03_prototype_pollution_import_defense",
+      "name": "JSON payload containing __proto__ does not pollute Object prototype",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F27_04_import_payload_excessive_subjects",
+      "name": "Importing payload with >16 subjects is rejected or capped by MAX_SUBJECTS",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 2,
+      "id": "T2_F27_05_corrupt_unlocked_codes_localstorage",
+      "name": "Corrupt string in unlocked codes LocalStorage recovers cleanly to empty array",
+      "feature": "F27",
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_01_custom_school_apollo_theme_tablet",
+      "name": "Custom School + Apollo Space Theme on Tablet Viewport (768px)",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 43,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_02_canvas_logo_json_backup_fidelity",
+      "name": "Canvas Downsampled Logo + JSON Export/Import Roundtrip",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_03_eduardo_gold_parser_mobile_widget",
+      "name": "Normalized EDUARDO Code + Gold Theme + Mobile 375px + Widget Payload",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 55,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_04_padlock_animation_switchboard_toggle",
+      "name": "Padlock Unlock Code -> Theme Activation -> Switchboard Deactivation",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 16,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_05_06062009_tribute_custom_period",
+      "name": "06062009 Tribute Unlock + Free-Form Custom Period Retention",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_06_catalog_country_filter_custom_school",
+      "name": "Catalog Country Filter + Custom School Builder Coexistence",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_07_custom_motto_header_drawer_theme_apollo",
+      "name": "Custom Slogan + Header & Drawer Rendering + Apollo Rocket Badges",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_08_tablet_2col_settings_switchboard",
+      "name": "Tablet 768px 2-Column Settings + Themes Switchboard Interaction",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 37,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_09_mobile_375px_free_form_period_dashboard",
+      "name": "Mobile 375px + Free-Form Period + Dashboard Quick Glance Sync",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 34,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_10_all_11_codes_unlocked_json_backup",
+      "name": "11 Vault Codes Unlocked + Export to JSON Backup File",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_11_custom_school_cycle_dates_progress",
+      "name": "Custom School + Cycle Dates Setting + Semester Progress Percentage",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_12_apollo_theme_dark_mode_contrast",
+      "name": "Apollo Cosmic Space Theme + Dark Mode State Interoperability",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_13_eduardo_gold_motto_identity_modal",
+      "name": "Eduardo Gold Theme + Custom Slogan in School Identity Modal",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_14_country_optgroups_custom_school_select",
+      "name": "Country Optgroup Select + Dynamically Appended Custom School",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_15_widget_payload_custom_school_apollo",
+      "name": "Widget JSON Payload Generation with Custom School & Active Apollo Theme",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_16_general_school_removed_custom_school_fallback",
+      "name": "General School Removal + Custom School Icon Fallback to general.svg",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 9,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_17_padlock_unlock_06062009_back_nav",
+      "name": "Padlock Unlock 06062009 -> Tribute Display -> Back Button Navigation",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 30,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_18_multiple_unlocked_themes_switchboard_swap",
+      "name": "Multiple Unlocked Themes Swapped via Switchboard with Mutual Exclusion",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_19_tablet_viewport_calendar_custom_period",
+      "name": "Tablet 820px Viewport + Calendar Modal Open + Custom Academic Period",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 38,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_20_mobile_viewport_drawer_vault_trigger",
+      "name": "Mobile 375px + Drawer Navigation + Secret Codes Trigger",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 33,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_21_canvas_logo_downsampling_quota_stability",
+      "name": "5 Custom Schools with Downsampled Logos Consume < 150KB LocalStorage",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_22_multi_format_eduardo_founder_fab",
+      "name": "Multi-Format eduardo Input + Founder Badge Near Bottom FAB",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 3,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_23_custom_period_task_deadlines_widget",
+      "name": "Task with Deadline Linked to Custom Period Displays in Widget",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_24_switchboard_rocket_toggle_fab_mobile",
+      "name": "Rocket Badge Toggle on Mobile FAB at 360px Viewport",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 14,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_25_json_backup_purge_restore_state",
+      "name": "Full State JSON Backup -> LocalStorage Purge -> State Restore Roundtrip",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_26_free_form_period_catalog_switch_retention",
+      "name": "Selecting School -> Free-Form Period -> School Switch Retains Custom Period",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_27_custom_school_task_subject_widget_sync",
+      "name": "Custom School + Course Subject + Task Assignment + Widget Payload Sync",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_28_tablet_viewport_820px_dashboard_glance",
+      "name": "Tablet 820px Viewport Displays Dashboard Glance Without Overflow",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 38,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_29_secret_vault_padlock_haptics_mock",
+      "name": "Secret Vault Padlock Unlock Triggers Haptic Feedback Without Error",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_30_full_theme_cycle_cleanliness",
+      "name": "Full Theme Cycle: Default -> Apollo -> Eduardo Gold -> Synthwave -> Default",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_31_custom_school_update_slogan_logo",
+      "name": "Updating Custom School Slogan and Logo Updates Storage and View",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "tier": 3,
+      "id": "T3_COMB_32_offline_reload_all_state_preserved",
+      "name": "Offline Page Reload Preserves Custom School, Theme, and Unlocked Codes",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 225,
+      "error": null
+    },
+    {
+      "tier": 4,
+      "id": "T4_SCENARIO_1_international_student_onboarding",
+      "name": "Scenario 1: New International Student Onboarding (UBA -> Custom Period -> Task Addition -> DOM Render -> Widget Sync)",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 256,
+      "error": null
+    },
+    {
+      "tier": 4,
+      "id": "T4_SCENARIO_2_private_academy_scholar_custom_identity",
+      "name": "Scenario 2: Private Academy Scholar (Custom School -> Canvas Logo -> Free-Form Period -> Slogan Display)",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 15,
+      "error": null
+    },
+    {
+      "tier": 4,
+      "id": "T4_SCENARIO_3_secret_hunter_vault_journey",
+      "name": "Scenario 3: Secret Hunter Journey (Padlock Unlock -> Apollo11 -> 06062009 -> Eduardo Gold -> Switchboard Deactivation)",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 76,
+      "error": null
+    },
+    {
+      "tier": 4,
+      "id": "T4_SCENARIO_4_cross_device_power_user_responsiveness",
+      "name": "Scenario 4: Cross-Device Responsiveness (Mobile 375px -> Tablet 768px -> Desktop 1280px)",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 240,
+      "error": null
+    },
+    {
+      "tier": 4,
+      "id": "T4_SCENARIO_5_disaster_recovery_and_migration_cycle",
+      "name": "Scenario 5: Disaster Recovery & Migration Cycle (Full Data -> JSON Export -> Purge -> Import -> Restore)",
+      "feature": null,
+      "status": "PASS",
+      "durationMs": 244,
+      "error": null
+    }
+  ]
+}

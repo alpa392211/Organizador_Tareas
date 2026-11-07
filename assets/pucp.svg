@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="pucp-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002855"/>
+      <stop offset="100%" stop-color="#001229"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="176" height="176" rx="36" fill="url(#pucp-bg)" stroke="#6BA4B8" stroke-width="3"/>
+  <!-- Escudo PUCP -->
+  <path d="M64 52 H136 V102 C136 132 100 150 100 150 C100 150 64 132 64 102 Z" fill="#001D40" stroke="#6BA4B8" stroke-width="2.5"/>
+  <!-- Cruz Latina radiante -->
+  <path d="M95 64 H105 V128 H95 Z" fill="#FFFFFF"/>
+  <path d="M80 80 H120 V90 H80 Z" fill="#FFFFFF"/>
+  <circle cx="100" cy="85" r="5" fill="#6BA4B8"/>
+  <!-- Estrellas y resplandor -->
+  <polygon points="76,66 78,71 83,71 79,74 80,79 76,76 72,79 73,74 69,71 74,71" fill="#FBBF24"/>
+  <polygon points="124,66 126,71 131,71 127,74 128,79 124,76 120,79 121,74 117,71 122,71" fill="#FBBF24"/>
+  <text x="100" y="40" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="3">PUCP</text>
+  <text x="100" y="172" fill="#BAE6FD" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7.5" font-weight="700" text-anchor="middle" letter-spacing="1">ET LUX IN TENEBRIS LUCET</text>
+</svg>
