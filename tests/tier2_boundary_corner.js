@@ -2190,16 +2190,16 @@ const tests = [
     {
         id: 'T2_F42_01_cross_file_version_parity_boundary',
         feature: 'F42',
-        name: 'Strict v1.3.4 version parity verified across package.json, sw.js, and index.html',
+        name: 'Strict v1.3.5 version parity verified across package.json, sw.js, and index.html',
         run: async (page, helpers) => {
             const pkg = JSON.parse(fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'package.json'), 'utf8'));
             const sw = fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'sw.js'), 'utf8');
             const html = fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'index.html'), 'utf8');
 
-            helpers.assertEqual(pkg.version, '1.3.4', 'package.json must be 1.3.4');
-            helpers.assertTrue(sw.includes('v1.3.4'), 'sw.js must contain v1.3.4');
-            helpers.assertTrue(html.includes('1.3.4'), 'index.html must contain 1.3.4');
-            helpers.assertFalse(sw.includes('v1.3.3'), 'sw.js must have 0 references to v1.3.3');
+            helpers.assertEqual(pkg.version, '1.3.5', 'package.json must be 1.3.5');
+            helpers.assertTrue(sw.includes('v1.3.5'), 'sw.js must contain v1.3.5');
+            helpers.assertTrue(html.includes('1.3.5'), 'index.html must contain 1.3.5');
+            helpers.assertFalse(sw.includes('v1.3.4'), 'sw.js must have 0 references to v1.3.4');
         }
     }
 ];

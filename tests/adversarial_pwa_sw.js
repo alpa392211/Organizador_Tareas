@@ -241,7 +241,7 @@ async function runAdversarialTests() {
         console.log(`\n${colors.bold}--- [2] Precache Completeness & Query Parameter Resilience ---${colors.reset}`);
 
         const cacheAudit = await page.evaluate(async () => {
-            const cacheName = 'organizador-tareas-cache-v1.3.4';
+            const cacheName = 'organizador-tareas-cache-v1.3.5';
             const exists = await caches.has(cacheName);
             if (!exists) return { exists: false, entries: [] };
 
@@ -249,7 +249,7 @@ async function runAdversarialTests() {
             const requests = await cache.keys();
             const urls = requests.map(r => r.url);
 
-            // Test ignoreSearch capability: match css/styles.css without query params against precached css/styles.css?v=1.3.4
+            // Test ignoreSearch capability: match css/styles.css without query params against precached css/styles.css?v=1.3.5
             const matchStripped = await cache.match('./css/styles.css', { ignoreSearch: true });
             const matchWithDiffParam = await cache.match('./css/styles.css?cachebust=xyz987', { ignoreSearch: true });
             const matchIndex = await cache.match('./index.html');
@@ -265,7 +265,7 @@ async function runAdversarialTests() {
         });
 
         if (cacheAudit.exists && cacheAudit.count >= 30) {
-            recordPass(`Cache 'organizador-tareas-cache-v1.3.4' populated with ${cacheAudit.count} precached assets`);
+            recordPass(`Cache 'organizador-tareas-cache-v1.3.5' populated with ${cacheAudit.count} precached assets`);
         } else {
             recordFail('Precache population count check', new Error(`Cache exists: ${cacheAudit.exists}, count: ${cacheAudit.count}`));
         }
@@ -278,13 +278,13 @@ async function runAdversarialTests() {
 
         // Verify that all critical URLs listed in PRECACHE_ASSETS are valid HTTP 200 in the cache
         const cacheAssetCheck = await page.evaluate(async () => {
-            const cache = await caches.open('organizador-tareas-cache-v1.3.4');
+            const cache = await caches.open('organizador-tareas-cache-v1.3.5');
             const essentialAssets = [
                 './index.html',
                 './manifest.webmanifest',
-                './css/tailwind.min.css?v=1.3.4',
-                './css/styles.css?v=1.3.4',
-                './js/app.js?v=1.3.4',
+                './css/tailwind.min.css?v=1.3.5',
+                './css/styles.css?v=1.3.5',
+                './js/app.js?v=1.3.5',
                 './assets/icons/icon-192x192.png',
                 './assets/icons/icon-512x512.png',
                 './assets/icons/icon-maskable-192x192.png',

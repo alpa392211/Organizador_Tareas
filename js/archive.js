@@ -30,27 +30,55 @@ window.ArchiveModule = (() => {
 
         if (titleEl) titleEl.textContent = title;
         if (descEl) descEl.textContent = message;
+
+        const close = () => {
+            window.HapticsModule?.light();
+            document.removeEventListener('keydown', handleKeydown);
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            }, 200);
+        };
+
+        const handleKeydown = (e) => {
+            if (e.key === 'Escape') {
+                close();
+            }
+        };
+        document.addEventListener('keydown', handleKeydown);
+
         if (confirmBtn) {
             confirmBtn.textContent = confirmText || 'Eliminar definitivamente';
-            confirmBtn.onclick = () => {
+            confirmBtn.onclick = (e) => {
+                e.stopPropagation();
+                confirmBtn.onclick = null;
                 close();
                 onConfirm?.();
             };
         }
 
-        const close = () => {
-            window.HapticsModule?.light();
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
-        };
+        if (cancelBtn) {
+            cancelBtn.onclick = (e) => {
+                e.stopPropagation();
+                close();
+            };
+        }
 
-        if (cancelBtn) cancelBtn.onclick = close;
-        if (backdrop) backdrop.onclick = close;
+        if (backdrop) {
+            backdrop.onclick = (e) => {
+                e.stopPropagation();
+                close();
+            };
+        }
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         document.body.classList.add('overflow-hidden');
+        requestAnimationFrame(() => {
+            modal.classList.add('active');
+        });
     }
 
     function setupEventListeners() {
@@ -258,7 +286,21 @@ window.ArchiveModule = (() => {
 
             if (combined.length === 0) {
                 container.innerHTML = '';
-                if (emptyState) emptyState.classList.remove('hidden');
+                if (emptyState) {
+                    const emptyTitle = emptyState.querySelector('h3');
+                    const emptyDesc = emptyState.querySelector('p');
+                    if (totalVaultItems === 0) {
+                        if (emptyTitle) emptyTitle.textContent = 'El baúl está vacío';
+                        if (emptyDesc) emptyDesc.textContent = 'Las notas que archives o las tareas que decidas resguardar aparecerán guardadas en este rincón.';
+                    } else if (searchQuery) {
+                        if (emptyTitle) emptyTitle.textContent = 'Sin coincidencias en el baúl';
+                        if (emptyDesc) emptyDesc.textContent = `No se encontraron elementos archivados que coincidan con "${escapeHtml(searchQuery)}".`;
+                    } else {
+                        if (emptyTitle) emptyTitle.textContent = `Sin ${currentFilter === 'tasks' ? 'tareas archivadas' : 'notas archivadas'}`;
+                        if (emptyDesc) emptyDesc.textContent = `No tienes ${currentFilter === 'tasks' ? 'tareas' : 'notas'} archivadas en esta pestaña.`;
+                    }
+                    emptyState.classList.remove('hidden');
+                }
                 return;
             }
 

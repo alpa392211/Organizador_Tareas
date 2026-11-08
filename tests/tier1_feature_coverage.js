@@ -2248,12 +2248,12 @@ const tests = [
     {
         id: 'T1_F32_01_sw_script_exists_and_cache_name',
         feature: 'F32',
-        name: 'sw.js exists and declares CACHE_NAME organizador-tareas-cache-v1.3.4',
+        name: 'sw.js exists and declares CACHE_NAME organizador-tareas-cache-v1.3.5',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             helpers.assertTrue(fs.existsSync(swPath), 'sw.js must exist at project root');
             const code = fs.readFileSync(swPath, 'utf8');
-            helpers.assertIncludes(code, 'organizador-tareas-cache-v1.3.4', 'CACHE_NAME must be organizador-tareas-cache-v1.3.4');
+            helpers.assertIncludes(code, 'organizador-tareas-cache-v1.3.5', 'CACHE_NAME must be organizador-tareas-cache-v1.3.5');
         }
     },
     {
@@ -2265,8 +2265,8 @@ const tests = [
             const code = fs.readFileSync(swPath, 'utf8');
             helpers.assertIncludes(code, 'index.html', 'Precache must include index.html');
             helpers.assertIncludes(code, 'manifest.webmanifest', 'Precache must include manifest.webmanifest');
-            helpers.assertIncludes(code, 'css/styles.css?v=1.3.4', 'Precache must include versioned styles.css');
-            helpers.assertIncludes(code, 'js/app.js?v=1.3.4', 'Precache must include versioned app.js');
+            helpers.assertIncludes(code, 'css/styles.css?v=1.3.5', 'Precache must include versioned styles.css');
+            helpers.assertIncludes(code, 'js/app.js?v=1.3.5', 'Precache must include versioned app.js');
             helpers.assertIncludes(code, 'assets/icons/icon-192x192.png', 'Precache must include icon-192x192.png');
         }
     },
@@ -3096,60 +3096,60 @@ const tests = [
     },
 
     // =========================================================================
-    // F42: Version Bump to v1.3.4
+    // F42: Version Bump to v1.3.5
     // =========================================================================
     {
-        id: 'T1_F42_01_package_json_version_v134',
+        id: 'T1_F42_01_package_json_version_v135',
         feature: 'F42',
-        name: 'package.json specifies version 1.3.4 strictly',
+        name: 'package.json specifies version 1.3.5 strictly',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.3.4', 'package.json version must be 1.3.4');
+            helpers.assertEqual(pkg.version, '1.3.5', 'package.json version must be 1.3.5');
         }
     },
     {
-        id: 'T1_F42_02_index_html_query_strings_v134',
+        id: 'T1_F42_02_index_html_query_strings_v135',
         feature: 'F42',
-        name: 'index.html asset references include ?v=1.3.4 cache-busting parameter',
+        name: 'index.html asset references include ?v=1.3.5 cache-busting parameter',
         run: async (page, helpers) => {
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const html = fs.readFileSync(htmlPath, 'utf8');
-            helpers.assertIncludes(html, 'css/styles.css?v=1.3.4', 'styles.css must reference ?v=1.3.4');
-            helpers.assertIncludes(html, 'js/app.js?v=1.3.4', 'app.js must reference ?v=1.3.4');
+            helpers.assertIncludes(html, 'css/styles.css?v=1.3.5', 'styles.css must reference ?v=1.3.5');
+            helpers.assertIncludes(html, 'js/app.js?v=1.3.5', 'app.js must reference ?v=1.3.5');
         }
     },
     {
-        id: 'T1_F42_03_settings_version_badge_displays_134',
+        id: 'T1_F42_03_settings_version_badge_displays_135',
         feature: 'F42',
-        name: 'Settings view version pill displays "Versión 1.3.4"',
+        name: 'Settings view version pill displays "Versión 1.3.5"',
         run: async (page, helpers) => {
             const text = await page.evaluate(() => {
                 const pill = document.getElementById('settings-version-pill');
                 return pill ? pill.textContent.trim() : null;
             });
-            helpers.assertIncludes(text, '1.3.4', 'Settings version pill must display 1.3.4');
+            helpers.assertIncludes(text, '1.3.5', 'Settings version pill must display 1.3.5');
         }
     },
     {
-        id: 'T1_F42_04_sw_cache_name_v134',
+        id: 'T1_F42_04_sw_cache_name_v135',
         feature: 'F42',
-        name: 'Service Worker cache name matches organizador-tareas-cache-v1.3.4',
+        name: 'Service Worker cache name matches organizador-tareas-cache-v1.3.5',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const code = fs.readFileSync(swPath, 'utf8');
-            helpers.assertIncludes(code, 'organizador-tareas-cache-v1.3.4', 'sw.js must define cache v1.3.4');
+            helpers.assertIncludes(code, 'organizador-tareas-cache-v1.3.5', 'sw.js must define cache v1.3.5');
         }
     },
     {
         id: 'T1_F42_05_sw_precache_assets_version_parameter_fidelity',
         feature: 'F42',
-        name: 'sw.js PRECACHE_ASSETS queries are unified to v=1.3.4 across all entries',
+        name: 'sw.js PRECACHE_ASSETS queries are unified to v=1.3.5 across all entries',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const code = fs.readFileSync(swPath, 'utf8');
-            helpers.assertFalse(code.includes('v=1.3.3'), 'sw.js must contain no references to older v=1.3.3');
-            helpers.assertIncludes(code, '?v=1.3.4', 'sw.js precache must reference ?v=1.3.4');
+            helpers.assertFalse(code.includes('v=1.3.4'), 'sw.js must contain no references to older v=1.3.4');
+            helpers.assertIncludes(code, '?v=1.3.5', 'sw.js precache must reference ?v=1.3.5');
         }
     }
 ];

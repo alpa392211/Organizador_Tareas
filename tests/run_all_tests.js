@@ -70,7 +70,7 @@ async function main() {
     const options = parseArgs();
 
     console.log(`${colors.bold}${colors.cyan}========================================================================${colors.reset}`);
-    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.3.4 - End-to-End Headless Test Suite           ${colors.reset}`);
+    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.3.5 - End-to-End Headless Test Suite           ${colors.reset}`);
     console.log(`${colors.cyan}========================================================================${colors.reset}`);
     console.log(`${colors.dim}Target:  ${helpers.TARGET_URL}${colors.reset}`);
     console.log(`${colors.dim}Binary:  ${helpers.CHROME_PATH}${colors.reset}`);
@@ -90,7 +90,7 @@ async function main() {
 
     const summary = {
         timestamp: new Date().toISOString(),
-        version: '1.3.4',
+        version: '1.3.5',
         total: 0,
         passed: 0,
         failed: 0,
