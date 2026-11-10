@@ -56,8 +56,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.3.5">
-    <link rel="stylesheet" href="css/styles.css?v=1.3.5">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.4.1">
+    <link rel="stylesheet" href="css/styles.css?v=1.4.1">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -835,8 +835,26 @@
                                     <span id="settings-inst-period-badge" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">1.º Semestre</span>
                                 </div>
                                 <p id="settings-inst-fullname" class="text-xs text-slate-600 dark:text-slate-400 truncate mt-0.5">Universidad Nacional Autónoma de México</p>
-                                <p id="settings-inst-slogan" class="text-[11px] text-slate-500 dark:text-slate-400 italic truncate">"Por mi raza hablará el espíritu"</p>
+                                <p id="settings-inst-slogan" class="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold truncate">Estudiante</p>
                             </div>
+                        </div>
+
+                        <!-- Configuración de Nombre de Usuario / Estudiante -->
+                        <div class="p-3.5 rounded-xl bg-indigo-50/50 dark:bg-slate-900/40 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                            <label for="settings-user-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                Tu Nombre de Usuario / Estudiante
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="text" id="settings-user-name" placeholder="Escribe tu nombre..."
+                                    class="flex-1 px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                                <button type="button" id="settings-save-user-name-btn"
+                                    class="tap-effect px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-colors">
+                                    Guardar
+                                </button>
+                            </div>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400">
+                                Tu nombre sustituye los lemas escolares en toda la aplicación.
+                            </p>
                         </div>
 
                         <!-- Selector Rápido de Institución (con Filtro por País y Creador) -->
@@ -985,44 +1003,6 @@
                                         <span class="app-switch-thumb"></span>
                                     </div>
                                 </label>
-                            </div>
-                        </div>
-
-                        <!-- PANEL SECRETO DESBLOQUEABLE: MODO GRISES Y GATITOS -->
-                        <div id="secret-theme-controls" class="hidden pt-3 border-t border-purple-200/50 dark:border-purple-800/50 space-y-2">
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/20 text-purple-700 dark:text-purple-300">
-                                <span class="text-sm">🐱</span>
-                                <h4 class="text-[11px] font-black uppercase tracking-wider">Funciones Especiales Desbloqueadas</h4>
-                            </div>
-
-                            <div class="settings-switch-row">
-                                <div class="settings-switch-label">
-                                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Modo Monocromático (Gris Elegante)</span>
-                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Estilo visual minimalista en escala de grises slate y zinc.</span>
-                                </div>
-                                <div class="settings-switch-toggle">
-                                    <label class="app-switch app-switch-slate" for="settings-gray-mode-toggle">
-                                        <input type="checkbox" id="settings-gray-mode-toggle">
-                                        <div class="app-switch-track">
-                                            <span class="app-switch-thumb"></span>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="settings-switch-row">
-                                <div class="settings-switch-label">
-                                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Celebración con Gatitos</span>
-                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Muestra gatitos festivos al completar tareas y patitas escondidas en botones.</span>
-                                </div>
-                                <div class="settings-switch-toggle">
-                                    <label class="app-switch app-switch-purple" for="settings-cats-toggle">
-                                        <input type="checkbox" id="settings-cats-toggle" checked>
-                                        <div class="app-switch-track">
-                                            <span class="app-switch-thumb"></span>
-                                        </div>
-                                    </label>
-                                </div>
                             </div>
                         </div>
 
@@ -1362,13 +1342,18 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.3.5 -->
-                <div class="text-center pt-2">
+                <!-- VERSIÓN HASTA ABAJO v1.4.1 PÁJARO 🐦 -->
+                <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
-                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none">
-                        <span>🐧</span>
-                        <span>Versión 1.3.5</span>
+                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        title="Ver novedades de la versión">
+                        <span>🐦</span>
+                        <span>Versión 1.4.1</span>
                     </div>
+                    <button type="button" id="settings-open-changelog-btn"
+                        class="tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
+                        <span>✨ Ver novedades de la versión 1.4.1 «Pájaro 🐦»</span>
+                    </button>
                 </div>
             </div>
         </section>
@@ -1385,6 +1370,32 @@
                     <span>Volver a Configuración</span>
                 </button>
                 <span class="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-3 py-1 rounded-xl border border-purple-500/20 uppercase tracking-widest">TERMINAL SEC-08</span>
+            </div>
+
+            <!-- Tarjeta de Progreso de Desbloqueo Automático (1 cada 5 tareas) -->
+            <div id="vault-progress-card" class="w-full max-w-lg mx-auto mb-4 p-4 rounded-2xl bg-white/95 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-2.5 transition-all">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base select-none">⚡</span>
+                        <h3 class="text-xs sm:text-sm font-extrabold text-purple-950 dark:text-purple-200">
+                            Desbloqueo Progresivo de Códigos
+                        </h3>
+                    </div>
+                    <span id="vault-completed-tasks-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-700">
+                        0 tareas
+                    </span>
+                </div>
+                <!-- Barra de progreso -->
+                <div class="w-full bg-slate-100 dark:bg-purple-950/80 rounded-full h-2.5 overflow-hidden border border-purple-200/60 dark:border-purple-700/50">
+                    <div id="vault-progress-bar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-purple-700 dark:text-purple-300">
+                    <span id="vault-next-unlock-text">Completa tareas para desbloquear el próximo código</span>
+                    <span id="vault-unlocked-count-text" class="font-mono font-bold">0 / 14</span>
+                </div>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-purple-100 dark:border-purple-900/50 pt-1.5">
+                    🔓 Se desbloquea 1 código automáticamente cada 5 tareas completadas. <em>(Los códigos confidenciales <code>EDUARDO</code> y <code>06062009</code> solo pueden descifrarse manualmente)</em>.
+                </p>
             </div>
 
             <!-- Contenedor Central con Aura de Suspenso Cinematográfica -->
@@ -1446,6 +1457,49 @@
                 
                 <div id="vault-unlocked-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[38vh] overflow-y-auto overflow-x-hidden pr-1">
                     <!-- Tarjetas renderizadas dinámicamente mediante App.renderVaultInventory() -->
+                </div>
+            </div>
+
+            <!-- Funciones Especiales Secretas (Exclusivas de la Bóveda) -->
+            <div id="secret-theme-controls" data-theme-switchboard="true" class="w-full max-w-lg mx-auto mt-4 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/80 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-3">
+                <div class="flex items-center gap-2 border-b border-purple-100 dark:border-purple-900/40 pb-2">
+                    <span class="text-base select-none">✨</span>
+                    <h3 class="text-xs sm:text-sm font-extrabold text-purple-950 dark:text-purple-200">
+                        Funciones Secretas de la Bóveda
+                    </h3>
+                </div>
+                <div class="space-y-3">
+                    <!-- Gatitos -->
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <label for="settings-cats-toggle" class="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
+                                <span>🐾</span> Efecto Gatitos
+                            </label>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                Añade pequeños gatitos interactivos en los botones de acción rápida.
+                            </p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" id="settings-cats-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-purple-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Modo Monocromático / Escala de Grises -->
+                    <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <div class="min-w-0">
+                            <label for="settings-gray-mode-toggle" class="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
+                                <span>🔲</span> Modo Monocromático
+                            </label>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                Interfaz minimalista en escala de grises para máxima concentración.
+                            </p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" id="settings-gray-mode-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-purple-600"></div>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -2187,7 +2241,7 @@
                 </span>
                 <div>
                     <h2 class="text-lg font-black text-slate-900 dark:text-white leading-tight">
-                        ¡Bienvenido a tu Organizador!
+                        ¡Bienvenido! 🎓
                     </h2>
                     <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                         Configuración Inicial
@@ -2196,15 +2250,41 @@
             </div>
 
             <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Selecciona tu casa de estudios oficial, tu grado o periodo lectivo y las fechas de tu ciclo escolar para comenzar:
+                Personaliza tu perfil de estudiante, elige tu país e institución y delimita tus fechas lectivas para comenzar:
             </p>
 
             <form id="cycle-setup-welcome-form" class="space-y-3.5 pt-1">
-                <!-- 1. Selección Interactiva de Institución Educativa -->
-                <div class="space-y-2">
+                <!-- 0. Nombre del Estudiante / Usuario -->
+                <div class="space-y-1.5">
+                    <label for="welcome-user-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        Tu Nombre o Apodo Estudiantil *
+                    </label>
+                    <input type="text" id="welcome-user-name" placeholder="Ej: Alex, Eduardo, Sofía..."
+                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400">Tu nombre sustituye los lemas escolares en toda la aplicación.</p>
+                </div>
+
+                <!-- 1. Selección de País (Country-first flow) -->
+                <div id="welcome-country-section" class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        1. Selecciona tu País *
+                    </label>
+                    <!-- Grid de Países -->
+                    <div id="welcome-country-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <!-- Inyectado por JS -->
+                    </div>
+                    <!-- Mensaje si México ya está fijado -->
+                    <div id="welcome-mexico-locked-msg" class="hidden p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2">
+                        <span class="text-base select-none">🇲🇽</span>
+                        <span>País fijado: <strong>México</strong> (permanente)</span>
+                    </div>
+                </div>
+
+                <!-- 2. Selección Interactiva de Institución Educativa -->
+                <div id="welcome-schools-section" class="space-y-2 hidden">
                     <div class="flex items-center justify-between">
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                            Institución Educativa *
+                            2. Institución Educativa *
                         </label>
                     </div>
 
@@ -2404,17 +2484,118 @@
         <!-- Notificaciones flotantes -->
     </div>
 
+    <!-- ========================================================= -->
+    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.4.1 «PÁJARO 🐦»         -->
+    <!-- ========================================================= -->
+    <div id="changelog-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
+        <div id="changelog-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
+
+        <div class="modal-dialog relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-indigo-200 dark:border-indigo-800/80 p-6 sm:p-7 space-y-4 max-h-[90vh] overflow-y-auto">
+            <!-- Encabezado con Icono y Versión -->
+            <div class="flex items-center gap-3.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+                <span class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                    🐦
+                </span>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-lg font-black text-slate-900 dark:text-white">
+                            Novedades de la Versión 1.4.1
+                        </h2>
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                            Pájaro 🐦
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        ¡Descubre las nuevas características y mejoras introducidas!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Lista de Cambios Mayores -->
+            <div class="space-y-3 py-1">
+                <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">🇲🇽</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Flujo de País Primero</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            Al iniciar, se selecciona primero tu país. Si eres de México, queda fijado permanentemente para que nunca más vuelva a preguntarte.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">👆</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Menú Contextual por Pulsación Prolongada</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            Interfaz limpia y despejada: mantén presionada cualquier tarea, materia o nota (o clic derecho en PC) para desplegar su menú flotante de editar y eliminar.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">👤</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Tu Nombre e Identidad Estudiantil</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            Ahora puedes registrar tu nombre o apodo en el inicio o en ajustes para que aparezca en el menú lateral y encabezado en lugar de los lemas escolares.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">🔔</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Permisos de Notificaciones Oportunos</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            Solicitud ágil de permisos para recordatorios puntuales de tus entregas académicas y materias.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">🗝️</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Bóveda Secreta Mejorada</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            Desbloqueo automático progresivo (1 código cada 5 tareas completadas), nuevo diseño elegante en modo claro y funciones secretas exclusivas (Gatitos y Modo Monocromático trasladados aquí).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">🛡️</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Preservación Total de Datos</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            Todas tus tareas, materias, notas, horarios y configuraciones se conservan 100% intactas en tu dispositivo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón de Confirmación -->
+            <div class="pt-2">
+                <button type="button" id="changelog-confirm-btn"
+                    class="tap-effect w-full py-3 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>¡Entendido! Comenzar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js?v=1.3.5"></script>
-    <script src="js/storage.js?v=1.3.5"></script>
-    <script src="js/haptics.js?v=1.3.5"></script>
-    <script src="js/notifications.js?v=1.3.5"></script>
-    <script src="js/widgets.js?v=1.3.5"></script>
-    <script src="js/subjects.js?v=1.3.5"></script>
-    <script src="js/tasks.js?v=1.3.5"></script>
-    <script src="js/notes.js?v=1.3.5"></script>
-    <script src="js/calendar.js?v=1.3.5"></script>
-    <script src="js/archive.js?v=1.3.5"></script>
-    <script src="js/app.js?v=1.3.5"></script>
+    <script src="js/institutions.js?v=1.4.1"></script>
+    <script src="js/storage.js?v=1.4.1"></script>
+    <script src="js/haptics.js?v=1.4.1"></script>
+    <script src="js/notifications.js?v=1.4.1"></script>
+    <script src="js/widgets.js?v=1.4.1"></script>
+    <script src="js/subjects.js?v=1.4.1"></script>
+    <script src="js/tasks.js?v=1.4.1"></script>
+    <script src="js/notes.js?v=1.4.1"></script>
+    <script src="js/calendar.js?v=1.4.1"></script>
+    <script src="js/archive.js?v=1.4.1"></script>
+    <script src="js/app.js?v=1.4.1"></script>
 </body>
 </html>

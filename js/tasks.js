@@ -409,6 +409,16 @@ window.TasksModule = (() => {
                 window.HapticsModule?.double();
                 cancelTaskNotification(id);
                 triggerCelebration(sourceEl);
+
+                // Desbloqueo progresivo automático: 1 código cada 5 tareas completadas (excluye eduardo y 06062009)
+                const unlockedCode = Storage.checkVaultAutoUnlockOnTaskCompleted?.();
+                if (unlockedCode) {
+                    const catalogItem = window.OrganizadorApp?.getVaultCatalogItem?.(unlockedCode) || { name: unlockedCode, icon: '🗝️' };
+                    setTimeout(() => {
+                        window.showNotification?.(`🗝️ ¡5 tareas completadas! Se desbloqueó «${catalogItem.name || unlockedCode}» en la Bóveda Secreta.`, 'success');
+                        window.OrganizadorApp?.renderVaultInventory?.();
+                    }, 500);
+                }
             } else {
                 window.HapticsModule?.light();
                 if (updated.dueDate) {
@@ -608,15 +618,8 @@ window.TasksModule = (() => {
                     </div>
                 </div>
 
-                <!-- Acciones Rápidas -->
-                <div class="flex items-center gap-1 self-end sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-700/60 w-full sm:w-auto justify-end">
-                    <button type="button" data-action="edit" data-id="${task.id}"
-                        class="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
-                        title="Editar tarea">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                        </svg>
-                    </button>
+                <!-- Acciones Rápidas (Archivar en baúl y menú contextual por pulsación prolongada) -->
+                <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-700/60 w-full sm:w-auto justify-end">
                     ${task.completed ? `
                         <button type="button" data-action="archive" data-id="${task.id}"
                             class="tap-effect flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm shadow-amber-500/30 transition-transform active:scale-95"
@@ -635,13 +638,6 @@ window.TasksModule = (() => {
                             </svg>
                         </button>
                     `}
-                    <button type="button" data-action="delete" data-id="${task.id}"
-                        class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"
-                        title="Eliminar tarea">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
                 </div>
             `;
 
@@ -649,20 +645,17 @@ window.TasksModule = (() => {
                 e.stopPropagation();
                 toggleTask(task.id, e.currentTarget);
             });
-            card.querySelector('[data-action="edit"]')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                openEditModal(task.id);
-            });
             card.querySelector('[data-action="archive"]')?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 archiveTask(task.id);
             });
-            card.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                deleteTaskPrompt(task.id);
+
+            // Menú contextual flotante por pulsación prolongada (Long-Press o Clic Derecho)
+            window.CardContextMenu?.bind?.(card, {
+                title: task.title,
+                onEdit: () => openEditModal(task.id),
+                onDelete: () => deleteTaskPrompt(task.id)
             });
 
             container.appendChild(card);

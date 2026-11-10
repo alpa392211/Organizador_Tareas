@@ -211,7 +211,7 @@ async function runTestSuite() {
         }
 
         assertEqual(json.name, 'Organizador de Tareas', `${mFile} name is "Organizador de Tareas"`);
-        assertEqual(json.short_name, 'Organizador', `${mFile} short_name is "Organizador"`);
+        assertEqual(json.short_name, '', `${mFile} short_name is empty to suppress splash text`);
         assertEqual(json.display, 'standalone', `${mFile} display is "standalone"`);
         assert(Boolean(json.start_url), `${mFile} has start_url declared (${json.start_url})`);
         assert(Array.isArray(json.icons) && json.icons.length > 0, `${mFile} has non-empty icons array`);

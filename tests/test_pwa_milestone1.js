@@ -99,7 +99,7 @@ async function run() {
 
     assert(JSON.stringify(manifestWeb) === JSON.stringify(manifestJson), 'manifest.webmanifest and manifest.json are synchronized');
     assert(manifestWeb.name === 'Organizador de Tareas', 'Manifest name is "Organizador de Tareas"');
-    assert(manifestWeb.short_name === 'Organizador', 'Manifest short_name is "Organizador"');
+    assert(manifestWeb.short_name === '', 'Manifest short_name is empty to suppress splash text');
     assert(manifestWeb.display === 'standalone', 'Manifest display mode is "standalone"');
     assert(manifestWeb.background_color === '#0c0143', 'Manifest background_color is #0c0143');
     assert(manifestWeb.theme_color === '#4F46E5', 'Manifest theme_color is #4F46E5');
@@ -142,7 +142,7 @@ async function run() {
     assert(fs.existsSync(swPath), 'sw.js exists at project root');
     const swContent = fs.readFileSync(swPath, 'utf8');
 
-    assert(swContent.includes('organizador-tareas-cache-v1.3.5'), 'sw.js uses versioned cache organizador-tareas-cache-v1.3.5');
+    assert(swContent.includes('organizador-tareas-cache-v1.4.1'), 'sw.js uses versioned cache organizador-tareas-cache-v1.4.1');
     assert(swContent.includes('Promise.allSettled'), 'sw.js employs Promise.allSettled for fault-tolerant precaching');
     assert(swContent.includes('skipWaiting'), 'sw.js executes skipWaiting for zero-latency activation');
     assert(swContent.includes('clients.claim'), 'sw.js claims clients immediately on activation');
@@ -205,7 +205,7 @@ async function run() {
         assert(domHeadCheck.appleIconHref === 'assets/icons/apple-touch-icon.png', '<link rel="apple-touch-icon"> present in head');
         assert(domHeadCheck.themeColor === '#4F46E5', '<meta name="theme-color" content="#4F46E5"> present');
         assert(domHeadCheck.appleTitle === 'Organizador', '<meta name="apple-mobile-web-app-title" content="Organizador"> present');
-        assert(domHeadCheck.versionText && domHeadCheck.versionText.includes('1.3.5'), 'Settings version pill displays updated "Versión 1.3.5"');
+        assert(domHeadCheck.versionText && domHeadCheck.versionText.includes('1.4.1'), 'Settings version pill displays updated "Versión 1.4.1"');
         assert(domHeadCheck.hasSettingsCard, '#pwa-settings-card present in settings view');
         assert(domHeadCheck.hasSettingsBtn, '#pwa-install-settings-btn present');
         assert(domHeadCheck.hasStatusPill, '#pwa-status-pill present');
@@ -227,13 +227,13 @@ async function run() {
         });
         assert(swRegistrationOk, 'Service Worker registered and activated on secure localhost');
 
-        const cacheHasV135 = await page.evaluate(async () => {
-            return await caches.has('organizador-tareas-cache-v1.3.5');
+        const cacheHasV141 = await page.evaluate(async () => {
+            return await caches.has('organizador-tareas-cache-v1.4.1');
         });
-        assert(cacheHasV135, 'Cache storage contains "organizador-tareas-cache-v1.3.5"');
+        assert(cacheHasV141, 'Cache storage contains "organizador-tareas-cache-v1.4.1"');
 
         const cachedKeysCount = await page.evaluate(async () => {
-            const cache = await caches.open('organizador-tareas-cache-v1.3.5');
+            const cache = await caches.open('organizador-tareas-cache-v1.4.1');
             const keys = await cache.keys();
             return keys.length;
         });

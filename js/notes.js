@@ -381,28 +381,12 @@ window.NotesModule = (() => {
                                         </svg>
                                     </button>
                                 ` : ''}
-                                <!-- Botón Editar -->
-                                <button type="button" data-note-edit="${note.id}"
-                                    class="p-1.5 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-700/60 tap-effect"
-                                    title="Editar nota">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                    </svg>
-                                </button>
                                 <!-- Botón Archivar -->
                                 <button type="button" data-note-archive="${note.id}"
                                     class="p-1.5 rounded-xl text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 tap-effect"
                                     title="Archivar en el baúl">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
-                                    </svg>
-                                </button>
-                                <!-- Botón Eliminar -->
-                                <button type="button" data-note-delete="${note.id}"
-                                    class="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 tap-effect"
-                                    title="Eliminar nota">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
                                 </button>
                             </div>
@@ -430,34 +414,27 @@ window.NotesModule = (() => {
             `;
         }).join('');
 
-        // Listeners para acciones en tarjetas
-        container.querySelectorAll('[data-note-edit]').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                openEditModal(btn.dataset.noteEdit);
-            };
-        });
+        // Vincular menú contextual por pulsación prolongada y listeners en cada tarjeta de nota
+        const cards = container.querySelectorAll('.stagger-card');
+        cards.forEach((card, i) => {
+            const note = notes[i];
+            if (!note) return;
 
-        container.querySelectorAll('[data-note-archive]').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                archiveNote(btn.dataset.noteArchive);
-            };
-        });
+            window.CardContextMenu?.bind?.(card, {
+                title: note.title || 'Nota',
+                onEdit: () => openEditModal(note.id),
+                onDelete: () => deleteNote(note.id)
+            });
 
-        container.querySelectorAll('[data-note-delete]').forEach(btn => {
-            btn.onclick = (e) => {
+            card.querySelector('[data-note-archive]')?.addEventListener('click', (e) => {
                 e.stopPropagation();
-                deleteNote(btn.dataset.noteDelete);
-            };
-        });
+                archiveNote(note.id);
+            });
 
-        container.querySelectorAll('[data-note-copy]').forEach(btn => {
-            btn.onclick = (e) => {
+            card.querySelector('[data-note-copy]')?.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const note = notes.find(n => n.id === btn.dataset.noteCopy);
-                if (note) copyNoteContent(note.content || note.title);
-            };
+                copyNoteContent(note.content || note.title);
+            });
         });
     }
 

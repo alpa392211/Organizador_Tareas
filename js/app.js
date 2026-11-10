@@ -400,8 +400,24 @@
 
             // 11. Renderizado inicial completo
             this.refreshAll();
+            this.updateVaultProgressCard?.();
 
-            // 12. Comprobar si es primer inicio (onboarding obligatorio de institución y ciclo)
+            // 12. Permisos de notificaciones al abrir la app
+            // Requerimiento v1.4.1: al abrir la app debe solicitar permiso de notificaciones
+            if (window.NotificationsModule?.requestPermission) {
+                window.NotificationsModule.requestPermission().catch(() => {});
+            }
+
+            // 13. Comprobar changelog de versión 1.4.1 «Pájaro 🐦»
+            // Requerimiento v1.4.1: cada que se actualice la app debe aparecer un mensaje con los cambios grandes
+            const lastSeenVersion = Storage.getLastSeenVersion?.();
+            if (lastSeenVersion !== '1.4.1') {
+                setTimeout(() => {
+                    this.openChangelogModal?.();
+                }, 600);
+            }
+
+            // 14. Comprobar si es primer inicio (onboarding obligatorio de institución y ciclo)
             if ((!Storage.isOnboardingCompleted?.() || !Storage.isCycleConfigured?.()) && urlParams.get('openSchoolModal') !== '1') {
                 setTimeout(() => {
                     this.openCycleWelcomeModal?.();
@@ -917,12 +933,18 @@
             const drawerName = document.getElementById('drawer-inst-name');
             const drawerSlogan = document.getElementById('drawer-inst-slogan');
 
+            const userName = Storage.getUserName?.();
+            const sloganDisplay = userName ? userName : (inst.slogan ? `"${inst.slogan}"` : '');
+
             if (logoContainer) logoContainer.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-10 h-10');
             if (nameEl) nameEl.textContent = inst.name;
             if (typeEl) typeEl.textContent = inst.systemType || inst.type;
             if (drawerLogo) drawerLogo.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-12 h-12');
             if (drawerName) drawerName.textContent = inst.name;
-            if (drawerSlogan) drawerSlogan.textContent = `"${inst.slogan}"`;
+            if (drawerSlogan) {
+                drawerSlogan.textContent = sloganDisplay;
+                drawerSlogan.title = userName || inst.slogan || '';
+            }
 
             // Actualizar vista previa institucional en Configuración
             const settingsLogo = document.getElementById('settings-inst-logo-container');
@@ -935,7 +957,7 @@
             if (settingsLogo) settingsLogo.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-14 h-14');
             if (settingsName) settingsName.textContent = inst.name;
             if (settingsFullName) settingsFullName.textContent = inst.fullName;
-            if (settingsSlogan) settingsSlogan.textContent = `"${inst.slogan}"`;
+            if (settingsSlogan) settingsSlogan.textContent = sloganDisplay;
             if (settingsTypeBadge) settingsTypeBadge.textContent = inst.systemType || inst.type;
             if (settingsBadgePill) settingsBadgePill.textContent = inst.name;
 
@@ -1081,6 +1103,9 @@
                     window.HapticsModule?.light();
                     this.setInstitution(instId);
                     this.showToast(`Institución seleccionada: ${this.activeInstitution.name}`, 'success');
+                    setTimeout(() => {
+                        card.closest('.settings-accordion-card')?.classList.remove('open');
+                    }, 400);
                 };
             });
 
@@ -2047,6 +2072,12 @@
             const startInput = document.getElementById('welcome-cycle-start');
             const endInput = document.getElementById('welcome-cycle-end');
 
+            const welcomeUserNameInput = document.getElementById('welcome-user-name');
+            const welcomeCountrySection = document.getElementById('welcome-country-section');
+            const welcomeCountryGrid = document.getElementById('welcome-country-grid');
+            const welcomeMexicoLockedMsg = document.getElementById('welcome-mexico-locked-msg');
+            const welcomeSchoolsSection = document.getElementById('welcome-schools-section');
+
             const createSchoolBtn = document.getElementById('welcome-create-school-btn');
             const skipSchoolBtn = document.getElementById('welcome-skip-school-btn');
             const selectedSchoolBox = document.getElementById('welcome-selected-school-box');
@@ -2068,6 +2099,62 @@
             let welcomeSelectedInstId = 'unam';
             let welcomeSelectedPeriod = '1.º Semestre';
             let welcomeCountryFilter = 'all';
+
+            // 0. Renderizado y gestión de la selección de país (Country-first)
+            const renderWelcomeCountries = () => {
+                if (!welcomeCountryGrid || !InstitutionsModule) return;
+                const isLocked = Storage.isCountryLocked();
+                const currentCountry = Storage.getUserCountry();
+
+                if (isLocked) {
+                    if (welcomeMexicoLockedMsg) welcomeMexicoLockedMsg.classList.remove('hidden');
+                    if (welcomeCountryGrid) welcomeCountryGrid.classList.add('hidden');
+                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
+                    return;
+                }
+
+                if (welcomeMexicoLockedMsg) welcomeMexicoLockedMsg.classList.add('hidden');
+                if (welcomeCountryGrid) welcomeCountryGrid.classList.remove('hidden');
+
+                const countries = InstitutionsModule.getCountries();
+                welcomeCountryGrid.innerHTML = countries.map(c => {
+                    const isSelected = c.code === currentCountry;
+                    const activeClasses = isSelected
+                        ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/60 border-indigo-500 font-bold'
+                        : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200 dark:border-slate-700 font-semibold';
+
+                    return `
+                        <button type="button" class="welcome-country-btn tap-effect p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all ${activeClasses}" data-country-code="${c.code}">
+                            <span class="text-xl select-none">${c.flag || '🌐'}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-xs text-slate-900 dark:text-white truncate">${c.name}</div>
+                            </div>
+                            ${isSelected ? '<span class="text-indigo-600 dark:text-indigo-400 text-xs font-bold">✓</span>' : ''}
+                        </button>
+                    `;
+                }).join('');
+
+                welcomeCountryGrid.querySelectorAll('.welcome-country-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        window.HapticsModule?.light();
+                        const code = btn.dataset.countryCode;
+                        Storage.setUserCountry(code);
+                        welcomeCountryFilter = code;
+                        if (code === 'MX') {
+                            Storage.setCountryLocked(true);
+                            if (welcomeMexicoLockedMsg) welcomeMexicoLockedMsg.classList.remove('hidden');
+                            if (welcomeCountryGrid) welcomeCountryGrid.classList.add('hidden');
+                        }
+                        if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
+                        renderCountryPills();
+                        renderSchoolsGrid();
+                        const schoolsForCountry = InstitutionsModule.getAllInstitutions().filter(i => i.countryCode === code);
+                        if (schoolsForCountry.length > 0) {
+                            selectSchool(schoolsForCountry[0].id);
+                        }
+                    };
+                });
+            };
 
             // 1. Renderiza el cuadro de selección activa (o cuadro en blanco / omitido)
             const renderSelectedSchoolBox = () => {
@@ -2224,14 +2311,24 @@
             const renderCountryPills = () => {
                 if (!countryPillsContainer || !InstitutionsModule) return;
 
-                const countries = InstitutionsModule.getCountries();
                 const customSchools = Storage.getCustomSchools?.() || [];
+                const isLocked = Storage.isCountryLocked();
 
-                const options = [
-                    { id: 'all', label: 'Todas' },
-                    ...countries.map(c => ({ id: c.code, label: c.name })),
-                    ...(customSchools.length > 0 ? [{ id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }] : [])
-                ];
+                let options = [];
+                if (isLocked) {
+                    options = [
+                        { id: 'MX', label: 'México' },
+                        ...(customSchools.length > 0 ? [{ id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }] : [])
+                    ];
+                    welcomeCountryFilter = 'MX';
+                } else {
+                    const countries = InstitutionsModule.getCountries();
+                    options = [
+                        { id: 'all', label: 'Todas' },
+                        ...countries.map(c => ({ id: c.code, label: c.name })),
+                        ...(customSchools.length > 0 ? [{ id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }] : [])
+                    ];
+                }
 
                 countryPillsContainer.innerHTML = options.map(opt => {
                     const isSelected = opt.id === welcomeCountryFilter;
@@ -2261,7 +2358,7 @@
 
                 const allInstitutions = InstitutionsModule.getAllInstitutions();
                 let filtered = [];
-                if (welcomeCountryFilter === 'all') {
+                if (!welcomeCountryFilter || welcomeCountryFilter === 'all') {
                     filtered = allInstitutions;
                 } else if (welcomeCountryFilter === 'custom') {
                     filtered = allInstitutions.filter(inst => inst.isCustom);
@@ -2326,6 +2423,7 @@
                 welcomeSelectedInstId = schoolId;
                 const inst = InstitutionsModule.getInstitution(schoolId);
                 welcomeSelectedPeriod = inst.defaultPeriod || inst.periods?.[0] || '1.º Semestre';
+                if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
                 renderSelectedSchoolBox();
                 updatePeriodLockState();
                 renderSchoolsGrid();
@@ -2334,6 +2432,7 @@
             const applySkipSchool = () => {
                 welcomeSelectedInstId = 'unconfigured';
                 welcomeSelectedPeriod = 'Sin periodo';
+                if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
                 renderSelectedSchoolBox();
                 updatePeriodLockState();
                 renderSchoolsGrid();
@@ -2379,6 +2478,10 @@
             });
 
             const openWelcome = () => {
+                if (welcomeUserNameInput) {
+                    welcomeUserNameInput.value = Storage.getUserName?.() || '';
+                }
+
                 const isSkipped = Storage.isSchoolSkipped?.();
                 const currentInstId = Storage.getInstitution?.();
                 if (isSkipped || currentInstId === 'unconfigured') {
@@ -2389,7 +2492,20 @@
                     welcomeSelectedPeriod = Storage.getAcademicPeriod?.() || '1.º Semestre';
                 }
 
-                welcomeCountryFilter = 'all';
+                const isLocked = Storage.isCountryLocked();
+                const currentCountry = Storage.getUserCountry();
+
+                if (isLocked) {
+                    welcomeCountryFilter = 'MX';
+                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
+                } else if (currentCountry) {
+                    welcomeCountryFilter = currentCountry;
+                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
+                } else {
+                    // Primero elegir país
+                    welcomeCountryFilter = 'all';
+                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.add('hidden');
+                }
 
                 const cycle = Storage.getAcademicCycle?.() || {};
                 if (startInput) startInput.value = cycle.startDate || '';
@@ -2400,6 +2516,7 @@
                     if (endInput && !endInput.value) endInput.value = def.endDate;
                 }
 
+                renderWelcomeCountries();
                 renderSelectedSchoolBox();
                 renderCountryPills();
                 renderSchoolsGrid();
@@ -2443,6 +2560,10 @@
                         return;
                     }
 
+                    if (welcomeUserNameInput && welcomeUserNameInput.value.trim()) {
+                        Storage.setUserName(welcomeUserNameInput.value.trim());
+                    }
+
                     if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
                         Storage.setSchoolSkipped(true);
                         Storage.setAcademicPeriod('Sin periodo');
@@ -2480,6 +2601,10 @@
             if (laterBtn) {
                 laterBtn.onclick = () => {
                     window.HapticsModule?.light();
+
+                    if (welcomeUserNameInput && welcomeUserNameInput.value.trim()) {
+                        Storage.setUserName(welcomeUserNameInput.value.trim());
+                    }
 
                     if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
                         Storage.setSchoolSkipped(true);
@@ -2592,22 +2717,57 @@
         }
 
         /* ========================================================
-           VISTA DE CONFIGURACIONES (ACORDEONES COLAPSABLES)
+           VISTA DE CONFIGURACIONES (ACORDEONES COLAPSABLES INTELIGENTES)
            ======================================================== */
         setupSettingsView() {
             const Storage = window.StorageModule;
 
-            // 1. Manejo de Acordeones Colapsables
+            // Helper de auto-cierre inteligente tras interactuar con una sección
+            const autoCloseCard = (el) => {
+                const card = el?.closest ? el.closest('.settings-accordion-card') : (typeof el === 'string' ? document.getElementById(el) : null);
+                if (card) {
+                    setTimeout(() => {
+                        card.classList.remove('open');
+                    }, 400);
+                }
+            };
+
+            // 1. Manejo de Acordeones Colapsables (Bloques concisos y cierre automático de otros)
             document.querySelectorAll('.settings-accordion-header').forEach(header => {
                 header.onclick = (e) => {
                     e.preventDefault();
                     window.HapticsModule?.light();
                     const card = header.closest('.settings-accordion-card');
                     if (card) {
-                        card.classList.toggle('open');
+                        const wasOpen = card.classList.contains('open');
+                        document.querySelectorAll('.settings-accordion-card').forEach(c => {
+                            if (c !== card) c.classList.remove('open');
+                        });
+                        if (wasOpen) {
+                            card.classList.remove('open');
+                        } else {
+                            card.classList.add('open');
+                        }
                     }
                 };
             });
+
+            // 1.1 Configuración de Nombre de Usuario / Estudiante
+            const userNameInput = document.getElementById('settings-user-name');
+            const saveUserNameBtn = document.getElementById('settings-save-user-name-btn');
+            if (userNameInput) {
+                userNameInput.value = Storage.getUserName() || '';
+            }
+            if (saveUserNameBtn) {
+                saveUserNameBtn.onclick = () => {
+                    const name = userNameInput ? userNameInput.value.trim() : '';
+                    Storage.setUserName(name);
+                    this.setInstitution(Storage.getInstitution());
+                    window.HapticsModule?.light();
+                    this.showToast('Nombre de usuario guardado con éxito.', 'success');
+                    autoCloseCard(saveUserNameBtn);
+                };
+            }
 
             // 2. Formulario de Ciclo Escolar Activo (Obligatorio)
             const cycle = Storage.getAcademicCycle();
@@ -2641,6 +2801,7 @@
                         window.CalendarModule?.render?.();
                         window.WidgetSyncModule?.sync?.();
                         this.showToast(`Ciclo escolar guardado: ${newStart} al ${newEnd}`, 'success');
+                        autoCloseCard(cycleForm);
                     } catch (err) {
                         this.showToast(err.message, 'error');
                     }
@@ -2663,14 +2824,17 @@
             }
 
             // 5. Tema y Modo Oscuro en Configuración
-            document.getElementById('settings-theme-light')?.addEventListener('click', () => {
+            document.getElementById('settings-theme-light')?.addEventListener('click', (e) => {
                 this.setTheme('light');
+                autoCloseCard(e.target);
             });
-            document.getElementById('settings-theme-dark')?.addEventListener('click', () => {
+            document.getElementById('settings-theme-dark')?.addEventListener('click', (e) => {
                 this.setTheme('dark');
+                autoCloseCard(e.target);
             });
-            document.getElementById('settings-theme-auto')?.addEventListener('click', () => {
+            document.getElementById('settings-theme-auto')?.addEventListener('click', (e) => {
                 this.setTheme('auto');
+                autoCloseCard(e.target);
             });
 
             this.updateThemeUI(
@@ -2712,6 +2876,7 @@
                         orbitron: 'Orbitron (Cyber HUD)'
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
+                    autoCloseCard(btn);
                 };
             });
 
@@ -2759,6 +2924,7 @@
                         this.setupBottomActionButton();
                         window.HapticsModule?.light();
                         this.showToast('Atajo del botón central actualizado.', 'success');
+                        autoCloseCard(e.target);
                     }
                 };
             });
@@ -2834,9 +3000,91 @@
                 }
             });
 
+            // 11. Novedades de Versión 1.4.1 «Pájaro 🐦»
+            const changelogBtn = document.getElementById('settings-open-changelog-btn');
+            const versionPill = document.getElementById('settings-version-pill');
+            const openChangelog = () => {
+                window.HapticsModule?.light();
+                this.openChangelogModal();
+            };
+            if (changelogBtn) changelogBtn.onclick = openChangelog;
+            if (versionPill) versionPill.onclick = openChangelog;
+
             // Cálculo inicial de métricas de almacenamiento y aplicación de tipografía
             this.updateStorageMetrics();
             this.applyFontFamily(Storage.getFontFamily?.() || 'calibri');
+        }
+
+        openChangelogModal() {
+            const modal = document.getElementById('changelog-modal');
+            const confirmBtn = document.getElementById('changelog-confirm-btn');
+            const backdrop = document.getElementById('changelog-backdrop');
+            if (!modal) return;
+
+            const closeModal = () => {
+                window.HapticsModule?.light();
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.classList.remove('overflow-hidden');
+                }, 200);
+                window.StorageModule.setLastSeenVersion('1.4.1');
+            };
+
+            if (confirmBtn) confirmBtn.onclick = closeModal;
+            if (backdrop) backdrop.onclick = closeModal;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+            requestAnimationFrame(() => {
+                modal.classList.add('active');
+            });
+        }
+
+        updateVaultProgressCard() {
+            const tasksCountBadge = document.getElementById('vault-completed-tasks-badge');
+            const progressBar = document.getElementById('vault-progress-bar');
+            const nextUnlockText = document.getElementById('vault-next-unlock-text');
+            const unlockedCountText = document.getElementById('vault-unlocked-count-text');
+            if (!tasksCountBadge && !progressBar) return;
+
+            const Storage = window.StorageModule;
+            const completedCount = Storage.getCompletedTasksCount ? Storage.getCompletedTasksCount() : 0;
+            const unlockedCodes = Storage.getUnlockedCodes ? Storage.getUnlockedCodes() : [];
+            const AUTO_UNLOCK_POOL = [
+                'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
+                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'GATITOS_', 'READABLE',
+                'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON'
+            ];
+            const unlockedFromPool = AUTO_UNLOCK_POOL.filter(id => unlockedCodes.includes(id)).length;
+
+            if (tasksCountBadge) {
+                tasksCountBadge.textContent = `${completedCount} tarea${completedCount === 1 ? '' : 's'}`;
+            }
+
+            if (unlockedCountText) {
+                unlockedCountText.textContent = `${unlockedFromPool} / ${AUTO_UNLOCK_POOL.length}`;
+            }
+
+            const remainder = completedCount % 5;
+            const needed = 5 - remainder;
+            const pct = (remainder / 5) * 100;
+
+            if (progressBar) {
+                progressBar.style.width = `${pct}%`;
+            }
+
+            if (nextUnlockText) {
+                if (unlockedFromPool >= AUTO_UNLOCK_POOL.length) {
+                    nextUnlockText.textContent = '🎉 ¡Todos los códigos automáticos han sido desbloqueados!';
+                } else if (remainder === 0 && completedCount > 0) {
+                    nextUnlockText.textContent = '¡Código desbloqueado! Faltan 5 tareas para el siguiente.';
+                } else {
+                    nextUnlockText.textContent = `Faltan ${needed} tarea${needed === 1 ? '' : 's'} para el siguiente código`;
+                }
+            }
         }
 
         setupSecretVersionTrigger() {
@@ -3123,6 +3371,7 @@
         }
 
         renderVaultInventory() {
+            this.updateVaultProgressCard();
             const grid = document.getElementById('vault-unlocked-grid');
             if (!grid) return;
 

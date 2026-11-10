@@ -31,7 +31,11 @@ window.StorageModule = (() => {
         VAULT_UNLOCKED: 'org_escolar_vault_unlocked_codes_v2',
         ACTIVE_SPECIAL_THEME: 'org_escolar_active_special_theme_v1',
         APOLLO_ROCKETS_ENABLED: 'org_escolar_apollo_rockets_v1',
-        SCHOOL_SKIPPED: 'org_escolar_school_skipped_v1'
+        SCHOOL_SKIPPED: 'org_escolar_school_skipped_v1',
+        USER_NAME: 'org_escolar_user_name',
+        USER_COUNTRY: 'org_escolar_user_country',
+        COUNTRY_LOCKED: 'org_escolar_country_locked',
+        LAST_SEEN_VERSION: 'org_escolar_last_version'
     };
 
     const MAX_SUBJECTS = 16;
@@ -193,6 +197,81 @@ window.StorageModule = (() => {
         },
         setAcademicPeriod(period) {
             localStorage.setItem(KEYS.ACADEMIC_PERIOD, period);
+        },
+
+        // --- Nombre de Usuario e Identidad Estudiantil ---
+        getUserName() {
+            return (localStorage.getItem(KEYS.USER_NAME) || '').trim();
+        },
+        setUserName(name) {
+            if (typeof name === 'string') {
+                localStorage.setItem(KEYS.USER_NAME, name.trim());
+            }
+        },
+
+        // --- País del Usuario y Bloqueo Permanente para México ---
+        getUserCountry() {
+            return localStorage.getItem(KEYS.USER_COUNTRY) || null;
+        },
+        setUserCountry(code) {
+            if (typeof code === 'string') {
+                const upper = code.trim().toUpperCase();
+                localStorage.setItem(KEYS.USER_COUNTRY, upper);
+                if (upper === 'MX') {
+                    this.setCountryLocked(true);
+                }
+            }
+        },
+        isCountryLocked() {
+            const locked = localStorage.getItem(KEYS.COUNTRY_LOCKED) === 'true';
+            const country = this.getUserCountry();
+            return locked || country === 'MX';
+        },
+        setCountryLocked(locked = true) {
+            localStorage.setItem(KEYS.COUNTRY_LOCKED, locked ? 'true' : 'false');
+        },
+
+        // --- Control de Versión y Changelog de Novedades ---
+        getLastSeenVersion() {
+            return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
+        },
+        setLastSeenVersion(version) {
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.4.1');
+        },
+
+        // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
+        getCompletedTasksCount() {
+            const activeTasks = this.getTasks() || [];
+            const activeCompleted = activeTasks.filter(t => t.completed).length;
+            const archivedTasks = this.getArchivedTasks() || [];
+            const archivedCompleted = archivedTasks.filter(t => t.completed || t.type === 'task').length;
+            return activeCompleted + archivedCompleted;
+        },
+
+        checkVaultAutoUnlockOnTaskCompleted() {
+            // Pool de códigos auto-desbloqueables en orden progresivo
+            // EXCLUSIÓN ESTRICTA: 'EDUARDO' y '06062009' NUNCA se auto-desbloquean (requerimiento explícito)
+            const AUTO_UNLOCK_POOL = [
+                'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
+                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'GATITOS_', 'READABLE',
+                'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON'
+            ];
+
+            const count = this.getCompletedTasksCount();
+            const unlocksEarned = Math.floor(count / 5);
+            if (unlocksEarned <= 0) return null;
+
+            const currentUnlocked = this.getUnlockedCodes();
+            const unlockedFromPool = AUTO_UNLOCK_POOL.filter(id => currentUnlocked.includes(id));
+
+            if (unlockedFromPool.length < unlocksEarned && unlockedFromPool.length < AUTO_UNLOCK_POOL.length) {
+                const nextCode = AUTO_UNLOCK_POOL.find(id => !currentUnlocked.includes(id));
+                if (nextCode) {
+                    this.unlockCode(nextCode);
+                    return nextCode;
+                }
+            }
+            return null;
         },
 
         // --- Escuelas Personalizadas (Custom School Builder) ---
@@ -965,6 +1044,9 @@ window.StorageModule = (() => {
                 unlockedCodes: this.getUnlockedCodes(),
                 activeSpecialTheme: this.getActiveSpecialTheme(),
                 apolloRocketsEnabled: this.getApolloRocketsEnabled(),
+                userName: this.getUserName(),
+                userCountry: this.getUserCountry(),
+                countryLocked: this.isCountryLocked(),
                 subjects: this.getSubjects(),
                 tasks: this.getTasks(),
                 notes: this.getNotes(),
@@ -1011,6 +1093,15 @@ window.StorageModule = (() => {
                 }
                 if (typeof data.apolloRocketsEnabled === 'boolean') {
                     this.setApolloRocketsEnabled(data.apolloRocketsEnabled);
+                }
+                if (typeof data.userName === 'string') {
+                    this.setUserName(data.userName);
+                }
+                if (typeof data.userCountry === 'string') {
+                    this.setUserCountry(data.userCountry);
+                }
+                if (typeof data.countryLocked === 'boolean') {
+                    this.setCountryLocked(data.countryLocked);
                 }
 
                 this.saveSubjects(data.subjects);

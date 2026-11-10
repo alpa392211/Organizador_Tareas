@@ -1,7 +1,7 @@
 {
   "id": "/organizador-tareas/",
   "name": "Organizador de Tareas",
-  "short_name": "Organizador",
+  "short_name": "",
   "description": "Organizador Escolar Pro y Gestor Académico Offline para estudiantes de bachillerato y universidad.",
   "start_url": "./index.html",
   "scope": "./",
