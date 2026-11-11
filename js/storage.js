@@ -35,7 +35,11 @@ window.StorageModule = (() => {
         USER_NAME: 'org_escolar_user_name',
         USER_COUNTRY: 'org_escolar_user_country',
         COUNTRY_LOCKED: 'org_escolar_country_locked',
-        LAST_SEEN_VERSION: 'org_escolar_last_version'
+        LAST_SEEN_VERSION: 'org_escolar_last_version',
+        USER_PHOTO: 'org_escolar_user_photo',
+        ACCOUNT_TYPE: 'org_escolar_account_type',
+        LONG_PRESS: 'org_escolar_long_press_enabled_v1',
+        GALLERY_PHOTOS: 'org_escolar_gallery_photos'
     };
 
     const MAX_SUBJECTS = 16;
@@ -209,6 +213,28 @@ window.StorageModule = (() => {
             }
         },
 
+        // --- Tipo de Cuenta (Institución u Organizador de actividades) ---
+        getAccountType() {
+            return localStorage.getItem(KEYS.ACCOUNT_TYPE) || 'institution';
+        },
+        setAccountType(type) {
+            if (typeof type === 'string' && type.trim()) {
+                localStorage.setItem(KEYS.ACCOUNT_TYPE, type.trim());
+            }
+        },
+
+        // --- Foto de Perfil / Logotipo Personal o Institucional ---
+        getUserPhoto() {
+            return localStorage.getItem(KEYS.USER_PHOTO) || '';
+        },
+        setUserPhoto(dataUrl) {
+            if (typeof dataUrl === 'string' && dataUrl.length > 0) {
+                localStorage.setItem(KEYS.USER_PHOTO, dataUrl);
+            } else {
+                localStorage.removeItem(KEYS.USER_PHOTO);
+            }
+        },
+
         // --- País del Usuario y Bloqueo Permanente para México ---
         getUserCountry() {
             return localStorage.getItem(KEYS.USER_COUNTRY) || null;
@@ -236,7 +262,7 @@ window.StorageModule = (() => {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.4.1');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.4.2');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
@@ -384,6 +410,13 @@ window.StorageModule = (() => {
         },
         setOnboardingCompleted(completed) {
             localStorage.setItem('org_escolar_onboarding_v1', completed ? 'true' : 'false');
+            if (!completed) {
+                if (window.OrganizadorApp?.openCycleWelcomeModal) {
+                    window.OrganizadorApp.openCycleWelcomeModal();
+                } else if (window.app?.openCycleWelcomeModal) {
+                    window.app.openCycleWelcomeModal();
+                }
+            }
         },
 
         // --- Ciclo Escolar (Fecha Inicio - Fecha Fin) y Verificación de Configuración ---
@@ -648,6 +681,58 @@ window.StorageModule = (() => {
             this.saveNotes(notes);
             return notes[index];
         },
+        saveNote(note) {
+            if (!note || !note.id) return null;
+            const notes = this.getNotes();
+            const index = notes.findIndex(n => String(n.id) === String(note.id));
+            if (index === -1) notes.unshift(note);
+            else notes[index] = { ...notes[index], ...note };
+            this.saveNotes(notes);
+            return note;
+        },
+
+        // --- Pulsación larga (menú dinámico) activable/desactivable ---
+        isLongPressEnabled() {
+            return localStorage.getItem(KEYS.LONG_PRESS) !== 'false';
+        },
+        setLongPressEnabled(enabled) {
+            const val = enabled === true;
+            localStorage.setItem(KEYS.LONG_PRESS, val ? 'true' : 'false');
+            return val;
+        },
+
+        // --- Galería de fotos (materiales / notas) ---
+        getGalleryPhotos() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(KEYS.GALLERY_PHOTOS) || '[]');
+                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+            } catch (e) {
+                return [];
+            }
+        },
+        saveGalleryPhoto(photo) {
+            if (!photo || !photo.dataUrl) return false;
+            const photos = this.getGalleryPhotos();
+            const entry = {
+                id: photo.id || 'photo_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
+                name: photo.name || 'Foto',
+                dataUrl: photo.dataUrl,
+                createdAt: photo.createdAt || Date.now()
+            };
+            photos.unshift(entry);
+            try {
+                localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(photos));
+            } catch (e) {
+                return false;
+            }
+            return entry;
+        },
+        deleteGalleryPhoto(id) {
+            const photos = this.getGalleryPhotos().filter(p => String(p.id) !== String(id));
+            localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(photos));
+            return true;
+        },
+
         deleteNote(id) {
             const notes = this.getNotes();
             const filtered = notes.filter(n => String(n.id) !== String(id));
@@ -693,11 +778,7 @@ window.StorageModule = (() => {
             return localStorage.getItem(KEYS.FONT_FAMILY) || 'calibri';
         },
         setFontFamily(font) {
-            const valid = [
-                'calibri', 'times', 'montserrat', 'lora', 'poppins',
-                'readable', 'firacode', 'playfair', 'caveat', 'orbitron'
-            ];
-            const chosen = valid.includes(font) ? font : 'calibri';
+            const chosen = (font && typeof font === 'string' && font.trim().length > 0) ? font.trim() : 'calibri';
             localStorage.setItem(KEYS.FONT_FAMILY, chosen);
             return chosen;
         },
@@ -922,6 +1003,18 @@ window.StorageModule = (() => {
             return this.getUnlockedCodes().includes(codeId.trim().toUpperCase());
         },
 
+        unlockVaultCode(codeId) {
+            return this.unlockCode(codeId);
+        },
+
+        isVaultCodeUnlocked(codeId) {
+            return this.isCodeUnlocked(codeId);
+        },
+
+        getVaultUnlockedCodes() {
+            return this.getUnlockedCodes();
+        },
+
         getActiveSpecialTheme() {
             return localStorage.getItem(KEYS.ACTIVE_SPECIAL_THEME) || 'default';
         },
@@ -1045,8 +1138,12 @@ window.StorageModule = (() => {
                 activeSpecialTheme: this.getActiveSpecialTheme(),
                 apolloRocketsEnabled: this.getApolloRocketsEnabled(),
                 userName: this.getUserName(),
+                accountType: this.getAccountType(),
+                userPhoto: this.getUserPhoto(),
                 userCountry: this.getUserCountry(),
                 countryLocked: this.isCountryLocked(),
+                longPressEnabled: this.isLongPressEnabled(),
+                galleryPhotos: this.getGalleryPhotos(),
                 subjects: this.getSubjects(),
                 tasks: this.getTasks(),
                 notes: this.getNotes(),
@@ -1094,8 +1191,18 @@ window.StorageModule = (() => {
                 if (typeof data.apolloRocketsEnabled === 'boolean') {
                     this.setApolloRocketsEnabled(data.apolloRocketsEnabled);
                 }
+                if (typeof data.longPressEnabled === 'boolean') this.setLongPressEnabled(data.longPressEnabled);
+                if (Array.isArray(data.galleryPhotos)) {
+                    try { localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(data.galleryPhotos.filter(p => p && p.dataUrl))); } catch (e) {}
+                }
                 if (typeof data.userName === 'string') {
                     this.setUserName(data.userName);
+                }
+                if (typeof data.accountType === 'string') {
+                    this.setAccountType(data.accountType);
+                }
+                if (typeof data.userPhoto === 'string') {
+                    this.setUserPhoto(data.userPhoto);
                 }
                 if (typeof data.userCountry === 'string') {
                     this.setUserCountry(data.userCountry);

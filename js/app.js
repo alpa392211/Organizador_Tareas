@@ -24,26 +24,26 @@
         },
         '06062009': {
             id: '06062009',
-            name: 'Starlight Tribute 06-06-2009',
+            name: 'Starlight Tribute ✨',
             icon: '✨',
             category: 'DEDICATORIA PRIVADA',
             themeId: 'starlight',
             badgeClass: 'bg-pink-500/20 text-pink-300 border-pink-400/30',
             phrase: 'Tu eres alguien especial por conocer esta fecha...',
-            description: 'Bajo el manto de las estrellas del 6 de junio de 2009, este protocolo conmemorativo rinde homenaje a un lazo eterno que trasciende el tiempo y el espacio. Activa el diseño cósmico Starlight con acentos celestiales y violeta nocturno.',
+            description: 'Bajo el manto de las estrellas, este protocolo conmemorativo rinde homenaje a un lazo eterno que trasciende el tiempo y el espacio. Activa el diseño cósmico Starlight con acentos celestiales y violeta nocturno.',
             actionLabel: 'Activar Tema Starlight ✨',
             themeClass: 'theme-starlight',
             supportsRockets: false
         },
         'EDUARDO': {
             id: 'EDUARDO',
-            name: 'Protocolo Creador Eduardo VIP',
+            name: 'Protocolo Creador VIP',
             icon: '👑',
             category: 'CREDENCIAL DE FUNDADOR',
             themeId: 'eduardo-gold',
             badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
             phrase: '«Reconocimiento de Autoría y Excelencia al Creador»',
-            description: '¡Bienvenido, Eduardo! Has activado la credencial de Fundador y el Tema Maestro Dorado, reservado con acabados en oro pulido, acentos de corona VIP 👑 y bordes de máxima distinción estudiantil.',
+            description: '¡Bienvenido! Has activado la credencial de Fundador y el Tema Maestro Dorado, reservado con acabados en oro pulido, acentos de corona VIP 👑 y bordes de máxima distinción estudiantil.',
             actionLabel: 'Activar Tema Maestro Dorado 👑',
             themeClass: 'theme-eduardo-gold',
             supportsRockets: false
@@ -229,7 +229,7 @@
             category: 'PROTOCOLO MAESTRO • ACCESO TOTAL',
             badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
             phrase: '«ACCESO TOTAL CONCEDIDO • 100% PROTOCOLOS Y FUENTES DESBLOQUEADOS»',
-            description: '¡Has descifrado la clave maestra universal! Se han desbloqueado simultáneamente los 11 temas de personalización, el tributo estelar 06062009 y las 5 familias tipográficas secretas en tu organizador.',
+            description: '¡Has descifrado la clave maestra universal! Se han desbloqueado simultáneamente los 11 temas de personalización, el tributo estelar Starlight y las 5 familias tipográficas secretas en tu organizador.',
             actionLabel: 'Explorar Bóveda Completa 🔓',
             themeId: null,
             themeClass: null,
@@ -402,30 +402,30 @@
             this.refreshAll();
             this.updateVaultProgressCard?.();
 
-            // 12. Permisos de notificaciones al abrir la app
-            // Requerimiento v1.4.1: al abrir la app debe solicitar permiso de notificaciones
-            if (window.NotificationsModule?.requestPermission) {
-                window.NotificationsModule.requestPermission().catch(() => {});
-            }
-
-            // 13. Comprobar changelog de versión 1.4.1 «Pájaro 🐦»
-            // Requerimiento v1.4.1: cada que se actualice la app debe aparecer un mensaje con los cambios grandes
-            const lastSeenVersion = Storage.getLastSeenVersion?.();
-            if (lastSeenVersion !== '1.4.1') {
-                setTimeout(() => {
-                    this.openChangelogModal?.();
-                }, 600);
-            }
-
-            // 14. Comprobar si es primer inicio (onboarding obligatorio de institución y ciclo)
+            // 12. Flujo de inicio de presentación (Presentation-First Flow Ordering)
+            // Si el onboarding NO se ha completado: NO solicitar notificaciones ni mostrar changelog; abrir bienvenida primero
             if ((!Storage.isOnboardingCompleted?.() || !Storage.isCycleConfigured?.()) && urlParams.get('openSchoolModal') !== '1') {
-                setTimeout(() => {
-                    this.openCycleWelcomeModal?.();
-                }, 400);
+                this.openCycleWelcomeModal?.();
+            } else {
+                // Si el onboarding YA está completado:
+                // Permisos de notificaciones al abrir la app
+                if (window.NotificationsModule?.requestPermission) {
+                    window.NotificationsModule.requestPermission().catch(() => {});
+                }
+
+                // Comprobar changelog de versión 1.4.2
+                const lastSeenVersion = Storage.getLastSeenVersion?.();
+                if (lastSeenVersion !== '1.4.2') {
+                    setTimeout(() => {
+                        this.openChangelogModal?.();
+                    }, 600);
+                }
             }
         }
 
         refreshAll() {
+            this.renderHeader();
+            this.renderDrawer();
             window.SubjectsModule?.render?.();
             window.TasksModule?.render?.();
             window.NotesModule?.render?.();
@@ -434,6 +434,86 @@
             this.updateCycleBadges();
             this.updateStorageMetrics();
             window.WidgetSyncModule?.sync?.();
+        }
+
+        renderHeader() {
+            const Storage = window.StorageModule;
+            const InstitutionsModule = window.InstitutionsModule;
+            if (!Storage) return;
+
+            const instId = Storage.getInstitution?.() || 'unam';
+            const inst = InstitutionsModule?.getInstitution?.(instId) || { name: 'Sin institución', colors: { primary: '#4F46E5' } };
+            const userName = Storage.getUserName?.() || '';
+            const userPhoto = Storage.getUserPhoto?.() || '';
+            const period = Storage.getAcademicPeriod?.() || inst.defaultPeriod || '1.º Semestre';
+
+            const headerUserName = document.getElementById('header-user-name');
+            if (headerUserName) {
+                headerUserName.textContent = userName;
+                if (userName) {
+                    headerUserName.classList.remove('hidden');
+                } else {
+                    headerUserName.classList.add('hidden');
+                }
+            }
+
+            const headerInstName = document.getElementById('header-inst-name');
+            if (headerInstName) {
+                headerInstName.textContent = inst.name;
+            }
+
+            const headerInstPeriod = document.getElementById('header-inst-period');
+            if (headerInstPeriod) {
+                headerInstPeriod.textContent = period;
+            }
+
+            const headerInstType = document.getElementById('header-inst-type');
+            if (headerInstType) {
+                headerInstType.textContent = inst.systemType || inst.type || 'Semestral';
+            }
+
+            const logoContainer = document.getElementById('header-inst-logo');
+            if (logoContainer) {
+                if (userPhoto) {
+                    logoContainer.innerHTML = `<img src="${userPhoto}" class="w-10 h-10 rounded-2xl object-cover border border-slate-200/60 dark:border-slate-700/60 shadow-xs" alt="Foto de perfil">`;
+                } else if (InstitutionsModule) {
+                    logoContainer.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-10 h-10');
+                }
+            }
+        }
+
+        renderDrawer() {
+            const Storage = window.StorageModule;
+            const InstitutionsModule = window.InstitutionsModule;
+            if (!Storage) return;
+
+            const instId = Storage.getInstitution?.() || 'unam';
+            const inst = InstitutionsModule?.getInstitution?.(instId) || { name: 'Sin institución' };
+            const userName = Storage.getUserName?.() || '';
+            const userPhoto = Storage.getUserPhoto?.() || '';
+            const period = Storage.getAcademicPeriod?.() || inst.defaultPeriod || '1.º Semestre';
+
+            const drawerName = document.getElementById('drawer-inst-name');
+            if (drawerName) drawerName.textContent = inst.name;
+
+            const drawerPeriod = document.getElementById('drawer-inst-period');
+            if (drawerPeriod) drawerPeriod.textContent = period;
+
+            const drawerSlogan = document.getElementById('drawer-inst-slogan');
+            if (drawerSlogan) {
+                const sloganDisplay = userName ? userName : (inst.slogan ? `"${inst.slogan}"` : '');
+                drawerSlogan.textContent = sloganDisplay;
+                drawerSlogan.title = userName || inst.slogan || '';
+            }
+
+            const drawerLogo = document.getElementById('drawer-inst-logo');
+            if (drawerLogo) {
+                if (userPhoto) {
+                    drawerLogo.innerHTML = `<img src="${userPhoto}" class="w-12 h-12 rounded-2xl object-cover border border-slate-200/60 dark:border-slate-700/60 shadow-sm" alt="Foto de perfil">`;
+                } else if (InstitutionsModule) {
+                    drawerLogo.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-12 h-12');
+                }
+            }
         }
 
         updateHeaderStats() {
@@ -847,6 +927,15 @@
             document.body.classList.toggle('theme-gray', isGray);
             const toggle = document.getElementById('settings-gray-mode-toggle');
             if (toggle) toggle.checked = isGray;
+            const grayBtn = document.getElementById('settings-gray-mode-btn');
+            if (grayBtn) {
+                grayBtn.textContent = isGray ? 'Desactivar' : 'Activar';
+                grayBtn.className = `tap-effect shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    isGray
+                        ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30'
+                        : 'bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50'
+                }`;
+            }
 
             // Actualizar inmediatamente el botón central inferior y componentes visuales
             this.setupBottomActionButton();
@@ -867,13 +956,51 @@
                 }
             }
 
+            const updateSecretButtons = () => {
+                const isGrayActive = Storage.getGrayModeEnabled();
+                const isCatsActive = Storage.getSecretCatsEnabled();
+
+                const grayBtn = document.getElementById('settings-gray-mode-btn');
+                if (grayBtn) {
+                    grayBtn.textContent = isGrayActive ? 'Desactivar' : 'Activar';
+                    grayBtn.className = `tap-effect shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                        isGrayActive
+                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30'
+                            : 'bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50'
+                    }`;
+                }
+
+                const catsBtn = document.getElementById('settings-cats-btn');
+                if (catsBtn) {
+                    catsBtn.textContent = isCatsActive ? 'Desactivar' : 'Activar';
+                    catsBtn.className = `tap-effect shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                        isCatsActive
+                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30'
+                            : 'bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50'
+                    }`;
+                }
+            };
+
             const grayToggle = document.getElementById('settings-gray-mode-toggle');
             if (grayToggle) {
                 grayToggle.checked = Storage.getGrayModeEnabled();
                 grayToggle.onchange = (e) => {
                     window.HapticsModule?.light();
                     this.applyGrayMode(e.target.checked);
+                    updateSecretButtons();
                     this.showToast(e.target.checked ? 'Modo Gris activado.' : 'Modo Gris desactivado.', 'info');
+                };
+            }
+
+            const grayBtn = document.getElementById('settings-gray-mode-btn');
+            if (grayBtn) {
+                grayBtn.onclick = () => {
+                    window.HapticsModule?.light();
+                    const next = !Storage.getGrayModeEnabled();
+                    this.applyGrayMode(next);
+                    if (grayToggle) grayToggle.checked = next;
+                    updateSecretButtons();
+                    this.showToast(next ? 'Modo Gris activado.' : 'Modo Gris desactivado.', 'info');
                 };
             }
 
@@ -884,12 +1011,27 @@
                     window.HapticsModule?.light();
                     Storage.setSecretCatsEnabled(e.target.checked);
                     this.updateHiddenKitties();
+                    updateSecretButtons();
                     this.showToast(e.target.checked ? '🐾 ¡Gatitos activados!' : 'Gatitos desactivados.', 'info');
+                };
+            }
+
+            const catsBtn = document.getElementById('settings-cats-btn');
+            if (catsBtn) {
+                catsBtn.onclick = () => {
+                    window.HapticsModule?.light();
+                    const next = !Storage.getSecretCatsEnabled();
+                    Storage.setSecretCatsEnabled(next);
+                    if (catsToggle) catsToggle.checked = next;
+                    this.updateHiddenKitties();
+                    updateSecretButtons();
+                    this.showToast(next ? '🐾 ¡Gatitos activados!' : 'Gatitos desactivados.', 'info');
                 };
             }
 
             this.applyGrayMode(Storage.getGrayModeEnabled());
             this.updateHiddenKitties();
+            updateSecretButtons();
         }
 
         updateHiddenKitties() {
@@ -1346,11 +1488,17 @@
             });
         }
 
+        closeAllSettingsSubmenus() {
+            document.querySelectorAll('.settings-accordion-card.open').forEach(c => c.classList.remove('open'));
+        }
+
         switchView(viewName) {
             this.currentView = viewName;
             window.HapticsModule?.light();
+            // v1.4.2: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
+            this.closeAllSettingsSubmenus();
 
-            const views = ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'];
+            const views = ['dashboard', 'subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'];
             views.forEach(v => {
                 const section = document.getElementById(`view-${v}`);
                 if (section) {
@@ -1384,6 +1532,10 @@
             });
 
             // Re-renderizado de la vista activada
+            if (viewName === 'dashboard') {
+                this.renderHeader?.();
+                this.renderDrawer?.();
+            }
             if (viewName === 'subjects') window.SubjectsModule?.render?.();
             if (viewName === 'tasks') window.TasksModule?.render?.();
             if (viewName === 'notes') window.NotesModule?.render?.();
@@ -1941,6 +2093,7 @@
                     updatePreviewDefaultLogo();
                 }
 
+                modal.style.display = '';
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 document.body.classList.add('overflow-hidden');
@@ -1952,7 +2105,11 @@
                 setTimeout(() => {
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
-                    document.body.classList.remove('overflow-hidden');
+                    modal.style.display = 'none';
+                    const onboardingModal = document.getElementById('cycle-setup-modal');
+                    if (!onboardingModal || onboardingModal.classList.contains('hidden')) {
+                        document.body.classList.remove('overflow-hidden');
+                    }
                 }, 200);
             };
 
@@ -2073,458 +2230,210 @@
             const endInput = document.getElementById('welcome-cycle-end');
 
             const welcomeUserNameInput = document.getElementById('welcome-user-name');
-            const welcomeCountrySection = document.getElementById('welcome-country-section');
-            const welcomeCountryGrid = document.getElementById('welcome-country-grid');
-            const welcomeMexicoLockedMsg = document.getElementById('welcome-mexico-locked-msg');
-            const welcomeSchoolsSection = document.getElementById('welcome-schools-section');
+            const welcomeTypeInst = document.getElementById('welcome-type-institution');
+            const welcomeTypeAct = document.getElementById('welcome-type-activities');
+
+            const welcomePhotoInput = document.getElementById('welcome-photo-input');
+            const welcomePhotoPreview = document.getElementById('welcome-photo-preview');
+            const welcomePhotoPlaceholder = document.getElementById('welcome-photo-placeholder');
+            const welcomePhotoClearBtn = document.getElementById('welcome-photo-clear-btn');
+
+            const celebrationContainer = document.getElementById('onboarding-celebration-container');
+            const progressBar = document.getElementById('onboarding-progress-bar');
+            const celebrationMsg = document.getElementById('onboarding-celebration-msg');
 
             const createSchoolBtn = document.getElementById('welcome-create-school-btn');
-            const skipSchoolBtn = document.getElementById('welcome-skip-school-btn');
-            const selectedSchoolBox = document.getElementById('welcome-selected-school-box');
-            const countryPillsContainer = document.getElementById('welcome-country-pills');
-            const schoolsGrid = document.getElementById('welcome-schools-grid');
-
-            const periodContainer = document.getElementById('welcome-period-container');
-            const periodLockedMsg = document.getElementById('welcome-period-locked-msg');
-            const periodChipsContainer = document.getElementById('welcome-period-chips');
-            const selectedPeriodBadge = document.getElementById('welcome-selected-period-badge');
-            const customPeriodWrapper = document.getElementById('welcome-custom-period-wrapper');
-            const customPeriodInput = document.getElementById('welcome-custom-period-input');
 
             const Storage = window.StorageModule;
             const InstitutionsModule = window.InstitutionsModule;
 
             if (!modal) return;
 
-            let welcomeSelectedInstId = 'unam';
-            let welcomeSelectedPeriod = '1.º Semestre';
-            let welcomeCountryFilter = 'all';
+            let currentAccountType = Storage?.getAccountType?.() || 'institution';
 
-            // 0. Renderizado y gestión de la selección de país (Country-first)
-            const renderWelcomeCountries = () => {
-                if (!welcomeCountryGrid || !InstitutionsModule) return;
-                const isLocked = Storage.isCountryLocked();
-                const currentCountry = Storage.getUserCountry();
+            // 1. Selector interactivo de modalidad (Institución vs Organizador de actividades)
+            const updateAccountTypeUI = (type) => {
+                currentAccountType = type === 'activities' ? 'organizer' : type;
+                Storage?.setAccountType?.(currentAccountType);
 
-                if (isLocked) {
-                    if (welcomeMexicoLockedMsg) welcomeMexicoLockedMsg.classList.remove('hidden');
-                    if (welcomeCountryGrid) welcomeCountryGrid.classList.add('hidden');
-                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
-                    return;
-                }
+                if (welcomeTypeInst && welcomeTypeAct) {
+                    const isInst = currentAccountType === 'institution';
+                    const instCheck = welcomeTypeInst.querySelector('.welcome-type-check');
+                    const actCheck = welcomeTypeAct.querySelector('.welcome-type-check');
 
-                if (welcomeMexicoLockedMsg) welcomeMexicoLockedMsg.classList.add('hidden');
-                if (welcomeCountryGrid) welcomeCountryGrid.classList.remove('hidden');
-
-                const countries = InstitutionsModule.getCountries();
-                welcomeCountryGrid.innerHTML = countries.map(c => {
-                    const isSelected = c.code === currentCountry;
-                    const activeClasses = isSelected
-                        ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/60 border-indigo-500 font-bold'
-                        : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200 dark:border-slate-700 font-semibold';
-
-                    return `
-                        <button type="button" class="welcome-country-btn tap-effect p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all ${activeClasses}" data-country-code="${c.code}">
-                            <span class="text-xl select-none">${c.flag || '🌐'}</span>
-                            <div class="min-w-0 flex-1">
-                                <div class="text-xs text-slate-900 dark:text-white truncate">${c.name}</div>
-                            </div>
-                            ${isSelected ? '<span class="text-indigo-600 dark:text-indigo-400 text-xs font-bold">✓</span>' : ''}
-                        </button>
-                    `;
-                }).join('');
-
-                welcomeCountryGrid.querySelectorAll('.welcome-country-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        window.HapticsModule?.light();
-                        const code = btn.dataset.countryCode;
-                        Storage.setUserCountry(code);
-                        welcomeCountryFilter = code;
-                        if (code === 'MX') {
-                            Storage.setCountryLocked(true);
-                            if (welcomeMexicoLockedMsg) welcomeMexicoLockedMsg.classList.remove('hidden');
-                            if (welcomeCountryGrid) welcomeCountryGrid.classList.add('hidden');
-                        }
-                        if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
-                        renderCountryPills();
-                        renderSchoolsGrid();
-                        const schoolsForCountry = InstitutionsModule.getAllInstitutions().filter(i => i.countryCode === code);
-                        if (schoolsForCountry.length > 0) {
-                            selectSchool(schoolsForCountry[0].id);
-                        }
-                    };
-                });
-            };
-
-            // 1. Renderiza el cuadro de selección activa (o cuadro en blanco / omitido)
-            const renderSelectedSchoolBox = () => {
-                if (!selectedSchoolBox) return;
-
-                if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
-                    selectedSchoolBox.className = 'p-3 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3 transition-all';
-                    selectedSchoolBox.innerHTML = `
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-10 h-10 rounded-2xl bg-slate-200/80 dark:bg-slate-700/80 flex items-center justify-center text-xl shrink-0">
-                                🎓
-                            </div>
-                            <div class="min-w-0">
-                                <div class="text-xs font-black text-slate-800 dark:text-slate-200">Sin institución</div>
-                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Configuración omitida • Puedes elegir o crear una abajo</div>
-                            </div>
-                        </div>
-                        <span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
-                            Omitida
-                        </span>
-                    `;
-                } else {
-                    const inst = InstitutionsModule.getInstitution(welcomeSelectedInstId);
-                    selectedSchoolBox.className = 'p-3 rounded-2xl border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/70 dark:bg-indigo-950/40 flex items-center justify-between gap-3 transition-all';
-                    selectedSchoolBox.innerHTML = `
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="shrink-0">
-                                ${InstitutionsModule.renderIconHtml(inst, 'w-10 h-10')}
-                            </div>
-                            <div class="min-w-0">
-                                <div class="text-xs font-black text-slate-900 dark:text-white truncate">${inst.name}</div>
-                                <div class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold truncate">${inst.fullName || inst.systemType || ''}</div>
-                            </div>
-                        </div>
-                        <button type="button" id="welcome-unselect-school-btn"
-                            class="tap-effect shrink-0 text-[11px] font-bold text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 px-2 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
-                            title="Omitir institución">
-                            ✕ Omitir
-                        </button>
-                    `;
-                    const unselectBtn = document.getElementById('welcome-unselect-school-btn');
-                    if (unselectBtn) {
-                        unselectBtn.onclick = () => {
-                            window.HapticsModule?.light();
-                            applySkipSchool();
-                        };
+                    if (isInst) {
+                        welcomeTypeInst.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-indigo-500 bg-indigo-500/10 text-white shadow-lg shadow-indigo-950/40';
+                        welcomeTypeAct.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-slate-700 bg-slate-800/60 text-slate-400 hover:border-slate-600';
+                        if (instCheck) instCheck.classList.remove('hidden');
+                        if (actCheck) actCheck.classList.add('hidden');
+                    } else {
+                        welcomeTypeAct.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-indigo-500 bg-indigo-500/10 text-white shadow-lg shadow-indigo-950/40';
+                        welcomeTypeInst.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-slate-700 bg-slate-800/60 text-slate-400 hover:border-slate-600';
+                        if (actCheck) actCheck.classList.remove('hidden');
+                        if (instCheck) instCheck.classList.add('hidden');
                     }
                 }
             };
 
-            // 2. Máquina de estados: Bloqueo / Desbloqueo del selector de periodo
-            const updatePeriodLockState = () => {
-                const isLocked = !welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured';
-                if (!periodContainer) return;
-
-                if (isLocked) {
-                    periodContainer.classList.add('opacity-40', 'pointer-events-none', 'cursor-not-allowed', 'select-none');
-                    periodContainer.setAttribute('aria-disabled', 'true');
-                    if (periodLockedMsg) periodLockedMsg.classList.remove('hidden');
-                    if (periodChipsContainer) periodChipsContainer.innerHTML = '';
-                    if (selectedPeriodBadge) selectedPeriodBadge.textContent = '🔒 Bloqueado';
-                    if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
-                } else {
-                    periodContainer.classList.remove('opacity-40', 'pointer-events-none', 'cursor-not-allowed', 'select-none');
-                    periodContainer.removeAttribute('aria-disabled');
-                    if (periodLockedMsg) periodLockedMsg.classList.add('hidden');
-                    const inst = InstitutionsModule.getInstitution(welcomeSelectedInstId);
-                    renderPeriodChips(inst);
-                }
-            };
-
-            // 3. Renderizado de chips táctiles de periodos
-            const renderPeriodChips = (inst) => {
-                if (!periodChipsContainer) return;
-
-                const periodsList = (inst && Array.isArray(inst.periods) && inst.periods.length > 0)
-                    ? [...inst.periods]
-                    : ['Periodo 1', 'Periodo 2'];
-
-                if (!welcomeSelectedPeriod || (!periodsList.includes(welcomeSelectedPeriod) && !customPeriodInput?.value)) {
-                    welcomeSelectedPeriod = inst.defaultPeriod || periodsList[0];
-                }
-
-                if (selectedPeriodBadge) {
-                    selectedPeriodBadge.textContent = welcomeSelectedPeriod || '';
-                }
-
-                let chipsHtml = periodsList.map(p => {
-                    const isSelected = p === welcomeSelectedPeriod;
-                    const chipStyle = isSelected
-                        ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-500/30'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
-                    return `
-                        <button type="button" class="welcome-period-chip tap-effect px-3 py-1.5 rounded-xl text-xs transition-all ${chipStyle}" data-period="${p}">
-                            ${p}
-                        </button>
-                    `;
-                }).join('');
-
-                // Botón interactivo para otro periodo libre
-                const isCustomSelected = welcomeSelectedPeriod && !periodsList.includes(welcomeSelectedPeriod);
-                const customChipStyle = isCustomSelected
-                    ? 'bg-indigo-600 text-white shadow-xs font-bold ring-2 ring-indigo-500/30'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
-
-                chipsHtml += `
-                    <button type="button" id="welcome-period-custom-chip" class="welcome-period-chip tap-effect px-3 py-1.5 rounded-xl text-xs transition-all ${customChipStyle}" data-period="__custom__">
-                        ✏️ Otro...
-                    </button>
-                `;
-
-                periodChipsContainer.innerHTML = chipsHtml;
-
-                // Listeners en chips
-                periodChipsContainer.querySelectorAll('.welcome-period-chip').forEach(btn => {
-                    btn.onclick = () => {
-                        window.HapticsModule?.light();
-                        const p = btn.dataset.period;
-                        if (p === '__custom__') {
-                            if (customPeriodWrapper) customPeriodWrapper.classList.remove('hidden');
-                            if (customPeriodInput) {
-                                customPeriodInput.focus();
-                                if (customPeriodInput.value.trim()) {
-                                    welcomeSelectedPeriod = customPeriodInput.value.trim();
-                                    if (selectedPeriodBadge) selectedPeriodBadge.textContent = welcomeSelectedPeriod;
-                                }
-                            }
-                        } else {
-                            if (customPeriodWrapper) customPeriodWrapper.classList.add('hidden');
-                            welcomeSelectedPeriod = p;
-                            if (selectedPeriodBadge) selectedPeriodBadge.textContent = welcomeSelectedPeriod;
-                        }
-                        renderPeriodChips(inst);
-                    };
-                });
-
-                if (isCustomSelected && customPeriodWrapper) {
-                    customPeriodWrapper.classList.remove('hidden');
-                    if (customPeriodInput) customPeriodInput.value = welcomeSelectedPeriod;
-                }
-            };
-
-            if (customPeriodInput) {
-                customPeriodInput.oninput = (e) => {
-                    const val = e.target.value.trim();
-                    if (val) {
-                        welcomeSelectedPeriod = val;
-                        if (selectedPeriodBadge) selectedPeriodBadge.textContent = val;
-                    }
+            if (welcomeTypeInst) {
+                welcomeTypeInst.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    updateAccountTypeUI('institution');
                 };
             }
 
-            // 4. Renderizado de píldoras de filtro por país (SIN emojis de banderas)
-            const renderCountryPills = () => {
-                if (!countryPillsContainer || !InstitutionsModule) return;
+            if (welcomeTypeAct) {
+                welcomeTypeAct.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    updateAccountTypeUI('organizer');
+                };
+            }
 
-                const customSchools = Storage.getCustomSchools?.() || [];
-                const isLocked = Storage.isCountryLocked();
-
-                let options = [];
-                if (isLocked) {
-                    options = [
-                        { id: 'MX', label: 'México' },
-                        ...(customSchools.length > 0 ? [{ id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }] : [])
-                    ];
-                    welcomeCountryFilter = 'MX';
-                } else {
-                    const countries = InstitutionsModule.getCountries();
-                    options = [
-                        { id: 'all', label: 'Todas' },
-                        ...countries.map(c => ({ id: c.code, label: c.name })),
-                        ...(customSchools.length > 0 ? [{ id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }] : [])
-                    ];
+            // 2. Subida de Foto y Reducción mediante Canvas HTML5 (máx 256x256, <30KB)
+            const downsampleAndSavePhoto = (file) => {
+                if (!file || (!file.type.startsWith('image/') && !file.name.match(/\.(png|jpe?g|webp|gif|bmp)$/i))) {
+                    this.showToast('Solo se admiten archivos de imagen válidos.', 'warning');
+                    return;
                 }
 
-                countryPillsContainer.innerHTML = options.map(opt => {
-                    const isSelected = opt.id === welcomeCountryFilter;
-                    const pillStyle = isSelected
-                        ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
-                    return `
-                        <button type="button" class="welcome-country-pill tap-effect shrink-0 px-3 py-1 rounded-xl text-xs transition-all whitespace-nowrap ${pillStyle}" data-country="${opt.id}">
-                            ${opt.label}
-                        </button>
-                    `;
-                }).join('');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const MAX_SIZE = 256;
+                        let targetW = img.width;
+                        let targetH = img.height;
 
-                countryPillsContainer.querySelectorAll('.welcome-country-pill').forEach(btn => {
-                    btn.onclick = () => {
-                        window.HapticsModule?.light();
-                        welcomeCountryFilter = btn.dataset.country;
-                        renderCountryPills();
-                        renderSchoolsGrid();
+                        if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
+                            if (targetW > targetH) {
+                                targetH = Math.round((targetH * MAX_SIZE) / targetW);
+                                targetW = MAX_SIZE;
+                            } else {
+                                targetW = Math.round((targetW * MAX_SIZE) / targetH);
+                                targetH = MAX_SIZE;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetW;
+                        canvas.height = targetH;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, targetW, targetH);
+
+                        let dataUrl;
+                        const isPng = file.type === 'image/png' || (file.name && file.name.toLowerCase().endsWith('.png'));
+                        if (isPng) {
+                            dataUrl = canvas.toDataURL('image/png');
+                            if (dataUrl.length * 0.75 > 30 * 1024) {
+                                dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            }
+                        } else {
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                            if (dataUrl.length * 0.75 > 30 * 1024) {
+                                dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                            }
+                        }
+
+                        Storage?.setUserPhoto?.(dataUrl);
+
+                        if (welcomePhotoPreview) {
+                            welcomePhotoPreview.src = dataUrl;
+                            welcomePhotoPreview.classList.remove('hidden');
+                        }
+                        if (welcomePhotoPlaceholder) {
+                            welcomePhotoPlaceholder.classList.add('hidden');
+                        }
+                        if (welcomePhotoClearBtn) {
+                            welcomePhotoClearBtn.classList.remove('hidden');
+                        }
+                        window.HapticsModule?.light?.();
                     };
-                });
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             };
 
-            // 5. Renderizado de rejilla compacta de escuelas
-            const renderSchoolsGrid = () => {
-                if (!schoolsGrid || !InstitutionsModule) return;
+            if (welcomePhotoInput) {
+                const handlePhotoChange = (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                        downsampleAndSavePhoto(file);
+                    }
+                };
+                welcomePhotoInput.addEventListener('change', handlePhotoChange);
+                welcomePhotoInput.addEventListener('input', handlePhotoChange);
+            }
 
-                const allInstitutions = InstitutionsModule.getAllInstitutions();
-                let filtered = [];
-                if (!welcomeCountryFilter || welcomeCountryFilter === 'all') {
-                    filtered = allInstitutions;
-                } else if (welcomeCountryFilter === 'custom') {
-                    filtered = allInstitutions.filter(inst => inst.isCustom);
-                } else {
-                    filtered = allInstitutions.filter(inst => inst.countryCode === welcomeCountryFilter);
-                }
+            if (welcomePhotoClearBtn) {
+                welcomePhotoClearBtn.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    Storage?.setUserPhoto?.('');
+                    if (welcomePhotoInput) welcomePhotoInput.value = '';
+                    if (welcomePhotoPreview) {
+                        welcomePhotoPreview.src = '';
+                        welcomePhotoPreview.classList.add('hidden');
+                    }
+                    if (welcomePhotoPlaceholder) {
+                        welcomePhotoPlaceholder.classList.remove('hidden');
+                    }
+                    welcomePhotoClearBtn.classList.add('hidden');
+                };
+            }
 
-                let cardsHtml = filtered.map(inst => {
-                    const isSelected = inst.id === welcomeSelectedInstId;
-                    const activeClasses = isSelected
-                        ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 shadow-xs'
-                        : 'bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200/80 dark:border-slate-700/70';
-
-                    return `
-                        <button type="button" class="welcome-school-card tap-effect text-left p-2 rounded-xl border transition-all flex items-center gap-2 ${activeClasses}" data-inst-id="${inst.id}">
-                            <div class="shrink-0">
-                                ${InstitutionsModule.renderIconHtml(inst, 'w-8 h-8')}
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <div class="text-[11px] font-black text-slate-900 dark:text-white truncate">${inst.name}</div>
-                                <div class="text-[9px] text-slate-500 dark:text-slate-400 truncate">${inst.systemType || inst.shortBadge || ''}</div>
-                            </div>
-                            ${isSelected ? '<span class="text-indigo-600 dark:text-indigo-400 text-xs shrink-0 font-bold">✓</span>' : ''}
-                        </button>
-                    `;
-                }).join('');
-
-                // Botón interactivo dentro de la cuadrícula para crear escuela
-                cardsHtml += `
-                    <button type="button" id="welcome-grid-create-btn"
-                        class="welcome-create-card tap-effect text-left p-2 rounded-xl border-2 border-dashed border-indigo-300/80 dark:border-indigo-700/80 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-all flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0 shadow-xs">
-                            ➕
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 truncate">Crear mi Escuela</div>
-                            <div class="text-[9px] text-slate-500 dark:text-slate-400 truncate">Personalizada</div>
-                        </div>
-                    </button>
-                `;
-
-                schoolsGrid.innerHTML = cardsHtml;
-
-                // Listeners de selección de tarjeta
-                schoolsGrid.querySelectorAll('.welcome-school-card').forEach(card => {
-                    card.onclick = () => {
-                        window.HapticsModule?.light();
-                        const schoolId = card.dataset.instId;
-                        selectSchool(schoolId);
-                    };
-                });
-
-                const gridCreate = document.getElementById('welcome-grid-create-btn');
-                if (gridCreate) {
-                    gridCreate.onclick = () => {
-                        this.openCustomSchoolModal?.();
-                    };
-                }
-            };
-
-            const selectSchool = (schoolId) => {
-                welcomeSelectedInstId = schoolId;
-                const inst = InstitutionsModule.getInstitution(schoolId);
-                welcomeSelectedPeriod = inst.defaultPeriod || inst.periods?.[0] || '1.º Semestre';
-                if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
-                renderSelectedSchoolBox();
-                updatePeriodLockState();
-                renderSchoolsGrid();
-            };
-
-            const applySkipSchool = () => {
-                welcomeSelectedInstId = 'unconfigured';
-                welcomeSelectedPeriod = 'Sin periodo';
-                if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
-                renderSelectedSchoolBox();
-                updatePeriodLockState();
-                renderSchoolsGrid();
-            };
-
-            // Wiring de botones explícitos: Crear y Omitir
+            // 3. Compatibilidad con Constructor de Escuela Personalizada (T5_ADV_03)
             if (createSchoolBtn) {
                 createSchoolBtn.onclick = () => {
                     this.openCustomSchoolModal?.();
                 };
             }
 
-            if (skipSchoolBtn) {
-                skipSchoolBtn.onclick = () => {
-                    window.HapticsModule?.light();
-                    applySkipSchool();
-                };
-            }
+            this.onCustomSchoolCreated = () => {};
+            this.refreshWelcomeSchoolsGrid = () => {};
 
-            // Hook para cuando una escuela personalizada es creada y guardada
-            this.onCustomSchoolCreated = (saved) => {
-                if (modal && !modal.classList.contains('hidden') && saved) {
-                    welcomeSelectedInstId = saved.id;
-                    welcomeSelectedPeriod = saved.defaultPeriod || saved.periods?.[0] || '1.º Semestre';
-                    renderCountryPills();
-                    renderSchoolsGrid();
-                    renderSelectedSchoolBox();
-                    updatePeriodLockState();
-                    // Preservar overflow hidden en el cuerpo ya que cycle-setup-modal sigue abierto
-                    document.body.classList.add('overflow-hidden');
-                }
-            };
-
-            this.refreshWelcomeSchoolsGrid = () => {
-                renderCountryPills();
-                renderSchoolsGrid();
-                renderSelectedSchoolBox();
-                updatePeriodLockState();
-            };
-
-            window.addEventListener('custom-schools-updated', () => {
-                this.refreshWelcomeSchoolsGrid?.();
-            });
-
+            // 4. Apertura y Cierre de Onboarding
             const openWelcome = () => {
+                modal.style.display = '';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+
+                if (form) form.classList.remove('hidden');
+                if (celebrationContainer) celebrationContainer.classList.add('hidden');
+                if (celebrationMsg) celebrationMsg.classList.add('hidden');
+                if (progressBar) progressBar.style.width = '0%';
+
                 if (welcomeUserNameInput) {
-                    welcomeUserNameInput.value = Storage.getUserName?.() || '';
+                    welcomeUserNameInput.value = Storage?.getUserName?.() || '';
                 }
 
-                const isSkipped = Storage.isSchoolSkipped?.();
-                const currentInstId = Storage.getInstitution?.();
-                if (isSkipped || currentInstId === 'unconfigured') {
-                    welcomeSelectedInstId = 'unconfigured';
-                    welcomeSelectedPeriod = 'Sin periodo';
+                const savedPhoto = Storage?.getUserPhoto?.() || '';
+                if (savedPhoto) {
+                    if (welcomePhotoPreview) {
+                        welcomePhotoPreview.src = savedPhoto;
+                        welcomePhotoPreview.classList.remove('hidden');
+                    }
+                    if (welcomePhotoPlaceholder) welcomePhotoPlaceholder.classList.add('hidden');
+                    if (welcomePhotoClearBtn) welcomePhotoClearBtn.classList.remove('hidden');
                 } else {
-                    welcomeSelectedInstId = currentInstId || 'unam';
-                    welcomeSelectedPeriod = Storage.getAcademicPeriod?.() || '1.º Semestre';
+                    if (welcomePhotoPreview) {
+                        welcomePhotoPreview.src = '';
+                        welcomePhotoPreview.classList.add('hidden');
+                    }
+                    if (welcomePhotoPlaceholder) welcomePhotoPlaceholder.classList.remove('hidden');
+                    if (welcomePhotoClearBtn) welcomePhotoClearBtn.classList.add('hidden');
                 }
 
-                const isLocked = Storage.isCountryLocked();
-                const currentCountry = Storage.getUserCountry();
+                updateAccountTypeUI(Storage?.getAccountType?.() || 'institution');
 
-                if (isLocked) {
-                    welcomeCountryFilter = 'MX';
-                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
-                } else if (currentCountry) {
-                    welcomeCountryFilter = currentCountry;
-                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.remove('hidden');
-                } else {
-                    // Primero elegir país
-                    welcomeCountryFilter = 'all';
-                    if (welcomeSchoolsSection) welcomeSchoolsSection.classList.add('hidden');
-                }
-
-                const cycle = Storage.getAcademicCycle?.() || {};
+                const cycle = Storage?.getAcademicCycle?.() || {};
                 if (startInput) startInput.value = cycle.startDate || '';
                 if (endInput) endInput.value = cycle.endDate || '';
-                if ((!startInput?.value || !endInput?.value) && Storage.getDefaultCycleDates) {
+                if ((!startInput?.value || !endInput?.value) && Storage?.getDefaultCycleDates) {
                     const def = Storage.getDefaultCycleDates();
                     if (startInput && !startInput.value) startInput.value = def.startDate;
                     if (endInput && !endInput.value) endInput.value = def.endDate;
                 }
 
-                renderWelcomeCountries();
-                renderSelectedSchoolBox();
-                renderCountryPills();
-                renderSchoolsGrid();
-                updatePeriodLockState();
-
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                document.body.classList.add('overflow-hidden');
                 requestAnimationFrame(() => {
                     modal.classList.add('active');
                 });
@@ -2535,6 +2444,7 @@
                 setTimeout(() => {
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
+                    modal.style.display = 'none';
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
             };
@@ -2542,17 +2452,51 @@
             this.openCycleWelcomeModal = openWelcome;
             this.closeCycleWelcomeModal = closeWelcome;
 
-            // Submit del formulario
+            // 5. Animación de Celebración con Barra de Progreso y Transición a Dashboard
+            const executeCelebration = (onFinish) => {
+                if (form) form.classList.add('hidden');
+                if (celebrationContainer) celebrationContainer.classList.remove('hidden');
+                if (celebrationMsg) celebrationMsg.classList.remove('hidden');
+
+                if (progressBar) {
+                    progressBar.style.width = '0%';
+                    void progressBar.offsetWidth; // forzar reflow
+                    progressBar.style.width = '100%';
+                }
+
+                window.HapticsModule?.success?.();
+
+                let animDuration = 1100;
+                if (progressBar) {
+                    const computedDuration = parseFloat(window.getComputedStyle(progressBar).transitionDuration);
+                    if (computedDuration === 0) {
+                        animDuration = 20;
+                    }
+                }
+
+                setTimeout(() => {
+                    if (typeof onFinish === 'function') onFinish();
+                }, animDuration);
+            };
+
+            // 6. Envío del Formulario
             if (form) {
                 form.onsubmit = (e) => {
                     e.preventDefault();
-                    window.HapticsModule?.double();
+                    if (this.isOnboardingSubmitting) return;
 
                     const s = startInput ? startInput.value : '';
                     const end = endInput ? endInput.value : '';
+                    const userName = welcomeUserNameInput ? welcomeUserNameInput.value.trim() : '';
+
+                    if (!userName) {
+                        this.showToast('Por favor escribe tu nombre o apodo.', 'warning');
+                        welcomeUserNameInput?.focus();
+                        return;
+                    }
 
                     if (!s || !end) {
-                        this.showToast('Por favor confirma ambas fechas de tu ciclo escolar.', 'warning');
+                        this.showToast('Por favor confirma ambas fechas de tu ciclo.', 'warning');
                         return;
                     }
                     if (s > end) {
@@ -2560,81 +2504,79 @@
                         return;
                     }
 
-                    if (welcomeUserNameInput && welcomeUserNameInput.value.trim()) {
-                        Storage.setUserName(welcomeUserNameInput.value.trim());
-                    }
+                    this.isOnboardingSubmitting = true;
 
-                    if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
-                        Storage.setSchoolSkipped(true);
-                        Storage.setAcademicPeriod('Sin periodo');
-                        Storage.setInstitution('unconfigured');
-                        this.setInstitution('unconfigured');
-                        const headerPeriod = document.getElementById('header-inst-period');
-                        if (headerPeriod) headerPeriod.textContent = 'Sin periodo';
-                        const drawerPeriod = document.getElementById('drawer-inst-period');
-                        if (drawerPeriod) drawerPeriod.textContent = 'Sin periodo';
-                    } else {
-                        Storage.setSchoolSkipped(false);
-                        Storage.setAcademicPeriod(welcomeSelectedPeriod || '1.º Semestre');
-                        Storage.setInstitution(welcomeSelectedInstId);
-                        this.setInstitution(welcomeSelectedInstId);
-                        const headerPeriod = document.getElementById('header-inst-period');
-                        if (headerPeriod) headerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
-                        const drawerPeriod = document.getElementById('drawer-inst-period');
-                        if (drawerPeriod) drawerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
-                    }
+                    Storage?.setUserName?.(userName);
+                    Storage?.setAccountType?.(currentAccountType);
+                    Storage?.setAcademicCycle?.(s, end);
 
-                    Storage.setAcademicCycle(s, end);
-                    Storage.setCycleConfigured(true);
-                    Storage.setOnboardingCompleted(true);
-                    closeWelcome();
-                    this.refreshAll();
-                    if (welcomeSelectedInstId === 'unconfigured') {
-                        this.showToast('¡Bienvenido! Podrás configurar tu institución en Ajustes cuando gustes.', 'info');
-                    } else {
-                        this.showToast('¡Perfil escolar e institución configurados exitosamente!', 'success');
-                    }
+                    executeCelebration(() => {
+                        Storage?.setCycleConfigured?.(true);
+                        Storage?.setOnboardingCompleted?.(true);
+                        closeWelcome();
+
+                        this.switchView?.('dashboard');
+                        this.renderHeader?.();
+                        this.renderDrawer?.();
+                        this.refreshAll?.();
+
+                        this.showToast('¡Configuración completada exitosamente! ¡Bienvenido!', 'success');
+
+                        // Trigger deferred presentation flows
+                        if (window.NotificationsModule?.requestPermission) {
+                            window.NotificationsModule.requestPermission().catch(() => {});
+                        }
+                        const lastSeenVersion = Storage?.getLastSeenVersion?.();
+                        if (lastSeenVersion !== '1.4.2') {
+                            setTimeout(() => {
+                                this.openChangelogModal?.();
+                            }, 800);
+                        }
+
+                        this.isOnboardingSubmitting = false;
+                    });
                 };
             }
 
-            // Guardar con ciclo provisional
+            // 7. Configuración con Ciclo Provisional
             if (laterBtn) {
                 laterBtn.onclick = () => {
-                    window.HapticsModule?.light();
+                    if (this.isOnboardingSubmitting) return;
 
-                    if (welcomeUserNameInput && welcomeUserNameInput.value.trim()) {
-                        Storage.setUserName(welcomeUserNameInput.value.trim());
+                    const userName = welcomeUserNameInput ? welcomeUserNameInput.value.trim() : '';
+                    if (userName) {
+                        Storage?.setUserName?.(userName);
                     }
 
-                    if (!welcomeSelectedInstId || welcomeSelectedInstId === 'unconfigured') {
-                        Storage.setSchoolSkipped(true);
-                        Storage.setAcademicPeriod('Sin periodo');
-                        Storage.setInstitution('unconfigured');
-                        this.setInstitution('unconfigured');
-                        const headerPeriod = document.getElementById('header-inst-period');
-                        if (headerPeriod) headerPeriod.textContent = 'Sin periodo';
-                        const drawerPeriod = document.getElementById('drawer-inst-period');
-                        if (drawerPeriod) drawerPeriod.textContent = 'Sin periodo';
-                    } else {
-                        Storage.setSchoolSkipped(false);
-                        Storage.setAcademicPeriod(welcomeSelectedPeriod || '1.º Semestre');
-                        Storage.setInstitution(welcomeSelectedInstId);
-                        this.setInstitution(welcomeSelectedInstId);
-                        const headerPeriod = document.getElementById('header-inst-period');
-                        if (headerPeriod) headerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
-                        const drawerPeriod = document.getElementById('drawer-inst-period');
-                        if (drawerPeriod) drawerPeriod.textContent = welcomeSelectedPeriod || '1.º Semestre';
-                    }
+                    this.isOnboardingSubmitting = true;
+                    Storage?.setAccountType?.(currentAccountType);
+                    Storage?.setProvisionalCycle?.();
 
-                    Storage.setProvisionalCycle();
-                    Storage.setOnboardingCompleted(true);
-                    closeWelcome();
-                    this.refreshAll();
-                    if (welcomeSelectedInstId === 'unconfigured') {
+                    executeCelebration(() => {
+                        Storage?.setCycleConfigured?.(true);
+                        Storage?.setOnboardingCompleted?.(true);
+                        closeWelcome();
+
+                        this.switchView?.('dashboard');
+                        this.renderHeader?.();
+                        this.renderDrawer?.();
+                        this.refreshAll?.();
+
                         this.showToast('Bienvenido. Configuración completada con ciclo provisional.', 'info');
-                    } else {
-                        this.showToast('Institución guardada. Ciclo asignado en modo provisional.', 'info');
-                    }
+
+                        // Trigger deferred presentation flows
+                        if (window.NotificationsModule?.requestPermission) {
+                            window.NotificationsModule.requestPermission().catch(() => {});
+                        }
+                        const lastSeenVersion = Storage?.getLastSeenVersion?.();
+                        if (lastSeenVersion !== '1.4.2') {
+                            setTimeout(() => {
+                                this.openChangelogModal?.();
+                            }, 800);
+                        }
+
+                        this.isOnboardingSubmitting = false;
+                    });
                 };
             }
         }
@@ -2876,7 +2818,7 @@
                         orbitron: 'Orbitron (Cyber HUD)'
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
-                    autoCloseCard(btn);
+                    // v1.4.2: la ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
                 };
             });
 
@@ -2907,6 +2849,37 @@
                         window.HapticsModule?.double();
                     }
                     this.showToast(enabled ? 'Vibraciones hápticas activadas.' : 'Vibraciones desactivadas.', 'info');
+                };
+            }
+
+            // 7b. Edición por pulsación larga (botón estándar, sin switches)
+            const longPressBtn = document.getElementById('settings-longpress-btn');
+            const longPressStatus = document.getElementById('settings-longpress-status');
+            const refreshLongPressUi = () => {
+                const on = Storage.isLongPressEnabled();
+                if (longPressBtn) {
+                    longPressBtn.textContent = on ? 'Desactivar pulsación larga' : 'Activar pulsación larga';
+                    longPressBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                }
+                if (longPressStatus) {
+                    longPressStatus.textContent = on ? 'Activada' : 'Desactivada';
+                    longPressStatus.className = on
+                        ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                        : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20';
+                }
+            };
+            if (longPressBtn) {
+                refreshLongPressUi();
+                longPressBtn.onclick = () => {
+                    const next = !Storage.isLongPressEnabled();
+                    Storage.setLongPressEnabled(next);
+                    window.CardContextMenu?.close?.();
+                    refreshLongPressUi();
+                    window.SubjectsModule?.render?.();
+                    window.TasksModule?.render?.();
+                    window.NotesModule?.render?.();
+                    window.HapticsModule?.light?.();
+                    this.showToast(next ? 'Pulsación larga activada: mantén presionado para editar o eliminar.' : 'Pulsación larga desactivada: los botones de editar y eliminar vuelven a estar visibles.', 'info');
                 };
             }
 
@@ -3000,7 +2973,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.4.1 «Pájaro 🐦»
+            // 11. Novedades de Versión 1.4.2
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -3029,7 +3002,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.4.1');
+                window.StorageModule.setLastSeenVersion('1.4.2');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
@@ -3094,6 +3067,7 @@
         setupSecretVault() {
             const openBtn = document.getElementById('open-secret-codes-btn');
             const backBtn = document.getElementById('vault-back-btn');
+            const singleInput = document.getElementById('vault-code-input');
             const p1 = document.getElementById('vault-code-p1');
             const p2 = document.getElementById('vault-code-p2');
             const submitBtn = document.getElementById('vault-submit-btn');
@@ -3104,7 +3078,7 @@
                 openBtn.onclick = () => {
                     window.HapticsModule?.medium?.();
                     this.switchView('secret-codes');
-                    setTimeout(() => p1?.focus(), 250);
+                    setTimeout(() => (singleInput || p1)?.focus(), 250);
                 };
             }
 
@@ -3115,6 +3089,23 @@
                 };
             }
 
+            if (singleInput) {
+                singleInput.addEventListener('input', () => {
+                    singleInput.value = singleInput.value.replace(/[^a-zA-Z0-9_\-\/]/g, '').toUpperCase();
+                    if (p1 && p2) {
+                        const clean = singleInput.value.replace(/[^a-zA-Z0-9]/g, '');
+                        p1.value = clean.slice(0, 4);
+                        p2.value = clean.slice(4, 8);
+                    }
+                });
+
+                singleInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        verifyCode();
+                    }
+                });
+            }
+
             if (p1 && p2) {
                 // Paste Handler on p1: Splits clipboard text into p1 (0-4) and p2 (4-8)
                 p1.addEventListener('paste', (e) => {
@@ -3122,6 +3113,7 @@
                     const pasted = ((e.clipboardData || window.clipboardData)?.getData('text') || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
                     p1.value = pasted.slice(0, 4);
                     p2.value = pasted.slice(4, 8);
+                    if (singleInput) singleInput.value = (p1.value + p2.value);
                     if (p2.value.length > 0) {
                         p2.focus();
                     } else {
@@ -3135,12 +3127,14 @@
                         e.preventDefault();
                         p1.value = pasted.slice(0, 4);
                         p2.value = pasted.slice(4, 8);
+                        if (singleInput) singleInput.value = (p1.value + p2.value);
                         p2.focus();
                     }
                 });
 
                 p1.addEventListener('input', () => {
                     p1.value = p1.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    if (singleInput) singleInput.value = (p1.value || '') + (p2.value || '');
                     if (p1.value.length >= 4) {
                         p2.focus();
                     }
@@ -3148,6 +3142,7 @@
 
                 p2.addEventListener('input', () => {
                     p2.value = p2.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    if (singleInput) singleInput.value = (p1.value || '') + (p2.value || '');
                 });
 
                 p2.addEventListener('keydown', (e) => {
@@ -3170,7 +3165,9 @@
             }
 
             const verifyCode = () => {
-                const raw = ((p1?.value || '') + (p2?.value || '')).trim().toUpperCase();
+                const singleVal = singleInput?.value?.trim() || '';
+                const splitVal = ((p1?.value || '') + (p2?.value || '')).trim();
+                const raw = (singleVal || splitVal).toUpperCase();
                 const cleaned = raw.replace(/[^A-Z0-9]/g, '');
 
                 // Resolve alias or direct match
@@ -3189,9 +3186,10 @@
                         statusMsg.textContent = '⚠️ Acceso denegado: Código no reconocido o credencial inválida.';
                     }
                     setTimeout(() => {
+                        if (singleInput) singleInput.value = '';
                         if (p1) p1.value = '';
                         if (p2) p2.value = '';
-                        p1?.focus();
+                        (singleInput || p1)?.focus();
                     }, 1500);
                     return;
                 }
@@ -3232,6 +3230,7 @@
                         lockDiv.classList.remove('vault-lock-unlocking');
                         lockDiv.classList.add('vault-lock-unlocked');
                     }
+                    if (singleInput) singleInput.value = '';
                     if (p1) p1.value = '';
                     if (p2) p2.value = '';
 
@@ -3242,6 +3241,10 @@
 
             if (submitBtn) {
                 submitBtn.onclick = verifyCode;
+            }
+            const verifyBtn = document.getElementById('vault-verify-btn');
+            if (verifyBtn) {
+                verifyBtn.onclick = verifyCode;
             }
 
             this.renderVaultInventory();
@@ -3272,7 +3275,7 @@
 
             // Estilo conmemorativo especial para la dedicatoria 06062009
             if (codeDef.id === '06062009') {
-                if (titleEl) titleEl.innerHTML = `✨ Starlight Tribute <span class="block text-xs font-serif text-pink-300 font-normal mt-1">06 · 06 · 2009</span>`;
+                if (titleEl) titleEl.innerHTML = `✨ Starlight Tribute`;
                 if (phraseEl) phraseEl.className = 'text-sm font-serif italic text-pink-100 leading-relaxed px-4 py-3 bg-pink-500/15 rounded-2xl border border-pink-400/30 shadow-lg shadow-pink-950/50 block text-center';
             } else {
                 if (phraseEl) phraseEl.className = 'text-xs font-serif italic text-purple-200/90 leading-relaxed px-2';
@@ -3379,10 +3382,10 @@
 
             if (unlocked.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-span-full py-6 px-4 rounded-2xl bg-black/40 border border-purple-500/20 text-center">
+                    <div class="vault-empty-state col-span-full py-7 px-5 rounded-2xl bg-purple-50/90 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-500/20 text-center shadow-xs transition-colors">
                         <span class="text-2xl mb-1 block opacity-60 select-none">🔒</span>
-                        <p class="text-xs font-mono font-bold text-purple-300/80">Ningún protocolo descifrado aún</p>
-                        <p class="text-[11px] text-purple-400/60 mt-0.5">Ingresa códigos válidos en la terminal para desbloquear personalizaciones clasificadas.</p>
+                        <p class="text-xs font-mono font-bold text-purple-950 dark:text-purple-300">Ningún protocolo descifrado aún</p>
+                        <p class="text-[11px] text-purple-800/80 dark:text-purple-400/70 mt-1 font-medium">Ingresa códigos válidos en la terminal para desbloquear personalizaciones clasificadas.</p>
                     </div>
                 `;
                 return;
@@ -3403,25 +3406,19 @@
                 const isActive = isFont
                     ? (def.fontKey && currentFont === def.fontKey)
                     : (def.themeId && currentSpecialTheme === def.themeId);
-                const buttonText = (def.id === '06062009')
-                    ? 'Ver Dedicatoria'
-                    : (def.isMasterCode || def.id === 'KRONOS99'
-                        ? 'Ver Detalle'
-                        : (isFont
-                            ? (isActive ? 'Restaurar Fuente Estándar' : 'Activar Tipografía')
-                            : (isActive ? 'Desactivar' : 'Activar')));
+                const buttonText = (def.id === '06062009') ? 'Ver' : (def.isMasterCode || def.id === 'KRONOS99' ? 'Ver Detalle' : (isFont ? (isActive ? 'Restaurar' : 'Activar') : (isActive ? 'Desactivar' : 'Activar')));
 
                 return `
-                    <div class="vault-inventory-card truncate p-3 rounded-2xl bg-slate-900/80 dark:bg-slate-950/80 border ${isActive ? 'border-emerald-400/60 shadow-lg shadow-emerald-950/40' : 'border-purple-500/20'} flex items-center justify-between gap-2.5 transition-all">
-                        <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="vault-inventory-card p-3 rounded-2xl bg-slate-900/80 dark:bg-slate-950/80 border ${isActive ? 'border-emerald-400/60 shadow-lg shadow-emerald-950/40' : 'border-purple-500/20'} flex items-center justify-between gap-2.5 transition-all">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
                             <span class="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-400/20 flex items-center justify-center text-lg shrink-0">
                                 ${def.icon}
                             </span>
-                            <div class="min-w-0">
-                                <h4 class="text-xs font-extrabold text-white truncate" title="${def.name}">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="text-xs font-extrabold text-white dark:text-white min-w-0 flex-1 break-words leading-snug" title="${def.name}">
                                     ${def.name}
                                 </h4>
-                                <div class="flex items-center gap-1.5 mt-0.5">
+                                <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                     <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">
                                         ${def.category || 'SECRETO'}
                                     </span>
@@ -3571,6 +3568,10 @@
                     Storage.setTheme('dark');
                     this.updateThemeUI('dark', false);
                 }
+            }
+            if (Storage?.getGrayModeEnabled?.()) {
+                document.documentElement.classList.add('theme-gray');
+                document.body?.classList.add('theme-gray');
             }
             this.updateApolloRockets();
         }

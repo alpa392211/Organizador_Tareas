@@ -235,6 +235,7 @@ window.SubjectsModule = (() => {
      */
     function render() {
         const Storage = window.StorageModule;
+        const longPress = typeof Storage.isLongPressEnabled === "function" ? Storage.isLongPressEnabled() : true;
         const container = document.getElementById('subjects-grid');
         const countBadge = document.getElementById('subjects-count-badge');
         const addBtn = document.getElementById('add-subject-btn');
@@ -286,7 +287,7 @@ window.SubjectsModule = (() => {
             const pendingTasks = subjectTasks.filter(t => !t.completed).length;
 
             const card = document.createElement('div');
-            card.className = `stagger-card card-hover group relative bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col justify-between`;
+            card.className = `subject-card stagger-card card-hover group relative bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col justify-between`;
             card.style.setProperty('--stagger-i', index);
             card.style.borderLeft = `6px solid ${subject.color}`;
 
@@ -366,13 +367,28 @@ window.SubjectsModule = (() => {
                     </button>
                     <span class="text-[11px] text-slate-400 font-mono">${subjectTasks.length} tot.</span>
                 </div>
+                ${longPress ? '' : `
+                <div class="flex items-center gap-2 pt-1">
+                    <button type="button" data-action="edit" data-id="${subject.id}" class="tap-effect flex-1 px-2 py-1.5 rounded-xl text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-slate-700 dark:text-indigo-300">✏️ Editar</button>
+                    <button type="button" data-action="delete" data-id="${subject.id}" class="tap-effect flex-1 px-2 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400">🗑️ Eliminar</button>
+                </div>`}
             `;
 
             // Menú contextual flotante por pulsación prolongada (Long-Press o Clic Derecho)
-            window.CardContextMenu?.bind?.(card, {
-                title: subject.name,
-                onEdit: () => openEditModal(subject.id),
-                onDelete: () => deleteSubjectPrompt(subject.id)
+            if (longPress) {
+                window.CardContextMenu?.bind?.(card, {
+                    title: subject.name,
+                    onEdit: () => openEditModal(subject.id),
+                    onDelete: () => deleteSubjectPrompt(subject.id)
+                });
+            }
+            card.querySelector('[data-action="edit"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditModal(subject.id);
+            });
+            card.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteSubjectPrompt(subject.id);
             });
 
             card.querySelector('[data-action="filter-tasks"]')?.addEventListener('click', () => {

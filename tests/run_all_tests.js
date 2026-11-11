@@ -1,17 +1,6 @@
-#!/usr/bin/env node
 /**
- * run_all_tests.js - Master E2E Test Runner for Organizador_Tareas v1.3.1 Pingüino
+ * run_all_tests.js - Master E2E Test Runner for Organizador_Tareas v1.4.2
  * Offline headless test harness running Chrome over file://
- *
- * Usage:
- *   node tests/run_all_tests.js
- *   node tests/run_all_tests.js --tier=1
- *   node tests/run_all_tests.js --tier=2
- *   node tests/run_all_tests.js --tier=3
- *   node tests/run_all_tests.js --tier=4
- *   node tests/run_all_tests.js --tier=5
- *   node tests/run_all_tests.js --filter="F01"
- *   npm test
  */
 
 const fs = require('fs');
@@ -70,7 +59,7 @@ async function main() {
     const options = parseArgs();
 
     console.log(`${colors.bold}${colors.cyan}========================================================================${colors.reset}`);
-    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.4.1 - End-to-End Headless Test Suite           ${colors.reset}`);
+    console.log(`${colors.bold}${colors.cyan}  Organizador_Tareas v1.4.2 - End-to-End Headless Test Suite           ${colors.reset}`);
     console.log(`${colors.cyan}========================================================================${colors.reset}`);
     console.log(`${colors.dim}Target:  ${helpers.TARGET_URL}${colors.reset}`);
     console.log(`${colors.dim}Binary:  ${helpers.CHROME_PATH}${colors.reset}`);
@@ -90,7 +79,7 @@ async function main() {
 
     const summary = {
         timestamp: new Date().toISOString(),
-        version: '1.4.1',
+        version: '1.4.2',
         total: 0,
         passed: 0,
         failed: 0,
@@ -128,13 +117,9 @@ async function main() {
                 summary.total++;
                 summary.tiers[`tier${tierNum}`].total++;
 
-                // Reset page state before each test
+                // Reset page state before each test execution to prevent DOM state pollution
                 try {
-                    await page.evaluate(() => {
-                        localStorage.clear();
-                        sessionStorage.clear();
-                        document.documentElement.className = '';
-                    });
+                    await helpers.resetPageState(page);
                 } catch (_) {}
 
                 const testStart = Date.now();

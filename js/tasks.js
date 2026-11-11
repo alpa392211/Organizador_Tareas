@@ -466,6 +466,7 @@ window.TasksModule = (() => {
 
     function render() {
         const Storage = window.StorageModule;
+        const longPress = typeof Storage.isLongPressEnabled === 'function' ? Storage.isLongPressEnabled() : true;
         const container = document.getElementById('tasks-container');
         const emptyState = document.getElementById('tasks-empty-state');
         const totalPendingBadge = document.getElementById('tasks-pending-count');
@@ -620,6 +621,9 @@ window.TasksModule = (() => {
 
                 <!-- Acciones Rápidas (Archivar en baúl y menú contextual por pulsación prolongada) -->
                 <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-700/60 w-full sm:w-auto justify-end">
+                    ${longPress ? '' : `
+                        <button type="button" data-action="edit" data-id="${task.id}" class="tap-effect px-2.5 py-1.5 rounded-xl text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-slate-700 dark:text-indigo-300">✏️ Editar</button>
+                        <button type="button" data-action="delete" data-id="${task.id}" class="tap-effect px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400">🗑️ Eliminar</button>`}
                     ${task.completed ? `
                         <button type="button" data-action="archive" data-id="${task.id}"
                             class="tap-effect flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm shadow-amber-500/30 transition-transform active:scale-95"
@@ -652,10 +656,20 @@ window.TasksModule = (() => {
             });
 
             // Menú contextual flotante por pulsación prolongada (Long-Press o Clic Derecho)
-            window.CardContextMenu?.bind?.(card, {
-                title: task.title,
-                onEdit: () => openEditModal(task.id),
-                onDelete: () => deleteTaskPrompt(task.id)
+            if (longPress) {
+                window.CardContextMenu?.bind?.(card, {
+                    title: task.title,
+                    onEdit: () => openEditModal(task.id),
+                    onDelete: () => deleteTaskPrompt(task.id)
+                });
+            }
+            card.querySelector('[data-action="edit"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditModal(task.id);
+            });
+            card.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteTaskPrompt(task.id);
             });
 
             container.appendChild(card);

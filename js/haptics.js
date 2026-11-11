@@ -26,7 +26,7 @@ window.HapticsModule = (() => {
         /**
          * Devuelve si la respuesta háptica está habilitada (por defecto true)
          */
-        isEnabled() {
+    isEnabled() {
             const val = localStorage.getItem(STORAGE_KEY);
             return val === null ? true : val === 'true';
         },
@@ -106,6 +106,14 @@ window.HapticsModule = (() => {
         },
 
         /**
+         * Patrón de éxito / celebración ([25, 50, 30, 50, 25])
+         * Usado al completar la configuración inicial y celebraciones
+         */
+        success() {
+            this.vibrate([25, 50, 30, 50, 25]);
+        },
+
+        /**
          * Vincula automáticamente retroalimentación háptica en la interfaz
          */
         bindGlobalInteractions() {
@@ -135,72 +143,40 @@ window.CardContextMenu = {
 
     show({ targetEl, title, onEdit, onDelete, position }) {
         this.close();
+        const popup = this.ensurePopup();
+        if (!popup) return;
 
-        const menu = document.createElement('div');
-        menu.id = 'floating-card-context-menu';
-        menu.className = 'fixed z-50 animate-in fade-in zoom-in-95 duration-150 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-2xl p-1.5 min-w-[170px] text-slate-800 dark:text-slate-100 flex flex-col gap-1';
-        
-        menu.innerHTML = `
-            <div class="px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800 truncate max-w-[210px]">
-                ${title || 'Opciones'}
-            </div>
-            <button type="button" class="context-action-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-left" data-context-action="edit">
-                <span class="text-sm">✏️</span>
-                <span>Editar</span>
-            </button>
-            <button type="button" class="context-action-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 transition-colors text-left" data-context-action="delete">
-                <span class="text-sm">🗑️</span>
-                <span>Eliminar</span>
-            </button>
-        `;
+        const titleEl = popup.querySelector('[data-popup-title]');
+        if (titleEl) titleEl.textContent = title || 'Opciones';
 
-        document.body.appendChild(menu);
-        this.activeMenuEl = menu;
+        this.activeMenuEl = popup;
         this.activeTargetEl = targetEl;
-
         if (targetEl) {
             targetEl.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2', 'dark:ring-offset-slate-900');
         }
 
-        // Posicionamiento inteligente sobre la tarjeta o punto de pulsación
-        const rect = targetEl ? targetEl.getBoundingClientRect() : { top: position?.clientY || 100, left: position?.clientX || 100, width: 0, height: 0, bottom: position?.clientY || 100 };
-        const menuRect = menu.getBoundingClientRect();
-
-        let top = rect.top - menuRect.height - 8;
-        if (top < 12) {
-            top = Math.min(window.innerHeight - menuRect.height - 12, rect.bottom + 8);
-        }
-
-        let left = rect.left + (rect.width / 2) - (menuRect.width / 2);
-        if (position && typeof position.clientX === 'number') {
-            left = position.clientX - (menuRect.width / 2);
-        }
-        left = Math.max(12, Math.min(window.innerWidth - menuRect.width - 12, left));
-
-        menu.style.top = `${Math.round(top)}px`;
-        menu.style.left = `${Math.round(left)}px`;
-
-        menu.querySelector('[data-context-action="edit"]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.close();
-            if (typeof onEdit === 'function') onEdit();
-        });
-
-        menu.querySelector('[data-context-action="delete"]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.close();
-            if (typeof onDelete === 'function') onDelete();
-        });
-
-        // Cerrar al hacer clic fuera
-        const onDocClick = (e) => {
-            if (!menu.contains(e.target)) {
+        const bindBtn = (action, cb) => {
+            const old = popup.querySelector(`[data-context-action="${action}"]`);
+            if (!old) return;
+            const btn = old.cloneNode(true); // elimina listeners anteriores
+            old.replaceWith(btn);
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.close();
-            }
+                if (typeof cb === 'function') cb();
+            });
         };
-        setTimeout(() => {
-            document.addEventListener('click', onDocClick, { once: true, capture: true });
-        }, 15);
+        bindBtn('edit', onEdit);
+        bindBtn('delete', onDelete);
+
+        popup.classList.remove('hidden');
+        popup.style.display = 'flex';
+        const dialog = popup.querySelector('.modal-dialog') || popup.firstElementChild;
+        if (dialog) {
+            dialog.classList.remove('dynamic-popup-in');
+            void dialog.offsetWidth;
+            dialog.classList.add('dynamic-popup-in');
+        }
     },
 
     close() {
@@ -208,23 +184,71 @@ window.CardContextMenu = {
             this.activeTargetEl.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2', 'dark:ring-offset-slate-900');
             this.activeTargetEl = null;
         }
-        if (this.activeMenuEl) {
-            this.activeMenuEl.remove();
-            this.activeMenuEl = null;
+        const popup = document.getElementById('card-dynamic-popup');
+        if (popup) {
+            popup.classList.add('hidden');
+            popup.style.display = '';
         }
+        this.activeMenuEl = null;
+    },
+
+        /** Crea (o recrea) el popup dinámico compacto si no existe en el DOM. */
+    ensurePopup() {
+        let popup = document.getElementById('card-dynamic-popup');
+        if (popup || !document.body) return popup;
+        popup = document.createElement('div');
+        popup.id = 'card-dynamic-popup';
+        popup.className = 'fixed inset-0 z-[70] hidden items-center justify-center p-4';
+        popup.style.display = 'none';
+        popup.innerHTML = `
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" data-popup-close></div>
+            <div class="modal-dialog dynamic-popup relative w-full max-w-xs bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 p-4 space-y-2">
+                <div data-popup-title class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">Opciones</div>
+                <button type="button" data-context-action="edit" class="tap-effect w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm font-bold bg-indigo-50 dark:bg-slate-700 text-indigo-700 dark:text-indigo-300"><span>✏️</span><span>Editar</span></button>
+                <button type="button" data-context-action="delete" class="tap-effect w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"><span>🗑️</span><span>Eliminar</span></button>
+                <button type="button" data-popup-close class="tap-effect w-full px-3 py-2 rounded-2xl text-xs font-bold text-slate-500 dark:text-slate-400">Cancelar</button>
+            </div>`;
+        document.body.appendChild(popup);
+        return popup;
+    },
+
+    isEnabled() {
+        const S = window.StorageModule;
+        return !S || typeof S.isLongPressEnabled !== 'function' || S.isLongPressEnabled();
+    },
+
+    init() {
+        if (this._inited) return;
+        this._inited = true;
+        this.ensurePopup();
+        if (window.MutationObserver && document.body) {
+            new MutationObserver(() => {
+                if (!document.getElementById('card-dynamic-popup')) this.ensurePopup();
+            }).observe(document.body, { childList: true });
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.close();
+        });
+        document.addEventListener('click', (e) => {
+            const popup = document.getElementById('card-dynamic-popup');
+            if (!popup || popup.classList.contains('hidden')) return;
+            if (e.target === popup || e.target.closest('[data-popup-close]')) this.close();
+        });
     },
 
     bind(element, { title, onEdit, onDelete }) {
         if (!element) return;
+        this.init();
         let timer = null;
         let startX = 0;
         let startY = 0;
         let isLongPress = false;
 
         const onTouchStart = (e) => {
+            if (!this.isEnabled()) return;
             if (e.target.closest('input, button, a, [data-action="toggle"], [data-action="archive"]')) return;
             isLongPress = false;
-            const t = e.touches ? e.touches[0] : e;
+            const t = (e.touches && e.touches[0]) || e;
             startX = t.clientX;
             startY = t.clientY;
 
@@ -269,6 +293,7 @@ window.CardContextMenu = {
 
         // Menú contextual en clic derecho desktop
         element.addEventListener('contextmenu', (e) => {
+            if (!this.isEnabled()) return;
             if (e.target.closest('input, button, a, [data-action="toggle"]')) return;
             e.preventDefault();
             if (timer) clearTimeout(timer);
@@ -278,3 +303,10 @@ window.CardContextMenu = {
     }
 };
 
+
+// Disponibilidad inmediata del popup dinámico
+(function () {
+    const boot = () => window.CardContextMenu.init();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+})();

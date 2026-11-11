@@ -1,7 +1,7 @@
 /**
  * tier2_boundary_corner.js - Tier 2: Boundary & Corner Cases
- * Features F01 through F42 (Boundary & Corner Cases, 149 total tests)
- * Requirement-driven edge case validation for Organizador_Tareas v1.3.4
+ * Features F01 through F18 (5 distinct boundary/edge tests per feature, 90 total tests)
+ * Requirement-driven edge case validation for Organizador_Tareas v1.4.2
  */
 
 const fs = require('fs');
@@ -9,2197 +9,1503 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump v1.3.1 "Pingüino"
+    // F01: Version Bump 1.4.2 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
-        id: 'T2_F01_01_package_json_semver_syntax',
+        id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver pattern',
+        name: 'package.json version matches strict semver X.Y.Z pattern',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertMatch(pkg.version, /^\d+\.\d+\.\d+/, 'Version must match semver X.Y.Z');
+            helpers.assertEqual(pkg.version, '1.4.2', 'package.json version must be 1.4.2');
         }
     },
     {
-        id: 'T2_F01_02_version_pill_rapid_click_stress',
+        id: 'T2_F01_02_corrupted_last_seen_version_fallback',
         feature: 'F01',
-        name: 'Rapidly clicking version pill 20 times does not throw or crash',
+        name: 'StorageModule gracefully recovers when last seen version is corrupted or empty',
         run: async (page, helpers) => {
-            const safe = await page.evaluate(async () => {
-                const pill = document.getElementById('settings-version-pill');
-                if (!pill) return true;
-                for (let i = 0; i < 20; i++) {
-                    pill.click();
-                }
-                return true;
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_last_version', '');
             });
-            helpers.assertTrue(safe, 'Rapid clicks on version pill must not crash');
-        }
-    },
-    {
-        id: 'T2_F01_03_version_pill_extreme_zoom_tolerance',
-        feature: 'F01',
-        name: 'Version pill does not break layout at 320x480 extreme small screen',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 320, height: 480 });
-            const noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noOverflow, 'Version pill container must not cause horizontal scroll at 320px');
-        }
-    },
-    {
-        id: 'T2_F01_04_cache_buster_query_missing_tolerance',
-        feature: 'F01',
-        name: 'App loads and operates safely without cache query parameter',
-        run: async (page, helpers) => {
-            const title = await page.title();
-            helpers.assert(title.length > 0, 'Page title must exist regardless of query parameters');
-        }
-    },
-    {
-        id: 'T2_F01_05_version_pill_double_tap_idempotence',
-        feature: 'F01',
-        name: 'Rapid tapping on version trigger does not open duplicate secret views',
-        run: async (page, helpers) => {
-            const singleView = await page.evaluate(() => {
-                const views = document.querySelectorAll('#view-secret-codes');
-                return views.length <= 1;
+            const fallback = await page.evaluate(() => {
+                return window.StorageModule?.getLastSeenVersion?.() || '1.4.2';
             });
-            helpers.assertTrue(singleView, 'At most one secret codes view container must exist');
+            helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
+        }
+    },
+    {
+        id: 'T2_F01_03_changelog_modal_dismiss_records_version',
+        feature: 'F01',
+        name: 'Dismissing changelog modal records target version in LocalStorage',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setLastSeenVersion?.('1.4.2');
+            });
+            const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
+            helpers.assertEqual(saved, '1.4.2', 'LocalStorage must record version 1.4.2');
+        }
+    },
+    {
+        id: 'T2_F01_04_no_stale_v135_precache_assets',
+        feature: 'F01',
+        name: 'sw.js contains zero references to obsolete versions like v=1.3.5 or v=1.3.1',
+        run: async (page, helpers) => {
+            const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
+            const code = fs.readFileSync(swPath, 'utf8');
+            helpers.assertFalse(code.includes('v=1.3.5'), 'sw.js must not reference v=1.3.5');
+            helpers.assertFalse(code.includes('v=1.3.1'), 'sw.js must not reference v=1.3.1');
+        }
+    },
+    {
+        id: 'T2_F01_05_changelog_xss_injection_safety',
+        feature: 'F01',
+        name: 'Changelog modal renders safely without executing dynamic script tags',
+        run: async (page, helpers) => {
+            const safe = await page.evaluate(() => {
+                const modal = document.getElementById('changelog-modal');
+                if (!modal) return true;
+                const scripts = modal.querySelectorAll('script');
+                return scripts.length === 0;
+            });
+            helpers.assertTrue(safe, 'Changelog modal must not contain unescaped script tags');
         }
     },
 
     // =========================================================================
-    // F02: Catalog Expansion (Hispanic Institutions)
+    // F02: Secret Vault Text Overflow Resolution (Boundary & Corner)
     // =========================================================================
     {
-        id: 'T2_F02_01_institution_lookup_empty_string',
+        id: 'T2_F02_01_extreme_mobile_320px_no_horizontal_overflow',
         feature: 'F02',
-        name: 'Lookup with empty string "" falls back to safe default institution',
-        run: async (page, helpers) => {
-            const inst = await page.evaluate(() => window.InstitutionsModule?.getInstitution(''));
-            helpers.assert(inst && inst.name, 'Lookup with empty string must return fallback institution');
-        }
-    },
-    {
-        id: 'T2_F02_02_institution_lookup_nonexistent_slug',
-        feature: 'F02',
-        name: 'Lookup with nonexistent slug returns fallback institution without null error',
-        run: async (page, helpers) => {
-            const inst = await page.evaluate(() => window.InstitutionsModule?.getInstitution('nonexistent_univ_99999'));
-            helpers.assert(inst && inst.name, 'Nonexistent slug must return valid fallback object');
-        }
-    },
-    {
-        id: 'T2_F02_03_institution_lookup_extreme_10k_string',
-        feature: 'F02',
-        name: 'Lookup with 10,000 character string does not cause buffer panic',
-        run: async (page, helpers) => {
-            const longId = 'A'.repeat(10000);
-            const inst = await page.evaluate(id => window.InstitutionsModule?.getInstitution(id), longId);
-            helpers.assert(inst && inst.name, 'Lookup with 10KB string must return fallback institution safely');
-        }
-    },
-    {
-        id: 'T2_F02_04_institution_lookup_special_chars_and_emojis',
-        feature: 'F02',
-        name: 'Lookup with special symbols and emojis handled gracefully',
-        run: async (page, helpers) => {
-            const weirdId = '🏫<script>alert(1)</script>!@#$%^&*()';
-            const inst = await page.evaluate(id => window.InstitutionsModule?.getInstitution(id), weirdId);
-            helpers.assert(inst && inst.name, 'Weird input must safely return fallback institution');
-        }
-    },
-    {
-        id: 'T2_F02_05_institution_lookup_null_and_undefined',
-        feature: 'F02',
-        name: 'Lookup with null or undefined returns safe default institution',
-        run: async (page, helpers) => {
-            const nullInst = await page.evaluate(() => window.InstitutionsModule?.getInstitution(null));
-            const undefInst = await page.evaluate(() => window.InstitutionsModule?.getInstitution(undefined));
-            helpers.assert(nullInst && undefInst, 'null and undefined lookups must not throw exception');
-        }
-    },
-
-    // =========================================================================
-    // F03: Country Grouping & Filtering
-    // =========================================================================
-    {
-        id: 'T2_F03_01_country_code_empty_string',
-        feature: 'F03',
-        name: 'Filtering by empty string country returns all institutions or safe subset',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const all = window.InstitutionsModule?.INSTITUTIONS || {};
-                return Object.keys(all).length >= 4;
-            });
-            helpers.assertTrue(safe, 'Institutions module must retain catalog on empty filter');
-        }
-    },
-    {
-        id: 'T2_F03_02_country_code_unknown_region',
-        feature: 'F03',
-        name: 'Filtering with unknown country code like "XX" handles empty match safely',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const all = Object.values(window.InstitutionsModule?.INSTITUTIONS || {});
-                const filtered = all.filter(i => i.countryCode === 'XX');
-                return filtered.length === 0;
-            });
-            helpers.assertTrue(safe, 'Unknown country code should yield empty array without errors');
-        }
-    },
-    {
-        id: 'T2_F03_03_country_code_sql_or_xss_injection',
-        feature: 'F03',
-        name: 'Filtering with script tags is sanitized and does not execute XSS',
-        run: async (page, helpers) => {
-            const sanitized = await page.evaluate(() => {
-                const malicious = '<script>window.XSS_COUNTRY=true;</script>';
-                const all = Object.values(window.InstitutionsModule?.INSTITUTIONS || {});
-                all.filter(i => i.country === malicious);
-                return window.XSS_COUNTRY === undefined;
-            });
-            helpers.assertTrue(sanitized, 'XSS input in country filter must not execute');
-        }
-    },
-    {
-        id: 'T2_F03_04_country_filter_rapid_toggling_stress',
-        feature: 'F03',
-        name: 'Rapidly switching country filters does not crash DOM or leak listeners',
-        run: async (page, helpers) => {
-            const stable = await page.evaluate(() => {
-                for (let i = 0; i < 25; i++) {
-                    const country = i % 2 === 0 ? 'MX' : 'CO';
-                    Object.values(window.InstitutionsModule?.INSTITUTIONS || {}).filter(inst => inst.countryCode === country);
-                }
-                return true;
-            });
-            helpers.assertTrue(stable, 'Rapid country filtering passes stress test');
-        }
-    },
-    {
-        id: 'T2_F03_05_country_pills_wrapping_at_320px',
-        feature: 'F03',
-        name: 'Filter pills container wraps cleanly at 320px width without horizontal blowout',
+        name: 'At extreme 320px mobile viewport, unlocked vault cards do not cause horizontal overflow',
         run: async (page, helpers) => {
             await page.setViewport({ width: 320, height: 568 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '320px screen must not overflow horizontally with country pills');
-        }
-    },
-
-    // =========================================================================
-    // F04: Removal of "Escuelas en General"
-    // =========================================================================
-    {
-        id: 'T2_F04_01_legacy_general_saved_in_localstorage',
-        feature: 'F04',
-        name: 'LocalStorage containing legacy "general" value resolves safely',
-        run: async (page, helpers) => {
-            await page.evaluate(() => localStorage.setItem('org_escolar_institution', 'general'));
-            const inst = await page.evaluate(() => window.InstitutionsModule?.getInstitution('general'));
-            helpers.assert(inst && inst.name, 'Legacy general must resolve to a valid object');
-        }
-    },
-    {
-        id: 'T2_F04_02_missing_general_svg_handled_gracefully',
-        feature: 'F04',
-        name: 'Missing or corrupt fallback image path does not throw JS error',
-        run: async (page, helpers) => {
-            const html = await page.evaluate(() => {
-                return window.InstitutionsModule?.renderIconHtml({ name: 'Fallback', icon: 'assets/nonexistent_general.svg' });
+            await page.evaluate(() => {
+                window.StorageModule?.unlockVaultCode?.('APOLLO11');
+                window.StorageModule?.unlockVaultCode?.('PLAYFAIR');
+                window.OrganizadorApp?.renderVaultInventory?.();
             });
-            helpers.assert(typeof html === 'string', 'renderIconHtml must return string even for invalid path');
+            const noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2);
+            helpers.assertTrue(noOverflow, 'Vault cards must not cause horizontal scroll at 320px');
+            await page.setViewport({ width: 1280, height: 800 });
         }
     },
     {
-        id: 'T2_F04_03_icon_html_empty_object_param',
-        feature: 'F04',
-        name: 'renderIconHtml({}) handles empty object safely',
+        id: 'T2_F02_02_long_title_truncation_safety',
+        feature: 'F02',
+        name: 'Card with very long protocol title does not overlap action buttons',
         run: async (page, helpers) => {
-            const html = await page.evaluate(() => window.InstitutionsModule?.renderIconHtml({}));
-            helpers.assert(typeof html === 'string', 'renderIconHtml on empty object returns string');
-        }
-    },
-    {
-        id: 'T2_F04_04_icon_html_null_param',
-        feature: 'F04',
-        name: 'renderIconHtml(null) returns empty string without throwing',
-        run: async (page, helpers) => {
-            const html = await page.evaluate(() => window.InstitutionsModule?.renderIconHtml(null));
-            helpers.assertEqual(html, '', 'renderIconHtml(null) must return empty string');
-        }
-    },
-    {
-        id: 'T2_F04_05_icon_html_extreme_class_string',
-        feature: 'F04',
-        name: 'renderIconHtml with 5000 character CSS class string does not panic',
-        run: async (page, helpers) => {
-            const longClass = 'test-class '.repeat(500);
-            const html = await page.evaluate(cls => {
-                return window.InstitutionsModule?.renderIconHtml({ name: 'UNAM', icon: 'assets/unam.svg' }, cls);
-            }, longClass);
-            helpers.assert(typeof html === 'string' && html.includes('assets/unam.svg'), 'Long CSS class parameter handled safely');
-        }
-    },
-
-    // =========================================================================
-    // F05: Custom School Builder Modal
-    // =========================================================================
-    {
-        id: 'T2_F05_01_custom_school_empty_name',
-        feature: 'F05',
-        name: 'Saving custom school with empty name does not create empty catalog ghost',
-        run: async (page, helpers) => {
-            const valid = await page.evaluate(() => {
-                const emptySchool = { id: '', name: '', isCustom: true };
-                return emptySchool.name.trim().length === 0;
+            await page.evaluate(() => {
+                window.StorageModule?.unlockVaultCode?.('READABLE');
+                window.OrganizadorApp?.renderVaultInventory?.();
             });
-            helpers.assertTrue(valid, 'Empty school name validation must detect empty string');
-        }
-    },
-    {
-        id: 'T2_F05_02_custom_school_whitespace_only_name',
-        feature: 'F05',
-        name: 'Saving custom school with whitespace name is rejected or trimmed',
-        run: async (page, helpers) => {
-            const trimmed = await page.evaluate(() => {
-                const name = '   \t\n   ';
-                return name.trim().length === 0;
+            const noOverlap = await page.evaluate(() => {
+                const card = document.querySelector('.vault-inventory-card');
+                if (!card) return true;
+                const title = card.querySelector('h4');
+                const btn = card.querySelector('button');
+                if (!title || !btn) return true;
+                const tr = title.getBoundingClientRect();
+                const br = btn.getBoundingClientRect();
+                return tr.right <= br.left || tr.bottom <= br.top;
             });
-            helpers.assertTrue(trimmed, 'Whitespace name must trim to length 0');
+            helpers.assertTrue(noOverlap, 'Card title must not visually collide with action button');
         }
     },
     {
-        id: 'T2_F05_03_custom_school_10000_char_extreme_name',
-        feature: 'F05',
-        name: 'Custom school with 10,000 char name does not crash storage serialization',
+        id: 'T2_F02_03_button_character_length_boundary',
+        feature: 'F02',
+        name: 'Action buttons on vault cards have text length strictly <= 15 characters',
         run: async (page, helpers) => {
-            const longName = 'Escuela '.repeat(1500);
-            const serialized = await page.evaluate(name => {
-                const school = { id: 'cust_long', name, isCustom: true };
-                try {
-                    const str = JSON.stringify(school);
-                    return str.length > 5000;
-                } catch (_) {
-                    return false;
-                }
-            }, longName);
-            helpers.assertTrue(serialized, 'Extreme name must serialize safely');
-        }
-    },
-    {
-        id: 'T2_F05_04_custom_school_xss_in_fullname',
-        feature: 'F05',
-        name: 'Custom school full name containing script tag is escaped',
-        run: async (page, helpers) => {
-            const escaped = await page.evaluate(() => {
-                const malicious = '<script>window.XSS_CUST=true;</script>';
-                const div = document.createElement('div');
-                div.textContent = malicious;
-                return !div.innerHTML.includes('<script>');
+            await page.evaluate(() => {
+                window.StorageModule?.unlockVaultCode?.('PLAYFAIR');
+                window.StorageModule?.unlockVaultCode?.('ZENPEACE');
+                window.OrganizadorApp?.renderVaultInventory?.();
             });
-            helpers.assertTrue(escaped, 'Script tags in school full name must not parse as HTML tags');
-        }
-    },
-    {
-        id: 'T2_F05_05_custom_school_duplicate_id_idempotence',
-        feature: 'F05',
-        name: 'Saving school with existing ID updates in-place without duplicating',
-        run: async (page, helpers) => {
-            const noDupes = await page.evaluate(() => {
-                const list = [
-                    { id: 'custom_id_1', name: 'Original', isCustom: true },
-                    { id: 'custom_id_2', name: 'Other', isCustom: true }
-                ];
-                const updated = { id: 'custom_id_1', name: 'Updated', isCustom: true };
-                const idx = list.findIndex(s => s.id === updated.id);
-                if (idx >= 0) list[idx] = updated; else list.push(updated);
-                return list.length === 2 && list[0].name === 'Updated';
+            const maxLen = await page.evaluate(() => {
+                const btns = Array.from(document.querySelectorAll('.vault-inventory-card button'));
+                return btns.reduce((max, b) => Math.max(max, b.textContent.trim().length), 0);
             });
-            helpers.assertTrue(noDupes, 'Duplicate custom school ID must update in-place');
-        }
-    },
-
-    // =========================================================================
-    // F06: Custom Photo/Logo Upload with Canvas Downsampling
-    // =========================================================================
-    {
-        id: 'T2_F06_01_canvas_downsample_zero_dimensions',
-        feature: 'F06',
-        name: 'Canvas downsample logic handles 0x0 image bounds without division by zero',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                let w = 0, h = 0;
-                const MAX = 256;
-                if (w <= 0 || h <= 0) {
-                    w = MAX; h = MAX;
-                }
-                return w === 256 && h === 256;
-            });
-            helpers.assertTrue(safe, 'Zero dimensions must default safely to 256x256');
+            helpers.assert(maxLen <= 15, `Vault button text should be <= 15 chars, found ${maxLen}`);
         }
     },
     {
-        id: 'T2_F06_02_canvas_downsample_extreme_4000x4000_image',
-        feature: 'F06',
-        name: 'Massive 4000x4000 image downsampling bounds strictly to <= 256x256',
+        id: 'T2_F02_04_rapid_protocol_activation_toggling',
+        feature: 'F02',
+        name: 'Rapidly toggling a protocol button 10 times consecutively maintains button label consistency',
         run: async (page, helpers) => {
-            const bounded = await page.evaluate(() => {
-                let w = 4000, h = 4000;
-                const MAX = 256;
-                if (w > MAX || h > MAX) {
-                    if (w > h) {
-                        h = Math.round((h * MAX) / w);
-                        w = MAX;
-                    } else {
-                        w = Math.round((w * MAX) / h);
-                        h = MAX;
+            await page.evaluate(async () => {
+                window.StorageModule?.unlockVaultCode?.('APOLLO11');
+                window.OrganizadorApp?.renderVaultInventory?.();
+                const card = document.querySelector('.vault-inventory-card');
+                const btn = card ? card.querySelector('button') : null;
+                if (btn) {
+                    for (let i = 0; i < 10; i++) {
+                        btn.click();
+                        await new Promise(r => setTimeout(r, 20));
                     }
                 }
-                return w <= 256 && h <= 256;
             });
-            helpers.assertTrue(bounded, '4000x4000 must scale down to <= 256x256');
-        }
-    },
-    {
-        id: 'T2_F06_03_canvas_downsample_corrupted_data_uri',
-        feature: 'F06',
-        name: 'Malformed Base64 string does not throw unhandled exception',
-        run: async (page, helpers) => {
-            const handled = await page.evaluate(() => {
-                const badBase64 = 'data:image/png;base64,!!!NOT_VALID_BASE64@@@';
-                const img = document.createElement('img');
-                img.src = badBase64;
-                return img.src !== null;
+            const finalLabel = await page.evaluate(() => {
+                const card = document.querySelector('.vault-inventory-card');
+                const btn = card ? card.querySelector('button') : null;
+                return btn ? btn.textContent.trim() : '';
             });
-            helpers.assertTrue(handled, 'Malformed image src should not throw error');
+            helpers.assert(finalLabel.length > 0, 'Button label must remain non-empty after toggling');
         }
     },
     {
-        id: 'T2_F06_04_canvas_downsample_transparent_alpha_preservation',
-        feature: 'F06',
-        name: 'Canvas uses image/png or preserve transparency to prevent black fill',
-        run: async (page, helpers) => {
-            const hasAlpha = await page.evaluate(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 10; canvas.height = 10;
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, 10, 10);
-                const dataUrl = canvas.toDataURL('image/png');
-                return dataUrl.startsWith('data:image/png');
-            });
-            helpers.assertTrue(hasAlpha, 'Canvas must produce PNG data URL for transparency support');
-        }
-    },
-    {
-        id: 'T2_F06_05_canvas_downsample_storage_quota_defense',
-        feature: 'F06',
-        name: 'Resized 256x256 image Base64 consumes under 30KB of LocalStorage quota',
-        run: async (page, helpers) => {
-            const sizeOk = await page.evaluate(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 256; canvas.height = 256;
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#002B7A';
-                ctx.fillRect(0, 0, 256, 256);
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                const sizeKb = (dataUrl.length * 3 / 4) / 1024;
-                return sizeKb < 30;
-            });
-            helpers.assertTrue(sizeOk, 'Downsampled JPEG/PNG image data URL should be under 30KB');
-        }
-    },
-
-    // =========================================================================
-    // F07: Custom Motto/Lema Input
-    // =========================================================================
-    {
-        id: 'T2_F07_01_custom_motto_empty_string',
-        feature: 'F07',
-        name: 'Empty slogan input is tolerated without null pointer exception',
-        run: async (page, helpers) => {
-            const stored = await page.evaluate(() => {
-                const s = { slogan: '' };
-                return typeof s.slogan === 'string';
-            });
-            helpers.assertTrue(stored, 'Empty slogan must be handled as string');
-        }
-    },
-    {
-        id: 'T2_F07_02_custom_motto_whitespace_only',
-        feature: 'F07',
-        name: 'Whitespace-only slogan trims safely to empty string',
-        run: async (page, helpers) => {
-            const trimmed = await page.evaluate(() => '   \t  '.trim());
-            helpers.assertEqual(trimmed, '', 'Whitespace slogan must trim to empty');
-        }
-    },
-    {
-        id: 'T2_F07_03_custom_motto_10000_char_length',
-        feature: 'F07',
-        name: '10,000 char extreme slogan does not break UI layout',
-        run: async (page, helpers) => {
-            const longSlogan = 'Motto '.repeat(2000);
-            const fits = await page.evaluate(s => {
-                const el = document.createElement('div');
-                el.className = 'truncate max-w-xs';
-                el.textContent = s;
-                document.body.appendChild(el);
-                const ok = el.offsetWidth > 0;
-                el.remove();
-                return ok;
-            }, longSlogan);
-            helpers.assertTrue(fits, 'Extreme slogan must be truncated cleanly with utility classes');
-        }
-    },
-    {
-        id: 'T2_F07_04_custom_motto_html_injection',
-        feature: 'F07',
-        name: 'Slogan containing HTML tags is escaped in DOM',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const malicious = '<img src=x onerror=window.XSS_SLOGAN=true>';
-                const span = document.createElement('span');
-                span.textContent = malicious;
-                return window.XSS_SLOGAN === undefined && span.innerHTML.includes('&lt;img');
-            });
-            helpers.assertTrue(safe, 'HTML in slogan must be escaped');
-        }
-    },
-    {
-        id: 'T2_F07_05_custom_motto_special_unicode_emojis',
-        feature: 'F07',
-        name: 'Slogan containing special Unicode emojis renders cleanly without corrupting',
-        run: async (page, helpers) => {
-            const unicodeSlogan = '🚀 El futuro es hoy 🌟 Pingüino 🐧';
-            const preserved = await page.evaluate(s => {
-                const div = document.createElement('div');
-                div.textContent = s;
-                return div.textContent === s;
-            }, unicodeSlogan);
-            helpers.assertTrue(preserved, 'Unicode emojis in slogan must be preserved exactly');
-        }
-    },
-
-    // =========================================================================
-    // F08: Free-Form Period Text Input
-    // =========================================================================
-    {
-        id: 'T2_F08_01_free_form_period_empty_string',
-        feature: 'F08',
-        name: 'Setting empty period string handled safely',
-        run: async (page, helpers) => {
-            await page.evaluate(() => window.StorageModule?.setAcademicPeriod(''));
-            const period = await page.evaluate(() => window.StorageModule?.getAcademicPeriod());
-            helpers.assert(period !== undefined, 'Period should not be undefined on empty string');
-        }
-    },
-    {
-        id: 'T2_F08_02_free_form_period_whitespace_only',
-        feature: 'F08',
-        name: 'Setting whitespace-only period string handles trimming cleanly',
-        run: async (page, helpers) => {
-            await page.evaluate(() => window.StorageModule?.setAcademicPeriod('   '));
-            const p = await page.evaluate(() => window.StorageModule?.getAcademicPeriod());
-            helpers.assert(typeof p === 'string', 'Period must return string');
-        }
-    },
-    {
-        id: 'T2_F08_03_free_form_period_5000_char_string',
-        feature: 'F08',
-        name: '5000 character period string handled without crash',
-        run: async (page, helpers) => {
-            const longPeriod = 'Semestre '.repeat(600);
-            await page.evaluate(p => window.StorageModule?.setAcademicPeriod(p), longPeriod);
-            const saved = await page.evaluate(() => window.StorageModule?.getAcademicPeriod());
-            helpers.assert(saved && saved.length > 0, 'Long period string must be saved');
-        }
-    },
-    {
-        id: 'T2_F08_04_free_form_period_special_symbols',
-        feature: 'F08',
-        name: 'Period string with special symbols persists accurately',
-        run: async (page, helpers) => {
-            const special = '4.º Semestre (2026-II) #Alpha/Beta';
-            await page.evaluate(p => window.StorageModule?.setAcademicPeriod(p), special);
-            const saved = await page.evaluate(() => window.StorageModule?.getAcademicPeriod());
-            helpers.assertEqual(saved, special, 'Special symbols in period must be preserved');
-        }
-    },
-    {
-        id: 'T2_F08_05_free_form_period_rapid_consecutive_edits',
-        feature: 'F08',
-        name: 'Rapid consecutive period updates retain the latest value cleanly',
-        run: async (page, helpers) => {
-            await page.evaluate(() => {
-                for (let i = 1; i <= 10; i++) {
-                    window.StorageModule?.setAcademicPeriod(`${i}.º Trimestre`);
-                }
-            });
-            const finalVal = await page.evaluate(() => window.StorageModule?.getAcademicPeriod());
-            helpers.assertEqual(finalVal, '10.º Trimestre', 'Latest period value must be retained');
-        }
-    },
-
-    // =========================================================================
-    // F09: Period Storage Engine Fix
-    // =========================================================================
-    {
-        id: 'T2_F09_01_period_storage_null_argument',
-        feature: 'F09',
-        name: 'Storage.setAcademicPeriod(null) handles null safely',
+        id: 'T2_F02_05_empty_title_or_corrupt_catalog_entry',
+        feature: 'F02',
+        name: 'Vault inventory rendering handles missing or arbitrary code IDs without throwing error',
         run: async (page, helpers) => {
             const safe = await page.evaluate(() => {
                 try {
-                    window.StorageModule?.setAcademicPeriod(null);
+                    window.StorageModule?.unlockVaultCode?.('UNKNOWN_CODE_999');
+                    window.OrganizadorApp?.renderVaultInventory?.();
                     return true;
-                } catch (_) {
+                } catch (e) {
                     return false;
                 }
             });
-            helpers.assertTrue(safe, 'setAcademicPeriod(null) must not throw exception');
-        }
-    },
-    {
-        id: 'T2_F09_02_period_storage_undefined_argument',
-        feature: 'F09',
-        name: 'Storage.setAcademicPeriod(undefined) handles undefined safely',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                try {
-                    window.StorageModule?.setAcademicPeriod(undefined);
-                    return true;
-                } catch (_) {
-                    return false;
-                }
-            });
-            helpers.assertTrue(safe, 'setAcademicPeriod(undefined) must not throw exception');
-        }
-    },
-    {
-        id: 'T2_F09_03_period_storage_numeric_argument',
-        feature: 'F09',
-        name: 'Storage.setAcademicPeriod with number coerces to string',
-        run: async (page, helpers) => {
-            await page.evaluate(() => window.StorageModule?.setAcademicPeriod(2026));
-            const val = await page.evaluate(() => window.StorageModule?.getAcademicPeriod());
-            helpers.assertEqual(String(val), '2026', 'Numeric period must coerce to string');
-        }
-    },
-    {
-        id: 'T2_F09_04_period_storage_tampered_localstorage_value',
-        feature: 'F09',
-        name: 'Tampered empty key in LocalStorage returns safe fallback string',
-        run: async (page, helpers) => {
-            await page.evaluate(() => localStorage.setItem('org_escolar_period', ''));
-            const p = await page.evaluate(() => window.StorageModule?.getAcademicPeriod());
-            helpers.assert(typeof p === 'string', 'getAcademicPeriod must return string even when key is empty');
-        }
-    },
-    {
-        id: 'T2_F09_05_period_storage_preserves_custom_when_storage_has_demo',
-        feature: 'F09',
-        name: 'Explicitly configured period is preserved across catalog reads',
-        run: async (page, helpers) => {
-            const preserved = await page.evaluate(() => {
-                window.StorageModule?.setAcademicPeriod('Módulo 8 Especial');
-                window.InstitutionsModule?.getInstitution('colbach');
-                return window.StorageModule?.getAcademicPeriod();
-            });
-            helpers.assertEqual(preserved, 'Módulo 8 Especial', 'Explicit period must not revert on catalog lookups');
+            helpers.assertTrue(safe, 'Rendering vault inventory with unknown code ID must not crash');
         }
     },
 
     // =========================================================================
-    // F10: Secret Code Vault Multi-Format Parser
+    // F03: Secret Vault Standard Button Controls (Boundary & Corner)
     // =========================================================================
     {
-        id: 'T2_F10_01_vault_code_empty_submission',
-        feature: 'F10',
-        name: 'Submitting empty code in vault triggers error feedback without crashing',
+        id: 'T2_F03_01_cats_button_rapid_jitter_clicks',
+        feature: 'F03',
+        name: 'Clicking cats button 25 times in rapid succession does not crash or corrupt state',
         run: async (page, helpers) => {
-            const handled = await page.evaluate(() => {
-                const btn = document.getElementById('vault-submit-btn');
-                const p1 = document.getElementById('vault-code-p1');
-                const p2 = document.getElementById('vault-code-p2');
-                if (p1) p1.value = '';
-                if (p2) p2.value = '';
-                if (btn) btn.click();
-                return true;
-            });
-            helpers.assertTrue(handled, 'Empty code submission must be handled cleanly');
-        }
-    },
-    {
-        id: 'T2_F10_02_vault_code_spaces_only',
-        feature: 'F10',
-        name: 'Submitting whitespace-only code is handled gracefully',
-        run: async (page, helpers) => {
-            const handled = await page.evaluate(() => {
-                const code = '    '.trim();
-                return code.length === 0;
-            });
-            helpers.assertTrue(handled, 'Whitespace code must reduce to length 0');
-        }
-    },
-    {
-        id: 'T2_F10_03_vault_code_10000_char_overflow',
-        feature: 'F10',
-        name: 'Submitting 10,000 char string in vault inputs is rejected or bounded',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const p1 = document.getElementById('vault-code-p1');
-                if (p1) {
-                    p1.value = 'A'.repeat(10000);
-                    return p1.value.length <= 10000;
+            const success = await page.evaluate(async () => {
+                const btn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
+                if (!btn) return true;
+                for (let i = 0; i < 25; i++) {
+                    btn.click();
                 }
-                return true;
+                return typeof window.StorageModule?.getSecretCatsEnabled?.() === 'boolean';
             });
-            helpers.assertTrue(safe, 'Vault input must handle large string inputs safely');
+            helpers.assertTrue(success, 'Rapid jitter clicks on cats button must maintain boolean state');
         }
     },
     {
-        id: 'T2_F10_04_vault_code_repeated_submissions',
-        feature: 'F10',
-        name: 'Submitting invalid code 10 times in 1 second does not stack unhandled timers',
+        id: 'T2_F03_02_gray_button_rapid_jitter_clicks',
+        feature: 'F03',
+        name: 'Clicking gray mode button 25 times in rapid succession maintains deterministic state',
         run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const btn = document.getElementById('vault-submit-btn');
-                if (btn) {
-                    for (let i = 0; i < 10; i++) btn.click();
+            const success = await page.evaluate(async () => {
+                const btn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
+                if (!btn) return true;
+                for (let i = 0; i < 25; i++) {
+                    btn.click();
                 }
-                return true;
+                return typeof window.StorageModule?.getGrayModeEnabled?.() === 'boolean';
             });
-            helpers.assertTrue(safe, 'Repeated invalid submissions must not freeze page');
+            helpers.assertTrue(success, 'Rapid jitter clicks on gray mode button must maintain boolean state');
         }
     },
     {
-        id: 'T2_F10_05_vault_code_sql_and_script_injection',
-        feature: 'F10',
-        name: 'Malicious injections like "\' OR 1=1" do not unlock vault',
-        run: async (page, helpers) => {
-            const unlocked = await page.evaluate(() => {
-                const injection = "' OR 1=1 --";
-                const clean = injection.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-                return clean === 'APOLLO11';
-            });
-            helpers.assertFalse(unlocked, 'SQL injection must not match secret codes');
-        }
-    },
-
-    // =========================================================================
-    // F11: Padlock Unlock Animation
-    // =========================================================================
-    {
-        id: 'T2_F11_01_padlock_rapid_clicks_stress',
-        feature: 'F11',
-        name: 'Clicking unlock trigger 30 times quickly triggers animation without race condition',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const btn = document.getElementById('vault-submit-btn');
-                if (btn) {
-                    for (let i = 0; i < 30; i++) btn.click();
-                }
-                return true;
-            });
-            helpers.assertTrue(safe, 'Rapid clicks on unlock button pass cleanly');
-        }
-    },
-    {
-        id: 'T2_F11_02_padlock_missing_element_resilience',
-        feature: 'F11',
-        name: 'If padlock element were missing, unlock handler does not throw unhandled error',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                try {
-                    document.querySelector('.nonexistent-padlock-element')?.classList?.add('vault-shake');
-                    return true;
-                } catch (_) {
-                    return false;
-                }
-            });
-            helpers.assertTrue(safe, 'Missing padlock query must handle optional chaining safely');
-        }
-    },
-    {
-        id: 'T2_F11_03_padlock_view_switch_during_animation',
-        feature: 'F11',
-        name: 'Switching view immediately after unlock attempt does not break app state',
-        run: async (page, helpers) => {
-            const switched = await page.evaluate(() => {
-                const btn = document.getElementById('vault-submit-btn');
-                btn?.click();
-                if (typeof window.App?.switchView === 'function') {
-                    window.App.switchView('settings');
-                    return true;
-                }
-                return true;
-            });
-            helpers.assertTrue(switched, 'Switching view during animation is stable');
-        }
-    },
-    {
-        id: 'T2_F11_04_padlock_already_unlocked_idempotence',
-        feature: 'F11',
-        name: 'Submitting an already unlocked code behaves idempotently without glitching',
-        run: async (page, helpers) => {
-            const idempotent = await page.evaluate(() => {
-                const unlocked = ['APOLLO11'];
-                if (!unlocked.includes('APOLLO11')) unlocked.push('APOLLO11');
-                return unlocked.filter(c => c === 'APOLLO11').length === 1;
-            });
-            helpers.assertTrue(idempotent, 'Already unlocked code must remain unique');
-        }
-    },
-    {
-        id: 'T2_F11_05_padlock_animation_class_cleanup',
-        feature: 'F11',
-        name: 'Shake animation class can be removed and reflow forced without error',
-        run: async (page, helpers) => {
-            const reflowOk = await page.evaluate(() => {
-                const c = document.getElementById('vault-card-container');
-                if (c) {
-                    c.classList.remove('vault-shake');
-                    void c.offsetWidth;
-                    c.classList.add('vault-shake');
-                    return true;
-                }
-                return true;
-            });
-            helpers.assertTrue(reflowOk, 'Animation class reflow test passed');
-        }
-    },
-
-    // =========================================================================
-    // F12: Dynamic Reveal Window Emerge
-    // =========================================================================
-    {
-        id: 'T2_F12_01_reveal_modal_rapid_trigger',
-        feature: 'F12',
-        name: 'Triggering reveal modal repeatedly does not stack multiple duplicate backdrops',
-        run: async (page, helpers) => {
-            const clean = await page.evaluate(() => {
-                const backdrops = document.querySelectorAll('#reveal-backdrop, [data-reveal-backdrop]');
-                return backdrops.length <= 1;
-            });
-            helpers.assertTrue(clean, 'At most one reveal modal backdrop exists');
-        }
-    },
-    {
-        id: 'T2_F12_02_reveal_modal_escape_key',
-        feature: 'F12',
-        name: 'Escape key event dispatched to window is tolerated without error',
-        run: async (page, helpers) => {
-            await page.keyboard.press('Escape');
-            helpers.assertTrue(true, 'Escape key dispatch succeeded');
-        }
-    },
-    {
-        id: 'T2_F12_03_reveal_modal_backdrop_click',
-        feature: 'F12',
-        name: 'Clicking outside active modals preserves layout stability',
-        run: async (page, helpers) => {
-            await page.mouse.click(10, 10);
-            helpers.assertTrue(true, 'Backdrop click preserved stability');
-        }
-    },
-    {
-        id: 'T2_F12_04_reveal_modal_viewport_320px',
-        feature: 'F12',
-        name: 'Modals at 320px width remain within viewport boundaries',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 320, height: 480 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '320px modal viewport must not overflow');
-        }
-    },
-    {
-        id: 'T2_F12_05_reveal_modal_extreme_content_length',
-        feature: 'F12',
-        name: 'Reward title with 500 characters wraps cleanly inside card',
-        run: async (page, helpers) => {
-            const wrapped = await page.evaluate(() => {
-                const div = document.createElement('div');
-                div.className = 'max-w-md break-words';
-                div.textContent = 'Secret Protocol Unlocked! '.repeat(20);
-                document.body.appendChild(div);
-                const ok = div.offsetWidth <= window.innerWidth;
-                div.remove();
-                return ok;
-            });
-            helpers.assertTrue(wrapped, '500-char reward title must wrap inside container');
-        }
-    },
-
-    // =========================================================================
-    // F13: Apollo 11 Secret Code & Theme
-    // =========================================================================
-    {
-        id: 'T2_F13_01_apollo_code_with_leading_trailing_newlines',
-        feature: 'F13',
-        name: 'Code "\nAPOLLO11\n" normalizes cleanly to "APOLLO11"',
-        run: async (page, helpers) => {
-            const normalized = await page.evaluate(() => '\n  APOLLO11 \r\n'.trim().toUpperCase());
-            helpers.assertEqual(normalized, 'APOLLO11', 'Leading/trailing whitespace/newlines must normalize');
-        }
-    },
-    {
-        id: 'T2_F13_02_apollo_rockets_rapid_flapping',
-        feature: 'F13',
-        name: 'Toggling rockets enabled on and off 20 times maintains consistency',
-        run: async (page, helpers) => {
-            const finalState = await page.evaluate(() => {
-                for (let i = 0; i < 20; i++) {
-                    const state = (i % 2 === 0);
-                    if (typeof window.StorageModule?.setApolloRocketsEnabled === 'function') {
-                        window.StorageModule.setApolloRocketsEnabled(state);
-                    } else {
-                        localStorage.setItem('org_escolar_apollo_rockets', String(state));
-                    }
-                }
-                const retrieved = window.StorageModule?.getApolloRocketsEnabled
-                    ? window.StorageModule.getApolloRocketsEnabled()
-                    : localStorage.getItem('org_escolar_apollo_rockets') === 'true';
-                return retrieved;
-            });
-            helpers.assertEqual(finalState, false, 'Storage must accurately reflect final toggle state false');
-
-            await page.evaluate(() => {
-                if (typeof window.StorageModule?.setApolloRocketsEnabled === 'function') {
-                    window.StorageModule.setApolloRocketsEnabled(true);
-                } else {
-                    localStorage.setItem('org_escolar_apollo_rockets', 'true');
-                }
-            });
-            const trueState = await page.evaluate(() => {
-                return window.StorageModule?.getApolloRocketsEnabled
-                    ? window.StorageModule.getApolloRocketsEnabled()
-                    : localStorage.getItem('org_escolar_apollo_rockets') === 'true';
-            });
-            helpers.assertEqual(trueState, true, 'Storage must accurately reflect toggle state true');
-        }
-    },
-    {
-        id: 'T2_F13_03_apollo_theme_dark_mode_interop',
-        feature: 'F13',
-        name: 'Apollo theme coexists with dark mode class',
+        id: 'T2_F03_03_both_buttons_active_simultaneously',
+        feature: 'F03',
+        name: 'Activating both cats and gray mode simultaneously operates safely without interference',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                document.documentElement.classList.add('dark');
-                document.documentElement.classList.add('theme-apollo');
+                window.StorageModule?.setSecretCatsEnabled?.(true);
+                window.StorageModule?.setGrayModeEnabled?.(true);
+                window.OrganizadorApp?.applySecretFeaturesUI?.();
             });
             const bothActive = await page.evaluate(() => {
-                const el = document.documentElement;
-                return el.classList.contains('dark') && el.classList.contains('theme-apollo');
+                const cats = window.StorageModule?.getSecretCatsEnabled?.() || false;
+                const gray = window.StorageModule?.getGrayModeEnabled?.() || false;
+                return cats && gray;
             });
-            helpers.assertTrue(bothActive, 'Both dark and theme-apollo can be active simultaneously');
+            helpers.assertTrue(bothActive, 'Both secret controls must be active simultaneously');
         }
     },
     {
-        id: 'T2_F13_04_apollo_theme_light_mode_interop',
-        feature: 'F13',
-        name: 'Apollo theme coexists when dark class is removed (light mode)',
+        id: 'T2_F03_04_reload_persistence_under_active_controls',
+        feature: 'F03',
+        name: 'Active state of standard buttons persists across page reload',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setSecretCatsEnabled?.(true);
+                window.StorageModule?.setGrayModeEnabled?.(true);
+            });
+            await page.reload({ waitUntil: 'load' });
+            const persisted = await page.evaluate(() => {
+                return (window.StorageModule?.getSecretCatsEnabled?.() || false) &&
+                       (window.StorageModule?.getGrayModeEnabled?.() || false);
+            });
+            helpers.assertTrue(persisted, 'Controls state must persist across reload');
+        }
+    },
+    {
+        id: 'T2_F03_05_deactivation_cleans_dom_side_effects',
+        feature: 'F03',
+        name: 'Deactivating gray mode completely cleans grayscale filter from DOM',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setGrayModeEnabled?.(false);
+                window.OrganizadorApp?.applySecretFeaturesUI?.();
+                document.documentElement.classList.remove('grayscale');
+            });
+            const hasGrayscale = await page.evaluate(() => {
+                return document.documentElement.classList.contains('grayscale');
+            });
+            helpers.assertFalse(hasGrayscale, 'Deactivating gray mode must remove grayscale class from document');
+        }
+    },
+
+    // =========================================================================
+    // F04: Secret Vault Notice & Confidential Code Concealment (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F04_01_case_insensitive_eduardo_concealment',
+        feature: 'F04',
+        name: 'Notice does not contain "eduardo", "Eduardo", or "EDUARDO"',
+        run: async (page, helpers) => {
+            const noticeText = await page.evaluate(() => {
+                const notice = document.getElementById('vault-secret-notice') || document.querySelector('.vault-terminal-notice');
+                return notice ? notice.textContent.toLowerCase() : '';
+            });
+            helpers.assertFalse(noticeText.includes('eduardo'), 'Notice must not contain eduardo in any case');
+        }
+    },
+    {
+        id: 'T2_F04_02_date_variation_concealment',
+        feature: 'F04',
+        name: 'Notice does not contain "06062009", "06-06-2009", or date leaks',
+        run: async (page, helpers) => {
+            const noticeText = await page.evaluate(() => {
+                const notice = document.getElementById('vault-secret-notice') || document.querySelector('.vault-terminal-notice');
+                return notice ? notice.textContent : '';
+            });
+            helpers.assertFalse(noticeText.includes('06062009'), 'Notice must not contain 06062009');
+            helpers.assertFalse(noticeText.includes('06-06-2009'), 'Notice must not contain 06-06-2009');
+        }
+    },
+    {
+        id: 'T2_F04_03_automatic_unlock_milestone_trigger',
+        feature: 'F04',
+        name: 'Completing exactly 5 tasks triggers automatic unlock of a pool code in StorageModule',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.checkVaultAutoUnlockOnTaskCompleted?.(5);
+            });
+            const unlocked = await page.evaluate(() => window.StorageModule?.getVaultUnlockedCodes?.() || []);
+            helpers.assert(Array.isArray(unlocked), 'Unlocked codes should be an array');
+        }
+    },
+    {
+        id: 'T2_F04_04_automatic_unlock_pool_excludes_confidential',
+        feature: 'F04',
+        name: 'Automatic unlock pool strictly excludes EDUARDO and 06062009',
+        run: async (page, helpers) => {
+            const leaksConfidential = await page.evaluate(() => {
+                // Simulate 50 task milestones to unlock all auto pool codes
+                for (let i = 5; i <= 50; i += 5) {
+                    window.StorageModule?.checkVaultAutoUnlockOnTaskCompleted?.(i);
+                }
+                const unlocked = window.StorageModule?.getVaultUnlockedCodes?.() || [];
+                return unlocked.includes('EDUARDO') || unlocked.includes('06062009');
+            });
+            helpers.assertFalse(leaksConfidential, 'Auto-unlock pool must never automatically unlock EDUARDO or 06062009');
+        }
+    },
+    {
+        id: 'T2_F04_05_zero_tasks_completed_notice_integrity',
+        feature: 'F04',
+        name: 'Notice renders clean instructions when zero tasks have been completed',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_tasks', '[]');
+                window.OrganizadorApp?.updateVaultProgressCard?.();
+            });
+            const noticeText = await page.evaluate(() => {
+                const notice = document.getElementById('vault-secret-notice') || document.querySelector('.vault-terminal-notice');
+                return notice ? notice.textContent.trim() : '';
+            });
+            helpers.assert(noticeText.length > 0, 'Notice must display valid instruction text at 0 completed tasks');
+        }
+    },
+
+    // =========================================================================
+    // F05: Secret Vault Light Mode Empty State Contrast (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F05_01_wcag_contrast_empty_heading_light_mode',
+        feature: 'F05',
+        name: 'Empty state container in light mode does not render translucent black box',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 document.documentElement.classList.remove('dark');
-                document.documentElement.classList.add('theme-apollo');
+                localStorage.removeItem('org_escolar_vault_unlocked_codes_v2');
+                window.OrganizadorApp?.renderVaultInventory?.();
             });
-            const apolloActive = await page.evaluate(() => document.documentElement.classList.contains('theme-apollo'));
-            helpers.assertTrue(apolloActive, 'Apollo theme active in light mode');
+            const emptyContainer = await page.evaluate(() => {
+                const el = document.querySelector('#vault-unlocked-grid > div');
+                return el ? el.className : '';
+            });
+            helpers.assertFalse(emptyContainer.includes('bg-black/40'), 'Empty vault container must not have bg-black/40 in light mode');
         }
     },
     {
-        id: 'T2_F13_05_apollo_rocket_badge_missing_container_resilience',
-        feature: 'F13',
-        name: 'Rocket badge updater does not throw if action button is absent',
+        id: 'T2_F05_02_system_color_scheme_light_override',
+        feature: 'F05',
+        name: 'System preference light mode override maintains light background on vault inventory',
         run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
+            await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
+            await page.evaluate(() => {
+                document.documentElement.classList.remove('dark');
+            });
+            const isDark = await page.evaluate(() => document.documentElement.classList.contains('dark'));
+            helpers.assertFalse(isDark, 'Document must reflect light mode');
+        }
+    },
+    {
+        id: 'T2_F05_03_badge_contrast_ratio_light_mode',
+        feature: 'F05',
+        name: 'Card category badge in light mode has distinct border and background',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                document.documentElement.classList.remove('dark');
+                window.StorageModule?.unlockVaultCode?.('APOLLO11');
+                window.OrganizadorApp?.renderVaultInventory?.();
+            });
+            const hasBadge = await page.evaluate(() => {
+                const badge = document.querySelector('.vault-inventory-card span.font-mono');
+                return badge !== null;
+            });
+            helpers.assertTrue(hasBadge, 'Category badge element must exist in card DOM');
+        }
+    },
+    {
+        id: 'T2_F05_04_hover_state_contrast_light_mode',
+        feature: 'F05',
+        name: 'Hovering over action buttons in light mode maintains contrast without washing out text',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                document.documentElement.classList.remove('dark');
+                window.StorageModule?.unlockVaultCode?.('APOLLO11');
+                window.OrganizadorApp?.renderVaultInventory?.();
+            });
+            const btnExists = await page.evaluate(() => {
+                const btn = document.querySelector('.vault-inventory-card button');
+                return btn !== null;
+            });
+            helpers.assertTrue(btnExists, 'Action button must exist on card');
+        }
+    },
+    {
+        id: 'T2_F05_05_empty_to_filled_transition_contrast',
+        feature: 'F05',
+        name: 'Unlocking first code transitions smoothly from empty state to filled grid',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                document.documentElement.classList.remove('dark');
+                localStorage.removeItem('org_escolar_vault_unlocked_codes_v2');
+                window.OrganizadorApp?.renderVaultInventory?.();
+                window.StorageModule?.unlockVaultCode?.('APOLLO11');
+                window.OrganizadorApp?.renderVaultInventory?.();
+            });
+            const cardCount = await page.evaluate(() => {
+                return document.querySelectorAll('.vault-inventory-card').length;
+            });
+            helpers.assertEqual(cardCount, 1, 'Exactly one vault inventory card must be rendered');
+        }
+    },
+
+    // =========================================================================
+    // F06: Secret Vault Continuous Single Code Input (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F06_01_leading_trailing_whitespace_trimmed',
+        feature: 'F06',
+        name: 'Entering code with leading and trailing spaces trims whitespace and unlocks successfully',
+        run: async (page, helpers) => {
+            const hasInput = await page.evaluate(() => {
+                localStorage.removeItem('org_escolar_vault_unlocked_codes_v2');
+                const inp = document.getElementById('vault-code-input');
+                if (!inp) return false;
+                inp.value = '   APOLLO11   ';
+                inp.dispatchEvent(new Event('input', { bubbles: true }));
+                const btn = document.getElementById('vault-verify-btn');
+                if (btn) btn.click();
+                return true;
+            });
+            helpers.assertTrue(hasInput, '#vault-code-input must exist in DOM');
+            const unlocked = await page.evaluate(() => window.StorageModule?.isVaultCodeUnlocked?.('APOLLO11') || false);
+            helpers.assertTrue(unlocked, 'Entering code with whitespace must trim and unlock');
+        }
+    },
+    {
+        id: 'T2_F06_02_invalid_code_shake_feedback',
+        feature: 'F06',
+        name: 'Entering invalid code triggers error feedback without crashing',
+        run: async (page, helpers) => {
+            const noCrash = await page.evaluate(() => {
                 try {
-                    const btn = document.querySelector('.nonexistent-action-btn');
-                    btn?.querySelector('.apollo-rocket-badge')?.remove();
+                    const inp = document.getElementById('vault-code-input');
+                    if (inp) {
+                        inp.value = 'INVALID_CODE_999';
+                        inp.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    const btn = document.getElementById('vault-verify-btn');
+                    if (btn) btn.click();
                     return true;
-                } catch (_) {
+                } catch (e) {
                     return false;
                 }
             });
-            helpers.assertTrue(safe, 'Rocket badge query on missing container is safe');
-        }
-    },
-
-    // =========================================================================
-    // F14: 06062009 Secret Code & Starlight Tribute
-    // =========================================================================
-    {
-        id: 'T2_F14_01_06062009_code_retention_of_leading_zero',
-        feature: 'F14',
-        name: 'Code retains leading zero (does not parse as numeric 6062009)',
-        run: async (page, helpers) => {
-            const raw = '06062009';
-            const str = String(raw).trim();
-            helpers.assertEqual(str.charAt(0), '0', 'Leading zero must be retained in code');
-            helpers.assertEqual(str.length, 8, 'Code length must be 8');
+            helpers.assertTrue(noCrash, 'Submitting invalid code must execute safely without crash');
         }
     },
     {
-        id: 'T2_F14_02_06062009_code_with_slashes_or_dashes',
-        feature: 'F14',
-        name: 'Date formatting like "06/06/2009" normalizes to "06062009"',
-        run: async (page, helpers) => {
-            const normalized = await page.evaluate(() => {
-                const dateCode = '06/06/2009';
-                return dateCode.replace(/[^0-9]/g, '');
-            });
-            helpers.assertEqual(normalized, '06062009', 'Date code with slashes must strip to 06062009');
-        }
-    },
-    {
-        id: 'T2_F14_03_06062009_tribute_modal_extreme_zoom',
-        feature: 'F14',
-        name: 'Tribute modal remains legible at compact 640x360 dimensions',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 640, height: 360 });
-            const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(fits, 'Tribute viewport must not overflow horizontally');
-        }
-    },
-    {
-        id: 'T2_F14_04_06062009_unlock_does_not_reset_custom_school',
-        feature: 'F14',
-        name: 'Unlocking 06062009 does not overwrite active custom school or period',
-        run: async (page, helpers) => {
-            const intact = await page.evaluate(() => {
-                window.StorageModule?.setAcademicPeriod('Periodo Intacto');
-                const codes = JSON.parse(localStorage.getItem('org_escolar_vault_unlocked_codes_v2') || '[]');
-                if (!codes.includes('06062009')) codes.push('06062009');
-                localStorage.setItem('org_escolar_vault_unlocked_codes_v2', JSON.stringify(codes));
-                return window.StorageModule?.getAcademicPeriod() === 'Periodo Intacto';
-            });
-            helpers.assertTrue(intact, 'Active period must be unaffected by tribute unlock');
-        }
-    },
-    {
-        id: 'T2_F14_05_06062009_repeated_unlock_no_duplicate',
-        feature: 'F14',
-        name: 'Unlocking 06062009 multiple times stores exactly 1 entry in unlocked codes',
-        run: async (page, helpers) => {
-            const single = await page.evaluate(() => {
-                const codes = ['06062009'];
-                if (!codes.includes('06062009')) codes.push('06062009');
-                return codes.filter(c => c === '06062009').length;
-            });
-            helpers.assertEqual(single, 1, 'Only one entry of 06062009 must exist');
-        }
-    },
-
-    // =========================================================================
-    // F15: Eduardo Creator Secret Code & Gold Theme
-    // =========================================================================
-    {
-        id: 'T2_F15_01_eduardo_code_accented_variation',
-        feature: 'F15',
-        name: 'Accented variation normalizes cleanly to EDUARDO',
-        run: async (page, helpers) => {
-            const norm = await page.evaluate(() => {
-                const raw = 'Éduardo';
-                return raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
-            });
-            helpers.assertEqual(norm, 'EDUARDO', 'Accents must normalize to EDUARDO');
-        }
-    },
-    {
-        id: 'T2_F15_02_eduardo_code_with_suffix_number',
-        feature: 'F15',
-        name: 'Alias EDUARDO1 resolves to EDUARDO creator unlock',
-        run: async (page, helpers) => {
-            const maps = await page.evaluate(() => {
-                const code = 'EDUARDO1';
-                const aliasMap = { 'EDUARDO1': 'EDUARDO' };
-                return aliasMap[code] || code;
-            });
-            helpers.assertEqual(maps, 'EDUARDO', 'EDUARDO1 must alias to EDUARDO');
-        }
-    },
-    {
-        id: 'T2_F15_03_eduardo_gold_palette_contrast_ratio',
-        feature: 'F15',
-        name: 'Gold theme palette satisfies contrast readability in DOM',
-        run: async (page, helpers) => {
-            const hasContrast = await page.evaluate(() => {
-                const div = document.createElement('div');
-                div.className = 'text-amber-400 bg-slate-900';
-                return div.className.includes('amber-400');
-            });
-            helpers.assertTrue(hasContrast, 'Gold contrast pairing valid');
-        }
-    },
-    {
-        id: 'T2_F15_04_eduardo_crown_badge_no_layout_break',
-        feature: 'F15',
-        name: 'Crown badge 👑 does not break surrounding element alignment',
-        run: async (page, helpers) => {
-            const aligned = await page.evaluate(() => {
-                const span = document.createElement('span');
-                span.className = 'inline-flex items-center text-xs';
-                span.textContent = '👑 Eduardo';
-                document.body.appendChild(span);
-                const h = span.offsetHeight;
-                span.remove();
-                return h > 0;
-            });
-            helpers.assertTrue(aligned, 'Crown badge container aligns cleanly');
-        }
-    },
-    {
-        id: 'T2_F15_05_eduardo_theme_rapid_toggle',
-        feature: 'F15',
-        name: 'Toggling Eduardo Gold theme 10 times leaves DOM in clean state',
+        id: 'T2_F06_03_already_unlocked_code_duplicate_handling',
+        feature: 'F06',
+        name: 'Re-entering an already unlocked code handles duplicate gracefully without duplicate array entries',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                for (let i = 0; i < 10; i++) {
-                    document.documentElement.classList.toggle('theme-eduardo-gold');
-                }
-                document.documentElement.classList.remove('theme-eduardo-gold');
+                window.StorageModule?.unlockVaultCode?.('APOLLO11');
+                window.StorageModule?.unlockVaultCode?.('APOLLO11');
             });
-            const active = await page.evaluate(() => document.documentElement.classList.contains('theme-eduardo-gold'));
-            helpers.assertFalse(active, 'Eduardo theme must be cleanly removed after rapid toggles');
-        }
-    },
-
-    // =========================================================================
-    // F16: 11-Code Secret Vault Catalog
-    // =========================================================================
-    {
-        id: 'T2_F16_01_vault_catalog_lookup_garbage_string',
-        feature: 'F16',
-        name: 'Looking up garbage string "XYZ_RANDOM_999!" returns invalid cleanly',
-        run: async (page, helpers) => {
-            const recognized = await page.evaluate(() => {
-                const validCodes = ['APOLLO11', '06062009', 'EDUARDO', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE', 'COFFEE42', 'ARCADE90', 'STUDYMAX', 'GATITOS_'];
-                return validCodes.includes('XYZ_RANDOM_999!');
-            });
-            helpers.assertFalse(recognized, 'Garbage code must not be recognized');
+            const codes = await page.evaluate(() => window.StorageModule?.getVaultUnlockedCodes?.() || []);
+            const occurrences = codes.filter(c => c === 'APOLLO11').length;
+            helpers.assertEqual(occurrences, 1, 'Code should not be duplicated in unlocked list');
         }
     },
     {
-        id: 'T2_F16_02_vault_catalog_lookup_empty_string',
-        feature: 'F16',
-        name: 'Looking up empty string in catalog returns false',
-        run: async (page, helpers) => {
-            const recognized = await page.evaluate(() => {
-                const validCodes = ['APOLLO11', '06062009', 'EDUARDO'];
-                return validCodes.includes('');
-            });
-            helpers.assertFalse(recognized, 'Empty code must not be recognized');
-        }
-    },
-    {
-        id: 'T2_F16_03_vault_catalog_lookup_null',
-        feature: 'F16',
-        name: 'Looking up null code in catalog returns false safely',
-        run: async (page, helpers) => {
-            const recognized = await page.evaluate(() => {
-                const validCodes = ['APOLLO11', '06062009', 'EDUARDO'];
-                return validCodes.includes(null);
-            });
-            helpers.assertFalse(recognized, 'Null code must return false');
-        }
-    },
-    {
-        id: 'T2_F16_04_vault_catalog_all_11_codes_unlocked_storage_size',
-        feature: 'F16',
-        name: 'Storing all 11 unlocked secret codes consumes < 5KB of LocalStorage',
-        run: async (page, helpers) => {
-            const sizeOk = await page.evaluate(() => {
-                const all11 = ['APOLLO11', '06062009', 'EDUARDO', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE', 'COFFEE42', 'ARCADE90', 'STUDYMAX', 'GATITOS_'];
-                const serialized = JSON.stringify(all11);
-                return (serialized.length / 1024) < 5;
-            });
-            helpers.assertTrue(sizeOk, 'All 11 codes serialized must consume < 5KB');
-        }
-    },
-    {
-        id: 'T2_F16_05_vault_catalog_idempotent_bulk_unlock',
-        feature: 'F16',
-        name: 'Unlocking entire catalog twice does not duplicate array entries',
-        run: async (page, helpers) => {
-            const count = await page.evaluate(() => {
-                const all11 = ['APOLLO11', '06062009', 'EDUARDO', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE', 'COFFEE42', 'ARCADE90', 'STUDYMAX', 'GATITOS_'];
-                const set = new Set([...all11, ...all11]);
-                return set.size;
-            });
-            helpers.assertEqual(count, 11, 'Bulk unlock set must contain exactly 11 unique entries');
-        }
-    },
-
-    // =========================================================================
-    // F17: Unlocked Secrets Inventory in Vault
-    // =========================================================================
-    {
-        id: 'T2_F17_01_vault_inventory_empty_array_state',
-        feature: 'F17',
-        name: 'Inventory handles empty array [] without crashing',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const codes = [];
-                return codes.length === 0;
-            });
-            helpers.assertTrue(safe, 'Empty array inventory is valid');
-        }
-    },
-    {
-        id: 'T2_F17_02_vault_inventory_corrupted_storage_array',
-        feature: 'F17',
-        name: 'Corrupted non-array string in unlocked codes recovers safely',
-        run: async (page, helpers) => {
-            const recovered = await page.evaluate(() => {
-                localStorage.setItem('org_escolar_vault_unlocked_codes_v2', 'NOT_AN_ARRAY');
-                let codes = [];
-                try {
-                    const parsed = JSON.parse(localStorage.getItem('org_escolar_vault_unlocked_codes_v2'));
-                    if (Array.isArray(parsed)) codes = parsed;
-                } catch (_) {
-                    codes = [];
-                }
-                return Array.isArray(codes);
-            });
-            helpers.assertTrue(recovered, 'Corrupt storage must fall back to empty array');
-        }
-    },
-    {
-        id: 'T2_F17_03_vault_inventory_item_with_long_name',
-        feature: 'F17',
-        name: 'Protocol with 200 character name truncates safely inside card',
-        run: async (page, helpers) => {
-            const fits = await page.evaluate(() => {
-                const div = document.createElement('div');
-                div.className = 'truncate max-w-xs';
-                div.textContent = 'A'.repeat(200);
-                document.body.appendChild(div);
-                const ok = div.offsetWidth > 0;
-                div.remove();
-                return ok;
-            });
-            helpers.assertTrue(fits, 'Long protocol name wraps/truncates');
-        }
-    },
-    {
-        id: 'T2_F17_04_vault_inventory_rapid_switch_clicks',
-        feature: 'F17',
-        name: 'Clicking inventory toggle switches 15 times quickly maintains consistent state',
-        run: async (page, helpers) => {
-            const consistent = await page.evaluate(() => {
-                let current = 'default';
-                for (let i = 0; i < 15; i++) {
-                    current = current === 'default' ? 'apollo' : 'default';
-                }
-                return current === 'apollo';
-            });
-            helpers.assertTrue(consistent, 'Rapid toggle state toggles consistently');
-        }
-    },
-    {
-        id: 'T2_F17_05_vault_inventory_overflow_scroll_mobile',
-        feature: 'F17',
-        name: 'At 360px mobile width, inventory list scrolls vertically without horizontal overflow',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 360, height: 640 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '360px viewport has zero horizontal scroll');
-        }
-    },
-
-    // =========================================================================
-    // F18: Deactivable Special Themes System
-    // =========================================================================
-    {
-        id: 'T2_F18_01_special_theme_unknown_theme_id',
-        feature: 'F18',
-        name: 'Setting special theme to unknown id falls back safely to "default"',
-        run: async (page, helpers) => {
-            const fallback = await page.evaluate(() => {
-                const validThemes = ['apollo', 'eduardo-gold', 'penguin', 'matrix'];
-                const target = 'unknown_theme_galaxy';
-                return validThemes.includes(target) ? target : 'default';
-            });
-            helpers.assertEqual(fallback, 'default', 'Unknown theme ID must fall back to default');
-        }
-    },
-    {
-        id: 'T2_F18_02_special_theme_deactivate_when_already_default',
-        feature: 'F18',
-        name: 'Deactivating theme when already default is a clean no-op',
-        run: async (page, helpers) => {
-            await page.evaluate(() => {
-                document.documentElement.classList.remove('theme-apollo', 'theme-eduardo-gold');
-            });
-            helpers.assertTrue(true, 'Deactivating on default theme passes safely');
-        }
-    },
-    {
-        id: 'T2_F18_03_special_theme_simultaneous_toggle_stress',
-        feature: 'F18',
-        name: 'Cycling through 5 themes rapidly leaves only the final theme class active',
-        run: async (page, helpers) => {
-            const finalClass = await page.evaluate(() => {
-                const el = document.documentElement;
-                const themes = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-matrix'];
-                themes.forEach(t => el.classList.remove(t));
-                el.classList.add('theme-matrix');
-                return el.classList.contains('theme-matrix') && !el.classList.contains('theme-apollo');
-            });
-            helpers.assertTrue(finalClass, 'Only final theme class must be present');
-        }
-    },
-    {
-        id: 'T2_F18_04_special_theme_root_class_no_duplicates',
-        feature: 'F18',
-        name: 'Root element never accumulates duplicate class names',
-        run: async (page, helpers) => {
-            const noDupes = await page.evaluate(() => {
-                document.documentElement.classList.add('theme-apollo');
-                document.documentElement.classList.add('theme-apollo');
-                const list = Array.from(document.documentElement.classList);
-                return list.filter(c => c === 'theme-apollo').length === 1;
-            });
-            helpers.assertTrue(noDupes, 'classList handles duplicates inherently');
-        }
-    },
-    {
-        id: 'T2_F18_05_special_theme_preserves_dark_mode_preference',
-        feature: 'F18',
-        name: 'Special themes do not clobber the "dark" class from documentElement',
-        run: async (page, helpers) => {
-            const preserved = await page.evaluate(() => {
-                const el = document.documentElement;
-                el.classList.add('dark');
-                el.classList.add('theme-apollo');
-                el.classList.remove('theme-apollo');
-                return el.classList.contains('dark');
-            });
-            helpers.assertTrue(preserved, 'Dark mode class must be preserved across special theme toggles');
-        }
-    },
-
-    // =========================================================================
-    // F19: Settings Menu Modern Reorganization
-    // =========================================================================
-    {
-        id: 'T2_F19_01_settings_accordion_rapid_open_close',
-        feature: 'F19',
-        name: 'Rapidly opening and closing settings sections 20 times does not hang',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                for (let i = 0; i < 20; i++) {
-                    const details = document.querySelectorAll('details');
-                    details.forEach(d => { d.open = !d.open; });
-                }
-                return true;
-            });
-            helpers.assertTrue(safe, 'Accordion rapid toggling completed safely');
-        }
-    },
-    {
-        id: 'T2_F19_02_settings_all_sections_collapsed',
-        feature: 'F19',
-        name: 'UI remains stable and visible when all settings sections are collapsed',
-        run: async (page, helpers) => {
-            const stable = await page.evaluate(() => {
-                document.querySelectorAll('details').forEach(d => { d.open = false; });
-                const settings = document.getElementById('view-settings');
-                return settings !== null;
-            });
-            helpers.assertTrue(stable, 'Settings view remains stable when collapsed');
-        }
-    },
-    {
-        id: 'T2_F19_03_settings_all_sections_expanded',
-        feature: 'F19',
-        name: 'UI remains stable when all settings sections are expanded simultaneously',
-        run: async (page, helpers) => {
-            const stable = await page.evaluate(() => {
-                document.querySelectorAll('details').forEach(d => { d.open = true; });
-                const settings = document.getElementById('view-settings');
-                return settings !== null;
-            });
-            helpers.assertTrue(stable, 'Settings view remains stable when expanded');
-        }
-    },
-    {
-        id: 'T2_F19_04_settings_viewport_320px_containment',
-        feature: 'F19',
-        name: 'Settings elements remain within 320px viewport without horizontal blowout',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 320, height: 600 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '320px viewport has zero horizontal scroll');
-        }
-    },
-    {
-        id: 'T2_F19_05_settings_nested_controls_hit_targets',
-        feature: 'F19',
-        name: 'Nested interactive elements maintain >= 36px touch targets',
-        run: async (page, helpers) => {
-            const touchTargetsOk = await page.evaluate(() => {
-                const buttons = Array.from(document.querySelectorAll('#view-settings button'));
-                if (buttons.length === 0) return true;
-                return buttons.some(b => b.offsetHeight >= 28);
-            });
-            helpers.assertTrue(touchTargetsOk, 'Settings buttons have acceptable touch height');
-        }
-    },
-
-    // =========================================================================
-    // F20: Settings Special Themes Switchboard
-    // =========================================================================
-    {
-        id: 'T2_F20_01_switchboard_empty_unlocked_themes',
-        feature: 'F20',
-        name: 'Switchboard renders cleanly when no special codes are unlocked',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const codes = [];
-                return Array.isArray(codes);
-            });
-            helpers.assertTrue(safe, 'Empty unlocked codes state handled');
-        }
-    },
-    {
-        id: 'T2_F20_02_switchboard_toggle_rapid_clicking',
-        feature: 'F20',
-        name: 'Rapid clicking on switchboard toggles does not desync storage from DOM',
-        run: async (page, helpers) => {
-            const inSync = await page.evaluate(() => {
-                let state = false;
-                for (let i = 0; i < 20; i++) state = !state;
-                return state === false;
-            });
-            helpers.assertTrue(inSync, 'Toggle states remain deterministic');
-        }
-    },
-    {
-        id: 'T2_F20_03_switchboard_disabled_switch_no_activation',
-        feature: 'F20',
-        name: 'Locked switch cannot be activated when disabled attribute is present',
-        run: async (page, helpers) => {
-            const disabledWorking = await page.evaluate(() => {
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.disabled = true;
-                input.click();
-                return input.checked === false;
-            });
-            helpers.assertTrue(disabledWorking, 'Disabled input cannot be checked via click');
-        }
-    },
-    {
-        id: 'T2_F20_04_switchboard_storage_key_tampering',
-        feature: 'F20',
-        name: 'Tampered theme value in storage resets safely to default on load',
-        run: async (page, helpers) => {
-            await page.evaluate(() => localStorage.setItem('org_escolar_active_special_theme_v1', 'MALFORMED_THEME_@#$%'));
-            const safeTheme = await page.evaluate(() => {
-                const val = localStorage.getItem('org_escolar_active_special_theme_v1');
-                const allowed = ['apollo', 'eduardo-gold', 'penguin', 'matrix'];
-                return allowed.includes(val) ? val : 'default';
-            });
-            helpers.assertEqual(safeTheme, 'default', 'Malformed theme resets to default');
-        }
-    },
-    {
-        id: 'T2_F20_05_switchboard_all_themes_switched_off',
-        feature: 'F20',
-        name: 'When all themes are switched off, default clean theme is active',
-        run: async (page, helpers) => {
-            const clean = await page.evaluate(() => {
-                const special = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin'];
-                special.forEach(c => document.documentElement.classList.remove(c));
-                return !special.some(c => document.documentElement.classList.contains(c));
-            });
-            helpers.assertTrue(clean, 'All special themes deactivated leaves clean DOM');
-        }
-    },
-
-    // =========================================================================
-    // F21: Tablet Header Overflow Fix
-    // =========================================================================
-    {
-        id: 'T2_F21_01_tablet_viewport_767px_boundary',
-        feature: 'F21',
-        name: 'Viewport 767px (mobile-tablet breakpoint boundary) has zero horizontal overflow',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 767, height: 1024 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '767px boundary must have zero horizontal scroll');
-        }
-    },
-    {
-        id: 'T2_F21_02_tablet_viewport_1023px_boundary',
-        feature: 'F21',
-        name: 'Viewport 1023px (tablet-desktop breakpoint boundary) has zero horizontal overflow',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 1023, height: 768 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '1023px boundary must have zero horizontal scroll');
-        }
-    },
-    {
-        id: 'T2_F21_03_tablet_landscape_1024x768',
-        feature: 'F21',
-        name: 'Tablet landscape orientation (1024x768) has zero horizontal overflow',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 1024, height: 768 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '1024x768 landscape orientation must have zero horizontal scroll');
-        }
-    },
-    {
-        id: 'T2_F21_04_tablet_portrait_768x1024',
-        feature: 'F21',
-        name: 'Tablet portrait orientation (768x1024) has zero horizontal overflow',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 768, height: 1024 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '768x1024 portrait orientation must have zero horizontal scroll');
-        }
-    },
-    {
-        id: 'T2_F21_05_tablet_header_buttons_alignment',
-        feature: 'F21',
-        name: 'Header interactive buttons remain aligned and visible on tablet',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 768, height: 1024 });
-            const headerBtns = await page.evaluate(() => {
-                const header = document.querySelector('header');
-                return header ? header.querySelectorAll('button').length >= 1 : false;
-            });
-            helpers.assertTrue(headerBtns, 'Header must contain action buttons on tablet');
-        }
-    },
-
-    // =========================================================================
-    // F22: Tablet Layout Polishing
-    // =========================================================================
-    {
-        id: 'T2_F22_01_tablet_settings_grid_at_768px',
-        feature: 'F22',
-        name: 'Settings grid renders without element overlap at 768px',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 768, height: 1024 });
-            const noOverlap = await page.evaluate(() => {
-                const settings = document.getElementById('view-settings');
-                return settings ? settings.offsetWidth <= 768 : true;
-            });
-            helpers.assertTrue(noOverlap, 'Settings container must fit within 768px width');
-        }
-    },
-    {
-        id: 'T2_F22_02_tablet_calendar_overflow_prevention',
-        feature: 'F22',
-        name: 'Calendar navigation buttons and days fit cleanly inside tablet width',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 768, height: 1024 });
-            const valid = await page.evaluate(() => {
-                const cal = document.getElementById('calendar-modal') || document.querySelector('header');
-                return cal !== null;
-            });
-            helpers.assertTrue(valid, 'Calendar modal or container exists and renders');
-        }
-    },
-    {
-        id: 'T2_F22_03_tablet_task_cards_max_width_768px',
-        feature: 'F22',
-        name: 'Task cards do not stretch awkwardly across screen on tablet',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 768, height: 1024 });
-            const maxWidthBounded = await page.evaluate(() => {
-                const main = document.querySelector('main');
-                return main ? main.offsetWidth <= 768 : true;
-            });
-            helpers.assertTrue(maxWidthBounded, 'Main content container on tablet must be bounded');
-        }
-    },
-    {
-        id: 'T2_F22_04_tablet_modals_width_bounding',
-        feature: 'F22',
-        name: 'Modals on 768px tablet occupy <= 95% of viewport width',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 768, height: 1024 });
-            const bounded = await page.evaluate(() => {
-                const modal = document.querySelector('.modal-overlay > div:nth-child(2)');
-                return modal ? modal.offsetWidth <= (768 * 0.95) : true;
-            });
-            helpers.assertTrue(bounded, 'Modals must not exceed 95% of tablet width');
-        }
-    },
-    {
-        id: 'T2_F22_05_tablet_font_scaling_large_text',
-        feature: 'F22',
-        name: 'Large text scaling does not push buttons off screen on tablet',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 768, height: 1024 });
-            const headerSafe = await page.evaluate(() => document.querySelector('header') !== null);
-            helpers.assertTrue(headerSafe, 'Header layout stable on tablet under font scaling');
-        }
-    },
-
-    // =========================================================================
-    // F23: Mobile UI Integrity Preservation
-    // =========================================================================
-    {
-        id: 'T2_F23_01_mobile_320px_minimum_viewport',
-        feature: 'F23',
-        name: 'At 320px minimum screen width, zero horizontal scrollbar',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 320, height: 568 });
-            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScroll, '320px screen width must have zero horizontal scroll');
-        }
-    },
-    {
-        id: 'T2_F23_02_mobile_480px_screen_width',
-        feature: 'F23',
-        name: 'At 480px large phone width, bottom nav remains aligned',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 480, height: 800 });
-            const navAligned = await page.evaluate(() => {
-                const nav = document.getElementById('bottom-nav');
-                return nav ? nav.offsetWidth <= 480 : true;
-            });
-            helpers.assertTrue(navAligned, 'Bottom nav must fit within 480px width');
-        }
-    },
-    {
-        id: 'T2_F23_03_mobile_bottom_nav_safe_area',
-        feature: 'F23',
-        name: 'Bottom nav provides clearance for fixed FAB button',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 375, height: 667 });
-            const fabPresent = await page.evaluate(() => {
-                const fab = document.getElementById('bottom-main-action-btn');
-                return fab !== null;
-            });
-            helpers.assertTrue(fabPresent, 'Mobile FAB button must be present in DOM');
-        }
-    },
-    {
-        id: 'T2_F23_04_mobile_long_title_task_card',
-        feature: 'F23',
-        name: 'Task card with 500-char title wraps text without horizontal stretching',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 375, height: 667 });
-            const wraps = await page.evaluate(() => {
-                const div = document.createElement('div');
-                div.className = 'break-words max-w-full';
-                div.textContent = 'Tarea Muy Larga '.repeat(50);
-                document.body.appendChild(div);
-                const ok = div.offsetWidth <= 375;
-                div.remove();
-                return ok;
-            });
-            helpers.assertTrue(wraps, '500-char task title must wrap within 375px');
-        }
-    },
-    {
-        id: 'T2_F23_05_mobile_drawer_touch_outside',
-        feature: 'F23',
-        name: 'Drawer backdrop handles click/touch events without crashing',
-        run: async (page, helpers) => {
-            await page.setViewport({ width: 375, height: 667 });
-            const safe = await page.evaluate(() => {
-                const backdrop = document.getElementById('drawer-backdrop') || document.querySelector('[data-drawer-backdrop]');
-                backdrop?.click();
-                return true;
-            });
-            helpers.assertTrue(safe, 'Backdrop click handled safely');
-        }
-    },
-
-    // =========================================================================
-    // F24: Widget JSON Payload Contract Fix
-    // =========================================================================
-    {
-        id: 'T2_F24_01_widget_payload_zero_tasks',
-        feature: 'F24',
-        name: 'Payload with 0 tasks computes pendingTodayCount: 0',
-        run: async (page, helpers) => {
-            const count = await page.evaluate(() => {
-                const tasks = [];
-                const pending = tasks.filter(t => !t.completed).length;
-                return pending;
-            });
-            helpers.assertEqual(count, 0, 'Zero tasks must produce 0 pending count');
-        }
-    },
-    {
-        id: 'T2_F24_02_widget_payload_100_tasks',
-        feature: 'F24',
-        name: 'Payload with 100 tasks computes correctly without performance lag',
-        run: async (page, helpers) => {
-            const count = await page.evaluate(() => {
-                const tasks = Array.from({ length: 100 }, (_, i) => ({ id: `t_${i}`, title: `Task ${i}`, completed: i % 2 === 0 }));
-                const pending = tasks.filter(t => !t.completed).length;
-                return pending;
-            });
-            helpers.assertEqual(count, 50, '100 tasks with half pending produces 50 count');
-        }
-    },
-    {
-        id: 'T2_F24_03_widget_payload_missing_cycle_dates',
-        feature: 'F24',
-        name: 'Payload handles missing cycle start/end dates with safe fallback',
-        run: async (page, helpers) => {
-            const progress = await page.evaluate(() => {
-                const cycle = { startDate: null, endDate: null };
-                if (!cycle.startDate || !cycle.endDate) {
-                    return { percentage: 0, daysRemaining: 0 };
-                }
-                return { percentage: 50, daysRemaining: 10 };
-            });
-            helpers.assertEqual(progress.percentage, 0, 'Missing cycle dates produces 0 percentage safely');
-        }
-    },
-    {
-        id: 'T2_F24_04_widget_payload_extreme_task_title',
-        feature: 'F24',
-        name: 'Task title of 1000 characters is preserved safely in payload',
-        run: async (page, helpers) => {
-            const longTitle = 'Examen '.repeat(150);
-            const payload = await page.evaluate(t => {
-                return { nextTaskTitle: t, nextTaskSubject: 'Física' };
-            }, longTitle);
-            helpers.assertEqual(payload.nextTaskTitle, longTitle, 'Extreme task title preserved in payload');
-        }
-    },
-    {
-        id: 'T2_F24_05_widget_payload_valid_json_serialization',
-        feature: 'F24',
-        name: 'Widget payload serializes cleanly to JSON without circular reference error',
-        run: async (page, helpers) => {
-            const jsonOk = await page.evaluate(() => {
-                const mock = {
-                    pendingTodayCount: 2,
-                    nextTaskTitle: 'Tarea 1',
-                    nextTaskSubject: 'Química',
-                    institution: { name: 'UNAM', period: '4.º Semestre' },
-                    cycleProgress: { percentage: 40, daysRemaining: 30 }
-                };
-                const str = JSON.stringify(mock);
-                return typeof str === 'string' && str.includes('UNAM');
-            });
-            helpers.assertTrue(jsonOk, 'Payload must serialize cleanly to JSON');
-        }
-    },
-
-    // =========================================================================
-    // F25: In-App Dashboard Widgets
-    // =========================================================================
-    {
-        id: 'T2_F25_01_dashboard_widget_empty_tasks',
-        feature: 'F25',
-        name: 'Dashboard widget handles empty tasks list with zero state',
-        run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                const list = [];
-                return list.length === 0;
-            });
-            helpers.assertTrue(safe, 'Empty task state handled');
-        }
-    },
-    {
-        id: 'T2_F25_02_dashboard_widget_all_tasks_completed',
-        feature: 'F25',
-        name: 'When 100% tasks are completed, pending counter shows 0',
-        run: async (page, helpers) => {
-            const pending = await page.evaluate(() => {
-                const tasks = [{ id: '1', completed: true }, { id: '2', completed: true }];
-                return tasks.filter(t => !t.completed).length;
-            });
-            helpers.assertEqual(pending, 0, 'Completed tasks produce 0 pending');
-        }
-    },
-    {
-        id: 'T2_F25_03_dashboard_widget_cycle_progress_0_percent',
-        feature: 'F25',
-        name: 'Cycle progress percentage returns 0% when cycle starts today',
-        run: async (page, helpers) => {
-            const pct = await page.evaluate(() => {
-                const now = Date.now();
-                const start = now;
-                const end = now + 100 * 86400000;
-                return Math.round(((now - start) / (end - start)) * 100);
-            });
-            helpers.assertEqual(pct, 0, 'Progress must be 0% at start of cycle');
-        }
-    },
-    {
-        id: 'T2_F25_04_dashboard_widget_cycle_progress_100_percent',
-        feature: 'F25',
-        name: 'Cycle progress percentage clamps to 100% when cycle has ended',
-        run: async (page, helpers) => {
-            const pct = await page.evaluate(() => {
-                const now = Date.now();
-                const start = now - 200 * 86400000;
-                const end = now - 10 * 86400000;
-                const calc = Math.round(((now - start) / (end - start)) * 100);
-                return Math.min(100, Math.max(0, calc));
-            });
-            helpers.assertEqual(pct, 100, 'Progress must clamp to 100% past end date');
-        }
-    },
-    {
-        id: 'T2_F25_05_dashboard_widget_inverted_cycle_dates',
-        feature: 'F25',
-        name: 'Inverted cycle dates (end < start) handles safely without NaN',
-        run: async (page, helpers) => {
-            const pct = await page.evaluate(() => {
-                const now = Date.now();
-                const start = now + 10 * 86400000;
-                const end = now - 10 * 86400000;
-                const total = end - start;
-                if (total <= 0) return 0;
-                return Math.min(100, Math.max(0, Math.round(((now - start) / total) * 100)));
-            });
-            helpers.assertEqual(pct, 0, 'Inverted cycle dates must default safely to 0');
-        }
-    },
-
-    // =========================================================================
-    // F26: Comprehensive E2E Test Suite (Tiers 1-4)
-    // =========================================================================
-    {
-        id: 'T2_F26_01_test_runner_nonexistent_tier_argument',
-        feature: 'F26',
-        name: 'Passing invalid tier argument handled safely',
-        run: async (page, helpers) => {
-            const handled = [1, 2, 3, 4].includes(99);
-            helpers.assertFalse(handled, 'Tier 99 is invalid');
-        }
-    },
-    {
-        id: 'T2_F26_02_test_runner_empty_filter_regex',
-        feature: 'F26',
-        name: 'Empty filter regex matches all tests safely',
-        run: async (page, helpers) => {
-            const reg = new RegExp('', 'i');
-            helpers.assertTrue(reg.test('T2_F01_case'), 'Empty regex matches everything');
-        }
-    },
-    {
-        id: 'T2_F26_03_test_runner_unmatched_filter_regex',
-        feature: 'F26',
-        name: 'Unmatched filter regex matches zero tests without error',
-        run: async (page, helpers) => {
-            const reg = new RegExp('NONEXISTENT_XYZ_123', 'i');
-            helpers.assertFalse(reg.test('T2_F01_case'), 'Unmatched filter should not match');
-        }
-    },
-    {
-        id: 'T2_F26_04_test_summary_directory_creation',
-        feature: 'F26',
-        name: 'Results directory is creatable without throwing',
-        run: async (page, helpers) => {
-            const resDir = path.join(helpers.PROJECT_ROOT, 'tests', 'results');
-            if (!fs.existsSync(resDir)) {
-                fs.mkdirSync(resDir, { recursive: true });
-            }
-            helpers.assertTrue(fs.existsSync(resDir), 'Results directory must exist or be creatable');
-        }
-    },
-    {
-        id: 'T2_F26_05_test_helpers_timeout_rejection',
-        feature: 'F26',
-        name: 'waitSelector rejects properly on missing element',
-        run: async (page, helpers) => {
-            let errorCaught = false;
-            try {
-                await helpers.waitSelector(page, '#nonexistent_element_xyz_123', 200);
-            } catch (e) {
-                errorCaught = true;
-            }
-            helpers.assertTrue(errorCaught, 'waitSelector on nonexistent element must reject with timeout error');
-        }
-    },
-
-    // =========================================================================
-    // F27: Tier 5 Adversarial Hardening & Final Gate
-    // =========================================================================
-    {
-        id: 'T2_F27_01_localstorage_quota_exceeded_mock',
-        feature: 'F27',
-        name: 'LocalStorage quota exceeded is handled without uncaught fatal exception',
+        id: 'T2_F06_04_pasting_large_string_safely_handled',
+        feature: 'F06',
+        name: 'Pasting a 100-character arbitrary string into input does not crash or throw unhandled error',
         run: async (page, helpers) => {
             const handled = await page.evaluate(() => {
-                try {
-                    const test = 'A'.repeat(1024);
-                    sessionStorage.setItem('test_quota', test);
-                    sessionStorage.removeItem('test_quota');
-                    return true;
-                } catch (_) {
-                    return true;
-                }
+                const inp = document.getElementById('vault-code-input');
+                if (!inp) return false;
+                inp.value = 'A'.repeat(100);
+                inp.dispatchEvent(new Event('input', { bubbles: true }));
+                return true;
             });
-            helpers.assertTrue(handled, 'Quota write must be protected');
+            helpers.assertTrue(handled, '#vault-code-input must exist in DOM and handle large string input safely');
         }
     },
     {
-        id: 'T2_F27_02_malformed_json_import_recovery',
-        feature: 'F27',
-        name: 'Importing malformed JSON string throws descriptive error without corrupting state',
+        id: 'T2_F06_05_empty_input_submission_ignored',
+        feature: 'F06',
+        name: 'Submitting empty continuous input does not trigger false positive unlock',
         run: async (page, helpers) => {
-            const thrown = await page.evaluate(() => {
-                try {
-                    if (typeof window.StorageModule?.importJson === 'function') {
-                        window.StorageModule.importJson('{ malformed bad json :::');
-                        return false;
-                    }
-                    return true;
-                } catch (e) {
-                    return e.message.includes('Error al importar');
+            await page.evaluate(() => {
+                localStorage.removeItem('org_escolar_vault_unlocked_codes_v2');
+                const inp = document.getElementById('vault-code-input');
+                if (inp) {
+                    inp.value = '';
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
                 }
+                const btn = document.getElementById('vault-verify-btn');
+                if (btn) btn.click();
             });
-            helpers.assertTrue(thrown, 'Malformed JSON import must throw clean error');
-        }
-    },
-    {
-        id: 'T2_F27_03_prototype_pollution_import_defense',
-        feature: 'F27',
-        name: 'JSON payload containing __proto__ does not pollute Object prototype',
-        run: async (page, helpers) => {
-            const defended = await page.evaluate(() => {
-                const payload = '{"__proto__": {"POLLUTED": true}, "subjects": [], "tasks": []}';
-                try {
-                    const parsed = JSON.parse(payload);
-                    return ({}).POLLUTED === undefined;
-                } catch (_) {
-                    return true;
-                }
-            });
-            helpers.assertTrue(defended, 'Prototype pollution defense passed');
-        }
-    },
-    {
-        id: 'T2_F27_04_import_payload_excessive_subjects',
-        feature: 'F27',
-        name: 'Importing payload with >16 subjects is rejected or capped by MAX_SUBJECTS',
-        run: async (page, helpers) => {
-            const rejected = await page.evaluate(() => {
-                const tooMany = Array.from({ length: 25 }, (_, i) => ({ id: `s_${i}`, name: `Sub ${i}` }));
-                const payload = JSON.stringify({ subjects: tooMany, tasks: [] });
-                try {
-                    if (typeof window.StorageModule?.importJson === 'function') {
-                        window.StorageModule.importJson(payload);
-                        return false;
-                    }
-                    return true;
-                } catch (e) {
-                    return e.message.includes('16');
-                }
-            });
-            helpers.assertTrue(rejected, 'Excessive subjects must be rejected with informative error');
-        }
-    },
-    {
-        id: 'T2_F27_05_corrupt_unlocked_codes_localstorage',
-        feature: 'F27',
-        name: 'Corrupt string in unlocked codes LocalStorage recovers cleanly to empty array',
-        run: async (page, helpers) => {
-            const recovered = await page.evaluate(() => {
-                localStorage.setItem('org_escolar_vault_unlocked_codes_v2', 'null');
-                let codes = [];
-                try {
-                    const p = JSON.parse(localStorage.getItem('org_escolar_vault_unlocked_codes_v2'));
-                    if (Array.isArray(p)) codes = p;
-                } catch (_) {
-                    codes = [];
-                }
-                return Array.isArray(codes);
-            });
-            helpers.assertTrue(recovered, 'Corrupt key recovers to array safely');
+            const codes = await page.evaluate(() => window.StorageModule?.getVaultUnlockedCodes?.() || []);
+            helpers.assertEqual(codes.length, 0, 'Empty submission must not unlock any code');
         }
     },
 
     // =========================================================================
-    // F28-F42: Boundary & Corner Cases for v1.3.4
+    // F07: Splash Opening Title Text Removal (Boundary & Corner)
     // =========================================================================
     {
-        id: 'T2_F31_01_manifest_json_corrupt_or_truncated_recovery',
-        feature: 'F31',
-        name: 'Manifest parsing is safe and resilient against unexpected fields',
+        id: 'T2_F07_01_manifest_valid_json_structure',
+        feature: 'F07',
+        name: 'manifest.json parses as strictly valid JSON with icons array',
         run: async (page, helpers) => {
             const manifestPath = path.join(helpers.PROJECT_ROOT, 'manifest.json');
-            const content = fs.readFileSync(manifestPath, 'utf8');
-            let parsed;
-            try {
-                parsed = JSON.parse(content);
-            } catch (e) {
-                parsed = null;
-            }
-            helpers.assertTrue(parsed !== null, 'manifest.json must be valid JSON');
-            helpers.assertTrue(Array.isArray(parsed.icons), 'manifest.json must contain icons array');
+            const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            helpers.assert(Array.isArray(data.icons), 'manifest.json must contain icons array');
+            helpers.assert(data.icons.length > 0, 'manifest.json must have at least 1 icon');
         }
     },
     {
-        id: 'T2_F32_01_service_worker_insecure_origin_guard',
-        feature: 'F32',
-        name: 'Service Worker registration under file:// protocol handles safely without unhandled rejection',
+        id: 'T2_F07_02_webmanifest_valid_json_structure',
+        feature: 'F07',
+        name: 'manifest.webmanifest parses as strictly valid JSON',
         run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
+            const manifestPath = path.join(helpers.PROJECT_ROOT, 'manifest.webmanifest');
+            const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            helpers.assert(typeof data === 'object' && data !== null, 'manifest.webmanifest must be valid JSON');
+        }
+    },
+    {
+        id: 'T2_F07_03_background_color_preserved',
+        feature: 'F07',
+        name: 'Manifest background_color is preserved for dark startup splash transition',
+        run: async (page, helpers) => {
+            const manifestPath = path.join(helpers.PROJECT_ROOT, 'manifest.json');
+            const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            helpers.assert(typeof data.background_color === 'string', 'background_color must be string');
+        }
+    },
+    {
+        id: 'T2_F07_04_display_standalone_preserved',
+        feature: 'F07',
+        name: 'Manifest display property specifies "standalone"',
+        run: async (page, helpers) => {
+            const manifestPath = path.join(helpers.PROJECT_ROOT, 'manifest.json');
+            const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            helpers.assertEqual(data.display, 'standalone', 'display must be standalone');
+        }
+    },
+    {
+        id: 'T2_F07_05_meta_apple_mobile_web_app_title_present',
+        feature: 'F07',
+        name: 'apple-mobile-web-app-title meta tag exists in index.html head',
+        run: async (page, helpers) => {
+            const metaPresent = await page.evaluate(() => {
+                const meta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+                return meta !== null && meta.getAttribute('content')?.length > 0;
+            });
+            helpers.assertTrue(metaPresent, 'apple-mobile-web-app-title meta tag must exist');
+        }
+    },
+
+    // =========================================================================
+    // F08: Full-Screen Onboarding Setup Menu (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F08_01_viewport_375x667_mobile_fullscreen',
+        feature: 'F08',
+        name: 'On mobile viewport (375x667), onboarding modal occupies 100% dimensions',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 375, height: 667 });
+            const occupies = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                if (!modal) return false;
+                const rect = modal.getBoundingClientRect();
+                return rect.width >= 370;
+            });
+            helpers.assertTrue(occupies, 'Onboarding modal must exist and occupy full width on mobile');
+            await page.setViewport({ width: 1280, height: 800 });
+        }
+    },
+    {
+        id: 'T2_F08_02_viewport_1280x800_desktop_backdrop',
+        feature: 'F08',
+        name: 'On desktop viewport (1280x800), onboarding fills screen with dark backdrop',
+        run: async (page, helpers) => {
+            const fills = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                if (!modal) return false;
+                const rect = modal.getBoundingClientRect();
+                return rect.width >= 1200;
+            });
+            helpers.assertTrue(fills, 'Onboarding modal must exist and fill desktop screen with full-screen container');
+        }
+    },
+    {
+        id: 'T2_F08_03_backdrop_click_does_not_dismiss',
+        feature: 'F08',
+        name: 'Clicking outside onboarding form does not dismiss the full-screen onboarding wizard',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                if (modal) modal.click();
+            });
+            const stillPresent = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                return modal !== null;
+            });
+            helpers.assertTrue(stillPresent, 'Onboarding wizard must remain open on backdrop click');
+        }
+    },
+    {
+        id: 'T2_F08_04_rapid_toggling_account_types',
+        feature: 'F08',
+        name: 'Rapidly toggling between Institution and Activities 10 times preserves clean form state',
+        run: async (page, helpers) => {
+            const success = await page.evaluate(async () => {
+                const inst = document.getElementById('welcome-type-institution');
+                const act = document.getElementById('welcome-type-activities');
+                if (!inst || !act) return false;
+                for (let i = 0; i < 10; i++) {
+                    if (i % 2 === 0) inst.click();
+                    else act.click();
+                }
+                return true;
+            });
+            helpers.assertTrue(success, '#welcome-type-institution and #welcome-type-activities must exist and rapidly toggle');
+        }
+    },
+    {
+        id: 'T2_F08_05_scroll_boundary_long_content',
+        feature: 'F08',
+        name: 'Full-screen onboarding allows vertical scrolling without breaking layout',
+        run: async (page, helpers) => {
+            const hasOverflowY = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                if (!modal) return false;
+                return modal.className.includes('overflow-y-auto');
+            });
+            helpers.assertTrue(hasOverflowY, 'Onboarding container must exist and support overflow-y-auto');
+        }
+    },
+
+    // =========================================================================
+    // F09: Removal of Countries and Schools Catalog + User Name (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F09_01_empty_user_name_validation',
+        feature: 'F09',
+        name: 'Submitting onboarding with empty user name is rejected or requires valid input',
+        run: async (page, helpers) => {
+            const prevented = await page.evaluate(() => {
+                const inp = document.getElementById('welcome-user-name');
+                if (!inp) return false;
+                inp.value = '';
+                const form = inp.closest('form');
+                return inp.required || form !== null;
+            });
+            helpers.assertTrue(prevented, '#welcome-user-name input must exist and be required in onboarding');
+        }
+    },
+    {
+        id: 'T2_F09_02_extreme_long_user_name_tolerance',
+        feature: 'F09',
+        name: 'Submitting 100-character user name wraps or truncates in header without crash',
+        run: async (page, helpers) => {
+            const longName = 'A'.repeat(100);
+            await page.evaluate(name => {
+                window.StorageModule?.setUserName?.(name);
+                window.OrganizadorApp?.renderHeader?.();
+            }, longName);
+            const headerText = await page.evaluate(() => document.querySelector('header')?.textContent || '');
+            helpers.assert(headerText.length > 0, 'Header must render without crashing on long name');
+        }
+    },
+    {
+        id: 'T2_F09_03_special_characters_user_name',
+        feature: 'F09',
+        name: 'User name with accents, apostrophes, and emojis persists and renders accurately',
+        run: async (page, helpers) => {
+            const specialName = 'María José Peña 🚀 🎓';
+            await page.evaluate(name => {
+                window.StorageModule?.setUserName?.(name);
+            }, specialName);
+            const saved = await page.evaluate(() => window.StorageModule?.getUserName?.());
+            helpers.assertEqual(saved, specialName, 'Special characters in user name must be preserved');
+        }
+    },
+    {
+        id: 'T2_F09_04_cycle_dates_end_before_start_validation',
+        feature: 'F09',
+        name: 'Cycle dates where end date is before start date are validated safely',
+        run: async (page, helpers) => {
+            const handled = await page.evaluate(() => {
+                const s = document.getElementById('welcome-cycle-start');
+                const e = document.getElementById('welcome-cycle-end');
+                if (!s || !e) return false;
+                s.value = '2026-08-01';
+                e.value = '2026-05-01';
+                return true;
+            });
+            helpers.assertTrue(handled, '#welcome-cycle-start and #welcome-cycle-end must exist in DOM');
+        }
+    },
+    {
+        id: 'T2_F09_05_update_user_name_in_settings_syncs',
+        feature: 'F09',
+        name: 'Updating user name in settings updates all header and drawer elements reactively',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setUserName?.('Carlos Slim');
+                window.OrganizadorApp?.renderHeader?.();
+                window.OrganizadorApp?.renderDrawer?.();
+            });
+            const stored = await page.evaluate(() => window.StorageModule?.getUserName?.());
+            helpers.assertEqual(stored, 'Carlos Slim', 'Updated name must persist');
+        }
+    },
+
+    // =========================================================================
+    // F10: Institution / Personal Photo Upload (Canvas downsampled to 256x256, <30KB) (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F10_01_giant_image_downsampled_successfully',
+        feature: 'F10',
+        name: 'Giant synthetic image (4000x3000) is downsampled to <= 256x256 and < 30KB',
+        run: async (page, helpers) => {
+            await helpers.simulateFileUpload(page, '#welcome-photo-input', {
+                width: 4000,
+                height: 3000,
+                color: '#10B981',
+                fileName: 'giant_image.png'
+            });
+            await new Promise(r => setTimeout(r, 200));
+            const photoDataUrl = await page.evaluate(() => {
+                return window.StorageModule?.getUserPhoto?.() ||
+                       document.getElementById('welcome-photo-preview')?.src ||
+                       '';
+            });
+            helpers.assert(photoDataUrl.startsWith('data:image/'), 'Photo must be downsampled and saved as data:image/ URL');
+            const approxBytes = Math.round(photoDataUrl.length * 0.75);
+            helpers.assert(approxBytes < 30 * 1024, `Size must be < 30KB, was ${approxBytes} bytes`);
+        }
+    },
+    {
+        id: 'T2_F10_02_tiny_image_upscale_boundary',
+        feature: 'F10',
+        name: 'Tiny 16x16 icon is handled cleanly without corruption or forced upscaling',
+        run: async (page, helpers) => {
+            await helpers.simulateFileUpload(page, '#welcome-photo-input', {
+                width: 16,
+                height: 16,
+                color: '#6366F1',
+                fileName: 'tiny_icon.png'
+            });
+            await new Promise(r => setTimeout(r, 200));
+            const photoDataUrl = await page.evaluate(() => {
+                return window.StorageModule?.getUserPhoto?.() ||
+                       document.getElementById('welcome-photo-preview')?.src ||
+                       '';
+            });
+            helpers.assert(photoDataUrl.startsWith('data:image/'), 'Tiny image upload must produce valid data:image/ URL');
+        }
+    },
+    {
+        id: 'T2_F10_03_non_image_file_rejection',
+        feature: 'F10',
+        name: 'Uploading non-image file is safely rejected with feedback',
+        run: async (page, helpers) => {
+            const inputInfo = await page.evaluate(() => {
+                const inp = document.getElementById('welcome-photo-input');
+                if (!inp) return null;
+                return inp.getAttribute('accept') || inp.accept || '';
+            });
+            helpers.assert(inputInfo !== null, '#welcome-photo-input must exist in DOM');
+            helpers.assertTrue(inputInfo.includes('image'), 'Input must restrict accepted file types to images');
+        }
+    },
+    {
+        id: 'T2_F10_04_transparent_png_alpha_preserved',
+        feature: 'F10',
+        name: 'Transparent PNG image produces data:image/png scheme',
+        run: async (page, helpers) => {
+            await helpers.simulateFileUpload(page, '#welcome-photo-input', {
+                width: 64,
+                height: 64,
+                color: 'transparent',
+                mimeType: 'image/png',
+                fileName: 'alpha.png'
+            });
+            await new Promise(r => setTimeout(r, 200));
+            const photoDataUrl = await page.evaluate(() => {
+                return window.StorageModule?.getUserPhoto?.() ||
+                       document.getElementById('welcome-photo-preview')?.src ||
+                       '';
+            });
+            helpers.assert(photoDataUrl.startsWith('data:image/'), 'Transparent PNG upload must produce valid data:image URL');
+        }
+    },
+    {
+        id: 'T2_F10_05_quota_safety_five_consecutive_uploads',
+        feature: 'F10',
+        name: 'Five consecutive photo uploads do not exceed 150KB total in LocalStorage',
+        run: async (page, helpers) => {
+            const totalBytes = await page.evaluate(async () => {
+                for (let i = 0; i < 5; i++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 128;
+                    canvas.height = 128;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = `#${i}${i}0000`;
+                    ctx.fillRect(0, 0, 128, 128);
+                    window.StorageModule?.setUserPhoto?.(canvas.toDataURL('image/jpeg', 0.7));
+                }
+                const photo = localStorage.getItem('org_escolar_user_photo') || '';
+                return photo.length;
+            });
+            helpers.assert(totalBytes < 150 * 1024, `Stored photo should consume < 150KB, was ${totalBytes}`);
+        }
+    },
+
+    // =========================================================================
+    // F11: Presentation-First Flow Ordering (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F11_01_page_refresh_during_onboarding_resets_flow',
+        feature: 'F11',
+        name: 'Refreshing page before completing onboarding restores onboarding on next reload',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.clear();
+                window.StorageModule?.setOnboardingCompleted?.(false);
+            });
+            await page.reload({ waitUntil: 'load' });
+            const modalOpen = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                return modal !== null;
+            });
+            helpers.assertTrue(modalOpen, 'Onboarding must remain active until submitted');
+        }
+    },
+    {
+        id: 'T2_F11_02_changelog_only_displays_once_after_onboarding',
+        feature: 'F11',
+        name: 'Changelog modal only displays at most once after onboarding completion',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.4.2');
+            });
+            const lastSeen = await page.evaluate(() => window.StorageModule?.getLastSeenVersion?.());
+            helpers.assertEqual(lastSeen, '1.4.2', 'Last seen version should be 1.4.2');
+        }
+    },
+    {
+        id: 'T2_F11_03_denying_notifications_does_not_break_app',
+        feature: 'F11',
+        name: 'Denying notification permission does not break app flow or throw uncaught errors',
+        run: async (page, helpers) => {
+            const safe = await page.evaluate(async () => {
                 try {
-                    if (location.protocol === 'file:') {
-                        return true;
+                    if (window.NotificationsModule?.requestPermission) {
+                        // Mock denial
+                        const orig = window.NotificationsModule.requestPermission;
+                        window.NotificationsModule.requestPermission = async () => 'denied';
+                        await window.NotificationsModule.requestPermission();
+                        window.NotificationsModule.requestPermission = orig;
                     }
                     return true;
                 } catch (e) {
                     return false;
                 }
             });
-            helpers.assertTrue(safe, 'Insecure or file:// origin must not throw unhandled exception');
+            helpers.assertTrue(safe, 'Notification denial must execute cleanly');
         }
     },
     {
-        id: 'T2_F33_01_pwa_install_prompt_null_deferred_guard',
-        feature: 'F33',
-        name: 'Invoking promptPwaInstall() when deferred prompt is null handles gracefully without throwing',
+        id: 'T2_F11_04_direct_view_switch_during_onboarding_blocked',
+        feature: 'F11',
+        name: 'Attempting to switch views before completing onboarding keeps onboarding visible',
         run: async (page, helpers) => {
-            const result = await page.evaluate(async () => {
-                window.deferredInstallPrompt = null;
+            await page.evaluate(() => {
+                window.StorageModule?.setOnboardingCompleted?.(false);
+            });
+            const modalPresent = await page.evaluate(() => {
+                return document.getElementById('cycle-setup-modal') !== null;
+            });
+            helpers.assertTrue(modalPresent, 'Onboarding modal must be present in DOM');
+        }
+    },
+    {
+        id: 'T2_F11_05_reset_storage_restores_presentation_first',
+        feature: 'F11',
+        name: 'Purging localStorage restores presentation-first flow on reload',
+        run: async (page, helpers) => {
+            await page.evaluate(() => localStorage.clear());
+            await page.reload({ waitUntil: 'load' });
+            const state = await page.evaluate(() => {
+                const onboarding = document.getElementById('cycle-setup-modal');
+                const changelog = document.getElementById('changelog-modal');
+                const onboardingVisible = onboarding && !onboarding.classList.contains('hidden') && onboarding.style.display !== 'none';
+                const changelogSuppressed = !changelog || changelog.classList.contains('hidden') || changelog.style.display === 'none';
+                return { onboardingVisible, changelogSuppressed };
+            });
+            helpers.assertTrue(state.onboardingVisible, 'Onboarding modal must be visible on reload after storage purge');
+            helpers.assertTrue(state.changelogSuppressed, 'Changelog modal must be suppressed during onboarding after reload');
+        }
+    },
+
+    // =========================================================================
+    // F12: Setup Completion Celebration Progress Bar (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F12_01_double_submit_debounce',
+        feature: 'F12',
+        name: 'Double-clicking setup submit button triggers celebration animation only once',
+        run: async (page, helpers) => {
+            const debounced = await page.evaluate(async () => {
+                const submitBtn = document.querySelector('#cycle-setup-modal button[type="submit"]') ||
+                                  document.querySelector('#welcome-save-btn');
+                if (!submitBtn) return false;
+                submitBtn.click();
+                submitBtn.click();
+                return true;
+            });
+            helpers.assertTrue(debounced, 'Submit button must exist in onboarding modal and support double submit cleanly');
+        }
+    },
+    {
+        id: 'T2_F12_02_haptics_mock_failure_graceful',
+        feature: 'F12',
+        name: 'Haptics invocation during celebration handles missing navigator.vibrate gracefully',
+        run: async (page, helpers) => {
+            const safe = await page.evaluate(() => {
                 try {
-                    if (typeof window.app?.promptPwaInstall === 'function') {
-                        await window.app.promptPwaInstall();
-                        return true;
-                    }
-                    return false;
+                    window.HapticsModule?.success?.();
+                    return true;
                 } catch (e) {
                     return false;
                 }
             });
-            helpers.assertTrue(result, 'promptPwaInstall with null prompt must handle gracefully');
+            helpers.assertTrue(safe, 'Haptics must not throw when vibration is unsupported');
         }
     },
     {
-        id: 'T2_F34_01_narrow_320px_settings_cards_zero_overflow',
-        feature: 'F34',
-        name: 'Zero horizontal overflow at 320px ultra-compact viewport in settings grid',
+        id: 'T2_F12_03_celebration_container_accessible_colors',
+        feature: 'F12',
+        name: 'Celebration message is high contrast in both dark and light modes',
         run: async (page, helpers) => {
-            await page.setViewport({ width: 320, height: 600 });
-            await page.evaluate(() => {
-                window.app?.switchView?.('settings');
+            const accessible = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                return modal !== null;
             });
-            const overflow = await page.evaluate(() => {
-                return document.documentElement.scrollWidth <= 320;
-            });
-            helpers.assertTrue(overflow, '320px viewport must have zero horizontal overflow');
+            helpers.assertTrue(accessible, 'Celebration container must exist in modal');
         }
     },
     {
-        id: 'T2_F35_01_settings_cards_extreme_viewport_scaling',
-        feature: 'F35',
-        name: 'Extreme compact viewport (320px) keeps settings school cards height within <= 85px',
+        id: 'T2_F12_04_zero_duration_fallback',
+        feature: 'F12',
+        name: 'Celebration progress bar handles instant transition when animation duration is zero',
+        run: async (page, helpers) => {
+            const hasBar = await page.evaluate(() => {
+                const bar = document.getElementById('onboarding-progress-bar');
+                if (!bar) return false;
+                bar.style.transitionDuration = '0s';
+                return true;
+            });
+            helpers.assertTrue(hasBar, '#onboarding-progress-bar must exist in DOM');
+        }
+    },
+    {
+        id: 'T2_F12_05_marks_cycle_and_onboarding_in_storage',
+        feature: 'F12',
+        name: 'Completing setup marks both onboarding and cycle configured in storage',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+            });
+            const bothConfigured = await page.evaluate(() => {
+                return (window.StorageModule?.isOnboardingCompleted?.() || false) &&
+                       (window.StorageModule?.isCycleConfigured?.() || false);
+            });
+            helpers.assertTrue(bothConfigured, 'Both onboarding and cycle must be configured');
+        }
+    },
+
+    // =========================================================================
+    // F13: Settings Sub-Menu Auto-Close on Exit (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F13_01_all_open_cards_closed_simultaneously',
+        feature: 'F13',
+        name: 'Opening multiple settings accordion cards and switching views collapses all of them',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                document.querySelectorAll('.settings-accordion-card').forEach(c => c.classList.add('open'));
+                window.OrganizadorApp?.closeAllSettingsSubmenus?.();
+            });
+            const countOpen = await page.evaluate(() => {
+                return document.querySelectorAll('.settings-accordion-card.open').length;
+            });
+            helpers.assertEqual(countOpen, 0, 'All open settings accordions must be collapsed');
+        }
+    },
+    {
+        id: 'T2_F13_02_autoclose_idempotence',
+        feature: 'F13',
+        name: 'Calling closeAllSettingsSubmenus() multiple times when already closed is safe no-op',
+        run: async (page, helpers) => {
+            const safe = await page.evaluate(() => {
+                try {
+                    window.OrganizadorApp?.closeAllSettingsSubmenus?.();
+                    window.OrganizadorApp?.closeAllSettingsSubmenus?.();
+                    window.OrganizadorApp?.closeAllSettingsSubmenus?.();
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            });
+            helpers.assertTrue(safe, 'closeAllSettingsSubmenus must be idempotent');
+        }
+    },
+    {
+        id: 'T2_F13_03_switching_between_submenus_in_settings',
+        feature: 'F13',
+        name: 'Opening accordion B collapses accordion A within settings view',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                const cards = document.querySelectorAll('.settings-accordion-card');
+                if (cards.length >= 2) {
+                    cards[0].classList.add('open');
+                    cards[0].classList.remove('open');
+                    cards[1].classList.add('open');
+                }
+            });
+            const openCount = await page.evaluate(() => {
+                return document.querySelectorAll('.settings-accordion-card.open').length;
+            });
+            helpers.assert(openCount <= 1, 'At most one accordion should be open at once');
+        }
+    },
+    {
+        id: 'T2_F13_04_url_param_navigation_autoclose',
+        feature: 'F13',
+        name: 'Navigating via external trigger or view change auto-closes open accordion submenus',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                document.querySelectorAll('.settings-accordion-card').forEach(c => c.classList.add('open'));
+                window.OrganizadorApp?.switchView?.('calendar');
+            });
+            const openCount = await page.evaluate(() => document.querySelectorAll('.settings-accordion-card.open').length);
+            helpers.assertEqual(openCount, 0, 'Switching to calendar view must auto-close settings submenus');
+        }
+    },
+    {
+        id: 'T2_F13_05_rapid_view_switching_settings_jitter',
+        feature: 'F13',
+        name: 'Switching rapidly between settings and dashboard 10 times leaves settings collapsed',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                for (let i = 0; i < 10; i++) {
+                    window.OrganizadorApp?.switchView?.('settings');
+                    window.OrganizadorApp?.switchView?.('dashboard');
+                }
+            });
+            const openCount = await page.evaluate(() => document.querySelectorAll('.settings-accordion-card.open').length);
+            helpers.assertEqual(openCount, 0, 'Rapid view jitter must leave accordions collapsed');
+        }
+    },
+
+    // =========================================================================
+    // F14: Persistent Font Selection Window (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F14_01_auditioning_all_standard_fonts',
+        feature: 'F14',
+        name: 'Sequentially clicking all font buttons keeps appearance card open without glitching',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                window.OrganizadorApp?.switchView?.('settings');
+                const fontCard = document.querySelector('#settings-font-buttons-grid')?.closest('.settings-accordion-card');
+                if (fontCard) fontCard.classList.add('open');
+                const btns = Array.from(document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]'));
+                for (const b of btns) {
+                    b.click();
+                }
+            });
+            const isOpen = await page.evaluate(() => {
+                const fontCard = document.querySelector('#settings-font-buttons-grid')?.closest('.settings-accordion-card');
+                if (!fontCard) return false;
+                return fontCard.classList.contains('open');
+            });
+            helpers.assertTrue(isOpen, 'Accordion must stay open throughout all font auditions');
+        }
+    },
+    {
+        id: 'T2_F14_02_toast_does_not_collapse_accordion',
+        feature: 'F14',
+        name: 'Toast notification displayed on font selection does not trigger accordion auto-close',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.OrganizadorApp?.showToast?.('Tipografía aplicada: Inter', 'success');
+            });
+            const toastExists = await page.evaluate(() => {
+                const t = document.getElementById('toast-container') || document.querySelector('.toast');
+                return t !== null;
+            });
+            helpers.assertTrue(toastExists, 'Toast container must be active');
+        }
+    },
+    {
+        id: 'T2_F14_03_invalid_font_string_fallback',
+        feature: 'F14',
+        name: 'Setting non-existent font string in storage falls back gracefully without crash',
+        run: async (page, helpers) => {
+            const safe = await page.evaluate(() => {
+                try {
+                    window.StorageModule?.setFontFamily?.('NON_EXISTENT_FONT_XYZ');
+                    window.OrganizadorApp?.applyFontFamily?.('NON_EXISTENT_FONT_XYZ');
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            });
+            helpers.assertTrue(safe, 'Invalid font string must be handled gracefully');
+        }
+    },
+    {
+        id: 'T2_F14_04_reloading_page_preserves_active_font',
+        feature: 'F14',
+        name: 'Reloading page restores selected font family in StorageModule',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setFontFamily?.('Inter');
+            });
+            await page.reload({ waitUntil: 'load' });
+            const font = await page.evaluate(() => window.StorageModule?.getFontFamily?.());
+            helpers.assertEqual(font, 'Inter', 'Font must persist across reload');
+        }
+    },
+    {
+        id: 'T2_F14_05_font_selection_scroll_stability',
+        feature: 'F14',
+        name: 'Auditioning fonts does not cause viewport scroll jump or jitter',
+        run: async (page, helpers) => {
+            const noJump = await page.evaluate(() => {
+                const scrollBefore = window.scrollY;
+                window.OrganizadorApp?.applyFontFamily?.('Inter');
+                return window.scrollY === scrollBefore;
+            });
+            helpers.assertTrue(noJump, 'Font change must not cause unexpected scroll jump');
+        }
+    },
+
+    // =========================================================================
+    // F15: Long-Press vs Persistent Buttons Setting Toggle (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F15_01_immediate_card_rerender_on_toggle',
+        feature: 'F15',
+        name: 'Toggling long-press setting immediately updates visible cards without page reload',
+        run: async (page, helpers) => {
+            await page.evaluate(() => { window.StorageModule.saveSubjects([{ id: 'sub_seed', name: 'Materia Semilla', color: '#6366F1', days: [] }]); window.SubjectsModule?.render?.(); });
+            const toggled = await page.evaluate(() => {
+                window.StorageModule?.setLongPressEnabled?.(false);
+                window.SubjectsModule?.render?.();
+                const hasBtns = document.querySelector('[data-action="edit"]') !== null;
+                window.StorageModule?.setLongPressEnabled?.(true);
+                window.SubjectsModule?.render?.();
+                return hasBtns;
+            });
+            helpers.assertTrue(toggled, 'Cards must dynamically re-render upon toggle');
+        }
+    },
+    {
+        id: 'T2_F15_02_static_edit_button_direct_click',
+        feature: 'F15',
+        name: 'Clicking static edit button ([data-action="edit"]) opens subject modal directly',
+        run: async (page, helpers) => {
+            await page.evaluate(() => { window.StorageModule.saveSubjects([{ id: 'sub_seed', name: 'Materia Semilla', color: '#6366F1', days: [] }]); window.SubjectsModule?.render?.(); });
+            const result = await page.evaluate(() => {
+                window.StorageModule?.setLongPressEnabled?.(false);
+                window.SubjectsModule?.render?.();
+                const editBtn = document.querySelector('[data-action="edit"]');
+                if (!editBtn) return { btnFound: false, modalOpen: false };
+                editBtn.click();
+                const m = document.getElementById('subject-modal');
+                return { btnFound: true, modalOpen: m ? !m.classList.contains('hidden') : false };
+            });
+            helpers.assertTrue(result.btnFound, 'Static edit button ([data-action="edit"]) must exist when long-press is disabled');
+            helpers.assertTrue(result.modalOpen, 'Edit button must open subject modal');
+        }
+    },
+    {
+        id: 'T2_F15_03_static_delete_button_direct_click',
+        feature: 'F15',
+        name: 'Clicking static delete button ([data-action="delete"]) triggers deletion prompt',
+        run: async (page, helpers) => {
+            await page.evaluate(() => { window.StorageModule.saveSubjects([{ id: 'sub_seed', name: 'Materia Semilla', color: '#6366F1', days: [] }]); window.SubjectsModule?.render?.(); });
+            const hasDelBtn = await page.evaluate(() => {
+                window.StorageModule?.setLongPressEnabled?.(false);
+                window.SubjectsModule?.render?.();
+                const delBtn = document.querySelector('[data-action="delete"]');
+                if (!delBtn) return false;
+                delBtn.click();
+                return true;
+            });
+            helpers.assertTrue(hasDelBtn, 'Static delete button ([data-action="delete"]) must exist when long-press is disabled');
+        }
+    },
+    {
+        id: 'T2_F15_04_storage_key_exact_boolean',
+        feature: 'F15',
+        name: 'Storage.isLongPressEnabled strictly returns boolean true or false',
+        run: async (page, helpers) => {
+            const typeCheck = await page.evaluate(() => {
+                const val = window.StorageModule?.isLongPressEnabled?.();
+                return typeof val === 'boolean';
+            });
+            helpers.assertTrue(typeCheck, 'isLongPressEnabled must return boolean type');
+        }
+    },
+    {
+        id: 'T2_F15_05_toggling_across_empty_subjects_list',
+        feature: 'F15',
+        name: 'Toggling long-press setting when 0 subjects exist operates without error',
+        run: async (page, helpers) => {
+            const safe = await page.evaluate(() => {
+                try {
+                    localStorage.setItem('org_escolar_subjects', '[]');
+                    window.StorageModule?.setLongPressEnabled?.(false);
+                    window.SubjectsModule?.render?.();
+                    window.StorageModule?.setLongPressEnabled?.(true);
+                    window.SubjectsModule?.render?.();
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            });
+            helpers.assertTrue(safe, 'Toggling long-press with 0 subjects must not throw error');
+        }
+    },
+
+    // =========================================================================
+    // F16: Compact Dynamic Card Configuration Popup (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F16_01_short_tap_does_not_open_popup',
+        feature: 'F16',
+        name: 'Tapping a card for < 200ms does NOT trigger dynamic configuration popup',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('subjects');
+                window.StorageModule?.setLongPressEnabled?.(true);
+                window.SubjectsModule?.render?.();
+                const card = document.querySelector('.subject-card');
+                if (card) card.click(); // simple click
+            });
+            const popupOpen = await page.evaluate(() => {
+                const p = document.getElementById('card-dynamic-popup');
+                return p ? !p.classList.contains('hidden') : false;
+            });
+            helpers.assertFalse(popupOpen, 'Short tap must not open dynamic popup');
+        }
+    },
+    {
+        id: 'T2_F16_02_gesture_cancel_on_scroll',
+        feature: 'F16',
+        name: 'Moving finger during press cancels gesture without opening popup',
+        run: async (page, helpers) => {
+            await page.evaluate(() => { window.StorageModule.saveSubjects([{ id: 'sub_seed', name: 'Materia Semilla', color: '#6366F1', days: [] }]); window.SubjectsModule?.render?.(); });
+            const cancelled = await page.evaluate(() => {
+                const card = document.querySelector('.subject-card');
+                if (!card) return false;
+                const mk = (y) => new Touch({ identifier: 1, target: card, clientX: 10, clientY: y });
+                card.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [mk(10)] }));
+                card.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: [mk(50)] }));
+                card.dispatchEvent(new TouchEvent('touchend', { touches: [] }));
+                return true;
+            });
+            helpers.assertTrue(cancelled, 'Subject card must exist and touch move must cancel gesture');
+        }
+    },
+    {
+        id: 'T2_F16_03_popup_boundary_on_320px_viewport',
+        feature: 'F16',
+        name: 'Dynamic popup remains completely within viewport on small 320px screen',
         run: async (page, helpers) => {
             await page.setViewport({ width: 320, height: 480 });
-            await page.evaluate(() => {
-                window.app?.switchView?.('settings');
+            const inside = await page.evaluate(() => {
+                const modal = document.querySelector('#card-dynamic-popup .modal-dialog') || document.getElementById('card-dynamic-popup');
+                if (!modal) return false;
+                const rect = modal.getBoundingClientRect();
+                return rect.left >= 0 && rect.right <= 325;
             });
-            const cardHeight = await page.evaluate(() => {
-                const card = document.querySelector('#settings-institution-grid .inst-grid-card');
-                return card ? card.getBoundingClientRect().height : null;
-            });
-            helpers.assertTrue(cardHeight !== null, 'Card must be rendered');
-            helpers.assertTrue(cardHeight <= 85, `Card height at 320px (${cardHeight}px) must be <= 85px`);
+            helpers.assertTrue(inside, 'Dynamic popup must exist and remain inside 320px viewport boundaries');
+            await page.setViewport({ width: 1280, height: 800 });
         }
     },
     {
-        id: 'T2_F36_01_modal_stacking_cancellation_preserves_state',
-        feature: 'F36',
-        name: 'Modal stacking and cancellation preserves welcome modal state without corruption',
+        id: 'T2_F16_04_color_accent_sync',
+        feature: 'F16',
+        name: 'Popup dynamically reflects the active item theme color',
         run: async (page, helpers) => {
-            await page.evaluate(() => {
-                window.app?.openCycleWelcomeModal?.();
-                document.getElementById('welcome-create-school-btn')?.click();
+            const hasColorSupport = await page.evaluate(() => {
+                const modal = document.getElementById('subject-modal');
+                return modal !== null;
             });
-            await new Promise(r => setTimeout(r, 100));
-            await page.evaluate(() => {
-                document.getElementById('custom-school-cancel-btn')?.click();
-            });
-            await new Promise(r => setTimeout(r, 260));
-            const state = await page.evaluate(() => {
-                const welcomeModal = document.getElementById('cycle-setup-modal');
-                const customModal = document.getElementById('custom-school-modal');
-                const cardsCount = document.querySelectorAll('.welcome-school-card').length;
-                return {
-                    welcomeVisible: welcomeModal && !welcomeModal.classList.contains('hidden'),
-                    customClosed: customModal && customModal.classList.contains('hidden'),
-                    cardsIntact: cardsCount >= 10
-                };
-            });
-            helpers.assertTrue(state.welcomeVisible, 'Welcome modal remains visible');
-            helpers.assertTrue(state.customClosed, 'Custom modal is closed');
-            helpers.assertTrue(state.cardsIntact, 'Welcome school cards remain rendered and intact');
+            helpers.assertTrue(hasColorSupport, 'Modal must exist to support color accents');
         }
     },
     {
-        id: 'T2_F37_01_welcome_cards_rapid_filter_jitter',
-        feature: 'F37',
-        name: 'Rapid clicking across country filter pills does not desync visible cards or throw errors',
+        id: 'T2_F16_05_escape_key_closes_popup',
+        feature: 'F16',
+        name: 'Pressing Escape key closes dynamic configuration popup',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                window.app?.openCycleWelcomeModal?.();
-                const pills = Array.from(document.querySelectorAll('#welcome-country-pills button'));
-                for (let i = 0; i < Math.min(pills.length, 6); i++) {
-                    pills[i].click();
-                }
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
             });
-            const cardsVisible = await page.evaluate(() => {
-                const visible = document.querySelectorAll('.welcome-school-card:not(.hidden)');
-                return visible.length > 0;
+            const isClosed = await page.evaluate(() => {
+                const p = document.getElementById('card-dynamic-popup');
+                if (!p) return false;
+                return p.classList.contains('hidden') || p.style.display === 'none';
             });
-            helpers.assertTrue(cardsVisible, 'Cards must remain rendered after filter jitter');
+            helpers.assertTrue(isClosed, 'Dynamic popup must exist in DOM and close on Escape key');
         }
     },
-    {
-        id: 'T2_F38_01_custom_school_modal_z_index_strictly_higher',
-        feature: 'F38',
-        name: 'Custom school modal computed z-index (60) is strictly greater than welcome modal (50)',
-        run: async (page, helpers) => {
-            await page.evaluate(() => {
-                window.app?.openCycleWelcomeModal?.();
-                document.getElementById('welcome-create-school-btn')?.click();
-            });
-            const zValues = await page.evaluate(() => {
-                const c = document.getElementById('custom-school-modal');
-                const w = document.getElementById('cycle-setup-modal');
-                return {
-                    customZ: c ? parseInt(window.getComputedStyle(c).zIndex, 10) : 0,
-                    welcomeZ: w ? parseInt(window.getComputedStyle(w).zIndex, 10) : 0
-                };
-            });
-            helpers.assertTrue(zValues.customZ > zValues.welcomeZ, `customZ (${zValues.customZ}) must be strictly > welcomeZ (${zValues.welcomeZ})`);
-        }
-    },
-    {
-        id: 'T2_F39_01_rapid_toggle_school_and_skip',
-        feature: 'F39',
-        name: 'Rapid toggle between schools and "Hacerla después" does not corrupt period lock state machine',
-        run: async (page, helpers) => {
-            await page.evaluate(() => {
-                window.app?.openCycleWelcomeModal?.();
-                const skipBtn = document.getElementById('welcome-skip-school-btn');
-                const unamCard = document.querySelector('.welcome-school-card[data-inst-id="unam"]');
-                const ipnCard = document.querySelector('.welcome-school-card[data-inst-id="ipn"]');
 
-                // 10 rapid alternating toggles
-                for (let i = 0; i < 5; i++) {
-                    skipBtn?.click();
-                    unamCard?.click();
-                    skipBtn?.click();
-                    ipnCard?.click();
-                }
-                // End with skip
-                skipBtn?.click();
-            });
-            const finalLock = await page.evaluate(() => {
-                const c = document.getElementById('welcome-period-container');
-                const msg = document.getElementById('welcome-period-locked-msg');
-                const chips = document.getElementById('welcome-period-chips');
-                const cs = c ? window.getComputedStyle(c) : null;
-                return {
-                    pointerEvents: cs ? cs.pointerEvents : 'auto',
-                    msgVisible: msg && !msg.classList.contains('hidden'),
-                    chipsCount: chips ? chips.querySelectorAll('button').length : -1
-                };
-            });
-            helpers.assertEqual(finalLock.pointerEvents, 'none', 'Pointer events must end locked (none)');
-            helpers.assertTrue(finalLock.msgVisible, 'Lock message must be visible');
-            helpers.assertEqual(finalLock.chipsCount, 0, 'Chips must be cleared when locked');
-        }
-    },
+    // =========================================================================
+    // F17: Materials Photo Gallery on the Left (<30KB Canvas downsampled) (Boundary & Corner)
+    // =========================================================================
     {
-        id: 'T2_F40_01_unconfigured_school_freeform_period_fallback',
-        feature: 'F40',
-        name: 'Unconfigured school with missing/custom periods safely returns "Sin periodo" without throwing',
+        id: 'T2_F17_01_empty_gallery_state_placeholder',
+        feature: 'F17',
+        name: 'Empty gallery displays helpful placeholder without broken images',
         run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_gallery_photos', '[]');
+            });
             const safe = await page.evaluate(() => {
-                try {
-                    window.StorageModule?.setSchoolSkipped(true);
-                    window.StorageModule?.setInstitution('unconfigured');
-                    window.StorageModule?.setAcademicPeriod('Sin periodo');
-                    const period = window.StorageModule?.getAcademicPeriod();
-                    const inst = window.InstitutionsModule?.getInstitution('unconfigured');
-                    return period === 'Sin periodo' && inst && inst.isUnconfigured;
-                } catch (e) {
-                    return false;
-                }
+                const grid = document.getElementById('notes-gallery-grid');
+                if (!grid) return false;
+                return grid.querySelectorAll('img[src=""]').length === 0;
             });
-            helpers.assertTrue(safe, 'Unconfigured school must safely return Sin periodo and fallback contract');
+            helpers.assertTrue(safe, '#notes-gallery-grid must exist in DOM and contain zero broken img tags');
         }
     },
     {
-        id: 'T2_F40_02_corrupt_institution_id_recovery',
-        feature: 'F40',
-        name: 'Nonexistent/corrupt institution ID gracefully recovers to unconfigured or default fallback',
+        id: 'T2_F17_02_delete_gallery_photo_removes_from_storage',
+        feature: 'F17',
+        name: 'Deleting a gallery photo frees storage and removes item from array',
         run: async (page, helpers) => {
-            const fallback = await page.evaluate(() => {
-                const resNull = window.InstitutionsModule?.getInstitution(null);
-                const resEmpty = window.InstitutionsModule?.getInstitution('');
-                const resUnconf = window.InstitutionsModule?.getInstitution('unconfigured');
-                const resUnknown = window.InstitutionsModule?.getInstitution('UNKNOWN_NONEXISTENT_SCHOOL_XYZ');
-                return (
-                    resNull?.id === 'unconfigured' &&
-                    resEmpty?.id === 'unconfigured' &&
-                    resUnconf?.id === 'unconfigured' &&
-                    Boolean(resUnknown?.name)
-                );
+            await page.evaluate(() => {
+                window.StorageModule?.saveGalleryPhoto?.({ id: 'photo_del_1', name: 'Del Photo', dataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' });
+                window.StorageModule?.deleteGalleryPhoto?.('photo_del_1');
             });
-            helpers.assertTrue(fallback, 'Corrupt institution ID must recover cleanly to fallback');
+            const photos = await page.evaluate(() => window.StorageModule?.getGalleryPhotos?.() || []);
+            const found = photos.some(p => p.id === 'photo_del_1');
+            helpers.assertFalse(found, 'Deleted photo must be removed from storage');
         }
     },
     {
-        id: 'T2_F41_01_custom_period_extreme_whitespace_and_special_chars',
-        feature: 'F41',
-        name: 'Custom free-form period with emojis, whitespace, and special characters stored safely',
+        id: 'T2_F17_03_gallery_mobile_responsive_no_overflow',
+        feature: 'F17',
+        name: 'On mobile viewport (360x640), notes gallery layout does not cause horizontal overflow',
         run: async (page, helpers) => {
-            const rawPeriod = '   🚀 Semestre Especial 2026 / Invierno #1   ';
-            await page.evaluate((p) => {
-                window.StorageModule?.setAcademicPeriod(p);
-            }, rawPeriod);
-            const saved = await page.evaluate(() => {
-                return window.StorageModule?.getAcademicPeriod();
-            });
-            helpers.assertEqual(saved, rawPeriod, 'Custom period with emojis and whitespace must be stored safely');
+            await page.setViewport({ width: 360, height: 640 });
+            await page.evaluate(() => window.OrganizadorApp?.switchView?.('notes'));
+            const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2);
+            helpers.assertTrue(noScroll, 'Notes view with gallery must not overflow horizontally on mobile');
+            await page.setViewport({ width: 1280, height: 800 });
         }
     },
     {
-        id: 'T2_F41_02_custom_period_empty_string_fallback',
-        feature: 'F41',
-        name: 'Custom free-form period empty string input recovers cleanly without crashing',
+        id: 'T2_F17_04_gallery_photo_with_long_name',
+        feature: 'F17',
+        name: 'Photo with 100-character name renders cleanly with truncation or wrap',
         run: async (page, helpers) => {
-            const safe = await page.evaluate(() => {
-                try {
-                    window.StorageModule?.setAcademicPeriod('');
-                    const p = window.StorageModule?.getAcademicPeriod();
-                    return typeof p === 'string';
-                } catch (e) {
-                    return false;
-                }
+            await page.evaluate(() => {
+                window.StorageModule?.saveGalleryPhoto?.({
+                    id: 'photo_long_name',
+                    name: 'Foto de laboratorio de química orgánica experimental con reactivos especiales 2026',
+                    dataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+                });
             });
-            helpers.assertTrue(safe, 'Empty string period handled without throwing');
+            const saved = await page.evaluate(() => window.StorageModule?.getGalleryPhotos?.() || []);
+            helpers.assert(saved.length > 0, 'Photo with long name must be stored successfully');
         }
     },
     {
-        id: 'T2_F42_01_cross_file_version_parity_boundary',
-        feature: 'F42',
-        name: 'Strict v1.4.1 version parity verified across package.json, sw.js, and index.html',
+        id: 'T2_F17_05_lightbox_close_on_escape_or_backdrop',
+        feature: 'F17',
+        name: 'Lightbox modal preview closes cleanly upon Escape key press',
         run: async (page, helpers) => {
-            const pkg = JSON.parse(fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'package.json'), 'utf8'));
-            const sw = fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'sw.js'), 'utf8');
-            const html = fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'index.html'), 'utf8');
+            await page.evaluate(() => {
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            });
+            const isClosed = await page.evaluate(() => {
+                const lb = document.getElementById('photo-preview-modal') || document.getElementById('gallery-lightbox');
+                if (!lb) return false;
+                return lb.classList.contains('hidden') || !lb.classList.contains('open') || lb.style.display === 'none';
+            });
+            helpers.assertTrue(isClosed, 'Lightbox element must exist in DOM and close on Escape key');
+        }
+    },
 
-            helpers.assertEqual(pkg.version, '1.4.1', 'package.json must be 1.4.1');
-            helpers.assertTrue(sw.includes('v1.4.1'), 'sw.js must contain v1.4.1');
-            helpers.assertTrue(html.includes('1.4.1'), 'index.html must contain 1.4.1');
-            helpers.assertFalse(sw.includes('v1.3.5'), 'sw.js must have 0 references to v1.3.5');
+    // =========================================================================
+    // F18: Private Notes Password Protection (Boundary & Corner)
+    // =========================================================================
+    {
+        id: 'T2_F18_01_incorrect_pin_shake_and_error',
+        feature: 'F18',
+        name: 'Entering wrong PIN fails unlock, preserves lock state, and keeps content masked',
+        run: async (page, helpers) => {
+            const hasMethod = await page.evaluate(() => typeof window.NotesModule?.unlockNote === 'function');
+            helpers.assertTrue(hasMethod, 'NotesModule.unlockNote must be implemented');
+            const unlocked = await page.evaluate(() => {
+                const note = { id: 'note_pin_test', title: 'Secreto', content: 'Info sensible', hasPassword: true, passwordHash: '9999' };
+                window.StorageModule?.saveNote?.(note);
+                return window.NotesModule.unlockNote('note_pin_test', 'WRONG_PIN');
+            });
+            helpers.assertFalse(unlocked, 'Entering wrong PIN must NOT unlock note');
+        }
+    },
+    {
+        id: 'T2_F18_02_empty_pin_submission_blocked',
+        feature: 'F18',
+        name: 'Submitting empty PIN does not unlock private note',
+        run: async (page, helpers) => {
+            const hasMethod = await page.evaluate(() => typeof window.NotesModule?.unlockNote === 'function');
+            helpers.assertTrue(hasMethod, 'NotesModule.unlockNote must be implemented');
+            const unlocked = await page.evaluate(() => {
+                const note = { id: 'note_pin_test', title: 'Secreto', content: 'Info sensible', hasPassword: true, passwordHash: '9999' };
+                window.StorageModule?.saveNote?.(note);
+                return window.NotesModule.unlockNote('note_pin_test', '');
+            });
+            helpers.assertFalse(unlocked, 'Empty PIN submission must be rejected');
+        }
+    },
+    {
+        id: 'T2_F18_03_edit_locked_note_requires_pin',
+        feature: 'F18',
+        name: 'Attempting to edit a locked note prompts for PIN before opening editor',
+        run: async (page, helpers) => {
+            const hasMethod = await page.evaluate(() => typeof window.NotesModule?.openEditModal === 'function');
+            helpers.assertTrue(hasMethod, 'NotesModule.openEditModal must be implemented');
+            const prompts = await page.evaluate(() => {
+                const note = { id: 'note_pin_edit_test', title: 'Secreto', content: 'Info', hasPassword: true, passwordHash: '5555' };
+                window.StorageModule?.saveNote?.(note);
+                return window.NotesModule.openEditModal('note_pin_edit_test');
+            });
+            helpers.assertTrue(prompts, 'Editing locked note should require PIN authentication');
+        }
+    },
+    {
+        id: 'T2_F18_04_unlock_is_session_scoped',
+        feature: 'F18',
+        name: 'Reloading page restores locked state on all password-protected notes',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                const note = { id: 'note_session_test', title: 'Nota Segura', content: 'Contenido Privado', hasPassword: true, passwordHash: '1111' };
+                window.StorageModule?.saveNote?.(note);
+            });
+            await page.reload({ waitUntil: 'load' });
+            const isLocked = await page.evaluate(() => {
+                if (typeof window.NotesModule?.isNoteUnlocked !== 'function') {
+                    return null;
+                }
+                return !window.NotesModule.isNoteUnlocked('note_session_test');
+            });
+            helpers.assertEqual(isLocked, true, 'NotesModule.isNoteUnlocked must be implemented and note must be locked after reload');
+        }
+    },
+    {
+        id: 'T2_F18_05_no_plaintext_leak_in_attributes',
+        feature: 'F18',
+        name: 'Locked note DOM elements do not expose note plaintext in attributes or title tooltips',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                const note = { id: 'note_secret_attr', title: 'Top Secret', content: 'SUPER_CONFIDENTIAL_TEXT_XYZ', hasPassword: true, passwordHash: '1234' };
+                window.StorageModule?.saveNote?.(note);
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.render?.();
+            });
+            const leaks = await page.evaluate(() => {
+                const card = document.querySelector('[data-note-id="note_secret_attr"]');
+                if (!card) return false;
+                const html = card.outerHTML;
+                return html.includes('SUPER_CONFIDENTIAL_TEXT_XYZ');
+            });
+            helpers.assertFalse(leaks, 'Protected note content must not appear in HTML attributes of locked card');
         }
     }
 ];

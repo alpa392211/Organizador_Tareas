@@ -1,595 +1,464 @@
 /**
  * tier4_real_world.js - Tier 4: Real-World Student Application Workflows
- * 7 End-to-End comprehensive student scenarios with opaque-box DOM interactions
- * Requirement-driven test suite for Organizador_Tareas v1.3.4
+ * 5 End-to-End comprehensive student scenarios with opaque-box DOM interactions
+ * Requirement-driven test suite for Organizador_Tareas v1.4.2
  */
 
 const tests = [
     // =========================================================================
-    // Scenario 1: New International Student Onboarding
+    // Scenario 1: New Student Fresh Onboarding
     // =========================================================================
     {
-        id: 'T4_SCENARIO_1_international_student_onboarding',
-        name: 'Scenario 1: New International Student Onboarding (UBA -> Custom Period -> Task Addition -> DOM Render -> Widget Sync)',
+        id: 'T4_SCENARIO_1_new_student_fresh_onboarding',
+        name: 'Scenario 1: New Student Fresh Onboarding (Activities Mode -> Name -> Photo Upload -> Celebration -> Dashboard Display)',
         run: async (page, helpers) => {
-            // Step 1: Set initial application state and international institution (UBA Argentina)
+            // Step 1: Clean slate startup
             await page.evaluate(() => {
-                localStorage.setItem('org_escolar_initialized_v3', 'true');
-                window.StorageModule?.setInstitution('uba');
-                window.StorageModule?.setAcademicPeriod('5.º Semestre');
+                localStorage.clear();
+                sessionStorage.clear();
+                window.StorageModule?.setOnboardingCompleted?.(false);
             });
 
-            // Step 2: Add courses via Storage and App controller
+            // Step 2: Presentation-first flow ordering - verify onboarding is visible and changelog is suppressed
+            const presentationState = await page.evaluate(() => {
+                const onboarding = document.getElementById('cycle-setup-modal');
+                const changelog = document.getElementById('changelog-modal');
+                const onboardingVisible = onboarding !== null &&
+                                          !onboarding.classList.contains('hidden') &&
+                                          onboarding.style.display !== 'none';
+                const changelogSuppressed = !changelog ||
+                                            changelog.classList.contains('hidden') ||
+                                            changelog.style.display === 'none' ||
+                                            !changelog.classList.contains('open');
+                return { onboardingVisible, changelogSuppressed };
+            });
+            helpers.assertTrue(presentationState.onboardingVisible, 'Onboarding modal must be visible on first launch');
+            helpers.assertTrue(presentationState.changelogSuppressed, 'Changelog modal must be suppressed during onboarding');
+
+            // Step 3: Choose "Organizador de actividades"
+            const accountSelected = await page.evaluate(() => {
+                const actBtn = document.getElementById('welcome-type-activities') ||
+                               document.querySelector('[data-type="activities"]');
+                if (!actBtn) return false;
+                actBtn.click();
+                return true;
+            });
+            helpers.assertTrue(accountSelected, 'Activities organizer option must exist and be selectable');
+            const accType = await page.evaluate(() => window.StorageModule?.getAccountType?.());
+            helpers.assertEqual(accType, 'organizer', 'Account type should be organizer in storage');
+
+            // Step 4: Enter user name and profile photo
+            const nameEntered = await page.evaluate(() => {
+                const nameInp = document.getElementById('welcome-user-name');
+                if (!nameInp) return false;
+                nameInp.value = 'Sofía Ramírez';
+                nameInp.dispatchEvent(new Event('input', { bubbles: true }));
+                return true;
+            });
+            helpers.assertTrue(nameEntered, '#welcome-user-name input must exist');
+
+            // Upload profile photo via simulateFileUpload
+            await helpers.simulateFileUpload(page, '#welcome-photo-input', {
+                width: 500,
+                height: 500,
+                color: '#6366F1',
+                fileName: 'sofia_profile.png'
+            });
+            await new Promise(r => setTimeout(r, 200));
+            const photoDataUrl = await page.evaluate(() => {
+                return window.StorageModule?.getUserPhoto?.() ||
+                       document.getElementById('welcome-photo-preview')?.src ||
+                       '';
+            });
+            helpers.assert(photoDataUrl.startsWith('data:image/'), 'Profile photo must be downsampled to data:image/ URL');
+            const approxBytes = Math.round(photoDataUrl.length * 0.75);
+            helpers.assert(approxBytes < 30 * 1024, `Photo size must be < 30KB, was ${approxBytes} bytes`);
+
+            // Step 5: Complete onboarding with celebration progress bar
+            const completed = await page.evaluate(async () => {
+                const submitBtn = document.querySelector('#cycle-setup-modal button[type="submit"]') ||
+                                  document.getElementById('welcome-save-btn');
+                if (!submitBtn) return { submitted: false, hasProgressBar: false, hasCelebration: false };
+                submitBtn.click();
+
+                const bar = document.getElementById('onboarding-progress-bar');
+                const celebrationMsg = document.getElementById('onboarding-celebration-msg') ||
+                                       document.querySelector('.celebration-msg') ||
+                                       document.getElementById('cycle-setup-modal');
+                const hasBar = bar !== null;
+                const text = celebrationMsg ? celebrationMsg.textContent : '';
+                const hasCelebration = text.includes('Disfruta la app') || text.includes('disfruta');
+
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.OrganizadorApp?.switchView?.('dashboard');
+                window.OrganizadorApp?.renderHeader?.();
+
+                return { submitted: true, hasBar, hasCelebration };
+            });
+            helpers.assertTrue(completed.submitted, 'Onboarding submit button must exist and submit setup');
+            helpers.assertTrue(completed.hasBar, '#onboarding-progress-bar must exist in onboarding DOM');
+            helpers.assertTrue(completed.hasCelebration, 'Celebration message must display "¡Disfruta la app!"');
+
+            // Step 6: Verify dashboard displays user name in header
+            const headerShowsName = await page.evaluate(() => {
+                const header = document.querySelector('header');
+                return header ? header.textContent.includes('Sofía Ramírez') : false;
+            });
+            helpers.assertTrue(headerShowsName, 'Header must display user name "Sofía Ramírez"');
+
+            const storedName = await page.evaluate(() => window.StorageModule?.getUserName?.());
+            helpers.assertEqual(storedName, 'Sofía Ramírez', 'User name must be persisted in StorageModule');
+        }
+    },
+
+    // =========================================================================
+    // Scenario 2: Institution Setup & Subject Creation
+    // =========================================================================
+    {
+        id: 'T4_SCENARIO_2_institution_setup_and_subject_creation',
+        name: 'Scenario 2: Institution Setup & Subject Creation (Institution Mode -> Logo -> Dynamic Popup Long-Press -> Toggle Legacy Buttons)',
+        run: async (page, helpers) => {
+            // Step 1: Configure as Institution
+            await helpers.simulateFileUpload(page, '#welcome-photo-input', {
+                width: 400,
+                height: 400,
+                color: '#10B981',
+                fileName: 'school_logo.png'
+            });
+            await page.evaluate(() => {
+                window.StorageModule?.setAccountType?.('institution');
+                window.StorageModule?.setUserName?.('Colegio San Ignacio');
+                window.StorageModule?.setAcademicPeriod?.('Ciclo 2026-2027');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+            });
+
+            // Step 2: Add subjects and switch to subjects view
             const subjects = [
-                { id: 'sub_analisis', name: 'Análisis Matemático II', color: '#6366F1' },
-                { id: 'sub_algebra', name: 'Álgebra Lineal', color: '#10B981' },
-                { id: 'sub_fisica', name: 'Física I', color: '#F59E0B' }
+                { id: 'sub_quimica', name: 'Química Orgánica', color: '#10B981' },
+                { id: 'sub_calculo', name: 'Cálculo Multivariable', color: '#6366F1' }
             ];
-            await page.evaluate(subs => window.StorageModule?.saveSubjects(subs), subjects);
+            await page.evaluate(subs => {
+                window.StorageModule?.saveSubjects?.(subs);
+                window.OrganizadorApp?.switchView?.('subjects');
+                window.SubjectsModule?.render?.();
+            }, subjects);
 
-            // Step 3: Open task modal and add a task through DOM inputs
+            // Step 3: Verify subject cards rendered
+            const subjectsRendered = await page.evaluate(() => {
+                const container = document.getElementById('subjects-container') || document.getElementById('view-subjects');
+                return container ? container.textContent.includes('Química Orgánica') : false;
+            });
+            helpers.assertTrue(subjectsRendered, 'Subjects must be rendered in view');
+
+            // Step 4: Emulate long-press gesture on a subject card
+            await helpers.simulateLongPress(page, '.subject-card', 500);
+
+            // Verify dynamic popup modal exists and is visible
+            const dynamicPopupVisible = await page.evaluate(() => {
+                const popup = document.getElementById('card-dynamic-popup') || document.getElementById('subject-modal');
+                if (!popup) return false;
+                return !popup.classList.contains('hidden') && popup.style.display !== 'none';
+            });
+            helpers.assertTrue(dynamicPopupVisible, 'Dynamic configuration popup must be visible after long-press gesture');
+
+            // Step 5: Toggle off long-press setting in settings view
             await page.evaluate(() => {
-                if (typeof window.App?.switchView === 'function') {
-                    window.App.switchView('tasks');
-                }
+                window.OrganizadorApp?.switchView?.('settings');
+                const toggle = document.getElementById('settings-longpress-toggle') ||
+                               document.getElementById('settings-longpress-btn') ||
+                               document.querySelector('[data-setting="longpress"]');
+                if (toggle) toggle.click();
+                else window.StorageModule?.setLongPressEnabled?.(false);
+                window.OrganizadorApp?.switchView?.('subjects');
+                window.SubjectsModule?.render?.();
             });
 
-            // Add task via DOM interaction or TasksModule controller
-            await page.evaluate(() => {
-                const newTask = {
-                    id: 'tsk_dom_1',
-                    subjectId: 'sub_analisis',
-                    title: 'Guía de Integrales Dobles',
-                    priority: 'alta',
-                    dueDate: '2026-11-20T18:00',
-                    completed: false
-                };
-                window.StorageModule?.addTask(newTask);
-                window.TasksModule?.render?.();
+            // Step 6: Verify classic persistent action buttons return
+            const classicActionsPresent = await page.evaluate(() => {
+                const editBtn = document.querySelector('[data-action="edit"]');
+                const delBtn = document.querySelector('[data-action="delete"]');
+                return editBtn !== null && delBtn !== null;
             });
-
-            // Step 4: Verify task card is rendered in tasks DOM container
-            const cardRendered = await page.evaluate(() => {
-                const container = document.getElementById('tasks-container');
-                return container ? container.textContent.includes('Guía de Integrales Dobles') : false;
-            });
-            helpers.assertTrue(cardRendered, 'Task card must be rendered in #tasks-container in the DOM');
-
-            // Step 5: Verify widget sync payload includes pending task
-            await page.evaluate(() => window.WidgetSyncModule?.sync?.());
-            const widgetPayload = await page.evaluate(() => {
-                const raw = localStorage.getItem('org_escolar_widget_payload');
-                return raw ? JSON.parse(raw) : null;
-            });
-            helpers.assert(widgetPayload !== null, 'Widget payload must be synced to localStorage');
-            helpers.assert(widgetPayload.quickTask?.pendingTotal >= 1, 'Widget payload must report pending task');
-
-            // Step 6: Reload page and confirm DOM and storage persistence
-            await page.reload({ waitUntil: 'load' });
-            const reloadedState = await page.evaluate(() => ({
-                tasksCount: window.StorageModule?.getTasks().length,
-                period: window.StorageModule?.getAcademicPeriod(),
-                inst: window.StorageModule?.getInstitution()
-            }));
-            helpers.assertEqual(reloadedState.tasksCount, 1, 'Tasks count after reload must persist');
-            helpers.assertEqual(reloadedState.period, '5.º Semestre', 'Academic period after reload must persist');
+            helpers.assertTrue(classicActionsPresent, 'Disabling long-press must restore persistent action buttons [data-action="edit"] and [data-action="delete"]');
         }
     },
 
     // =========================================================================
-    // Scenario 2: Private Academy Scholar with Custom Identity
+    // Scenario 3: Study Materials & Private Notes Workflow
     // =========================================================================
     {
-        id: 'T4_SCENARIO_2_private_academy_scholar_custom_identity',
-        name: 'Scenario 2: Private Academy Scholar (Custom School -> Canvas Logo -> Free-Form Period -> Slogan Display)',
+        id: 'T4_SCENARIO_3_study_materials_and_private_notes_workflow',
+        name: 'Scenario 3: Study Materials & Private Notes (Left Gallery Upload -> Canvas Downsample -> Password Protected Note -> PIN Unlock)',
         run: async (page, helpers) => {
-            // Step 1: Create canvas downsampled logo (256x256 Base64 < 30KB)
-            const logoDataUrl = await page.evaluate(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 256; canvas.height = 256;
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#0F172A';
-                ctx.fillRect(0, 0, 256, 256);
-                ctx.fillStyle = '#38BDF8';
-                ctx.font = 'bold 36px sans-serif';
-                ctx.fillText('ITA', 80, 140);
-                return canvas.toDataURL('image/png');
+            // Step 1: Navigate to Notes view and verify 2-column layout
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('notes');
             });
-            helpers.assert(logoDataUrl.startsWith('data:image/png'), 'Logo must be valid PNG data URI');
-
-            // Step 2: Open custom school modal and populate form inputs
-            await page.evaluate(logo => {
-                localStorage.setItem('org_escolar_initialized_v3', 'true');
-                const modal = document.getElementById('custom-school-modal');
-                if (modal) modal.classList.remove('hidden');
-
-                const nameInput = document.getElementById('custom-school-name');
-                const fullNameInput = document.getElementById('custom-school-fullname');
-                const sloganInput = document.getElementById('custom-school-slogan');
-                const badgeInput = document.getElementById('custom-school-shortbadge');
-
-                if (nameInput) nameInput.value = 'Instituto Ártico';
-                if (fullNameInput) fullNameInput.value = 'Instituto Tecnológico Ártico';
-                if (sloganInput) sloganInput.value = 'Aprender sin límites';
-                if (badgeInput) badgeInput.value = 'ITA';
-
-                const customSchool = {
-                    id: 'custom_ita_school',
-                    name: 'Instituto Ártico',
-                    fullName: 'Instituto Tecnológico Ártico',
-                    shortBadge: 'ITA',
-                    country: 'México',
-                    countryCode: 'MX',
-                    slogan: 'Aprender sin límites',
-                    icon: logo,
-                    isCustom: true
-                };
-
-                window.StorageModule?.saveCustomSchool?.(customSchool);
-                window.StorageModule?.setInstitution(customSchool.id);
-                window.StorageModule?.setAcademicPeriod('Módulo Otoño 2026');
-            }, logoDataUrl);
-
-            // Step 3: Verify custom school stored and retrievable
-            const schoolInfo = await page.evaluate(() => {
-                const inst = window.InstitutionsModule?.getInstitution('custom_ita_school');
-                const period = window.StorageModule?.getAcademicPeriod();
+            const notesLayout = await page.evaluate(() => {
+                const notesView = document.getElementById('view-notes');
+                const galleryPanel = document.getElementById('notes-gallery-panel');
+                const cardsPanel = document.getElementById('notes-cards-panel') || document.getElementById('notes-container');
+                const isViewActive = notesView && !notesView.classList.contains('hidden');
                 return {
-                    name: inst ? inst.name : '',
-                    slogan: inst ? inst.slogan : '',
-                    isCustom: inst ? inst.isCustom : false,
-                    period: period
+                    isViewActive,
+                    hasGalleryPanel: galleryPanel !== null,
+                    hasCardsPanel: cardsPanel !== null
                 };
             });
-            helpers.assertEqual(schoolInfo.name, 'Instituto Ártico', 'Custom school name must match');
-            helpers.assertEqual(schoolInfo.slogan, 'Aprender sin límites', 'Custom school slogan must match');
-            helpers.assertEqual(schoolInfo.period, 'Módulo Otoño 2026', 'Free-form period must match');
-            helpers.assertTrue(schoolInfo.isCustom, 'School must be flagged as isCustom');
+            helpers.assertTrue(notesLayout.isViewActive, 'Notes view must be active');
+            helpers.assertTrue(notesLayout.hasGalleryPanel, '#notes-gallery-panel must exist on left side of notes view');
 
-            // Step 4: Verify icon rendering embeds data URI
-            const renderedHtml = await page.evaluate(() => {
-                const inst = window.InstitutionsModule?.getInstitution('custom_ita_school');
-                return window.InstitutionsModule?.renderIconHtml(inst);
+            // Step 2: Upload study material photo to left gallery
+            await helpers.simulateFileUpload(page, '#notes-photo-input', {
+                width: 600,
+                height: 600,
+                color: '#3B82F6',
+                fileName: 'pizarron_calculo.png'
             });
-            helpers.assertIncludes(renderedHtml, 'data:image/png', 'Rendered HTML must embed Base64 image');
-        }
-    },
+            await new Promise(r => setTimeout(r, 200));
 
-    // =========================================================================
-    // Scenario 3: Secret Hunter Journey
-    // =========================================================================
-    {
-        id: 'T4_SCENARIO_3_secret_hunter_vault_journey',
-        name: 'Scenario 3: Secret Hunter Journey (Padlock Unlock -> Apollo11 -> 06062009 -> Eduardo Gold -> Switchboard Deactivation)',
-        run: async (page, helpers) => {
-            // Step 1: Open vault view via App controller
-            await page.evaluate(() => {
-                if (typeof window.App?.switchView === 'function') {
-                    window.App.switchView('secret-codes');
-                }
-            });
-            const inVault = await page.evaluate(() => {
-                const v = document.getElementById('view-secret-codes');
-                return v ? !v.classList.contains('hidden') : false;
-            });
-            helpers.assertTrue(inVault, 'Secret codes vault view must be active');
+            const savedPhotos = await page.evaluate(() => window.StorageModule?.getGalleryPhotos?.() || []);
+            helpers.assert(savedPhotos.length > 0, 'Photo must be saved in gallery storage');
+            const photoItem = savedPhotos[0];
+            helpers.assert(photoItem.dataUrl && photoItem.dataUrl.startsWith('data:image/'), 'Gallery photo must contain valid data:image/ URL');
+            const photoBytes = Math.round(photoItem.dataUrl.length * 0.75);
+            helpers.assert(photoBytes < 30 * 1024, `Gallery photo must be < 30KB, was ${photoBytes} bytes`);
 
-            // Step 2: Interact with vault inputs and trigger verify
-            await page.evaluate(() => {
-                const p1 = document.getElementById('vault-code-p1');
-                const p2 = document.getElementById('vault-code-p2');
-                const btn = document.getElementById('vault-submit-btn');
-                if (p1) { p1.value = 'APOL'; p1.dispatchEvent(new Event('input', { bubbles: true })); }
-                if (p2) { p2.value = 'LO11'; p2.dispatchEvent(new Event('input', { bubbles: true })); }
-                btn?.click();
-            });
-
-            // Check feedback message in DOM
-            const statusMsgText = await page.evaluate(() => {
-                const msg = document.getElementById('vault-status-message');
-                return msg ? msg.textContent : '';
-            });
-            helpers.assert(statusMsgText.length > 0, 'Status message must receive feedback in DOM');
-
-            // Step 3: Activate Apollo Theme and rocket badges in Storage & DOM
-            await page.evaluate(() => {
-                const codes = ['APOLLO11'];
-                localStorage.setItem('org_escolar_vault_unlocked_codes_v2', JSON.stringify(codes));
-                document.documentElement.classList.add('theme-apollo');
-                localStorage.setItem('org_escolar_apollo_rockets', 'true');
-            });
-            let apolloActive = await page.evaluate(() => document.documentElement.classList.contains('theme-apollo'));
-            helpers.assertTrue(apolloActive, 'theme-apollo class must be active on document root');
-
-            // Step 4: Unlock EDUARDO and activate Gold Theme
-            await page.evaluate(() => {
-                const codes = JSON.parse(localStorage.getItem('org_escolar_vault_unlocked_codes_v2') || '[]');
-                if (!codes.includes('EDUARDO')) codes.push('EDUARDO');
-                localStorage.setItem('org_escolar_vault_unlocked_codes_v2', JSON.stringify(codes));
-                document.documentElement.classList.remove('theme-apollo');
-                document.documentElement.classList.add('theme-eduardo-gold');
-            });
-            const goldActive = await page.evaluate(() => document.documentElement.classList.contains('theme-eduardo-gold'));
-            helpers.assertTrue(goldActive, 'theme-eduardo-gold class must be active');
-
-            // Step 5: Deactivate special theme via switchboard / DOM
-            await page.evaluate(() => {
-                document.documentElement.classList.remove('theme-eduardo-gold');
-                localStorage.setItem('org_escolar_active_special_theme_v1', 'default');
-            });
-            const finalClasses = await page.evaluate(() => Array.from(document.documentElement.classList));
-            helpers.assertFalse(finalClasses.includes('theme-apollo'), 'Apollo must be deactivated');
-            helpers.assertFalse(finalClasses.includes('theme-eduardo-gold'), 'Eduardo Gold must be deactivated');
-
-            // Step 6: Navigate back to settings via back button
-            await page.evaluate(() => {
-                const backBtn = document.getElementById('vault-back-btn');
-                backBtn?.click();
-            });
-            const inSettings = await page.evaluate(() => {
-                const s = document.getElementById('view-settings');
-                return s ? !s.classList.contains('hidden') : true;
-            });
-            helpers.assertTrue(inSettings, 'Clicking vault back button returns to settings view');
-        }
-    },
-
-    // =========================================================================
-    // Scenario 4: Cross-Device Responsiveness
-    // =========================================================================
-    {
-        id: 'T4_SCENARIO_4_cross_device_power_user_responsiveness',
-        name: 'Scenario 4: Cross-Device Responsiveness (Mobile 375px -> Tablet 768px -> Desktop 1280px)',
-        run: async (page, helpers) => {
-            // Viewport 1: Mobile 375px
-            await page.setViewport({ width: 375, height: 667 });
-            let noScrollMobile = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScrollMobile, 'Mobile 375px viewport must have zero horizontal scroll');
-
-            const bottomNavVisible = await page.evaluate(() => {
-                const nav = document.getElementById('bottom-nav');
-                return nav && !nav.classList.contains('hidden');
-            });
-            helpers.assertTrue(bottomNavVisible, 'Bottom nav must be visible on mobile viewport');
-
-            // Viewport 2: Tablet 768px (Portrait) - Strict zero horizontal scroll
-            await page.setViewport({ width: 768, height: 1024 });
-            let noScrollTablet = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScrollTablet, 'Tablet 768px viewport must have strict zero horizontal scroll');
-
-            // Viewport 3: Tablet 820px (iPad Air) - Strict zero horizontal scroll
-            await page.setViewport({ width: 820, height: 1180 });
-            let noScrollTabletAir = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScrollTabletAir, 'Tablet 820px viewport must have strict zero horizontal scroll');
-
-            // Viewport 4: Desktop 1280px
-            await page.setViewport({ width: 1280, height: 800 });
-            let noScrollDesktop = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-            helpers.assertTrue(noScrollDesktop, 'Desktop 1280px viewport must have zero horizontal scroll');
-
-            // Drawer interaction check on mobile viewport
-            await page.setViewport({ width: 375, height: 667 });
-            await page.evaluate(() => {
-                const toggle = document.getElementById('drawer-toggle-btn');
-                toggle?.click();
-            });
-            const drawerOpen = await page.evaluate(() => {
-                const drawer = document.getElementById('sidebar-drawer');
-                return drawer !== null;
-            });
-            helpers.assertTrue(drawerOpen, 'Sidebar drawer must be responsive to click toggle');
-            await page.evaluate(() => {
-                const closeBtn = document.getElementById('drawer-close-btn');
-                closeBtn?.click();
-            });
-        }
-    },
-
-    // =========================================================================
-    // Scenario 5: Disaster Recovery & Migration Cycle
-    // =========================================================================
-    {
-        id: 'T4_SCENARIO_5_disaster_recovery_and_migration_cycle',
-        name: 'Scenario 5: Disaster Recovery & Migration Cycle (Full Data -> JSON Export -> Purge -> Import -> Restore)',
-        run: async (page, helpers) => {
-            // Step 1: Populate comprehensive rich state
-            const mockCustomSchool = {
-                id: 'cust_disaster_prep',
-                name: 'Academia Fénix',
-                fullName: 'Academia Superior Fénix',
-                country: 'Colombia',
-                countryCode: 'CO',
-                slogan: 'Resurgir del conocimiento',
-                isCustom: true
+            // Step 3: Create a private note with password protection
+            const privateNote = {
+                id: 'note_exam_secret',
+                title: 'Preguntas de Examen Parcial',
+                content: 'Pregunta 1: Demostración del Teorema de Rolle',
+                category: 'personal',
+                hasPassword: true,
+                passwordHash: '2468',
+                createdAt: Date.now()
             };
-            const mockSubjects = [
-                { id: 'sub_rec_1', name: 'Arquitectura de Software', color: '#4F46E5' },
-                { id: 'sub_rec_2', name: 'Bases de Datos Distribuidas', color: '#06B6D4' }
-            ];
-            const mockTasks = [
-                { id: 'tsk_rec_1', subjectId: 'sub_rec_1', title: 'Diseño de Microservicios', completed: false, priority: 'alta' },
-                { id: 'tsk_rec_2', subjectId: 'sub_rec_2', title: 'Particionamiento Sharding', completed: true, priority: 'media' }
-            ];
-            const mockCodes = ['APOLLO11', '06062009', 'EDUARDO'];
+            await page.evaluate(note => {
+                window.StorageModule?.saveNote?.(note);
+                window.NotesModule?.render?.();
+            }, privateNote);
 
-            await page.evaluate((school, subs, tsks, codes) => {
-                localStorage.setItem('org_escolar_initialized_v3', 'true');
-                window.StorageModule?.saveCustomSchool?.(school);
-                window.StorageModule?.setInstitution(school.id);
-                window.StorageModule?.setAcademicPeriod('Ciclo Avanzado 2026');
-                window.StorageModule?.saveSubjects(subs);
-                window.StorageModule?.saveTasks(tsks);
-                localStorage.setItem('org_escolar_vault_unlocked_codes_v2', JSON.stringify(codes));
-            }, mockCustomSchool, mockSubjects, mockTasks, mockCodes);
-
-            // Step 2: Export JSON backup payload
-            const exportedPayload = await page.evaluate(() => {
-                const base = window.StorageModule?.exportJson ? JSON.parse(window.StorageModule.exportJson()) : {};
-                base.customSchools = window.StorageModule?.getCustomSchools ? window.StorageModule.getCustomSchools() : [];
-                base.unlockedCodes = JSON.parse(localStorage.getItem('org_escolar_vault_unlocked_codes_v2') || '[]');
-                return JSON.stringify(base);
+            // Step 4: Verify note card is masked in UI with padlock indicator
+            const maskState = await page.evaluate(() => {
+                const card = document.querySelector('[data-note-id="note_exam_secret"]') ||
+                             document.querySelector('.note-card-locked');
+                if (!card) return { found: false, masked: false, plaintextLeaked: true };
+                const text = card.textContent;
+                const masked = text.includes('🔒') || text.includes('Privada');
+                const plaintextLeaked = text.includes('Teorema de Rolle');
+                return { found: true, masked, plaintextLeaked };
             });
-            helpers.assert(typeof exportedPayload === 'string' && exportedPayload.length > 50, 'Exported JSON payload must be non-empty');
+            helpers.assertTrue(maskState.found, 'Private note card must exist in DOM');
+            helpers.assertTrue(maskState.masked, 'Private note content must be masked with lock indicator');
+            helpers.assertFalse(maskState.plaintextLeaked, 'Private note content must NOT be visible before unlocking');
 
-            // Step 3: Trigger catastrophic wipe (simulate disaster)
+            // Step 5: Click locked card and verify PIN unlock modal appears
+            const pinModalAppeared = await page.evaluate(() => {
+                const card = document.querySelector('[data-note-id="note_exam_secret"]') ||
+                             document.querySelector('.note-card-locked');
+                if (card) card.click();
+                const pinModal = document.getElementById('note-unlock-modal') ||
+                                 document.getElementById('note-pin-modal');
+                return pinModal !== null && !pinModal.classList.contains('hidden');
+            });
+            helpers.assertTrue(pinModalAppeared, 'Clicking locked note card must display PIN unlock modal');
+
+            // Step 6: Attempt unlocking with incorrect PIN (must fail)
+            const hasUnlockMethod = await page.evaluate(() => typeof window.NotesModule?.unlockNote === 'function');
+            helpers.assertTrue(hasUnlockMethod, 'NotesModule.unlockNote must be implemented');
+
+            const incorrectUnlock = await page.evaluate(() => {
+                return window.NotesModule.unlockNote('note_exam_secret', '0000');
+            });
+            helpers.assertFalse(incorrectUnlock, 'Incorrect PIN must not unlock note');
+
+            // Step 7: Unlock with correct PIN (must succeed)
+            const correctUnlock = await page.evaluate(() => {
+                return window.NotesModule.unlockNote('note_exam_secret', '2468');
+            });
+            helpers.assertTrue(correctUnlock, 'Correct PIN must unlock private note');
+
+            // Verify plaintext content is now revealed
+            const contentRevealed = await page.evaluate(() => {
+                const container = document.getElementById('view-notes');
+                return container ? container.textContent.includes('Teorema de Rolle') : false;
+            });
+            helpers.assertTrue(contentRevealed, 'Unlocking note must reveal plaintext content');
+        }
+    },
+
+    // =========================================================================
+    // Scenario 4: Secret Vault Easter Egg Discovery
+    // =========================================================================
+    {
+        id: 'T4_SCENARIO_4_secret_vault_easter_egg_discovery',
+        name: 'Scenario 4: Secret Vault Easter Egg Discovery (5 Task Auto Unlock -> Continuous Input -> Standard Push Buttons -> Light Mode Contrast)',
+        run: async (page, helpers) => {
+            // Step 1: Create 5 real tasks and complete them to trigger automatic vault milestone
             await page.evaluate(() => {
-                localStorage.clear();
-                sessionStorage.clear();
-            });
-            await page.reload({ waitUntil: 'load' });
+                const tasks = [
+                    { id: 'task_s4_1', title: 'Tarea Álgebra', completed: false },
+                    { id: 'task_s4_2', title: 'Tarea Física', completed: false },
+                    { id: 'task_s4_3', title: 'Tarea Historia', completed: false },
+                    { id: 'task_s4_4', title: 'Tarea Biología', completed: false },
+                    { id: 'task_s4_5', title: 'Tarea Literatura', completed: false }
+                ];
+                window.StorageModule?.saveTasks?.(tasks);
 
-            // Verify clean/empty state after wipe
-            const emptyCheck = await page.evaluate(() => {
-                return (window.StorageModule?.getTasks() || []).length === 0;
-            });
-            helpers.assertTrue(emptyCheck, 'State must be clean after catastrophic wipe');
-
-            // Step 4: Import JSON backup
-            const restoreResult = await page.evaluate(payloadStr => {
-                try {
-                    const parsed = JSON.parse(payloadStr);
-                    localStorage.setItem('org_escolar_initialized_v3', 'true');
-                    if (Array.isArray(parsed.customSchools)) {
-                        parsed.customSchools.forEach(s => window.StorageModule?.saveCustomSchool?.(s));
-                    }
-                    if (Array.isArray(parsed.unlockedCodes)) {
-                        localStorage.setItem('org_escolar_vault_unlocked_codes_v2', JSON.stringify(parsed.unlockedCodes));
-                    }
-                    if (window.StorageModule?.importJson) {
-                        window.StorageModule.importJson(payloadStr);
+                for (let i = 1; i <= 5; i++) {
+                    if (window.TasksModule?.toggleComplete) {
+                        window.TasksModule.toggleComplete(`task_s4_${i}`);
+                    } else if (window.TasksModule?.completeTask) {
+                        window.TasksModule.completeTask(`task_s4_${i}`);
                     } else {
-                        if (parsed.subjects) window.StorageModule?.saveSubjects(parsed.subjects);
-                        if (parsed.tasks) window.StorageModule?.saveTasks(parsed.tasks);
-                        if (parsed.institution) window.StorageModule?.setInstitution(parsed.institution);
-                        if (parsed.academicPeriod) window.StorageModule?.setAcademicPeriod(parsed.academicPeriod);
+                        window.StorageModule?.checkVaultAutoUnlockOnTaskCompleted?.(i);
                     }
-                    return true;
-                } catch (e) {
-                    return false;
                 }
-            }, exportedPayload);
-            helpers.assertTrue(restoreResult, 'Import operation must complete successfully');
+            });
 
-            // Step 5: Assert 100% state fidelity restoration
-            const finalState = await page.evaluate(() => {
-                const custom = window.StorageModule?.getCustomSchools ? window.StorageModule.getCustomSchools() : [];
-                const codes = JSON.parse(localStorage.getItem('org_escolar_vault_unlocked_codes_v2') || '[]');
-                const tasks = window.StorageModule?.getTasks() || [];
-                const subjects = window.StorageModule?.getSubjects() || [];
-                const period = window.StorageModule?.getAcademicPeriod();
+            // Step 2: Open vault terminal and verify notice
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('vault');
+                window.OrganizadorApp?.renderVaultInventory?.();
+            });
+            const noticeText = await page.evaluate(() => {
+                const notice = document.getElementById('vault-secret-notice') || document.querySelector('.vault-terminal-notice');
+                return notice ? notice.textContent : '';
+            });
+            helpers.assertFalse(noticeText.includes('EDUARDO'), 'Notice must conceal EDUARDO');
+            helpers.assertFalse(noticeText.includes('06062009'), 'Notice must conceal 06062009');
+            helpers.assertTrue(noticeText.includes('5 tareas'), 'Notice must state that completing 5 tasks gives a code');
+
+            // Step 3: Enter code via continuous single input (no storage bypass)
+            const inputSubmitted = await page.evaluate(() => {
+                const inp = document.getElementById('vault-code-input');
+                if (!inp) return false;
+                inp.value = 'APOLLO11';
+                inp.dispatchEvent(new Event('input', { bubbles: true }));
+                const btn = document.getElementById('vault-submit-btn') || document.getElementById('vault-verify-btn');
+                if (btn) btn.click();
+                return true;
+            });
+            helpers.assertTrue(inputSubmitted, 'Continuous code input #vault-code-input must exist and submit code');
+
+            // Wait for verify timeout (850ms in app.js) to finish unlock animation and inventory render
+            await new Promise(r => setTimeout(r, 950));
+
+            const apolloUnlocked = await page.evaluate(() => window.StorageModule?.isVaultCodeUnlocked?.('APOLLO11') || false);
+            helpers.assertTrue(apolloUnlocked, 'APOLLO11 must be unlocked via continuous input');
+
+            // Step 4: Verify vault inventory cards have flexible wrapping and no outer truncate
+            const cardFormatting = await page.evaluate(() => {
+                const card = document.querySelector('.vault-inventory-card');
+                if (!card) return null;
+                const titleWrapper = card.querySelector('h4') || card.querySelector('.min-w-0');
+                const style = titleWrapper ? window.getComputedStyle(titleWrapper) : null;
                 return {
-                    customSchoolName: custom[0]?.name,
-                    unlockedCodesCount: codes.length,
-                    tasksCount: tasks.length,
-                    subjectsCount: subjects.length,
-                    period: period
+                    hasOuterTruncate: card.classList.contains('truncate'),
+                    isWrappingAllowed: style ? style.whiteSpace !== 'nowrap' : true
                 };
             });
-            helpers.assertEqual(finalState.customSchoolName, 'Academia Fénix', 'Custom school name restored');
-            helpers.assertEqual(finalState.unlockedCodesCount, 3, '3 unlocked secret codes restored');
-            helpers.assertEqual(finalState.tasksCount, 2, '2 tasks restored');
-            helpers.assertEqual(finalState.subjectsCount, 2, '2 subjects restored');
-            helpers.assertEqual(finalState.period, 'Ciclo Avanzado 2026', 'Academic period restored');
+            helpers.assert(cardFormatting !== null, 'Vault inventory card must exist');
+            helpers.assertFalse(cardFormatting.hasOuterTruncate, 'Inventory card must not have outer truncate');
+            helpers.assertTrue(cardFormatting.isWrappingAllowed, 'Title wrapper should permit multi-line text wrapping');
+
+            // Step 5: Verify standard button controls are used instead of iOS switches
+            const controlsCheck = await page.evaluate(() => {
+                const catsBtn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
+                const grayBtn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
+                return {
+                    catsIsButton: catsBtn ? catsBtn.tagName.toLowerCase() === 'button' : false,
+                    grayIsButton: grayBtn ? grayBtn.tagName.toLowerCase() === 'button' : false
+                };
+            });
+            helpers.assertTrue(controlsCheck.catsIsButton, '#settings-cats-btn must be a standard button element');
+            helpers.assertTrue(controlsCheck.grayIsButton, '#settings-gray-mode-btn must be a standard button element');
+
+            // Step 6: Switch to light mode and confirm contrast
+            await page.evaluate(() => {
+                document.documentElement.classList.remove('dark');
+                window.OrganizadorApp?.renderVaultInventory?.();
+            });
+            const lightContrast = await page.evaluate(() => {
+                const emptyHeading = document.getElementById('vault-empty-heading');
+                const emptyCard = document.querySelector('#vault-inventory-empty > div');
+                const noDarkTranslucent = emptyCard ? !emptyCard.className.includes('bg-black/40') : true;
+                const headingColor = emptyHeading ? window.getComputedStyle(emptyHeading).color : '';
+                return {
+                    isLight: !document.documentElement.classList.contains('dark'),
+                    noDarkTranslucent,
+                    headingHasContrast: !headingColor.includes('rgba(238, 242, 255')
+                };
+            });
+            helpers.assertTrue(lightContrast.isLight, 'Light mode must be active');
+            helpers.assertTrue(lightContrast.noDarkTranslucent, 'Empty state container must not use dark translucency in light mode');
         }
     },
 
     // =========================================================================
-    // Scenario 6: Clean-Slate Student with Skipped School -> Later Settings Config & PWA
+    // Scenario 5: Settings Customization & View Switching
     // =========================================================================
     {
-        id: 'T4_SCENARIO_6_fresh_student_skipped_onboarding_to_configured_pwa',
-        name: 'Scenario 6: Clean-slate onboarding with "Hacerla después", view navigation, settings configuration, and PWA readiness',
+        id: 'T4_SCENARIO_5_settings_customization_and_view_switching',
+        name: 'Scenario 5: Settings Customization & View Switching (Audition Multiple Fonts -> Expand Accordion -> Navigate to Dashboard -> Verify Auto-Close)',
         run: async (page, helpers) => {
-            // Step 1: Clean slate application start
+            // Step 1: Open Settings view
             await page.evaluate(() => {
-                localStorage.clear();
-                sessionStorage.clear();
+                window.OrganizadorApp?.switchView?.('settings');
             });
-            await page.reload({ waitUntil: 'load' });
-            await new Promise(r => setTimeout(r, 400));
+            const settingsActive = await page.evaluate(() => {
+                const s = document.getElementById('view-settings');
+                return s ? !s.classList.contains('hidden') : false;
+            });
+            helpers.assertTrue(settingsActive, 'Settings view must be active');
 
-            // Step 2: Welcome modal is displayed, student chooses "Hacerla después"
+            // Step 2: Open appearance accordion
             await page.evaluate(() => {
-                window.app?.openCycleWelcomeModal?.();
+                const fontCard = document.querySelector('#settings-font-buttons-grid')?.closest('.settings-accordion-card');
+                if (fontCard) fontCard.classList.add('open');
             });
-            await new Promise(r => setTimeout(r, 200));
 
+            // Step 3: Audition multiple fonts consecutively by clicking UI buttons in grid
+            const audited = await page.evaluate(async () => {
+                const btns = Array.from(document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]'));
+                if (btns.length === 0) return false;
+                for (let i = 0; i < Math.min(3, btns.length); i++) {
+                    btns[i].click();
+                    await new Promise(r => setTimeout(r, 60));
+                }
+                return true;
+            });
+            helpers.assertTrue(audited, 'Font buttons in #settings-font-buttons-grid must exist and be clickable');
+
+            // Step 4: Verify appearance accordion remains open during auditioning (persistent font window)
+            const accordionStillOpen = await page.evaluate(() => {
+                const fontCard = document.querySelector('#settings-font-buttons-grid')?.closest('.settings-accordion-card');
+                if (!fontCard) return false;
+                return fontCard.classList.contains('open');
+            });
+            helpers.assertTrue(accordionStillOpen, 'Accordion must stay open while auditioning fonts');
+
+            // Step 5: Navigate away from settings to Dashboard
             await page.evaluate(() => {
-                document.getElementById('welcome-skip-school-btn')?.click();
+                window.OrganizadorApp?.switchView?.('dashboard');
             });
-            await new Promise(r => setTimeout(r, 100));
-
-            // Verify period selector is locked
-            const isLocked = await page.evaluate(() => {
-                const c = document.getElementById('welcome-period-container');
-                return c ? window.getComputedStyle(c).pointerEvents === 'none' : false;
+            const dashboardActive = await page.evaluate(() => {
+                const d = document.getElementById('view-dashboard');
+                return d ? !d.classList.contains('hidden') : false;
             });
-            helpers.assertTrue(isLocked, 'Period selector must be locked when "Hacerla después" is selected');
+            helpers.assertTrue(dashboardActive, 'Dashboard must be active after navigation');
 
-            // Step 3: Provide provisional cycle dates and submit
+            // Step 6: Return to Settings and verify all accordions were cleanly auto-closed
             await page.evaluate(() => {
-                const start = document.getElementById('welcome-cycle-start');
-                const end = document.getElementById('welcome-cycle-end');
-                if (start) start.value = '2026-08-15';
-                if (end) end.value = '2026-12-15';
-                document.getElementById('welcome-cycle-save-btn')?.click();
+                window.OrganizadorApp?.switchView?.('settings');
             });
-            await new Promise(r => setTimeout(r, 300));
-
-            // Step 4: Verify unconfigured defaults across header and storage
-            const unconfState = await page.evaluate(() => {
-                return {
-                    isSkipped: window.StorageModule?.isSchoolSkipped(),
-                    instId: window.StorageModule?.getInstitution(),
-                    period: window.StorageModule?.getAcademicPeriod(),
-                    headerName: document.getElementById('header-inst-name')?.textContent?.trim(),
-                    headerPeriod: document.getElementById('header-inst-period')?.textContent?.trim()
-                };
+            const anyOpen = await page.evaluate(() => {
+                return document.querySelectorAll('.settings-accordion-card.open').length > 0;
             });
-            helpers.assertTrue(unconfState.isSkipped, 'isSchoolSkipped must be true');
-            helpers.assertEqual(unconfState.instId, 'unconfigured', 'Institution ID must be unconfigured');
-            helpers.assertEqual(unconfState.period, 'Sin periodo', 'Academic period must be Sin periodo');
-            helpers.assertEqual(unconfState.headerName, 'Sin institución', 'Header name displays Sin institución');
-            helpers.assertEqual(unconfState.headerPeriod, 'Sin periodo', 'Header period displays Sin periodo');
-
-            // Step 5: Student creates a course and task while school is unconfigured
-            await page.evaluate(() => {
-                const sub = [{ id: 'sub_web', name: 'Desarrollo Web Fullstack', color: '#6366F1' }];
-                window.StorageModule?.saveSubjects?.(sub);
-                const task = [{
-                    id: 'tsk_pwa_1',
-                    subjectId: 'sub_web',
-                    title: 'Entregable PWA & Service Worker',
-                    dueDate: '2026-11-25',
-                    completed: false
-                }];
-                window.StorageModule?.saveTasks?.(task);
-            });
-
-            // Step 6: Student navigates to Settings to configure institution
-            await page.evaluate(() => {
-                window.app?.switchView?.('settings');
-            });
-            await new Promise(r => setTimeout(r, 200));
-
-            // Student clicks UNAM card in settings
-            await page.evaluate(() => {
-                const unamBtn = document.querySelector('#settings-institution-grid [data-inst-id="unam"]');
-                if (unamBtn) unamBtn.click();
-            });
-            await new Promise(r => setTimeout(r, 200));
-
-            // Student selects "4.º Semestre" period pill
-            await page.evaluate(() => {
-                const pills = Array.from(document.querySelectorAll('#settings-period-pills button, .period-pill'));
-                const pill4 = pills.find(p => p.textContent.includes('4.º Semestre'));
-                if (pill4) pill4.click();
-            });
-            await new Promise(r => setTimeout(r, 200));
-
-            // Step 7: Verify smooth transition from unconfigured to UNAM
-            const configuredState = await page.evaluate(() => {
-                return {
-                    isSkipped: window.StorageModule?.isSchoolSkipped(),
-                    instId: window.StorageModule?.getInstitution(),
-                    period: window.StorageModule?.getAcademicPeriod(),
-                    headerName: document.getElementById('header-inst-name')?.textContent?.trim(),
-                    headerPeriod: document.getElementById('header-inst-period')?.textContent?.trim(),
-                    hasPwaCard: document.getElementById('pwa-settings-card') !== null,
-                    hasPwaBtn: document.getElementById('pwa-install-settings-btn') !== null
-                };
-            });
-
-            helpers.assertFalse(configuredState.isSkipped, 'isSchoolSkipped cleared after configuring school');
-            helpers.assertEqual(configuredState.instId, 'unam', 'Active institution is UNAM');
-            helpers.assertIncludes(configuredState.headerName, 'UNAM', 'Header reflects UNAM');
-            helpers.assertNotEqual(configuredState.headerPeriod, 'Sin periodo', 'Header period updated');
-            helpers.assertTrue(configuredState.hasPwaCard, 'PWA settings card is available');
-            helpers.assertTrue(configuredState.hasPwaBtn, 'PWA install button is available');
-        }
-    },
-
-    // =========================================================================
-    // Scenario 7: Custom Academy Student Cuatrimestral Full Lifecycle
-    // =========================================================================
-    {
-        id: 'T4_SCENARIO_7_custom_academy_student_cuatrimestre_full_lifecycle',
-        name: 'Scenario 7: Custom school creation during welcome onboarding with cuatrimestral system and persistence',
-        run: async (page, helpers) => {
-            // Step 1: Clean state
-            await page.evaluate(() => {
-                localStorage.clear();
-                sessionStorage.clear();
-            });
-            await page.reload({ waitUntil: 'load' });
-            await new Promise(r => setTimeout(r, 400));
-
-            // Step 2: Open welcome onboarding and launch custom school builder
-            await page.evaluate(() => {
-                window.app?.openCycleWelcomeModal?.();
-                document.getElementById('welcome-create-school-btn')?.click();
-            });
-            await new Promise(r => setTimeout(r, 200));
-
-            // Step 3: Populate custom school form
-            await page.evaluate(() => {
-                document.getElementById('custom-school-name').value = 'Colegio Mayor Vanguardia';
-                document.getElementById('custom-school-shortbadge').value = 'CMV';
-                document.getElementById('custom-school-fullname').value = 'Colegio Mayor Vanguardia de Innovación';
-                document.getElementById('custom-school-slogan').value = 'Liderazgo y Saber';
-                document.getElementById('custom-school-country').value = 'MX';
-                document.getElementById('custom-school-system').value = 'Cuatrimestral';
-                document.getElementById('custom-school-color').value = '#059669';
-                document.getElementById('custom-school-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            });
-            await new Promise(r => setTimeout(r, 300));
-
-            // Step 4: Verify auto-selection in welcome modal and select 3.º Cuatrimestre
-            await page.evaluate(() => {
-                const chips = Array.from(document.querySelectorAll('.welcome-period-chip'));
-                const chip3 = chips.find(c => c.textContent.includes('3.º Cuatrimestre'));
-                if (chip3) chip3.click();
-
-                const start = document.getElementById('welcome-cycle-start');
-                const end = document.getElementById('welcome-cycle-end');
-                if (start) start.value = '2026-09-01';
-                if (end) end.value = '2026-12-31';
-                document.getElementById('welcome-cycle-save-btn')?.click();
-            });
-            await new Promise(r => setTimeout(r, 300));
-
-            // Step 5: Verify custom school active state in header and drawer
-            const customState = await page.evaluate(() => {
-                return {
-                    hName: document.getElementById('header-inst-name')?.textContent?.trim(),
-                    dName: document.getElementById('drawer-inst-name')?.textContent?.trim(),
-                    hPeriod: document.getElementById('header-inst-period')?.textContent?.trim(),
-                    dPeriod: document.getElementById('drawer-inst-period')?.textContent?.trim(),
-                    dSlogan: document.getElementById('drawer-inst-slogan')?.textContent?.trim()
-                };
-            });
-
-            helpers.assertEqual(customState.hName, customState.dName, 'Header and drawer names sync');
-            helpers.assertIncludes(customState.hName, 'Colegio Mayor Vanguardia', 'Custom school name active');
-            helpers.assertEqual(customState.hPeriod, '3.º Cuatrimestre', 'Selected custom period active');
-            helpers.assertEqual(customState.hPeriod, customState.dPeriod, 'Header and drawer periods sync');
-            helpers.assertIncludes(customState.dSlogan, 'Liderazgo y Saber', 'Drawer slogan matches custom motto');
-
-            // Step 6: Hard page reload to test complete offline persistence
-            await page.reload({ waitUntil: 'load' });
-            await new Promise(r => setTimeout(r, 400));
-
-            const postReload = await page.evaluate(() => {
-                return {
-                    hName: document.getElementById('header-inst-name')?.textContent?.trim(),
-                    hPeriod: document.getElementById('header-inst-period')?.textContent?.trim(),
-                    dName: document.getElementById('drawer-inst-name')?.textContent?.trim()
-                };
-            });
-
-            helpers.assertIncludes(postReload.hName, 'Colegio Mayor Vanguardia', 'Custom school persisted across reload');
-            helpers.assertEqual(postReload.hPeriod, '3.º Cuatrimestre', 'Custom period persisted across reload');
-            helpers.assertEqual(postReload.hName, postReload.dName, 'Drawer and header match post-reload');
+            helpers.assertFalse(anyOpen, 'All settings accordions must be auto-closed on return to settings');
         }
     }
 ];

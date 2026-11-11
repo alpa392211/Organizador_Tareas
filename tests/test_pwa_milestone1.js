@@ -142,7 +142,7 @@ async function run() {
     assert(fs.existsSync(swPath), 'sw.js exists at project root');
     const swContent = fs.readFileSync(swPath, 'utf8');
 
-    assert(swContent.includes('organizador-tareas-cache-v1.4.1'), 'sw.js uses versioned cache organizador-tareas-cache-v1.4.1');
+    assert(swContent.includes('organizador-tareas-cache-v1.4.2'), 'sw.js uses versioned cache organizador-tareas-cache-v1.4.2');
     assert(swContent.includes('Promise.allSettled'), 'sw.js employs Promise.allSettled for fault-tolerant precaching');
     assert(swContent.includes('skipWaiting'), 'sw.js executes skipWaiting for zero-latency activation');
     assert(swContent.includes('clients.claim'), 'sw.js claims clients immediately on activation');
@@ -205,7 +205,7 @@ async function run() {
         assert(domHeadCheck.appleIconHref === 'assets/icons/apple-touch-icon.png', '<link rel="apple-touch-icon"> present in head');
         assert(domHeadCheck.themeColor === '#4F46E5', '<meta name="theme-color" content="#4F46E5"> present');
         assert(domHeadCheck.appleTitle === 'Organizador', '<meta name="apple-mobile-web-app-title" content="Organizador"> present');
-        assert(domHeadCheck.versionText && domHeadCheck.versionText.includes('1.4.1'), 'Settings version pill displays updated "Versión 1.4.1"');
+        assert(domHeadCheck.versionText && domHeadCheck.versionText.includes('1.4.2'), 'Settings version pill displays updated "Versión 1.4.2"');
         assert(domHeadCheck.hasSettingsCard, '#pwa-settings-card present in settings view');
         assert(domHeadCheck.hasSettingsBtn, '#pwa-install-settings-btn present');
         assert(domHeadCheck.hasStatusPill, '#pwa-status-pill present');
@@ -228,12 +228,12 @@ async function run() {
         assert(swRegistrationOk, 'Service Worker registered and activated on secure localhost');
 
         const cacheHasV141 = await page.evaluate(async () => {
-            return await caches.has('organizador-tareas-cache-v1.4.1');
+            return await caches.has('organizador-tareas-cache-v1.4.2');
         });
-        assert(cacheHasV141, 'Cache storage contains "organizador-tareas-cache-v1.4.1"');
+        assert(cacheHasV141, 'Cache storage contains "organizador-tareas-cache-v1.4.2"');
 
         const cachedKeysCount = await page.evaluate(async () => {
-            const cache = await caches.open('organizador-tareas-cache-v1.4.1');
+            const cache = await caches.open('organizador-tareas-cache-v1.4.2');
             const keys = await cache.keys();
             return keys.length;
         });
