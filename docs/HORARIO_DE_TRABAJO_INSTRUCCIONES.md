@@ -37,3 +37,5 @@ Objetivo: para el modo **Organizador de actividades**, ofrecer en Ajustes un bot
 
 ## 5. Pruebas
 - Añadir en `tests/` casos para: valores por defecto, validación de horas, persistencia tras recargar, visibilidad según tipo de cuenta, y exportar/importar.
+
+> **Nota (1.4.4):** esta función forma parte de la reestructuración futura de la app (escuela + trabajo). Las instrucciones de reestructuración se darán después. Ver [REESTRUCTURACION_FUTURA.md](REESTRUCTURACION_FUTURA.md).

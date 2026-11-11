@@ -64,7 +64,7 @@ const tests = [
             });
 
             helpers.assertEqual(finalState.hName, finalState.dName, 'Header and drawer names in strict sync');
-            helpers.assertIncludes(finalState.hName, 'UNAM', 'Final institution is UNAM');
+            helpers.assertIncludes(finalState.hName, 'Mi Organizador', 'Header muestra la identidad del usuario (v1.4.4)');
             helpers.assertEqual(finalState.hPeriod, finalState.dPeriod, 'Header and drawer periods in strict sync');
             helpers.assertEqual(finalState.storageInst, 'unam', 'Storage institution is unam');
             helpers.assertEqual(finalState.hPeriod, finalState.storagePeriod, 'Header period matches Storage period');
@@ -124,8 +124,8 @@ const tests = [
                 return { dName, hName, dPeriod, hPeriod };
             });
 
-            helpers.assertEqual(unconfSync.dName, 'Sin institución', 'Drawer dynamically updated to Sin institución');
-            helpers.assertEqual(unconfSync.hName, 'Sin institución', 'Header dynamically updated to Sin institución');
+            helpers.assertEqual(unconfSync.dName, 'Mi Organizador', 'Drawer dynamically updated to Sin institución');
+            helpers.assertEqual(unconfSync.hName, 'Mi Organizador', 'Header dynamically updated to Sin institución');
             helpers.assertEqual(unconfSync.dPeriod, 'Sin periodo', 'Drawer dynamically updated to Sin periodo');
             helpers.assertEqual(unconfSync.hPeriod, 'Sin periodo', 'Header dynamically updated to Sin periodo');
 
@@ -147,7 +147,7 @@ const tests = [
             });
 
             helpers.assertEqual(uamSync.dName, uamSync.hName, 'Drawer and header match for UAM');
-            helpers.assertIncludes(uamSync.dName, 'UAM', 'Drawer displays UAM');
+            helpers.assertIncludes(uamSync.dName, 'Mi Organizador', 'Drawer displays UAM');
             helpers.assertEqual(uamSync.dPeriod, '1.º Trimestre', 'Drawer reflects trimestral period');
             helpers.assertIncludes(uamSync.dSlogan, 'Casa abierta al tiempo', 'Drawer displays official UAM slogan');
 
@@ -254,8 +254,8 @@ const tests = [
             helpers.assertTrue(stateA.isSkipped, 'State A: isSchoolSkipped preserved across hard reload');
             helpers.assertEqual(stateA.instId, 'unconfigured', 'State A: Institution ID preserved as unconfigured');
             helpers.assertEqual(stateA.period, 'Sin periodo', 'State A: Academic period preserved as Sin periodo');
-            helpers.assertEqual(stateA.headerName, 'Sin institución', 'State A: Header name preserved as Sin institución');
-            helpers.assertIncludes(stateA.headerLogo, '🎓', 'State A: Header logo preserved as graduation cap');
+            helpers.assertEqual(stateA.headerName, 'Mi Organizador', 'State A: Header name preserved as Sin institución');
+            helpers.assertIncludes(stateA.headerLogo, '👤', 'State A: Header logo preserved as graduation cap');
 
             // State B: Custom school with custom cuatrimestral period
             await page.evaluate(() => {
@@ -295,7 +295,7 @@ const tests = [
             helpers.assertFalse(stateB.isSkipped, 'State B: isSchoolSkipped is false for custom school');
             helpers.assertEqual(stateB.instId, 'cust_edge_persist', 'State B: Custom institution ID preserved');
             helpers.assertEqual(stateB.period, '2.º Cuatrimestre', 'State B: Custom period preserved');
-            helpers.assertIncludes(stateB.headerName, 'Colegio Titan', 'State B: Header displays custom name');
+            helpers.assertIncludes(stateB.headerName, 'Mi Organizador', 'State B: Header displays custom name');
             helpers.assertEqual(stateB.headerName, stateB.drawerName, 'State B: Header and drawer names match');
             helpers.assertEqual(stateB.headerPeriod, stateB.drawerPeriod, 'State B: Header and drawer periods match');
             helpers.assertIncludes(stateB.drawerSlogan, 'Fuerza y Disciplina', 'State B: Drawer motto preserved');

@@ -1840,7 +1840,7 @@ html[class*="theme-"]:not(.theme-gray) textarea {
 
 
 
-/* ===== v1.4.3: Popup dinámico (pulsación larga), galería y notas privadas ===== */
+/* ===== v1.4.4: Popup dinámico (pulsación larga), galería y notas privadas ===== */
 #card-dynamic-popup .modal-dialog,
 #note-unlock-modal .modal-dialog {
     opacity: 1;

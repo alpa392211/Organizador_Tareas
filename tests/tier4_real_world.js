@@ -1,7 +1,7 @@
 /**
  * tier4_real_world.js - Tier 4: Real-World Student Application Workflows
  * 5 End-to-End comprehensive student scenarios with opaque-box DOM interactions
- * Requirement-driven test suite for Organizador_Tareas v1.4.3
+ * Requirement-driven test suite for Organizador_Tareas v1.4.4
  */
 
 const tests = [

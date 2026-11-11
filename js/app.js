@@ -413,9 +413,9 @@
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.4.3
+                // Comprobar changelog de versión 1.4.4
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.4.3') {
+                if (lastSeenVersion !== '1.4.4') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
@@ -459,7 +459,7 @@
 
             const headerInstName = document.getElementById('header-inst-name');
             if (headerInstName) {
-                headerInstName.textContent = inst.name;
+                headerInstName.textContent = userName || 'Mi Organizador';
             }
 
             const headerInstPeriod = document.getElementById('header-inst-period');
@@ -476,8 +476,8 @@
             if (logoContainer) {
                 if (userPhoto) {
                     logoContainer.innerHTML = `<img src="${userPhoto}" class="w-10 h-10 rounded-2xl object-cover border border-slate-200/60 dark:border-slate-700/60 shadow-xs" alt="Foto de perfil">`;
-                } else if (InstitutionsModule) {
-                    logoContainer.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-10 h-10');
+                } else {
+                    logoContainer.innerHTML = '<div class="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-slate-700 flex items-center justify-center text-lg leading-none select-none">👤</div>';
                 }
             }
         }
@@ -494,7 +494,7 @@
             const period = Storage.getAcademicPeriod?.() || inst.defaultPeriod || '1.º Semestre';
 
             const drawerName = document.getElementById('drawer-inst-name');
-            if (drawerName) drawerName.textContent = inst.name;
+            if (drawerName) drawerName.textContent = userName || 'Mi Organizador';
 
             const drawerPeriod = document.getElementById('drawer-inst-period');
             if (drawerPeriod) drawerPeriod.textContent = period;
@@ -510,8 +510,8 @@
             if (drawerLogo) {
                 if (userPhoto) {
                     drawerLogo.innerHTML = `<img src="${userPhoto}" class="w-12 h-12 rounded-2xl object-cover border border-slate-200/60 dark:border-slate-700/60 shadow-sm" alt="Foto de perfil">`;
-                } else if (InstitutionsModule) {
-                    drawerLogo.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-12 h-12');
+                } else {
+                    drawerLogo.innerHTML = '<div class="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-slate-700 flex items-center justify-center text-xl leading-none select-none">👤</div>';
                 }
             }
         }
@@ -949,7 +949,7 @@
             const isUnlocked = Storage.isSecretUnlocked();
             const secretSection = document.getElementById('secret-theme-controls');
             if (secretSection) {
-                // v1.4.3: las funciones secretas viven dentro del inventario de la bóveda.
+                // v1.4.4: las funciones secretas viven dentro del inventario de la bóveda.
                 secretSection.classList.add('hidden');
             }
 
@@ -1113,6 +1113,9 @@
 
             document.documentElement.style.setProperty('--inst-primary', inst.colors.primary);
             this.updateCycleBadges();
+            // v1.4.4: la identidad visible es el usuario (nombre y foto), no la escuela.
+            this.renderHeader?.();
+            this.renderDrawer?.();
         }
 
         renderSettingsSchools() {
@@ -1493,7 +1496,7 @@
         switchView(viewName) {
             this.currentView = viewName;
             window.HapticsModule?.light();
-            // v1.4.3: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
+            // v1.4.4: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
             this.closeAllSettingsSubmenus();
 
             const views = ['dashboard', 'subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'];
@@ -2513,7 +2516,7 @@
                         Storage?.setOnboardingCompleted?.(true);
                         closeWelcome();
 
-                        this.switchView?.('dashboard');
+                        this.switchView?.('subjects');
                         this.renderHeader?.();
                         this.renderDrawer?.();
                         this.refreshAll?.();
@@ -2525,7 +2528,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.4.3') {
+                        if (lastSeenVersion !== '1.4.4') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2555,7 +2558,7 @@
                         Storage?.setOnboardingCompleted?.(true);
                         closeWelcome();
 
-                        this.switchView?.('dashboard');
+                        this.switchView?.('subjects');
                         this.renderHeader?.();
                         this.renderDrawer?.();
                         this.refreshAll?.();
@@ -2567,7 +2570,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.4.3') {
+                        if (lastSeenVersion !== '1.4.4') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2816,7 +2819,7 @@
                         orbitron: 'Orbitron (Cyber HUD)'
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
-                    // v1.4.3: la ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
+                    // v1.4.4: la ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
                 };
             });
 
@@ -2971,7 +2974,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.4.3
+            // 11. Novedades de Versión 1.4.4
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -3000,7 +3003,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.4.3');
+                window.StorageModule.setLastSeenVersion('1.4.4');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;

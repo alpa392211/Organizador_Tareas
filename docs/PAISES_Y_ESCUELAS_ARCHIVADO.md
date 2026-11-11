@@ -1,6 +1,6 @@
-# Países y selección de escuelas (archivado en 1.4.3)
+# Países y selección de escuelas (archivado en 1.4.4)
 
-Estos menús están **ocultos** en la interfaz desde la 1.4.3. El usuario ahora sube la foto/logo de su escuela en la configuración inicial.
+Estos menús están **ocultos** en la interfaz desde la 1.4.4. El usuario ahora sube la foto/logo de su escuela en la configuración inicial.
 
 ## Qué está oculto
 | Elemento | Archivo | Cómo se oculta |
@@ -22,3 +22,5 @@ Cuando se confirme que ya no se necesitan, eliminar por completo:
 2. El bloque `#settings-school-selector-block` y los proxies `#welcome-country-*` / `#welcome-schools-*` de `index.html`.
 3. Las claves de país/escuelas personalizadas en `storage.js` (respetando los datos ya guardados por los usuarios al migrar).
 4. Actualizar las pruebas de `tests/` que aún los referencian.
+
+> **Nota (1.4.4):** además, la app ya no asigna automáticamente el logo de una escuela: sin foto se muestra un avatar 👤, y el encabezado/menú muestran el nombre del usuario. Ver [REESTRUCTURACION_FUTURA.md](REESTRUCTURACION_FUTURA.md).

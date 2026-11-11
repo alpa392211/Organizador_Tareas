@@ -56,8 +56,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.4.3">
-    <link rel="stylesheet" href="css/styles.css?v=1.4.3">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.4.4">
+    <link rel="stylesheet" href="css/styles.css?v=1.4.4">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -82,7 +82,7 @@
                     <!-- Insignia y Datos de la Institución con Periodo Adaptado -->
                     <div class="flex items-center gap-2.5">
                         <div id="header-inst-logo" class="shrink-0 flex items-center justify-center cursor-pointer tap-effect transition-transform hover:scale-105 active:scale-95"
-                             title="Tocar para ver datos y lema de tu institución">
+                             title="Tu perfil">
                             <!-- Inyectado dinámicamente con escudo oficial en contenedor blanco -->
                         </div>
                         <div class="flex flex-col">
@@ -91,13 +91,13 @@
                                     UNAM
                                 </span>
                                 <span class="text-slate-300 dark:text-slate-600 hidden xs:inline">•</span>
-                                <span id="header-inst-period" class="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                <span id="header-inst-period" style="display:none" class="hidden text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400">
                                     1.º Semestre
                                 </span>
                             </div>
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <span id="header-user-name" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[160px]"></span>
-                                <span id="header-inst-type" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                <span id="header-user-name" style="display:none" class="hidden text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[160px]"></span>
+                                <span id="header-inst-type" style="display:none" class="hidden text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                                     Semestral
                                 </span>
                                 <span id="header-cycle-warning" class="hidden text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 animate-pulse">
@@ -112,7 +112,7 @@
                 <div class="flex items-center gap-2 sm:gap-3">
                     
                     <!-- Selector Institucional Oficial (UNAM, IPN, UAM, CCH, ENP, CECyT, Colbach, General) -->
-                    <div class="relative hidden sm:block">
+                    <div class="relative hidden" style="display:none">
                         <select id="header-institution-select"
                             class="appearance-none bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold pl-3 pr-8 py-2 rounded-2xl border border-transparent focus:border-indigo-500 focus:outline-none cursor-pointer transition-colors"
                             title="Cambiar institución educativa">
@@ -204,11 +204,11 @@
                             <h2 id="drawer-inst-name" class="text-sm font-black text-slate-900 dark:text-white truncate">
                                 UNAM
                             </h2>
-                            <span id="drawer-inst-period" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                            <span id="drawer-inst-period" style="display:none" class="hidden text-xs font-bold text-indigo-600 dark:text-indigo-400">
                                 1.º Semestre
                             </span>
                         </div>
-                        <p id="drawer-inst-slogan" class="text-[11px] text-slate-600 dark:text-slate-400 italic truncate">
+                        <p id="drawer-inst-slogan" style="display:none" class="hidden text-[11px] text-slate-600 dark:text-slate-400 italic truncate">
                             Por mi raza hablará el espíritu
                         </p>
                         <div id="drawer-cycle-text" class="text-[10px] text-slate-600 dark:text-slate-300 font-mono mt-0.5">
@@ -372,29 +372,7 @@
         <!-- ========================================================= -->
         <!-- VISTA: DASHBOARD / PANEL PRINCIPAL                        -->
         <!-- ========================================================= -->
-        <section id="view-dashboard" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-indigo-500/20 flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div class="space-y-2 text-center sm:text-left">
-                    <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/20 text-white backdrop-blur-xs">
-                        Panel de Control Académico
-                    </span>
-                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight">
-                        ¡Todo listo para hoy! 🚀
-                    </h2>
-                    <p class="text-xs sm:text-sm text-indigo-100 max-w-md">
-                        Revisa tus materias, gestiona tus tareas pendientes y consulta tus notas rápidas desde un solo lugar.
-                    </p>
-                </div>
-                <div class="flex flex-wrap gap-2.5">
-                    <button type="button" class="tap-effect px-4 py-2.5 rounded-2xl bg-white text-indigo-600 font-extrabold text-xs shadow-md hover:bg-slate-50 transition-all" data-view-target="subjects">
-                        📚 Ver Materias
-                    </button>
-                    <button type="button" class="tap-effect px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs border border-white/20 transition-all" data-view-target="tasks">
-                        ✅ Ver Tareas
-                    </button>
-                </div>
-            </div>
-        </section>
+        <section id="view-dashboard" class="hidden"></section>
 
         <!-- ========================================================= -->
         <!-- VISTA 1: MATERIAS Y HORARIOS (LÍMITE ESTRICTO 1 A 16)    -->
@@ -1406,17 +1384,17 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.4.3 -->
+                <!-- VERSIÓN HASTA ABAJO v1.4.4 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.4.3</span>
+                        <span>Versión 1.4.4 🐦</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.4.3</span>
+                        <span>✨ Ver novedades de la versión 1.4.4</span>
                     </button>
                 </div>
             </div>
@@ -2311,8 +2289,8 @@
 
         <div class="modal-dialog relative w-full max-w-xl mx-auto my-auto p-6 sm:p-10 pb-32 space-y-6">
             <!-- Encabezado de bienvenida -->
-            <div class="flex items-center gap-4">
-                <span class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-3xl shrink-0 shadow-lg shadow-indigo-950/50">
+            <div class="flex flex-col items-center text-center gap-3">
+                <span class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-3xl leading-none shrink-0 shadow-lg shadow-indigo-950/50 mx-auto">
                     🎓
                 </span>
                 <div>
@@ -2325,8 +2303,8 @@
                 </div>
             </div>
 
-            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Personaliza tu perfil, elige cómo deseas organizarte y delimita tus fechas para comenzar:
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed text-center">
+                Personaliza tu perfil y delimita tus fechas para comenzar:
             </p>
 
             <!-- Compatibilidad con tests heredados (elementos vacíos ocultos) -->
@@ -2341,8 +2319,8 @@
             <span id="welcome-selected-period-badge" class="hidden"></span>
 
             <form id="cycle-setup-welcome-form" class="space-y-5 pt-1">
-                <!-- 1. Selección de Rama / Tipo de Organizador -->
-                <div class="space-y-2">
+                <!-- 1. Selección de modalidad: oculta hasta la reestructuración (ver docs/REESTRUCTURACION_FUTURA.md) -->
+                <div class="hidden space-y-2" style="display:none" aria-hidden="true">
                     <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
                         1. Selecciona tu Modalidad *
                     </label>
@@ -2452,11 +2430,11 @@
                     <div id="onboarding-progress-bar" class="onboarding-progress-bar bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%;"></div>
                 </div>
                 <div id="onboarding-celebration-msg" class="celebration-msg hidden text-center space-y-3">
-                    <div class="text-2xl sm:text-3xl font-black text-white tracking-tight animate-bounce">
+                    <div class="text-2xl sm:text-3xl font-black text-white tracking-tight animate-bounce text-center leading-snug break-words mx-auto">
                         ¡Disfruta la app! 🎉 🥳 🚀 ✨ 🎊 👏 🎓
                     </div>
                     <p class="text-xs sm:text-sm text-indigo-300 font-semibold max-w-sm mx-auto">
-                        Tu perfil e inicio de ciclo se han configurado con éxito. Preparando tu panel de control...
+                        Tu perfil e inicio de ciclo se han configurado con éxito. Preparando tu organizador...
                     </p>
                 </div>
             </div>
@@ -2564,7 +2542,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.4.3                     -->
+    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.4.4                     -->
     <!-- ========================================================= -->
     <div id="changelog-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
         <div id="changelog-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
@@ -2578,10 +2556,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                            Novedades de la Versión 1.4.3
+                            Novedades de la Versión 1.4.4 🐦
                         </h2>
                         <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                            v1.4.3
+                            v1.4.4 🐦
                         </span>
                     </div>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
@@ -2592,6 +2570,16 @@
 
             <!-- Lista de Cambios Mayores -->
             <div class="space-y-3 py-1">
+                <div class="p-3 rounded-2xl bg-teal-50/60 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">🧹</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Inicio Más Limpio y Centrado</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            Bienvenida con textos y emojis centrados, sin panel de control inicial ni logos de escuela automáticos. Tu nombre y tu foto son ahora la identidad de la app.
+                        </p>
+                    </div>
+                </div>
+
                 <div class="p-3 rounded-2xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50 flex gap-3">
                     <span class="text-xl shrink-0 select-none">🛠️</span>
                     <div>
@@ -2685,17 +2673,17 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js?v=1.4.3"></script>
-    <script src="js/storage.js?v=1.4.3"></script>
-    <script src="js/haptics.js?v=1.4.3"></script>
-    <script src="js/notifications.js?v=1.4.3"></script>
-    <script src="js/widgets.js?v=1.4.3"></script>
-    <script src="js/subjects.js?v=1.4.3"></script>
-    <script src="js/tasks.js?v=1.4.3"></script>
-    <script src="js/notes.js?v=1.4.3"></script>
-    <script src="js/calendar.js?v=1.4.3"></script>
-    <script src="js/archive.js?v=1.4.3"></script>
-    <script src="js/app.js?v=1.4.3"></script>
+    <script src="js/institutions.js?v=1.4.4"></script>
+    <script src="js/storage.js?v=1.4.4"></script>
+    <script src="js/haptics.js?v=1.4.4"></script>
+    <script src="js/notifications.js?v=1.4.4"></script>
+    <script src="js/widgets.js?v=1.4.4"></script>
+    <script src="js/subjects.js?v=1.4.4"></script>
+    <script src="js/tasks.js?v=1.4.4"></script>
+    <script src="js/notes.js?v=1.4.4"></script>
+    <script src="js/calendar.js?v=1.4.4"></script>
+    <script src="js/archive.js?v=1.4.4"></script>
+    <script src="js/app.js?v=1.4.4"></script>
 
     <!-- Visor de fotos de la galería -->
     <div id="photo-preview-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
