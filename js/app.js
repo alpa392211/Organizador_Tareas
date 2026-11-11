@@ -413,9 +413,9 @@
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.4.2
+                // Comprobar changelog de versión 1.4.3
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.4.2') {
+                if (lastSeenVersion !== '1.4.3') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
@@ -949,11 +949,8 @@
             const isUnlocked = Storage.isSecretUnlocked();
             const secretSection = document.getElementById('secret-theme-controls');
             if (secretSection) {
-                if (isUnlocked) {
-                    secretSection.classList.remove('hidden');
-                } else {
-                    secretSection.classList.add('hidden');
-                }
+                // v1.4.3: las funciones secretas viven dentro del inventario de la bóveda.
+                secretSection.classList.add('hidden');
             }
 
             const updateSecretButtons = () => {
@@ -1000,6 +997,7 @@
                     this.applyGrayMode(next);
                     if (grayToggle) grayToggle.checked = next;
                     updateSecretButtons();
+                    this.renderVaultInventory?.();
                     this.showToast(next ? 'Modo Gris activado.' : 'Modo Gris desactivado.', 'info');
                 };
             }
@@ -1495,7 +1493,7 @@
         switchView(viewName) {
             this.currentView = viewName;
             window.HapticsModule?.light();
-            // v1.4.2: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
+            // v1.4.3: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
             this.closeAllSettingsSubmenus();
 
             const views = ['dashboard', 'subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'];
@@ -1753,7 +1751,7 @@
                 }
                 if (nameEl) nameEl.textContent = inst.name;
                 if (fullnameEl) fullnameEl.textContent = inst.fullName;
-                if (sloganEl) sloganEl.textContent = `"${inst.slogan}"`;
+                if (sloganEl) sloganEl.textContent = Storage.getUserName?.() || 'Estudiante';
                 if (systemBadge) systemBadge.textContent = inst.systemType || inst.type;
 
                 if (cycleDates) {
@@ -2527,7 +2525,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.4.2') {
+                        if (lastSeenVersion !== '1.4.3') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2569,7 +2567,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.4.2') {
+                        if (lastSeenVersion !== '1.4.3') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2818,7 +2816,7 @@
                         orbitron: 'Orbitron (Cyber HUD)'
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
-                    // v1.4.2: la ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
+                    // v1.4.3: la ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
                 };
             });
 
@@ -2973,7 +2971,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.4.2
+            // 11. Novedades de Versión 1.4.3
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -3002,7 +3000,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.4.2');
+                window.StorageModule.setLastSeenVersion('1.4.3');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
@@ -3379,8 +3377,9 @@
             if (!grid) return;
 
             const unlocked = window.StorageModule.getUnlockedCodes();
+            const showFeatures = window.StorageModule.isSecretUnlocked();
 
-            if (unlocked.length === 0) {
+            if (unlocked.length === 0 && !showFeatures) {
                 grid.innerHTML = `
                     <div class="vault-empty-state col-span-full py-7 px-5 rounded-2xl bg-purple-50/90 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-500/20 text-center shadow-xs transition-colors">
                         <span class="text-2xl mb-1 block opacity-60 select-none">🔒</span>
@@ -3393,6 +3392,28 @@
 
             const currentSpecialTheme = window.StorageModule.getActiveSpecialTheme ? window.StorageModule.getActiveSpecialTheme() : 'default';
             const currentFont = window.StorageModule.getFontFamily ? window.StorageModule.getFontFamily() : 'calibri';
+
+            const featureDefs = showFeatures ? [
+                { key: 'cats', icon: '🐾', name: 'Efecto Gatitos', category: 'FUNCIÓN', active: !!window.StorageModule.getSecretCatsEnabled() },
+                { key: 'gray', icon: '🔲', name: 'Modo Monocromático', category: 'FUNCIÓN', active: !!window.StorageModule.getGrayModeEnabled() }
+            ] : [];
+            const featureCardsHtml = featureDefs.map(f => `
+                    <div class="vault-inventory-card p-3 rounded-2xl bg-slate-900/80 dark:bg-slate-950/80 border ${f.active ? 'border-emerald-400/60 shadow-lg shadow-emerald-950/40' : 'border-purple-500/20'} flex items-center justify-between gap-2.5 transition-all">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <span class="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-400/20 flex items-center justify-center text-lg shrink-0">${f.icon}</span>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="text-xs font-extrabold text-white min-w-0 flex-1 break-words leading-snug">${f.name}</h4>
+                                <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                    <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">${f.category}</span>
+                                    ${f.active ? '<span class="text-[9px] font-bold text-emerald-400">● ACTIVO</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" data-vault-feature="${f.key}"
+                            class="tap-effect shrink-0 px-2.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${f.active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30' : 'bg-purple-600/30 text-purple-200 border border-purple-500/30 hover:bg-purple-600/50'}">
+                            ${f.active ? 'Desactivar' : 'Activar'}
+                        </button>
+                    </div>`).join('');
 
             grid.innerHTML = unlocked.map(codeId => {
                 const def = VAULT_CATALOG[codeId] || {
@@ -3432,7 +3453,41 @@
                         </button>
                     </div>
                 `;
-            }).join('');
+            }).join('') + featureCardsHtml;
+
+            // Funciones exclusivas de la bóveda (Gatitos / Monocromático)
+            grid.querySelectorAll('[data-vault-feature]').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const Storage = window.StorageModule;
+                    const key = btn.getAttribute('data-vault-feature');
+                    window.HapticsModule?.light?.();
+                    if (key === 'cats') {
+                        const next = !Storage.getSecretCatsEnabled();
+                        if (next) {
+                            const otherActive = Storage.getGrayModeEnabled()
+                                || (Storage.getActiveSpecialTheme && Storage.getActiveSpecialTheme() !== 'default')
+                                || (VAULT_CATALOG && Object.values(VAULT_CATALOG).some(d => d.type === 'font' && d.fontKey && Storage.getFontFamily() === d.fontKey));
+                            if (otherActive) {
+                                this.showToast('Desactiva primero cualquier otro tema, fuente o modo activo para usar Gatitos.', 'warning');
+                                return;
+                            }
+                        }
+                        Storage.setSecretCatsEnabled(next);
+                        this.updateHiddenKitties();
+                        this.showToast(next ? '🐾 ¡Gatitos activados!' : 'Gatitos desactivados.', 'info');
+                    } else if (key === 'gray') {
+                        const next = !Storage.getGrayModeEnabled();
+                        if (next && Storage.getSecretCatsEnabled()) {
+                            this.showToast('Desactiva primero Gatitos para usar el modo monocromático.', 'warning');
+                            return;
+                        }
+                        this.applyGrayMode(next);
+                        this.showToast(next ? 'Modo Monocromático activado.' : 'Modo Monocromático desactivado.', 'info');
+                    }
+                    this.renderVaultInventory();
+                };
+            });
 
             // Attach toggle listeners
             grid.querySelectorAll('[data-vault-toggle]').forEach(btn => {

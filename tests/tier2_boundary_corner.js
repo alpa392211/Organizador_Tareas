@@ -1,7 +1,7 @@
 /**
  * tier2_boundary_corner.js - Tier 2: Boundary & Corner Cases
  * Features F01 through F18 (5 distinct boundary/edge tests per feature, 90 total tests)
- * Requirement-driven edge case validation for Organizador_Tareas v1.4.2
+ * Requirement-driven edge case validation for Organizador_Tareas v1.4.3
  */
 
 const fs = require('fs');
@@ -9,7 +9,7 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.4.2 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.4.3 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
@@ -18,7 +18,7 @@ const tests = [
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.4.2', 'package.json version must be 1.4.2');
+            helpers.assertEqual(pkg.version, '1.4.3', 'package.json version must be 1.4.3');
         }
     },
     {
@@ -30,7 +30,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.4.2';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.4.3';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -41,10 +41,10 @@ const tests = [
         name: 'Dismissing changelog modal records target version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                window.StorageModule?.setLastSeenVersion?.('1.4.2');
+                window.StorageModule?.setLastSeenVersion?.('1.4.3');
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.4.2', 'LocalStorage must record version 1.4.2');
+            helpers.assertEqual(saved, '1.4.3', 'LocalStorage must record version 1.4.3');
         }
     },
     {
@@ -857,10 +857,10 @@ const tests = [
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setOnboardingCompleted?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.4.2');
+                window.StorageModule?.setLastSeenVersion?.('1.4.3');
             });
             const lastSeen = await page.evaluate(() => window.StorageModule?.getLastSeenVersion?.());
-            helpers.assertEqual(lastSeen, '1.4.2', 'Last seen version should be 1.4.2');
+            helpers.assertEqual(lastSeen, '1.4.3', 'Last seen version should be 1.4.3');
         }
     },
     {

@@ -262,7 +262,7 @@ window.StorageModule = (() => {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.4.2');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.4.3');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---

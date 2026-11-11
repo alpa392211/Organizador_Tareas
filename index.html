@@ -56,8 +56,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.4.2">
-    <link rel="stylesheet" href="css/styles.css?v=1.4.2">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.4.3">
+    <link rel="stylesheet" href="css/styles.css?v=1.4.3">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
@@ -899,7 +899,7 @@
                         </div>
 
                         <!-- Selector Rápido de Institución (con Filtro por País y Creador) -->
-                        <div class="space-y-2.5 pt-1">
+                        <div id="settings-school-selector-block" class="hidden space-y-2.5 pt-1" style="display:none" aria-hidden="true">
                             <div class="flex items-center justify-between flex-wrap gap-2">
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                                     Selector de Casa de Estudios (con Escudo Oficial)
@@ -1406,17 +1406,17 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.4.2 -->
+                <!-- VERSIÓN HASTA ABAJO v1.4.3 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.4.2</span>
+                        <span>Versión 1.4.3</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.4.2</span>
+                        <span>✨ Ver novedades de la versión 1.4.3</span>
                     </button>
                 </div>
             </div>
@@ -1524,7 +1524,7 @@
             <button type="button" id="vault-verify-btn" style="display:none;" aria-hidden="true"></button>
 
             <!-- Funciones Especiales Secretas (Exclusivas de la Bóveda) -->
-            <div id="secret-theme-controls" data-theme-switchboard="true" class="w-full max-w-lg mx-auto mt-4 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/80 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-3">
+            <div id="secret-theme-controls" data-theme-switchboard="true" style="display:none" class="hidden w-full max-w-lg mx-auto mt-4 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/80 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-3">
                 <div class="flex items-center gap-2 border-b border-purple-100 dark:border-purple-900/40 pb-2">
                     <span class="text-base select-none">✨</span>
                     <h3 class="text-xs sm:text-sm font-extrabold text-purple-950 dark:text-purple-200">
@@ -2273,7 +2273,7 @@
             <!-- Lema / Eslogan Institucional -->
             <div class="relative z-10 my-4 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60 w-full">
                 <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-                    Lema Oficial
+                    Nombre o Apodo
                 </span>
                 <p id="school-identity-slogan" class="text-sm font-bold italic text-indigo-600 dark:text-indigo-400">
                     "Por mi raza hablará el espíritu"
@@ -2306,10 +2306,10 @@
     <!-- ========================================================= -->
     <!-- MODAL DE BIENVENIDA Y CONFIGURACIÓN INICIAL (ONBOARDING)  -->
     <!-- ========================================================= -->
-    <div id="cycle-setup-modal" class="modal-overlay fixed inset-0 w-full h-full min-h-screen bg-slate-900 dark:bg-slate-950 text-white z-50 overflow-y-auto hidden flex-col justify-start">
+    <div id="cycle-setup-modal" class="modal-overlay fixed inset-0 w-full bg-slate-900 dark:bg-slate-950 text-white z-50 overflow-y-auto hidden flex-col justify-start" style="height:100dvh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain">
         <div id="cycle-setup-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md pointer-events-none"></div>
 
-        <div class="modal-dialog relative w-full max-w-xl mx-auto my-auto p-6 sm:p-10 space-y-6">
+        <div class="modal-dialog relative w-full max-w-xl mx-auto my-auto p-6 sm:p-10 pb-32 space-y-6">
             <!-- Encabezado de bienvenida -->
             <div class="flex items-center gap-4">
                 <span class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-3xl shrink-0 shadow-lg shadow-indigo-950/50">
@@ -2564,7 +2564,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.4.2                     -->
+    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.4.3                     -->
     <!-- ========================================================= -->
     <div id="changelog-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
         <div id="changelog-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
@@ -2578,10 +2578,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                            Novedades de la Versión 1.4.2
+                            Novedades de la Versión 1.4.3
                         </h2>
                         <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                            v1.4.2
+                            v1.4.3
                         </span>
                     </div>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
@@ -2592,6 +2592,26 @@
 
             <!-- Lista de Cambios Mayores -->
             <div class="space-y-3 py-1">
+                <div class="p-3 rounded-2xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">🛠️</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Corrección en la Primera Apertura</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            La pantalla de bienvenida ahora se desplaza por completo y permite llegar a todos los botones inferiores.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">🙋</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Tu Nombre en Lugar del Lema</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                            La tarjeta de identidad muestra tu nombre o apodo en lugar del lema oficial. Además, el diseño de los botones de personalización es ahora uniforme.
+                        </p>
+                    </div>
+                </div>
+
                 <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
                     <span class="text-xl shrink-0 select-none">🎓</span>
                     <div>
@@ -2665,17 +2685,17 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js?v=1.4.2"></script>
-    <script src="js/storage.js?v=1.4.2"></script>
-    <script src="js/haptics.js?v=1.4.2"></script>
-    <script src="js/notifications.js?v=1.4.2"></script>
-    <script src="js/widgets.js?v=1.4.2"></script>
-    <script src="js/subjects.js?v=1.4.2"></script>
-    <script src="js/tasks.js?v=1.4.2"></script>
-    <script src="js/notes.js?v=1.4.2"></script>
-    <script src="js/calendar.js?v=1.4.2"></script>
-    <script src="js/archive.js?v=1.4.2"></script>
-    <script src="js/app.js?v=1.4.2"></script>
+    <script src="js/institutions.js?v=1.4.3"></script>
+    <script src="js/storage.js?v=1.4.3"></script>
+    <script src="js/haptics.js?v=1.4.3"></script>
+    <script src="js/notifications.js?v=1.4.3"></script>
+    <script src="js/widgets.js?v=1.4.3"></script>
+    <script src="js/subjects.js?v=1.4.3"></script>
+    <script src="js/tasks.js?v=1.4.3"></script>
+    <script src="js/notes.js?v=1.4.3"></script>
+    <script src="js/calendar.js?v=1.4.3"></script>
+    <script src="js/archive.js?v=1.4.3"></script>
+    <script src="js/app.js?v=1.4.3"></script>
 
     <!-- Visor de fotos de la galería -->
     <div id="photo-preview-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">

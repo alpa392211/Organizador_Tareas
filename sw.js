@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.4.2
+ * sw.js - Service Worker for Organizador_Tareas v1.4.3
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.4.2';
+const CACHE_NAME = 'organizador-tareas-cache-v1.4.3';
 
 const PRECACHE_ASSETS = [
     './',
@@ -12,20 +12,20 @@ const PRECACHE_ASSETS = [
     './manifest.json',
     './favicon.ico',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.4.2',
-    './css/styles.css?v=1.4.2',
+    './css/tailwind.min.css?v=1.4.3',
+    './css/styles.css?v=1.4.3',
     // JavaScript application modules
-    './js/institutions.js?v=1.4.2',
-    './js/storage.js?v=1.4.2',
-    './js/haptics.js?v=1.4.2',
-    './js/notifications.js?v=1.4.2',
-    './js/widgets.js?v=1.4.2',
-    './js/subjects.js?v=1.4.2',
-    './js/tasks.js?v=1.4.2',
-    './js/notes.js?v=1.4.2',
-    './js/calendar.js?v=1.4.2',
-    './js/archive.js?v=1.4.2',
-    './js/app.js?v=1.4.2',
+    './js/institutions.js?v=1.4.3',
+    './js/storage.js?v=1.4.3',
+    './js/haptics.js?v=1.4.3',
+    './js/notifications.js?v=1.4.3',
+    './js/widgets.js?v=1.4.3',
+    './js/subjects.js?v=1.4.3',
+    './js/tasks.js?v=1.4.3',
+    './js/notes.js?v=1.4.3',
+    './js/calendar.js?v=1.4.3',
+    './js/archive.js?v=1.4.3',
+    './js/app.js?v=1.4.3',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
@@ -57,7 +57,7 @@ self.addEventListener('install', event => {
                     })
                 )
             );
-            console.log(`[SW v1.4.2] Precaching complete. Processed ${results.length} assets.`);
+            console.log(`[SW v1.4.3] Precaching complete. Processed ${results.length} assets.`);
         }).then(() => self.skipWaiting())
     );
 });
@@ -69,7 +69,7 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(name => {
                     if (name !== CACHE_NAME) {
-                        console.log(`[SW v1.4.2] Purging deprecated cache: ${name}`);
+                        console.log(`[SW v1.4.3] Purging deprecated cache: ${name}`);
                         return caches.delete(name);
                     }
                 })
@@ -97,7 +97,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[SW v1.4.2] Navigation offline. Serving cached index.html fallback.');
+                    console.log('[SW v1.4.3] Navigation offline. Serving cached index.html fallback.');
                     const cachedNav = await caches.match(request);
                     if (cachedNav) return cachedNav;
                     return caches.match('./index.html') || caches.match('index.html');

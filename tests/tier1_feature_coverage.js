@@ -1,7 +1,7 @@
 /**
  * tier1_feature_coverage.js - Tier 1: Feature Coverage (Equivalence Classes)
  * Features F01 through F18 (5 distinct tests per feature, 90 total tests)
- * Requirement-driven and opaque-box test suite for Organizador_Tareas v1.4.2
+ * Requirement-driven and opaque-box test suite for Organizador_Tareas v1.4.3
  */
 
 const fs = require('fs');
@@ -9,17 +9,17 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.4.2 & Scoped Changelog
+    // F01: Version Bump 1.4.3 & Scoped Changelog
     // =========================================================================
     {
         id: 'T1_F01_01_package_json_version',
         feature: 'F01',
-        name: 'package.json specifies version 1.4.2',
+        name: 'package.json specifies version 1.4.3',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             helpers.assert(fs.existsSync(pkgPath), 'package.json must exist');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.4.2', 'package.json version must be 1.4.2');
+            helpers.assertEqual(pkg.version, '1.4.3', 'package.json version must be 1.4.3');
             helpers.assertEqual(typeof pkg.version, 'string', 'package.json version must be string');
         }
     },
@@ -30,7 +30,7 @@ const tests = [
         run: async (page, helpers) => {
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const html = fs.readFileSync(htmlPath, 'utf8');
-            const hasVersionedStyles = html.includes('css/styles.css?v=1.4.2') || html.includes('css/styles.css?v=1.4.1');
+            const hasVersionedStyles = html.includes('css/styles.css?v=1.4.3') || html.includes('css/styles.css?v=1.4.1');
             helpers.assertTrue(hasVersionedStyles, 'styles.css must reference version query parameter');
         }
     },
@@ -44,7 +44,7 @@ const tests = [
                 return pill ? pill.textContent.trim() : null;
             });
             helpers.assert(versionText !== null, 'Settings version pill element must exist');
-            helpers.assert(versionText.includes('1.4.2') || versionText.includes('1.4.1'), 'Version indicator must display 1.4.x');
+            helpers.assert(versionText.includes('1.4.3') || versionText.includes('1.4.1'), 'Version indicator must display 1.4.x');
         }
     },
     {
@@ -54,7 +54,7 @@ const tests = [
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const swCode = fs.readFileSync(swPath, 'utf8');
-            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.4.2') || swCode.includes('organizador-tareas-cache-v1.4.1');
+            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.4.3') || swCode.includes('organizador-tareas-cache-v1.4.1');
             helpers.assertTrue(hasTargetCache, 'sw.js must specify v1.4.x cache name');
         }
     },
