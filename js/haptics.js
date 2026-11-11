@@ -206,6 +206,10 @@ window.CardContextMenu = {
                 <div data-popup-title class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">Opciones</div>
                 <button type="button" data-context-action="edit" class="tap-effect w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm font-bold bg-indigo-50 dark:bg-slate-700 text-indigo-700 dark:text-indigo-300"><span>✏️</span><span>Editar</span></button>
                 <button type="button" data-context-action="delete" class="tap-effect w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"><span>🗑️</span><span>Eliminar</span></button>
+                <!-- Aviso temporal v1.4.4 (borrar después de 1.4.4: ver docs/BORRAR_AVISO_INESTABILIDAD_1.4.4.md) -->
+                <div id="context-menu-instability-notice" class="p-2.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/70 text-[11px] leading-snug text-amber-900 dark:text-amber-200">
+                    ⚠️ <strong>En desarrollo:</strong> la versión <strong>1.4.4</strong> no es estable y aún contiene varios errores. Te invitamos a probar la versión <strong>1.5.0</strong> dentro de unos <strong>5 días</strong>.
+                </div>
                 <button type="button" data-popup-close class="tap-effect w-full px-3 py-2 rounded-2xl text-xs font-bold text-slate-500 dark:text-slate-400">Cancelar</button>
             </div>`;
         document.body.appendChild(popup);

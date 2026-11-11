@@ -419,6 +419,8 @@
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
+                } else {
+                    setTimeout(() => this.openInstabilityNoticeIfNeeded?.(), 600);
                 }
             }
         }
@@ -2989,6 +2991,22 @@
             this.applyFontFamily(Storage.getFontFamily?.() || 'calibri');
         }
 
+        // Aviso temporal 1.4.4 (borrar después de 1.4.4: ver docs/BORRAR_AVISO_INESTABILIDAD_1.4.4.md)
+        openInstabilityNoticeIfNeeded() {
+            if (localStorage.getItem('org_escolar_dev_notice_144_seen') === 'true') return;
+            const modal = document.getElementById('dev-instability-modal');
+            if (!modal) return;
+            const close = () => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                localStorage.setItem('org_escolar_dev_notice_144_seen', 'true');
+            };
+            document.getElementById('dev-instability-close-btn')?.addEventListener('click', close, { once: true });
+            document.getElementById('dev-instability-backdrop')?.addEventListener('click', close, { once: true });
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+
         openChangelogModal() {
             const modal = document.getElementById('changelog-modal');
             const confirmBtn = document.getElementById('changelog-confirm-btn');
@@ -3004,6 +3022,7 @@
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
                 window.StorageModule.setLastSeenVersion('1.4.4');
+                this.openInstabilityNoticeIfNeeded?.();
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;

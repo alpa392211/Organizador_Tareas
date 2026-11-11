@@ -2568,6 +2568,15 @@
                 </div>
             </div>
 
+            <!-- Aviso temporal v1.4.4 (borrar después de 1.4.4: ver docs/BORRAR_AVISO_INESTABILIDAD_1.4.4.md) -->
+            <div id="changelog-instability-notice" class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/80 flex gap-3">
+                <span class="text-xl shrink-0 select-none">⚠️</span>
+                <div class="text-xs text-amber-950 dark:text-amber-100 leading-relaxed">
+                    <strong class="block font-extrabold">Aviso importante: versión 1.4.4 en desarrollo</strong>
+                    La app sigue en desarrollo, no es estable y todavía contiene varios errores. Te invitamos a probar la versión <strong>1.5.0</strong> dentro de unos <strong>5 días</strong>.
+                </div>
+            </div>
+
             <!-- Lista de Cambios Mayores -->
             <div class="space-y-3 py-1">
                 <div class="p-3 rounded-2xl bg-teal-50/60 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/50 flex gap-3">
@@ -2669,6 +2678,22 @@
                     <span>¡Entendido! Comenzar</span>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- AVISO TEMPORAL DE INESTABILIDAD 1.4.4 (BORRAR DESPUÉS DE 1.4.4: docs/BORRAR_AVISO_INESTABILIDAD_1.4.4.md) -->
+    <div id="dev-instability-modal" class="fixed inset-0 z-[65] hidden items-center justify-center p-4" style="display:none">
+        <div id="dev-instability-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-xs"></div>
+        <div class="modal-dialog dynamic-popup-in relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-amber-300 dark:border-amber-700/80 p-6 space-y-4 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl mx-auto select-none">⚠️</div>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">Versión 1.4.4 en desarrollo</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Esta aplicación sigue en desarrollo, <strong>no es estable</strong> y aún contiene varios errores.<br><br>
+                Te invitamos a probar la versión <strong>1.5.0</strong> dentro de unos <strong>5 días</strong>.
+            </p>
+            <button type="button" id="dev-instability-close-btn" class="tap-effect w-full py-2.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md">
+                Entendido
+            </button>
         </div>
     </div>
 
