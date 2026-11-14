@@ -6,3 +6,4 @@ scratch/
 .agents/
 __pycache__/
 *.pyc
+.open-design/

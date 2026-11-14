@@ -8,13 +8,37 @@
 :root {
     --inst-primary: #002B7A;
     --font-sans: 'Calibri', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    
-    /* Curvas de aceleración dinámica y elástica por hardware */
-    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Curvas de aceleración dinámica y elástica por hardware (Emil Design Eng / UI Animation) */
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
     --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     --transition-fast: 0.16s var(--ease-smooth);
-    --transition-normal: 0.28s var(--ease-smooth);
+    --transition-normal: 0.26s var(--ease-smooth);
+
+    /* ========================================================
+       LIQUID GLASS WEB APPROXIMATION TOKENS (Modo Claro)
+       Aproximación CSS web (Open Design Appendix C):
+       Blur real reservado a nav, modales y popovers.
+       Tarjetas/paneles usan fondo semitransparente + borde + sombra.
+       ======================================================== */
+    --lg-nav-bg: rgba(255, 255, 255, 0.72);
+    --lg-nav-border: rgba(255, 255, 255, 0.85);
+    --lg-nav-ring: rgba(15, 23, 42, 0.07);
+    --lg-drawer-bg: rgba(248, 250, 252, 0.90);
+    --lg-panel-bg: rgba(255, 255, 255, 0.86);
+    --lg-card-bg: rgba(255, 255, 255, 0.92);
+    --lg-card-border: rgba(203, 213, 225, 0.72);
+    --lg-modal-bg: rgba(255, 255, 255, 0.84);
+    --lg-popover-bg: rgba(255, 255, 255, 0.82);
+    --lg-indicator-bg: rgba(255, 255, 255, 0.96);
+    --lg-indicator-border: rgba(99, 102, 241, 0.16);
+    --lg-specular: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    --shadow-glass-sm: 0 2px 10px -2px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-glass-md: 0 10px 28px -8px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    --shadow-glass-lg: 0 20px 44px -12px rgba(15, 23, 42, 0.15), 0 6px 16px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    --shadow-glass-hover: 0 18px 38px -10px rgba(15, 23, 42, 0.13), 0 6px 14px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
 
 /* ========================================================
@@ -83,16 +107,21 @@
     font-family: var(--font-sans);
 }
 
-/* Modo Claro: Fondo gris suave relajante para evitar deslumbramientos */
+/* Modo Claro: Fondo ambiental con profundidad sutil */
 body {
-    background-color: #eaeff5;
+    background-color: #eaedf4;
+    background-image:
+        radial-gradient(950px 480px at 8% -6%, rgba(99, 102, 241, 0.08), transparent 60%),
+        radial-gradient(820px 440px at 94% 6%, rgba(14, 165, 233, 0.07), transparent 55%);
+    background-attachment: fixed;
     color: #1e293b;
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth);
 }
 
-/* Modo Claro: Contraste diferenciado para clases, tareas y tarjetas para que no se pierdan con el fondo (cuando NO es tema especial) */
+/* Modo Claro: Superficies semitransparentes para tarjetas y paneles (sin blur pesado) */
+html:not(.dark):not([class*="theme-"]) .glass-panel,
 html:not(.dark):not([class*="theme-"]) .stagger-card,
 html:not(.dark):not([class*="theme-"]) .card-hover,
 html:not(.dark):not([class*="theme-"]) #view-subjects > div.bg-white,
@@ -102,97 +131,157 @@ html:not(.dark):not([class*="theme-"]) #view-archive > div.bg-white,
 html:not(.dark):not([class*="theme-"]) #archive-empty-state,
 html:not(.dark):not([class*="theme-"]) #view-settings > div.bg-white,
 html:not(.dark):not([class*="theme-"]) .settings-accordion-card {
-    background-color: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03) !important;
+    background-color: var(--lg-card-bg) !important;
+    border: 1px solid var(--lg-card-border) !important;
+    box-shadow: var(--shadow-glass-md) !important;
 }
 
-/* Modo Claro Estándar: Encabezado y Barra Inferior Limpios (cuando NO es tema especial) */
+/* Modo Claro Estándar: Navegación flotante Liquid Glass (blur real solo en nav, drawer, modales y popovers) */
 html:not(.dark):not([class*="theme-"]) header,
 html:not(.dark):not([class*="theme-"]) #bottom-nav {
-    background-color: #ffffff !important;
-    border-color: #e2e8f0 !important;
+    background-color: var(--lg-nav-bg) !important;
+    border-color: var(--lg-nav-border) !important;
+    box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring) !important;
+}
+html:not(.dark):not([class*="theme-"]) #sidebar-drawer,
+html:not(.dark):not([class*="theme-"]) #sidebar-drawer-footer {
+    background-color: var(--lg-drawer-bg) !important;
+    border-color: rgba(203, 213, 225, 0.65) !important;
+}
+html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
+    background-color: var(--lg-modal-bg) !important;
+    border-color: rgba(255, 255, 255, 0.85) !important;
+    box-shadow: var(--shadow-glass-lg) !important;
 }
 
 /* Modo Oscuro Global */
 html.dark {
     color-scheme: dark;
+    --lg-nav-bg: rgba(15, 23, 42, 0.72);
+    --lg-nav-border: rgba(255, 255, 255, 0.13);
+    --lg-nav-ring: rgba(2, 6, 23, 0.45);
+    --lg-drawer-bg: rgba(15, 23, 42, 0.88);
+    --lg-panel-bg: rgba(15, 23, 42, 0.78);
+    --lg-card-bg: rgba(22, 31, 52, 0.82);
+    --lg-card-border: rgba(255, 255, 255, 0.10);
+    --lg-modal-bg: rgba(15, 23, 42, 0.84);
+    --lg-popover-bg: rgba(15, 23, 42, 0.82);
+    --lg-indicator-bg: rgba(255, 255, 255, 0.12);
+    --lg-indicator-border: rgba(255, 255, 255, 0.18);
+    --lg-specular: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    --shadow-glass-sm: 0 2px 10px -2px rgba(2, 6, 23, 0.40), 0 1px 2px rgba(2, 6, 23, 0.25);
+    --shadow-glass-md: 0 12px 30px -8px rgba(2, 6, 23, 0.50), 0 2px 8px -2px rgba(2, 6, 23, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    --shadow-glass-lg: 0 24px 52px -12px rgba(2, 6, 23, 0.68), 0 8px 20px -4px rgba(2, 6, 23, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    --shadow-glass-hover: 0 20px 42px -10px rgba(2, 6, 23, 0.65), 0 8px 16px -4px rgba(2, 6, 23, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 html.dark body {
-    background-color: #0b1120;
+    background-color: #090e1a;
+    background-image:
+        radial-gradient(950px 480px at 8% -6%, rgba(99, 102, 241, 0.14), transparent 60%),
+        radial-gradient(820px 440px at 94% 6%, rgba(20, 184, 166, 0.09), transparent 55%);
+    background-attachment: fixed;
     color: #f8fafc;
 }
 
-/* Modo Oscuro Estándar: Encabezado, Barra Inferior, Menú Lateral, Modales y Pie Unificados (cuando NO es tema especial) */
+/* Modo Oscuro Estándar: Tarjetas/paneles semitransparentes, Nav/Drawer/Modales Liquid Glass */
+html.dark:not([class*="theme-"]) .glass-panel,
+html.dark:not([class*="theme-"]) .stagger-card,
+html.dark:not([class*="theme-"]) .card-hover,
+html.dark:not([class*="theme-"]) #view-subjects > div.bg-white,
+html.dark:not([class*="theme-"]) #view-tasks > div.bg-white,
+html.dark:not([class*="theme-"]) #view-notes > div.bg-white,
+html.dark:not([class*="theme-"]) #view-archive > div.bg-white,
+html.dark:not([class*="theme-"]) #archive-empty-state,
+html.dark:not([class*="theme-"]) #view-settings > div.bg-white,
+html.dark:not([class*="theme-"]) .settings-accordion-card {
+    background-color: var(--lg-card-bg) !important;
+    border-color: var(--lg-card-border) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+}
 html.dark:not([class*="theme-"]) header,
-html.dark:not([class*="theme-"]) #bottom-nav,
+html.dark:not([class*="theme-"]) #bottom-nav {
+    background-color: var(--lg-nav-bg) !important;
+    border-color: var(--lg-nav-border) !important;
+    box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring) !important;
+}
 html.dark:not([class*="theme-"]) #sidebar-drawer,
 html.dark:not([class*="theme-"]) #sidebar-drawer-footer {
-    background-color: #0f172a !important;
-    border-color: #1e293b !important;
+    background-color: var(--lg-drawer-bg) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
 }
 html.dark:not([class*="theme-"]) #sidebar-drawer-footer > div {
     color: #94a3b8 !important;
 }
 html.dark:not([class*="theme-"]) #app-exit-btn {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
+    background-color: rgba(30, 41, 59, 0.78) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
     color: #f1f5f9 !important;
 }
-html.dark:not([class*="theme-"]) .modal-dialog {
-    background-color: #0f172a !important;
-    border-color: #1e293b !important;
+html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html.dark:not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
+    background-color: var(--lg-modal-bg) !important;
+    border-color: rgba(255, 255, 255, 0.13) !important;
     color: #f8fafc !important;
 }
 
 /* ========================================================
-   MODO MONOCROMÁTICO (GRIS ELEGANTE)
+   MODO MONOCROMÁTICO (GRIS ELEGANTE) - LIQUID GLASS
    Adaptado meticulosamente a Modo Claro y Modo Oscuro
    ======================================================== */
 
-/* Caso 1: Modo Monocromático en MODO CLARO (Silver & Slate Suave Equilibrado - No tan oscuro ni blanco deslumbrante) */
+/* Caso 1: Modo Monocromático en MODO CLARO (Silver & Slate Liquid Glass) */
 html:not(.dark).theme-gray {
     color-scheme: light;
+    --lg-indicator-bg: rgba(255, 255, 255, 0.94);
+    --lg-indicator-border: rgba(100, 116, 139, 0.25);
 }
 html:not(.dark).theme-gray body,
 html:not(.dark).theme-gray body.bg-slate-50 {
     background-color: #d6dbe4 !important;
+    background-image:
+        radial-gradient(900px 440px at 12% -5%, rgba(148, 163, 184, 0.24), transparent 60%),
+        radial-gradient(760px 420px at 90% 10%, rgba(100, 116, 139, 0.14), transparent 55%) !important;
     color: #1e293b !important;
 }
 html:not(.dark).theme-gray header,
-html:not(.dark).theme-gray header.bg-white {
-    background-color: #e2e6ed !important;
-    border-bottom: 1px solid #cbd2dc !important;
-}
+html:not(.dark).theme-gray header.bg-white,
 html:not(.dark).theme-gray #bottom-nav,
 html:not(.dark).theme-gray #bottom-nav.bg-white {
-    background-color: #e2e6ed !important;
-    border-top: 1px solid #cbd2dc !important;
+    background-color: rgba(232, 236, 243, 0.78) !important;
+    border-color: rgba(255, 255, 255, 0.85) !important;
+    box-shadow: var(--shadow-glass-lg), 0 0 0 1px rgba(100, 116, 139, 0.12) !important;
 }
 html:not(.dark).theme-gray #sidebar-drawer,
-html:not(.dark).theme-gray #sidebar-drawer.bg-white {
-    background-color: #eaedf4 !important;
-}
+html:not(.dark).theme-gray #sidebar-drawer.bg-white,
 html:not(.dark).theme-gray #sidebar-drawer-footer {
-    background-color: #d6dbe4 !important;
-    border-top: 1px solid #cbd2dc !important;
+    background-color: rgba(235, 239, 246, 0.90) !important;
+    border-color: #cbd2dc !important;
 }
 html:not(.dark).theme-gray nav {
     border-color: #cbd2dc !important;
 }
+html:not(.dark).theme-gray .glass-panel,
 html:not(.dark).theme-gray .stagger-card,
 html:not(.dark).theme-gray .card-hover,
 html:not(.dark).theme-gray #view-subjects > div.bg-white,
 html:not(.dark).theme-gray #view-tasks > div.bg-white,
 html:not(.dark).theme-gray #view-notes > div.bg-white,
+html:not(.dark).theme-gray #view-archive > div.bg-white,
+html:not(.dark).theme-gray #archive-empty-state,
 html:not(.dark).theme-gray #view-settings > div.bg-white,
 html:not(.dark).theme-gray .settings-accordion-card,
-html:not(.dark).theme-gray .modal-dialog,
 html:not(.dark).theme-gray .bg-white:not(header):not(#bottom-nav):not(#sidebar-drawer):not(#sidebar-drawer-footer) {
-    background-color: #edf1f6 !important;
-    border: 1px solid #c2c9d4 !important;
-    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.08) !important;
+    background-color: rgba(240, 244, 249, 0.90) !important;
+    border: 1px solid rgba(194, 201, 212, 0.9) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+}
+html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html:not(.dark).theme-gray #card-dynamic-popup .modal-dialog {
+    background-color: rgba(241, 244, 249, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.86) !important;
+    box-shadow: var(--shadow-glass-lg) !important;
 }
 html:not(.dark).theme-gray .bg-slate-50:not(body),
 html:not(.dark).theme-gray .bg-slate-100 {
@@ -237,39 +326,49 @@ html.dark.theme-gray #bottom-main-label {
     color: #cbd5e1 !important;
 }
 
-/* Caso 2: Modo Monocromático en MODO OSCURO (Titanium & Slate Gray Notorio) */
+/* Caso 2: Modo Monocromático en MODO OSCURO (Titanium & Slate Liquid Glass) */
 html.dark.theme-gray {
     color-scheme: dark;
+    --lg-indicator-bg: rgba(255, 255, 255, 0.12);
+    --lg-indicator-border: rgba(255, 255, 255, 0.18);
 }
 html.dark.theme-gray body,
 html.dark.theme-gray body.dark\:bg-slate-900 {
-    background-color: #181a1f !important;
+    background-color: #16181d !important;
+    background-image:
+        radial-gradient(900px 440px at 10% -5%, rgba(148, 163, 184, 0.09), transparent 60%),
+        radial-gradient(760px 420px at 90% 10%, rgba(100, 116, 139, 0.08), transparent 55%) !important;
     color: #f1f2f5 !important;
 }
 html.dark.theme-gray header,
-html.dark.theme-gray header.dark\:bg-slate-900 {
-    background-color: #252830 !important;
-    border-bottom: 1px solid #383c46 !important;
-}
+html.dark.theme-gray header.dark\:bg-slate-900,
 html.dark.theme-gray #bottom-nav,
 html.dark.theme-gray #bottom-nav.dark\:bg-slate-900 {
-    background-color: #252830 !important;
-    border-top: 1px solid #383c46 !important;
+    background-color: rgba(34, 37, 45, 0.78) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: var(--shadow-glass-lg), 0 0 0 1px rgba(0, 0, 0, 0.4) !important;
 }
 html.dark.theme-gray #sidebar-drawer,
-html.dark.theme-gray #sidebar-drawer.dark\:bg-slate-900 {
-    background-color: #202228 !important;
-}
+html.dark.theme-gray #sidebar-drawer.dark\:bg-slate-900,
 html.dark.theme-gray #sidebar-drawer-footer {
-    background-color: #181a1f !important;
-    border-top: 1px solid #383c46 !important;
+    background-color: rgba(32, 35, 42, 0.90) !important;
+    border-color: #383c46 !important;
 }
 html.dark.theme-gray .bg-white,
 html.dark.theme-gray .dark\:bg-slate-800,
+html.dark.theme-gray .glass-panel,
 html.dark.theme-gray .stagger-card,
+html.dark.theme-gray .card-hover,
 html.dark.theme-gray .settings-accordion-card {
-    background-color: #252830 !important;
-    border-color: #383c46 !important;
+    background-color: rgba(37, 40, 48, 0.86) !important;
+    border-color: rgba(255, 255, 255, 0.09) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+}
+html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html.dark.theme-gray #card-dynamic-popup .modal-dialog {
+    background-color: rgba(34, 37, 45, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.13) !important;
+    box-shadow: var(--shadow-glass-lg) !important;
 }
 html.dark.theme-gray .bg-slate-50,
 html.dark.theme-gray .bg-slate-100,
@@ -332,36 +431,36 @@ section.hidden, .modal-overlay.hidden {
    SISTEMA DE TRANSICIONES Y ANIMACIONES DINÁMICAS
    ======================================================== */
 
-/* 1. Transición Dinámica de Vistas (Slide-up, Scale & Fade) */
-@keyframes viewSlideUpFade {
+/* 1. Transición Dinámica de Vistas (sin transform/filter residual al finalizar) */
+@keyframes viewGlassEnter {
     0% {
         opacity: 0;
-        transform: translate3d(0, 20px, 0) scale(0.985);
+        transform: translate3d(0, 14px, 0);
     }
     100% {
         opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1);
+        transform: none;
     }
 }
 
 .view-transition {
     opacity: 0;
-    transform: translate3d(0, 20px, 0) scale(0.985);
-    transition: opacity 0.32s var(--ease-smooth), transform 0.32s var(--ease-smooth);
-    will-change: transform, opacity;
+    transform: none;
+    filter: none;
 }
 
 .view-transition.active {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: none;
+    filter: none;
+    animation: viewGlassEnter 0.34s var(--ease-out-expo) both;
 }
 
 /* 2. Modales Dinámicos con Rebote Elástico (Backdrop + Dialog) */
 .modal-overlay {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.28s var(--ease-smooth);
-    will-change: opacity;
+    transition: opacity 0.26s var(--ease-smooth);
 }
 
 .modal-overlay.active {
@@ -371,79 +470,195 @@ section.hidden, .modal-overlay.hidden {
 
 .modal-dialog {
     opacity: 0;
-    transform: translate3d(0, 28px, 0) scale(0.92);
-    transition: transform 0.35s var(--ease-spring), opacity 0.28s var(--ease-smooth);
-    will-change: transform, opacity;
+    transform: translate3d(0, 24px, 0) scale(0.94);
+    transition: transform 0.34s var(--ease-out-expo), opacity 0.24s var(--ease-smooth);
 }
 
 .modal-overlay.active .modal-dialog {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: none;
 }
 
-/* 3. Menú Lateral de Pantalla Completa (Sidebar Drawer Full-Page) */
+/* 3. Menú Lateral Liquid Glass (Sidebar Drawer) */
 #sidebar-drawer {
-    transition: transform 0.36s var(--ease-smooth);
+    transition: transform 0.38s var(--ease-drawer);
     will-change: transform;
 }
 
 #drawer-backdrop {
     transition: opacity 0.32s var(--ease-smooth);
-    will-change: opacity;
 }
 
 /* 4. Efecto Dinámico Staggered Fade-in para Tarjetas (Grid Items) */
 @keyframes cardStaggerIn {
     0% {
         opacity: 0;
-        transform: translate3d(0, 18px, 0) scale(0.96);
-    }
-    70% {
-        transform: translate3d(0, -2px, 0) scale(1.005);
+        transform: translate3d(0, 14px, 0) scale(0.975);
     }
     100% {
         opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1);
+        transform: none;
     }
 }
 
 .stagger-card {
-    animation: cardStaggerIn 0.42s var(--ease-spring) both;
-    animation-delay: calc(var(--stagger-i, 0) * 40ms);
-    will-change: transform, opacity;
+    animation: cardStaggerIn 0.38s var(--ease-out-expo) both;
+    animation-delay: calc(min(var(--stagger-i, 0), 8) * 35ms);
 }
 
 /* 5. Microinteracciones Táctiles y Efecto Scale en Botones */
 .tap-effect {
-    transition: transform 0.16s var(--ease-spring), box-shadow 0.16s var(--ease-smooth), background-color 0.16s var(--ease-smooth);
+    transition: transform 0.16s var(--ease-spring), box-shadow 0.16s var(--ease-smooth), background-color 0.16s var(--ease-smooth), color 0.16s var(--ease-smooth);
+    touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
 }
 
 .tap-effect:active {
-    transform: scale(0.96) !important;
+    transform: scale(0.965) !important;
 }
 
 .tap-scale {
     transition: transform 0.18s var(--ease-spring);
+    touch-action: manipulation;
 }
 
 .tap-scale:active {
     transform: scale(0.94);
 }
 
-/* Hover dinámico en tarjetas interactivas */
+/* Hover reactivo en tarjetas interactivas (solo dispositivos con puntero fino) */
 .card-hover {
     transition: transform 0.24s var(--ease-smooth), box-shadow 0.24s var(--ease-smooth), border-color 0.24s var(--ease-smooth);
 }
 
-.card-hover:hover {
-    transform: translateY(-3px) scale(1.008);
-    box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.1), 0 8px 12px -6px rgba(0, 0, 0, 0.05);
+@media (hover: hover) and (pointer: fine) {
+    .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-glass-hover) !important;
+    }
 }
 
-.dark .card-hover:hover {
-    box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.45), 0 8px 12px -6px rgba(0, 0, 0, 0.25);
+/* ========================================================
+   CAPA LIQUID GLASS REAL (NAV, DRAWER, MODALES Y POPOVERS)
+   Nota: Tarjetas/paneles usan fondo semitransparente + borde
+   + sombra sin backdrop-filter para rendimiento óptimo 60fps.
+   ======================================================== */
+.liquid-glass-nav,
+#bottom-nav.liquid-glass-bottom,
+.liquid-glass-drawer,
+.modal-dialog,
+.liquid-glass-popover,
+.toast-floating-stack > div {
+    backdrop-filter: blur(20px) saturate(175%) contrast(1.03);
+    -webkit-backdrop-filter: blur(20px) saturate(175%) contrast(1.03);
+}
+
+.liquid-glass-nav {
+    position: sticky;
+    overflow: hidden;
+    box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring);
+}
+
+/* Barra inferior flotante con safe-area-inset-bottom (sin overflow:hidden para no recortar el FAB central -mt-7) */
+#bottom-nav.liquid-glass-bottom {
+    position: fixed;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring);
+}
+
+/* Brillo especular superior sutil reservado exclusivamente para barras flotantes */
+.liquid-glass-nav::before,
+#bottom-nav.liquid-glass-bottom::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 42%, transparent 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+html.dark .liquid-glass-nav::before,
+html.dark #bottom-nav.liquid-glass-bottom::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 45%, transparent 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.liquid-header-inner,
+.bottom-nav-inner {
+    position: relative;
+    z-index: 1;
+}
+
+/* Despeje seguro sobre barra inferior flotante y botón central para banner PWA y toasts */
+.pwa-floating-banner {
+    bottom: calc(7.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+.toast-floating-stack {
+    top: calc(5.5rem + env(safe-area-inset-top, 0px));
+    bottom: auto;
+}
+
+@media (min-width: 768px) {
+    .pwa-floating-banner {
+        bottom: 1.5rem;
+    }
+    .toast-floating-stack {
+        top: 6rem;
+        bottom: auto;
+    }
+}
+
+/* Indicadores animados de navegación activa */
+.nav-sliding-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 0.75rem;
+    background: var(--lg-indicator-bg);
+    border: 1px solid var(--lg-indicator-border);
+    box-shadow: var(--shadow-glass-sm), var(--lg-specular);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+    transition:
+        transform 0.36s var(--ease-out-expo),
+        width 0.32s var(--ease-out-expo),
+        height 0.32s var(--ease-out-expo),
+        opacity 0.2s var(--ease-smooth);
+}
+
+.bottom-nav-indicator {
+    border-radius: 1.1rem;
+}
+
+.drawer-nav-active {
+    background: rgba(99, 102, 241, 0.12) !important;
+    color: #4f46e5 !important;
+    border: 1px solid rgba(99, 102, 241, 0.22);
+    box-shadow: var(--shadow-glass-sm);
+}
+
+html.dark .drawer-nav-active {
+    background: rgba(129, 140, 248, 0.18) !important;
+    color: #a5b4fc !important;
+    border-color: rgba(129, 140, 248, 0.28);
+}
+
+html.theme-gray .drawer-nav-active {
+    background: rgba(100, 116, 139, 0.18) !important;
+    color: #1e293b !important;
+    border-color: rgba(100, 116, 139, 0.30) !important;
+}
+
+html.dark.theme-gray .drawer-nav-active {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.20) !important;
 }
 
 /* 6. Botón Flotante Central (FAB) con Pulso Dinámico */
@@ -733,13 +948,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 14px 28px -4px rgba(234, 88, 12, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Botón Central Inferior: Acabado translúcido con degradado vibrante y resplandor suave */
+/* Botón Central Inferior: Acabado vibrante y resplandor suave (sin backdrop-filter anidado) */
 .fab-gradient-action {
-    background: linear-gradient(135deg, rgba(13, 148, 136, 0.90) 0%, rgba(5, 150, 105, 0.90) 50%, rgba(16, 185, 129, 0.90) 100%) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 2px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+    background: linear-gradient(135deg, #0d9488 0%, #059669 50%, #10b981 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.55) !important;
+    box-shadow: 0 10px 26px -3px rgba(16, 185, 129, 0.48), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
     color: #ffffff !important;
     transition: all 0.22s var(--ease-spring);
 }
@@ -748,9 +961,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 12px 28px -2px rgba(16, 185, 129, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
 }
 html.dark .fab-gradient-action {
-    background: linear-gradient(135deg, rgba(13, 148, 136, 0.85) 0%, rgba(5, 150, 105, 0.85) 50%, rgba(16, 185, 129, 0.85) 100%) !important;
+    background: linear-gradient(135deg, #0d9488 0%, #059669 50%, #10b981 100%) !important;
     border: 2px solid rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 10px 26px -3px rgba(16, 185, 129, 0.52), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
 }
 /* MODO MONOCROMÁTICO UNIFICADO: TODOS LOS BOTONES DE ACCESO DIRECTO Y ACCIONES PRINCIPALES */
 html:not(.dark).theme-gray .btn-gradient-subject,
@@ -763,8 +976,6 @@ html:not(.dark).theme-gray #empty-add-task-btn,
 html:not(.dark).theme-gray #empty-add-note-btn,
 html:not(.dark).theme-gray button[type="submit"]:not(.kofi-btn) {
     background: linear-gradient(135deg, #5b6576 0%, #4a5464 50%, #3a4350 100%) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
     border: 2px solid rgba(255, 255, 255, 0.45) !important;
     box-shadow: 0 8px 20px -2px rgba(71, 85, 105, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.45) !important;
     color: #ffffff !important;
@@ -794,8 +1005,6 @@ html.dark.theme-gray #empty-add-task-btn,
 html.dark.theme-gray #empty-add-note-btn,
 html.dark.theme-gray button[type="submit"]:not(.kofi-btn) {
     background: linear-gradient(135deg, #475569 0%, #3a4556 50%, #2f3846 100%) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
     border: 2px solid rgba(255, 255, 255, 0.25) !important;
     box-shadow: 0 8px 22px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.25) !important;
     color: #f8fafc !important;
@@ -806,9 +1015,9 @@ html.dark.theme-gray .btn-gradient-task:hover,
 html.dark.theme-gray .btn-gradient-note:hover,
 html.dark.theme-gray .fab-gradient-action:hover,
 html.dark.theme-gray #bottom-main-circle:hover,
-html.dark.theme-gray #empty-add-subject-btn:hover,
 html.dark.theme-gray #empty-add-task-btn:hover,
 html.dark.theme-gray #empty-add-note-btn:hover,
+html.dark.theme-gray #empty-add-subject-btn:hover,
 html.dark.theme-gray button[type="submit"]:not(.kofi-btn):hover {
     background: linear-gradient(135deg, #526177 0%, #435063 50%, #353f4e 100%) !important;
     box-shadow: 0 12px 26px -2px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
@@ -1081,13 +1290,16 @@ html:not(.dark) .vault-inventory-card button[data-vault-toggle][class*="emerald"
    CALENDARIO EN MODO MONOCROMÁTICO (THEME-GRAY)
    Contraste nítido para números, celdas y fechas
    ======================================================== */
-html.dark.theme-gray #calendar-modal .modal-dialog,
 html.dark.theme-gray #view-calendar {
-    background-color: #18191e !important;
+    background-color: transparent !important;
+    color: #f1f2f5 !important;
+}
+html.dark.theme-gray #calendar-modal .modal-dialog {
+    background-color: rgba(34, 37, 45, 0.86) !important;
     color: #f1f2f5 !important;
 }
 html.dark.theme-gray #cal-days-grid button {
-    background-color: #22242b !important;
+    background-color: rgba(34, 36, 43, 0.92) !important;
     border-color: #353842 !important;
     color: #f8fafc !important;
 }
@@ -1110,13 +1322,16 @@ html.dark.theme-gray #cal-days-grid .text-slate-600 {
 }
 
 /* Calendario en Modo Claro Monocromático */
-html:not(.dark).theme-gray #calendar-modal .modal-dialog,
 html:not(.dark).theme-gray #view-calendar {
-    background-color: #ffffff !important;
+    background-color: transparent !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-gray #calendar-modal .modal-dialog {
+    background-color: rgba(241, 244, 249, 0.88) !important;
     color: #0f172a !important;
 }
 html:not(.dark).theme-gray #cal-days-grid button {
-    background-color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.92) !important;
     border-color: #cbd5e1 !important;
     color: #0f172a !important;
 }
@@ -1248,8 +1463,8 @@ html:not(.dark).theme-gray #cal-days-grid button span {
 }
 
 /* ========================================================
-   TEMAS ESPECIALES CLASIFICADOS DE LA BÓVEDA (v1.3.2)
-   Visibilidad y transformación total en Modo Claro y Oscuro
+   TEMAS ESPECIALES CLASIFICADOS DE LA BÓVEDA (v1.5.0 Liquid Glass)
+   Visibilidad, profundidad cristalina y contraste total
    ======================================================== */
 
 /* 1. Apollo 11: Cósmico Interestelar */
@@ -1261,9 +1476,10 @@ html.theme-apollo header,
 html.theme-apollo #bottom-nav,
 html.theme-apollo #sidebar-drawer,
 html.theme-apollo #sidebar-drawer-footer {
-    background: rgba(10, 15, 35, 0.96) !important;
-    border-color: rgba(99, 102, 241, 0.35) !important;
+    background: rgba(10, 15, 35, 0.82) !important;
+    border-color: rgba(99, 102, 241, 0.36) !important;
 }
+html.theme-apollo .glass-panel,
 html.theme-apollo .stagger-card,
 html.theme-apollo .card-hover,
 html.theme-apollo .settings-accordion-card,
@@ -1272,9 +1488,11 @@ html.theme-apollo #view-subjects > div.bg-white,
 html.theme-apollo #view-tasks > div.bg-white,
 html.theme-apollo #view-notes > div.bg-white,
 html.theme-apollo #view-archive > div.bg-white,
+html.theme-apollo #archive-empty-state,
 html.theme-apollo #view-settings > div.bg-white {
-    background-color: rgba(13, 20, 48, 0.92) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
+    background-color: rgba(13, 20, 48, 0.84) !important;
+    border-color: rgba(99, 102, 241, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #f8fafc !important;
 }
 html.theme-apollo .text-slate-900,
@@ -1300,9 +1518,10 @@ html.theme-eduardo-gold header,
 html.theme-eduardo-gold #bottom-nav,
 html.theme-eduardo-gold #sidebar-drawer,
 html.theme-eduardo-gold #sidebar-drawer-footer {
-    background: rgba(28, 20, 6, 0.96) !important;
-    border-color: rgba(245, 158, 11, 0.45) !important;
+    background: rgba(28, 20, 6, 0.84) !important;
+    border-color: rgba(245, 158, 11, 0.42) !important;
 }
+html.theme-eduardo-gold .glass-panel,
 html.theme-eduardo-gold .stagger-card,
 html.theme-eduardo-gold .card-hover,
 html.theme-eduardo-gold .settings-accordion-card,
@@ -1311,9 +1530,11 @@ html.theme-eduardo-gold #view-subjects > div.bg-white,
 html.theme-eduardo-gold #view-tasks > div.bg-white,
 html.theme-eduardo-gold #view-notes > div.bg-white,
 html.theme-eduardo-gold #view-archive > div.bg-white,
+html.theme-eduardo-gold #archive-empty-state,
 html.theme-eduardo-gold #view-settings > div.bg-white {
-    background-color: rgba(36, 26, 8, 0.92) !important;
-    border-color: rgba(245, 158, 11, 0.35) !important;
+    background-color: rgba(36, 26, 8, 0.86) !important;
+    border-color: rgba(245, 158, 11, 0.34) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #fef9c3 !important;
 }
 html.theme-eduardo-gold .text-slate-900,
@@ -1339,9 +1560,10 @@ html.theme-penguin header,
 html.theme-penguin #bottom-nav,
 html.theme-penguin #sidebar-drawer,
 html.theme-penguin #sidebar-drawer-footer {
-    background: rgba(5, 21, 35, 0.96) !important;
-    border-color: rgba(6, 182, 212, 0.4) !important;
+    background: rgba(5, 21, 35, 0.82) !important;
+    border-color: rgba(6, 182, 212, 0.38) !important;
 }
+html.theme-penguin .glass-panel,
 html.theme-penguin .stagger-card,
 html.theme-penguin .card-hover,
 html.theme-penguin .settings-accordion-card,
@@ -1350,9 +1572,11 @@ html.theme-penguin #view-subjects > div.bg-white,
 html.theme-penguin #view-tasks > div.bg-white,
 html.theme-penguin #view-notes > div.bg-white,
 html.theme-penguin #view-archive > div.bg-white,
+html.theme-penguin #archive-empty-state,
 html.theme-penguin #view-settings > div.bg-white {
-    background-color: rgba(6, 28, 46, 0.92) !important;
-    border-color: rgba(6, 182, 212, 0.3) !important;
+    background-color: rgba(6, 28, 46, 0.85) !important;
+    border-color: rgba(6, 182, 212, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #f0fdfa !important;
 }
 html.theme-penguin .text-slate-900,
@@ -1378,9 +1602,10 @@ html.theme-synthwave header,
 html.theme-synthwave #bottom-nav,
 html.theme-synthwave #sidebar-drawer,
 html.theme-synthwave #sidebar-drawer-footer {
-    background: rgba(26, 7, 38, 0.96) !important;
-    border-color: rgba(236, 72, 153, 0.4) !important;
+    background: rgba(26, 7, 38, 0.84) !important;
+    border-color: rgba(236, 72, 153, 0.38) !important;
 }
+html.theme-synthwave .glass-panel,
 html.theme-synthwave .stagger-card,
 html.theme-synthwave .card-hover,
 html.theme-synthwave .settings-accordion-card,
@@ -1389,9 +1614,11 @@ html.theme-synthwave #view-subjects > div.bg-white,
 html.theme-synthwave #view-tasks > div.bg-white,
 html.theme-synthwave #view-notes > div.bg-white,
 html.theme-synthwave #view-archive > div.bg-white,
+html.theme-synthwave #archive-empty-state,
 html.theme-synthwave #view-settings > div.bg-white {
-    background-color: rgba(35, 10, 50, 0.92) !important;
-    border-color: rgba(236, 72, 153, 0.3) !important;
+    background-color: rgba(35, 10, 50, 0.85) !important;
+    border-color: rgba(236, 72, 153, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #fae8ff !important;
 }
 html.theme-synthwave .text-slate-900,
@@ -1410,16 +1637,17 @@ html.theme-synthwave #bottom-main-circle {
 
 /* 5. Terminal Matrix: Verde Fósforo Cyberspace */
 html.theme-matrix body {
-    background: #020804 !important;
+    background: radial-gradient(circle at 50% 15%, #04160a 0%, #020804 70%, #010402 100%) !important;
     color: #10b981 !important;
 }
 html.theme-matrix header,
 html.theme-matrix #bottom-nav,
 html.theme-matrix #sidebar-drawer,
 html.theme-matrix #sidebar-drawer-footer {
-    background: rgba(2, 12, 5, 0.96) !important;
-    border-color: rgba(16, 185, 129, 0.45) !important;
+    background: rgba(2, 14, 6, 0.82) !important;
+    border-color: rgba(16, 185, 129, 0.42) !important;
 }
+html.theme-matrix .glass-panel,
 html.theme-matrix .stagger-card,
 html.theme-matrix .card-hover,
 html.theme-matrix .settings-accordion-card,
@@ -1428,19 +1656,21 @@ html.theme-matrix #view-subjects > div.bg-white,
 html.theme-matrix #view-tasks > div.bg-white,
 html.theme-matrix #view-notes > div.bg-white,
 html.theme-matrix #view-archive > div.bg-white,
+html.theme-matrix #archive-empty-state,
 html.theme-matrix #view-settings > div.bg-white {
-    background-color: rgba(4, 20, 10, 0.92) !important;
-    border-color: rgba(16, 185, 129, 0.35) !important;
+    background-color: rgba(4, 20, 10, 0.86) !important;
+    border-color: rgba(16, 185, 129, 0.34) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #6ee7b7 !important;
 }
 html.theme-matrix .text-slate-900,
 html.theme-matrix .text-slate-800,
 html.theme-matrix .text-slate-700 {
-    color: #10b981 !important;
+    color: #34d399 !important;
 }
 html.theme-matrix .text-slate-600,
 html.theme-matrix .text-slate-500 {
-    color: #34d399 !important;
+    color: #10b981 !important;
 }
 html.theme-matrix .fab-gradient-action,
 html.theme-matrix #bottom-main-circle {
@@ -1457,9 +1687,10 @@ html.theme-sakura header,
 html.theme-sakura #bottom-nav,
 html.theme-sakura #sidebar-drawer,
 html.theme-sakura #sidebar-drawer-footer {
-    background: rgba(30, 13, 19, 0.96) !important;
-    border-color: rgba(244, 63, 94, 0.4) !important;
+    background: rgba(30, 13, 19, 0.82) !important;
+    border-color: rgba(244, 63, 94, 0.38) !important;
 }
+html.theme-sakura .glass-panel,
 html.theme-sakura .stagger-card,
 html.theme-sakura .card-hover,
 html.theme-sakura .settings-accordion-card,
@@ -1468,9 +1699,11 @@ html.theme-sakura #view-subjects > div.bg-white,
 html.theme-sakura #view-tasks > div.bg-white,
 html.theme-sakura #view-notes > div.bg-white,
 html.theme-sakura #view-archive > div.bg-white,
+html.theme-sakura #archive-empty-state,
 html.theme-sakura #view-settings > div.bg-white {
-    background-color: rgba(38, 17, 24, 0.92) !important;
-    border-color: rgba(244, 63, 94, 0.3) !important;
+    background-color: rgba(38, 17, 24, 0.85) !important;
+    border-color: rgba(244, 63, 94, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #ffe4e6 !important;
 }
 html.theme-sakura .text-slate-900,
@@ -1496,9 +1729,10 @@ html.theme-coffee header,
 html.theme-coffee #bottom-nav,
 html.theme-coffee #sidebar-drawer,
 html.theme-coffee #sidebar-drawer-footer {
-    background: rgba(28, 15, 8, 0.96) !important;
-    border-color: rgba(217, 119, 6, 0.4) !important;
+    background: rgba(28, 15, 8, 0.84) !important;
+    border-color: rgba(217, 119, 6, 0.38) !important;
 }
+html.theme-coffee .glass-panel,
 html.theme-coffee .stagger-card,
 html.theme-coffee .card-hover,
 html.theme-coffee .settings-accordion-card,
@@ -1507,9 +1741,11 @@ html.theme-coffee #view-subjects > div.bg-white,
 html.theme-coffee #view-tasks > div.bg-white,
 html.theme-coffee #view-notes > div.bg-white,
 html.theme-coffee #view-archive > div.bg-white,
+html.theme-coffee #archive-empty-state,
 html.theme-coffee #view-settings > div.bg-white {
-    background-color: rgba(36, 20, 11, 0.92) !important;
-    border-color: rgba(217, 119, 6, 0.3) !important;
+    background-color: rgba(36, 20, 11, 0.86) !important;
+    border-color: rgba(217, 119, 6, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #fef3c7 !important;
 }
 html.theme-coffee .text-slate-900,
@@ -1535,9 +1771,10 @@ html.theme-arcade header,
 html.theme-arcade #bottom-nav,
 html.theme-arcade #sidebar-drawer,
 html.theme-arcade #sidebar-drawer-footer {
-    background: rgba(20, 14, 33, 0.96) !important;
-    border-color: rgba(234, 179, 8, 0.45) !important;
+    background: rgba(20, 14, 33, 0.84) !important;
+    border-color: rgba(234, 179, 8, 0.42) !important;
 }
+html.theme-arcade .glass-panel,
 html.theme-arcade .stagger-card,
 html.theme-arcade .card-hover,
 html.theme-arcade .settings-accordion-card,
@@ -1546,9 +1783,11 @@ html.theme-arcade #view-subjects > div.bg-white,
 html.theme-arcade #view-tasks > div.bg-white,
 html.theme-arcade #view-notes > div.bg-white,
 html.theme-arcade #view-archive > div.bg-white,
+html.theme-arcade #archive-empty-state,
 html.theme-arcade #view-settings > div.bg-white {
-    background-color: rgba(26, 18, 43, 0.92) !important;
-    border-color: rgba(234, 179, 8, 0.35) !important;
+    background-color: rgba(26, 18, 43, 0.86) !important;
+    border-color: rgba(234, 179, 8, 0.34) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #fef9c3 !important;
 }
 html.theme-arcade .text-slate-900,
@@ -1574,9 +1813,10 @@ html.theme-hyperfocus header,
 html.theme-hyperfocus #bottom-nav,
 html.theme-hyperfocus #sidebar-drawer,
 html.theme-hyperfocus #sidebar-drawer-footer {
-    background: rgba(7, 19, 36, 0.96) !important;
-    border-color: rgba(59, 130, 246, 0.45) !important;
+    background: rgba(7, 19, 36, 0.84) !important;
+    border-color: rgba(59, 130, 246, 0.42) !important;
 }
+html.theme-hyperfocus .glass-panel,
 html.theme-hyperfocus .stagger-card,
 html.theme-hyperfocus .card-hover,
 html.theme-hyperfocus .settings-accordion-card,
@@ -1585,9 +1825,11 @@ html.theme-hyperfocus #view-subjects > div.bg-white,
 html.theme-hyperfocus #view-tasks > div.bg-white,
 html.theme-hyperfocus #view-notes > div.bg-white,
 html.theme-hyperfocus #view-archive > div.bg-white,
+html.theme-hyperfocus #archive-empty-state,
 html.theme-hyperfocus #view-settings > div.bg-white {
-    background-color: rgba(10, 26, 50, 0.92) !important;
-    border-color: rgba(59, 130, 246, 0.35) !important;
+    background-color: rgba(10, 26, 50, 0.86) !important;
+    border-color: rgba(59, 130, 246, 0.34) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #dbeafe !important;
 }
 html.theme-hyperfocus .text-slate-900,
@@ -1613,9 +1855,10 @@ html.theme-starlight header,
 html.theme-starlight #bottom-nav,
 html.theme-starlight #sidebar-drawer,
 html.theme-starlight #sidebar-drawer-footer {
-    background: rgba(22, 9, 32, 0.96) !important;
-    border-color: rgba(236, 72, 153, 0.4) !important;
+    background: rgba(22, 9, 32, 0.84) !important;
+    border-color: rgba(236, 72, 153, 0.38) !important;
 }
+html.theme-starlight .glass-panel,
 html.theme-starlight .stagger-card,
 html.theme-starlight .card-hover,
 html.theme-starlight .settings-accordion-card,
@@ -1624,9 +1867,11 @@ html.theme-starlight #view-subjects > div.bg-white,
 html.theme-starlight #view-tasks > div.bg-white,
 html.theme-starlight #view-notes > div.bg-white,
 html.theme-starlight #view-archive > div.bg-white,
+html.theme-starlight #archive-empty-state,
 html.theme-starlight #view-settings > div.bg-white {
-    background-color: rgba(29, 12, 42, 0.92) !important;
-    border-color: rgba(236, 72, 153, 0.3) !important;
+    background-color: rgba(29, 12, 42, 0.86) !important;
+    border-color: rgba(236, 72, 153, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
     color: #fdf2f8 !important;
 }
 html.theme-starlight .text-slate-900,
@@ -1667,6 +1912,28 @@ html[class*="theme-"]:not(.theme-gray) textarea {
     background-color: rgba(255, 255, 255, 0.07) !important;
     color: inherit !important;
     border-color: rgba(255, 255, 255, 0.18) !important;
+}
+html[class*="theme-"]:not(.theme-gray) .liquid-glass-popover {
+    background-color: rgba(15, 23, 42, 0.86) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #f8fafc !important;
+}
+html[class*="theme-"]:not(.theme-gray) .nav-link-btn.nav-link-active {
+    color: #ffffff !important;
+}
+
+/* Preservar contraste oscuro nativo de Onboarding (#cycle-setup-modal) y Bóveda (#vault-reveal-modal) en todos los temas */
+html body #cycle-setup-modal .modal-dialog {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+html body #vault-reveal-modal .modal-dialog {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(59, 7, 100, 0.88) 55%, rgba(2, 6, 23, 0.94) 100%) !important;
+    border-color: rgba(168, 85, 247, 0.45) !important;
+    color: #ffffff !important;
 }
 
 /* ========================================================
@@ -1716,10 +1983,6 @@ html[class*="theme-"]:not(.theme-gray) textarea {
     pointer-events: none !important;
 }
 
-
-
-
-
 /* ===== v1.4.4: Popup dinámico (pulsación larga), galería y notas privadas ===== */
 #card-dynamic-popup .modal-dialog,
 #note-unlock-modal .modal-dialog {
@@ -1745,6 +2008,119 @@ html[class*="theme-"]:not(.theme-gray) textarea {
 .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gallery-thumb .gallery-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 9999px; background: rgba(15, 23, 42, 0.7); color: #fff; font-size: 12px; line-height: 22px; text-align: center; }
 .gallery-name { font-size: 10px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; word-break: break-all; }
+
+/* ========================================================
+   RESPALDO SIN BACKDROP-FILTER, TRANSPARENCIA Y MOVIMIENTO
+   Garantiza legibilidad y accesibilidad en cualquier dispositivo
+   ======================================================== */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .liquid-glass-nav,
+    #bottom-nav.liquid-glass-bottom,
+    .liquid-glass-drawer,
+    .liquid-glass-popover,
+    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    #card-dynamic-popup .modal-dialog {
+        background-color: #ffffff !important;
+    }
+    html.dark .liquid-glass-nav,
+    html.dark #bottom-nav.liquid-glass-bottom,
+    html.dark .liquid-glass-drawer,
+    html.dark .liquid-glass-popover,
+    html.dark .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark #card-dynamic-popup .modal-dialog {
+        background-color: #0f172a !important;
+    }
+    html.theme-gray .liquid-glass-nav,
+    html.theme-gray #bottom-nav.liquid-glass-bottom,
+    html.theme-gray .liquid-glass-drawer,
+    html.theme-gray .liquid-glass-popover,
+    html.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.theme-gray #card-dynamic-popup .modal-dialog {
+        background-color: #edf1f6 !important;
+    }
+    html.dark.theme-gray .liquid-glass-nav,
+    html.dark.theme-gray #bottom-nav.liquid-glass-bottom,
+    html.dark.theme-gray .liquid-glass-drawer,
+    html.dark.theme-gray .liquid-glass-popover,
+    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark.theme-gray #card-dynamic-popup .modal-dialog {
+        background-color: #252830 !important;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .liquid-glass-nav,
+    #bottom-nav.liquid-glass-bottom,
+    .liquid-glass-drawer,
+    .liquid-glass-popover,
+    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    #card-dynamic-popup .modal-dialog,
+    .glass-panel,
+    .stagger-card,
+    .toast-floating-stack > div {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    html:not(.dark):not([class*="theme-"]) .liquid-glass-nav,
+    html:not(.dark):not([class*="theme-"]) #bottom-nav.liquid-glass-bottom,
+    html:not(.dark):not([class*="theme-"]) .liquid-glass-drawer,
+    html:not(.dark):not([class*="theme-"]) .liquid-glass-popover,
+    html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
+    html:not(.dark):not([class*="theme-"]) .glass-panel,
+    html:not(.dark):not([class*="theme-"]) .stagger-card {
+        background-color: #ffffff !important;
+    }
+    html.dark:not([class*="theme-"]) .liquid-glass-nav,
+    html.dark:not([class*="theme-"]) #bottom-nav.liquid-glass-bottom,
+    html.dark:not([class*="theme-"]) .liquid-glass-drawer,
+    html.dark:not([class*="theme-"]) .liquid-glass-popover,
+    html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark:not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
+    html.dark:not([class*="theme-"]) .glass-panel,
+    html.dark:not([class*="theme-"]) .stagger-card {
+        background-color: #0f172a !important;
+    }
+    html:not(.dark).theme-gray .liquid-glass-nav,
+    html:not(.dark).theme-gray #bottom-nav.liquid-glass-bottom,
+    html:not(.dark).theme-gray .liquid-glass-drawer,
+    html:not(.dark).theme-gray .liquid-glass-popover,
+    html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html:not(.dark).theme-gray #card-dynamic-popup .modal-dialog,
+    html:not(.dark).theme-gray .glass-panel,
+    html:not(.dark).theme-gray .stagger-card {
+        background-color: #edf1f6 !important;
+    }
+    html.dark.theme-gray .liquid-glass-nav,
+    html.dark.theme-gray #bottom-nav.liquid-glass-bottom,
+    html.dark.theme-gray .liquid-glass-drawer,
+    html.dark.theme-gray .liquid-glass-popover,
+    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark.theme-gray #card-dynamic-popup .modal-dialog,
+    html.dark.theme-gray .glass-panel,
+    html.dark.theme-gray .stagger-card {
+        background-color: #252830 !important;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .dynamic-popup-in, .note-shake { animation: none; }
+    .view-transition,
+    .view-transition.active,
+    .stagger-card,
+    .modal-dialog,
+    .modal-overlay,
+    #sidebar-drawer,
+    #drawer-backdrop,
+    .nav-sliding-indicator,
+    .fab-glow,
+    .tap-effect,
+    .tap-scale,
+    .card-hover,
+    .dynamic-popup-in,
+    .note-shake,
+    .onboarding-progress-bar,
+    .celebration-msg:not(.hidden) {
+        animation: none !important;
+        transition: none !important;
+    }
 }

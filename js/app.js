@@ -377,6 +377,7 @@
             // 11. Renderizado inicial completo
             this.refreshAll();
             this.updateVaultProgressCard?.();
+            requestAnimationFrame(() => this.updateNavIndicators?.(this.currentView));
 
             // 12. Flujo de inicio de presentación (Presentation-First Flow Ordering)
             // Si el onboarding NO se ha completado: NO solicitar notificaciones ni mostrar changelog; abrir bienvenida primero
@@ -1025,6 +1026,64 @@
                     this.closeSidebarDrawer?.();
                 });
             });
+
+            if (!this._navResizeBound) {
+                this._navResizeBound = true;
+                let resizeRaf = null;
+                window.addEventListener('resize', () => {
+                    if (resizeRaf) cancelAnimationFrame(resizeRaf);
+                    resizeRaf = requestAnimationFrame(() => {
+                        this.updateNavIndicators(this.currentView);
+                    });
+                });
+                document.fonts?.ready?.then(() => {
+                    requestAnimationFrame(() => this.updateNavIndicators(this.currentView));
+                });
+            }
+
+            requestAnimationFrame(() => this.updateNavIndicators(this.currentView));
+        }
+
+        updateNavIndicators(viewName = this.currentView) {
+            const targetView = viewName || this.currentView;
+            const prefersReducedMotion = Boolean(
+                window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            );
+
+            const isVisible = (el) => {
+                if (!el || el.offsetParent === null) return false;
+                const rect = el.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+            };
+
+            const positionIndicator = (container, indicator, activeBtn) => {
+                if (!indicator) return;
+                if (!container || !isVisible(container) || !activeBtn || !isVisible(activeBtn)) {
+                    indicator.style.opacity = '0';
+                    return;
+                }
+                const width = activeBtn.offsetWidth;
+                const height = activeBtn.offsetHeight;
+                if (width <= 0 || height <= 0) {
+                    indicator.style.opacity = '0';
+                    return;
+                }
+                indicator.style.transition = prefersReducedMotion ? 'none' : '';
+                indicator.style.width = `${width}px`;
+                indicator.style.height = `${height}px`;
+                indicator.style.transform = `translate3d(${activeBtn.offsetLeft}px, ${activeBtn.offsetTop}px, 0)`;
+                indicator.style.opacity = '1';
+            };
+
+            const desktopNav = document.getElementById('desktop-nav-pill');
+            const desktopIndicator = document.getElementById('desktop-nav-indicator');
+            const desktopActiveBtn = desktopNav?.querySelector(`[data-view-target="${targetView}"]`) || null;
+            positionIndicator(desktopNav, desktopIndicator, desktopActiveBtn);
+
+            const bottomContainer = document.querySelector('#bottom-nav .bottom-nav-inner');
+            const bottomIndicator = document.getElementById('bottom-nav-indicator');
+            const bottomActiveBtn = bottomContainer?.querySelector(`[data-view-target="${targetView}"]`) || null;
+            positionIndicator(bottomContainer, bottomIndicator, bottomActiveBtn);
         }
 
         closeAllSettingsSubmenus() {
@@ -1053,18 +1112,18 @@
                 }
             });
 
-            // Actualizar botones de navegación activos
+            // Actualizar botones de navegación activos e indicadores flotantes
             document.querySelectorAll('[data-view-target]').forEach(btn => {
                 const isMatch = btn.dataset.viewTarget === viewName;
                 if (btn.classList.contains('nav-link-btn')) {
                     if (isMatch) {
-                        btn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'font-bold');
-                        btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-semibold');
-                        if (btn.closest('header nav')) {
-                            btn.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-xs');
+                        btn.classList.add('nav-link-active', 'text-indigo-600', 'dark:text-indigo-400', 'font-bold');
+                        btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-semibold', 'bg-white', 'dark:bg-slate-700', 'shadow-xs');
+                        if (btn.closest('#sidebar-drawer')) {
+                            btn.classList.add('drawer-nav-active');
                         }
                     } else {
-                        btn.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'font-bold', 'bg-white', 'dark:bg-slate-700', 'shadow-xs');
+                        btn.classList.remove('nav-link-active', 'drawer-nav-active', 'text-indigo-600', 'dark:text-indigo-400', 'font-bold', 'bg-white', 'dark:bg-slate-700', 'shadow-xs');
                         btn.classList.add('text-slate-600', 'dark:text-slate-400', 'font-semibold');
                     }
                 }
@@ -1085,6 +1144,8 @@
                 this.syncSettingsFontButtons();
             }
             if (viewName === 'secret-codes') this.renderVaultInventory();
+
+            requestAnimationFrame(() => this.updateNavIndicators(viewName));
 
             // Scroll suave hacia la parte superior
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2713,10 +2774,10 @@
 
             const toast = document.createElement('div');
             toast.className = `flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold transition-all duration-300 transform translate-y-3 opacity-0 pointer-events-auto border ${
-                type === 'success' ? 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-500/20' :
-                type === 'warning' ? 'bg-amber-600 text-white border-amber-500 shadow-amber-500/20' :
-                type === 'error' ? 'bg-rose-600 text-white border-rose-500 shadow-rose-500/20' :
-                'bg-slate-900 text-white border-slate-700 shadow-slate-900/30'
+                type === 'success' ? 'bg-emerald-600/90 text-white border-emerald-400/50 shadow-emerald-600/25' :
+                type === 'warning' ? 'bg-amber-600/90 text-white border-amber-400/50 shadow-amber-600/25' :
+                type === 'error' ? 'bg-rose-600/90 text-white border-rose-400/50 shadow-rose-600/25' :
+                'bg-slate-900/90 text-white border-white/15 shadow-slate-950/35'
             }`;
 
             const iconSvg = type === 'success' ? `

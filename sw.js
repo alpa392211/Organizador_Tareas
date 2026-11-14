@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.5.0
+ * sw.js - Service Worker for Organizador_Tareas v1.5.0-ui
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.5.0';
+const CACHE_NAME = 'organizador-tareas-cache-v1.5.0-ui';
 
 const PRECACHE_ASSETS = [
     './',
@@ -12,19 +12,19 @@ const PRECACHE_ASSETS = [
     './manifest.json',
     './favicon.ico',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.5.0',
-    './css/styles.css?v=1.5.0',
+    './css/tailwind.min.css?v=1.5.0-ui',
+    './css/styles.css?v=1.5.0-ui',
     // JavaScript application modules
-    './js/storage.js?v=1.5.0',
-    './js/haptics.js?v=1.5.0',
-    './js/notifications.js?v=1.5.0',
-    './js/widgets.js?v=1.5.0',
-    './js/subjects.js?v=1.5.0',
-    './js/tasks.js?v=1.5.0',
-    './js/notes.js?v=1.5.0',
-    './js/calendar.js?v=1.5.0',
-    './js/archive.js?v=1.5.0',
-    './js/app.js?v=1.5.0',
+    './js/storage.js?v=1.5.0-ui',
+    './js/haptics.js?v=1.5.0-ui',
+    './js/notifications.js?v=1.5.0-ui',
+    './js/widgets.js?v=1.5.0-ui',
+    './js/subjects.js?v=1.5.0-ui',
+    './js/tasks.js?v=1.5.0-ui',
+    './js/notes.js?v=1.5.0-ui',
+    './js/calendar.js?v=1.5.0-ui',
+    './js/archive.js?v=1.5.0-ui',
+    './js/app.js?v=1.5.0-ui',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
