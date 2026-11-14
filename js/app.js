@@ -605,10 +605,14 @@
                 pill.textContent = labels[normalized] || 'Normal';
             }
 
+            const group = document.getElementById('settings-glass-intensity-group');
             document.querySelectorAll('#settings-glass-intensity-group [data-glass-intensity]').forEach(btn => {
                 const isSelected = btn.dataset.glassIntensity === normalized;
                 btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
             });
+            if (group) {
+                window.SegmentedControl?.sync?.(group);
+            }
         }
 
         syncSettingsFontButtons() {
@@ -1181,7 +1185,11 @@
             }
             if (viewName === 'secret-codes') this.renderVaultInventory();
 
-            requestAnimationFrame(() => this.updateNavIndicators(viewName));
+            window.SegmentedControl?.syncAll?.({ instant: true });
+            requestAnimationFrame(() => {
+                this.updateNavIndicators(viewName);
+                window.SegmentedControl?.syncAll?.({ instant: true });
+            });
 
             // Scroll suave hacia la parte superior
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2041,6 +2049,8 @@
                             card.classList.remove('open');
                         } else {
                             card.classList.add('open');
+                            window.SegmentedControl?.syncAll?.({ instant: true });
+                            requestAnimationFrame(() => window.SegmentedControl?.syncAll?.({ instant: true }));
                         }
                     }
                 };

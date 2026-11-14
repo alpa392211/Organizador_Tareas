@@ -3261,4 +3261,215 @@ html.dark[data-bg-active="true"] .text-slate-400 {
     color: #cbd5e1;
 }
 
+/* ========================================================
+   v1.5.3 ETAPA 1: CONTROLES SEGMENTADOS CON CÁPSULA DE CRISTAL ANIMADA
+   ======================================================== */
+.segmented-control-track {
+    position: relative !important;
+    isolation: isolate;
+    padding: 0.25rem !important;
+    border-radius: 9999px !important;
+    background-color: rgba(226, 232, 240, 0.88) !important;
+    border: 1px solid rgba(148, 163, 184, 0.32) !important;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+html.dark .segmented-control-track,
+html[class*="theme-"]:not(.theme-gray) .segmented-control-track {
+    background-color: rgba(15, 23, 42, 0.86) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    box-shadow: inset 0 1px 2px rgba(2, 6, 23, 0.45);
+}
+html:not(.dark).theme-gray .segmented-control-track {
+    background-color: rgba(218, 224, 233, 0.92) !important;
+    border-color: rgba(148, 163, 184, 0.42) !important;
+}
+html.dark.theme-gray .segmented-control-track {
+    background-color: rgba(30, 33, 40, 0.90) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+}
 
+.segmented-control-track > button {
+    position: relative;
+    z-index: 1;
+    border-radius: 9999px !important;
+    min-height: 44px;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+    touch-action: manipulation;
+    transition: transform 0.15s var(--ease-spring) !important;
+}
+
+/* Textos de botones inactivos con contraste WCAG >= 4.5:1 */
+.segmented-control-track > button.seg-btn-inactive,
+.segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active) {
+    color: #1e293b !important;
+}
+html.dark .segmented-control-track > button.seg-btn-inactive,
+html.dark .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active),
+html[class*="theme-"]:not(.theme-gray) .segmented-control-track > button.seg-btn-inactive,
+html[class*="theme-"]:not(.theme-gray) .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active) {
+    color: #f1f5f9 !important;
+}
+
+/* Textos de botones activos sobre la cápsula de cristal (>= 7:1 con blanco) */
+.segmented-control-track > button.seg-btn-active,
+.segmented-control-track > button[aria-selected="true"],
+.segmented-control-track > button[aria-pressed="true"],
+.segmented-control-track > button.bg-indigo-600,
+.segmented-control-track > button.notes-seg-active {
+    color: #ffffff !important;
+}
+.segmented-control-track > button.seg-btn-active #notes-gallery-count,
+.segmented-control-track > button.notes-seg-active #notes-gallery-count {
+    background-color: rgba(255, 255, 255, 0.24) !important;
+    color: #ffffff !important;
+}
+
+/* Cápsula deslizante de cristal líquido (SIN backdrop-filter para 60fps en móvil) */
+.segmented-glass-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 9999px;
+    box-sizing: border-box;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(67, 56, 202, 0.96);
+    background-image: linear-gradient(145deg, rgba(67, 56, 202, 0.96) 0%, rgba(79, 70, 229, 0.94) 52%, rgba(55, 48, 163, 0.98) 100%);
+    box-shadow:
+        0 6px 16px -4px rgba(79, 70, 229, 0.48),
+        0 2px 6px -1px rgba(15, 23, 42, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 0.48),
+        inset 0 -1px 2px rgba(30, 27, 75, 0.38);
+    transform: translate3d(0, 0, 0);
+    transform-origin: center center;
+    transition:
+        transform 0.42s cubic-bezier(0.32, 1.25, 0.4, 1),
+        width 0.39s cubic-bezier(0.32, 1.25, 0.4, 1),
+        height 0.39s cubic-bezier(0.32, 1.25, 0.4, 1),
+        opacity 0.18s var(--ease-smooth);
+}
+
+/* Borde especular degradado (más luminoso arriba-izquierda, sutil abajo-derecha) */
+.segmented-glass-indicator::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(199, 210, 254, 0.32) 48%, rgba(255, 255, 255, 0.10) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+}
+
+/* Reflejo especular curvo superior sutil */
+.segmented-glass-indicator::after {
+    content: "";
+    position: absolute;
+    inset: 1px 4px 42% 4px;
+    border-radius: 9999px;
+    pointer-events: none;
+    background: radial-gradient(120% 90% at 50% -12%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0) 68%);
+}
+
+/* Primer render / cambio de vista: sin transición */
+.segmented-glass-indicator.is-instant {
+    transition: none !important;
+    transition-duration: 0s !important;
+    animation: none !important;
+}
+
+/* Deformación elástica líquida durante el trayecto */
+@keyframes segmentedLiquidScale {
+    0% {
+        scale: 1 1;
+    }
+    38% {
+        scale: var(--seg-stretch-x, 1.08) var(--seg-squish-y, 0.93);
+    }
+    76% {
+        scale: 0.988 1.012;
+    }
+    100% {
+        scale: 1 1;
+    }
+}
+.segmented-glass-indicator.is-deforming {
+    animation: segmentedLiquidScale 0.42s cubic-bezier(0.32, 1.25, 0.4, 1) both;
+}
+
+/* Intensidad del cristal "Suave": transición corta sin deformación y menor brillo */
+html[data-glass-intensity="suave"] .segmented-glass-indicator {
+    transition:
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.15s ease !important;
+    animation: none !important;
+}
+html[data-glass-intensity="suave"] .segmented-glass-indicator::before,
+html[data-glass-intensity="suave"] .segmented-glass-indicator::after {
+    opacity: 0.35;
+}
+
+/* Paleta de la cápsula deslizante para Monocromático y los 10 temas de la Bóveda (contraste >= 4.5:1) */
+html.theme-gray .segmented-glass-indicator {
+    background-color: rgba(51, 65, 85, 0.96);
+    background-image: linear-gradient(145deg, rgba(51, 65, 85, 0.96) 0%, rgba(71, 85, 105, 0.94) 52%, rgba(30, 41, 59, 0.98) 100%);
+    box-shadow: 0 6px 16px -4px rgba(15, 23, 42, 0.38), 0 2px 6px -1px rgba(15, 23, 42, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.42);
+}
+html.theme-matrix .segmented-glass-indicator {
+    background-color: rgba(6, 95, 70, 0.96);
+    background-image: linear-gradient(145deg, rgba(6, 95, 70, 0.96) 0%, rgba(4, 120, 87, 0.94) 52%, rgba(6, 78, 59, 0.98) 100%);
+    box-shadow: 0 6px 16px -4px rgba(16, 185, 129, 0.42), 0 2px 6px -1px rgba(2, 6, 23, 0.38), inset 0 1px 1px rgba(167, 243, 208, 0.45);
+}
+html.theme-sakura .segmented-glass-indicator {
+    background-color: rgba(159, 18, 57, 0.96);
+    background-image: linear-gradient(145deg, rgba(159, 18, 57, 0.96) 0%, rgba(190, 18, 60, 0.94) 52%, rgba(136, 19, 55, 0.98) 100%);
+    box-shadow: 0 6px 16px -4px rgba(244, 63, 94, 0.42), 0 2px 6px -1px rgba(2, 6, 23, 0.38), inset 0 1px 1px rgba(254, 205, 211, 0.45);
+}
+html.theme-arcade .segmented-glass-indicator {
+    background-color: rgba(91, 33, 182, 0.96);
+    background-image: linear-gradient(145deg, rgba(91, 33, 182, 0.96) 0%, rgba(109, 40, 217, 0.94) 52%, rgba(76, 29, 149, 0.98) 100%);
+}
+html.theme-synthwave .segmented-glass-indicator {
+    background-color: rgba(134, 25, 143, 0.96);
+    background-image: linear-gradient(145deg, rgba(134, 25, 143, 0.96) 0%, rgba(162, 28, 175, 0.94) 52%, rgba(112, 26, 117, 0.98) 100%);
+}
+html.theme-coffee .segmented-glass-indicator,
+html.theme-eduardo-gold .segmented-glass-indicator {
+    background-color: rgba(146, 64, 14, 0.96);
+    background-image: linear-gradient(145deg, rgba(146, 64, 14, 0.96) 0%, rgba(180, 83, 9, 0.94) 52%, rgba(120, 53, 15, 0.98) 100%);
+}
+html.theme-penguin .segmented-glass-indicator {
+    background-color: rgba(21, 94, 117, 0.96);
+    background-image: linear-gradient(145deg, rgba(21, 94, 117, 0.96) 0%, rgba(14, 116, 144, 0.94) 52%, rgba(22, 78, 99, 0.98) 100%);
+}
+html.theme-apollo .segmented-glass-indicator,
+html.theme-hyperfocus .segmented-glass-indicator {
+    background-color: rgba(30, 64, 175, 0.96);
+    background-image: linear-gradient(145deg, rgba(30, 64, 175, 0.96) 0%, rgba(29, 78, 216, 0.94) 52%, rgba(30, 58, 138, 0.98) 100%);
+}
+html.theme-starlight .segmented-glass-indicator {
+    background-color: rgba(131, 24, 67, 0.96);
+    background-image: linear-gradient(145deg, rgba(131, 24, 67, 0.96) 0%, rgba(157, 23, 77, 0.94) 52%, rgba(112, 26, 117, 0.98) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .segmented-glass-indicator,
+    .segmented-glass-indicator.is-deforming,
+    .segmented-control-track > button {
+        transition: none !important;
+        transition-duration: 0s !important;
+        animation: none !important;
+        scale: 1 1 !important;
+    }
+}

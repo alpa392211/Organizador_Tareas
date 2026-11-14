@@ -107,14 +107,7 @@ window.TasksModule = (() => {
 
         document.querySelectorAll('[data-task-filter]').forEach(btn => {
             btn.onclick = () => {
-                document.querySelectorAll('[data-task-filter]').forEach(b => {
-                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'bg-slate-100', 'dark:bg-slate-800');
-                    b.classList.add('text-slate-600', 'dark:text-slate-300');
-                });
-                btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300', 'dark:text-slate-400');
-                currentFilter = btn.dataset.taskFilter;
-                render();
+                setFilter(btn.dataset.taskFilter);
             };
         });
 
@@ -775,9 +768,27 @@ window.TasksModule = (() => {
                   .replace(/'/g, '&#039;');
     }
 
+    function setFilter(nextFilter) {
+        currentFilter = nextFilter || 'all';
+        document.querySelectorAll('[data-task-filter]').forEach(b => {
+            const active = b.dataset.taskFilter === currentFilter;
+            b.classList.toggle('bg-indigo-600', active);
+            b.classList.toggle('text-white', active);
+            b.classList.toggle('shadow-md', active);
+            b.classList.toggle('text-slate-600', !active);
+            b.classList.toggle('dark:text-slate-300', !active);
+            b.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'dark:text-slate-400');
+            b.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        const track = document.getElementById('tasks-filter-track') || document.querySelector('[data-task-filter]')?.closest('.segmented-control-track');
+        if (track) window.SegmentedControl?.sync?.(track);
+        render();
+    }
+
     return {
         init,
         render,
+        setFilter,
         openAddModal,
         openEditModal,
         closeModal,

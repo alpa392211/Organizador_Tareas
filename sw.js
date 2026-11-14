@@ -20,6 +20,7 @@ const PRECACHE_ASSETS = [
     // JavaScript application modules
     './js/storage.js?v=1.5.2',
     './js/haptics.js?v=1.5.2',
+    './js/segmented.js?v=1.5.2',
     './js/notifications.js?v=1.5.2',
     './js/widgets.js?v=1.5.2',
     './js/subjects.js?v=1.5.2',

@@ -453,17 +453,17 @@
                     </div>
 
                     <!-- Filtro por Estado (Control segmentado estilo Apple: Todas, Pendientes, Completadas) -->
-                    <div class="sm:col-span-4 segmented-control-track rounded-full flex items-center gap-1 min-w-0">
-                        <button type="button" data-task-filter="all"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-bold rounded-full transition-all bg-indigo-600 text-white shadow-md truncate">
+                    <div id="tasks-filter-track" role="tablist" aria-label="Filtrar tareas por estado" class="sm:col-span-4 segmented-control-track rounded-full flex items-center gap-1 min-w-0">
+                        <button type="button" data-task-filter="all" aria-selected="true"
+                            class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2 py-2 text-xs font-bold rounded-full transition-colors bg-indigo-600 text-white shadow-md truncate">
                             Todas
                         </button>
-                        <button type="button" data-task-filter="pending"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-all truncate">
+                        <button type="button" data-task-filter="pending" aria-selected="false"
+                            class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2 py-2 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-colors truncate">
                             Pendientes
                         </button>
-                        <button type="button" data-task-filter="completed"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-all truncate">
+                        <button type="button" data-task-filter="completed" aria-selected="false"
+                            class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2 py-2 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-colors truncate">
                             Listas
                         </button>
                     </div>
@@ -548,14 +548,14 @@
                 <!-- Control segmentado Notas | Galería (estilo Apple HIG) -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
                     <div id="notes-view-tabs" role="tablist" aria-label="Secciones de notas"
-                        class="notes-segmented-control inline-flex items-center p-1 rounded-2xl bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 w-full sm:w-auto">
+                        class="notes-segmented-control segmented-control-track inline-flex items-center p-1 rounded-full bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 w-full sm:w-auto">
                         <button type="button" id="notes-tab-notes" role="tab" aria-selected="true" data-notes-tab="notes"
-                            class="notes-seg-btn notes-seg-active touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            class="notes-seg-btn notes-seg-active touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-full text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
                             <span>📝</span>
                             <span>Notas</span>
                         </button>
                         <button type="button" id="notes-tab-gallery" role="tab" aria-selected="false" data-notes-tab="gallery"
-                            class="notes-seg-btn touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            class="notes-seg-btn touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-full text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
                             <span>🖼️</span>
                             <span>Galería</span>
                             <span id="notes-gallery-count" class="px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">0</span>
@@ -785,14 +785,14 @@
                     </div>
 
                     <!-- Pestañas de Filtrado (Control segmentado) -->
-                    <div class="segmented-control-track rounded-full flex items-center gap-1 self-stretch sm:self-auto min-w-0">
-                        <button type="button" data-archive-filter="all" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-indigo-600 text-white shadow-xs">
+                    <div id="archive-filter-track" role="tablist" aria-label="Filtrar elementos del baúl" class="segmented-control-track rounded-full flex items-center gap-1 self-stretch sm:self-auto min-w-0">
+                        <button type="button" data-archive-filter="all" aria-selected="true" class="touch-target-44 tap-effect flex-1 sm:flex-initial min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-colors bg-indigo-600 text-white shadow-xs">
                             Todos
                         </button>
-                        <button type="button" data-archive-filter="tasks" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
+                        <button type="button" data-archive-filter="tasks" aria-selected="false" class="touch-target-44 tap-effect flex-1 sm:flex-initial min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-colors text-slate-600 dark:text-slate-300">
                             Tareas
                         </button>
-                        <button type="button" data-archive-filter="notes" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
+                        <button type="button" data-archive-filter="notes" aria-selected="false" class="touch-target-44 tap-effect flex-1 sm:flex-initial min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-colors text-slate-600 dark:text-slate-300">
                             Notas
                         </button>
                     </div>
@@ -2519,6 +2519,7 @@
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
     <script src="js/storage.js?v=1.5.2"></script>
     <script src="js/haptics.js?v=1.5.2"></script>
+    <script src="js/segmented.js?v=1.5.2"></script>
     <script src="js/notifications.js?v=1.5.2"></script>
     <script src="js/widgets.js?v=1.5.2"></script>
     <script src="js/subjects.js?v=1.5.2"></script>

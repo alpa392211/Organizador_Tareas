@@ -3901,6 +3901,272 @@ const tests = [
                 await window.StorageModule?.clearGalleryPhotosIdb?.();
             });
         }
+    },
+    {
+        id: 'T2_F26_01_segmented_indicator_presence_position_and_motion',
+        feature: 'F26',
+        name: 'Segmented controls have a single liquid crystal indicator behind the active button, no initial animation, spring slide on click, and 0s under prefers-reduced-motion',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+
+            const trackChecks = await page.evaluate(async () => {
+                window.StorageModule?.setGlassIntensity?.('intenso');
+                window.OrganizadorApp?.applyGlassIntensity?.('intenso');
+
+                const results = {};
+
+                const inspectTrack = (trackId, btnSelector) => {
+                    const track = document.getElementById(trackId);
+                    if (!track) return { exists: false };
+                    const ind = track.querySelector('.segmented-glass-indicator');
+                    const btns = Array.from(track.querySelectorAll(btnSelector));
+                    const activeBtn = btns.find(b =>
+                        b.classList.contains('seg-btn-active') ||
+                        b.getAttribute('aria-selected') === 'true' ||
+                        b.getAttribute('aria-pressed') === 'true' ||
+                        b.classList.contains('bg-indigo-600') ||
+                        b.classList.contains('notes-seg-active')
+                    ) || btns[0];
+
+                    const indRect = ind?.getBoundingClientRect();
+                    const btnRect = activeBtn?.getBoundingClientRect();
+                    const indStyle = ind ? getComputedStyle(ind) : null;
+
+                    return {
+                        exists: Boolean(ind),
+                        indicatorCount: track.querySelectorAll('.segmented-glass-indicator').length,
+                        firstRenderAnimated: ind?.dataset.firstRenderAnimated,
+                        backdropFilter: indStyle?.backdropFilter || indStyle?.webkitBackdropFilter || 'none',
+                        zIndexInd: parseInt(indStyle?.zIndex || '0', 10),
+                        zIndexBtn: parseInt(activeBtn ? getComputedStyle(activeBtn).zIndex || '0' : '0', 10),
+                        posDiffX: indRect && btnRect ? Math.abs(indRect.left - btnRect.left) : 999,
+                        posDiffY: indRect && btnRect ? Math.abs(indRect.top - btnRect.top) : 999,
+                        widthDiff: indRect && btnRect ? Math.abs(indRect.width - btnRect.width) : 999,
+                        heightDiff: indRect && btnRect ? Math.abs(indRect.height - btnRect.height) : 999,
+                        minBtnHeight: Math.min(...btns.map(b => Math.round(b.getBoundingClientRect().height)))
+                    };
+                };
+
+                // 1. Tareas
+                window.OrganizadorApp?.switchView?.('tasks');
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                results.tasks = inspectTrack('tasks-filter-track', 'button[data-task-filter]');
+
+                // Test click transition on Tareas
+                const taskTrack = document.getElementById('tasks-filter-track');
+                const taskInd = taskTrack.querySelector('.segmented-glass-indicator');
+                const beforeTransform = taskInd.style.transform;
+                const pendingBtn = taskTrack.querySelector('[data-task-filter="pending"]');
+                pendingBtn.click();
+                const afterTransform = taskInd.style.transform;
+                const activeDuration = parseFloat(getComputedStyle(taskInd).transitionDuration) || 0;
+                const hasDeformingClass = taskInd.classList.contains('is-deforming');
+                results.tasksClick = {
+                    beforeTransform,
+                    afterTransform,
+                    changed: beforeTransform !== afterTransform,
+                    activeDuration,
+                    hasDeformingClass
+                };
+                // Reset back to all
+                taskTrack.querySelector('[data-task-filter="all"]')?.click();
+
+                // 2. Notas | Galería
+                window.OrganizadorApp?.switchView?.('notes');
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                results.notes = inspectTrack('notes-view-tabs', 'button[data-notes-tab]');
+
+                // 3. Baúl
+                window.OrganizadorApp?.switchView?.('archive');
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                results.archive = inspectTrack('archive-filter-track', 'button[data-archive-filter]');
+
+                // 4. Configuraciones > Intensidad del cristal
+                window.OrganizadorApp?.switchView?.('settings');
+                const appearanceHeader = document.querySelector('#settings-acc-appearance .settings-accordion-header');
+                if (appearanceHeader && !document.getElementById('settings-acc-appearance')?.classList.contains('open')) {
+                    appearanceHeader.click();
+                }
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                results.glass = inspectTrack('settings-glass-intensity-group', 'button[data-glass-intensity]');
+
+                return results;
+            });
+
+            for (const key of ['tasks', 'notes', 'archive', 'glass']) {
+                const c = trackChecks[key];
+                helpers.assertTrue(c.exists && c.indicatorCount === 1, `Track ${key} must have exactly 1 .segmented-glass-indicator`);
+                helpers.assertEqual(c.firstRenderAnimated, 'false', `Track ${key} must NOT animate on initial render`);
+                helpers.assertEqual(c.backdropFilter, 'none', `Track ${key} indicator must NOT use backdrop-filter`);
+                helpers.assertTrue(c.zIndexBtn > c.zIndexInd, `Track ${key} buttons must sit above indicator`);
+                helpers.assertTrue(c.posDiffX <= 1.5 && c.posDiffY <= 1.5, `Track ${key} indicator must align with active button (dx=${c.posDiffX}, dy=${c.posDiffY})`);
+                helpers.assertTrue(c.widthDiff <= 1.5 && c.heightDiff <= 1.5, `Track ${key} indicator size must match active button (dw=${c.widthDiff}, dh=${c.heightDiff})`);
+                helpers.assertTrue(c.minBtnHeight >= 44, `Track ${key} buttons must have min-height >= 44px (got ${c.minBtnHeight})`);
+            }
+
+            helpers.assertTrue(trackChecks.tasksClick.changed, 'Clicking another segmented button must update indicator transform');
+            helpers.assertTrue(trackChecks.tasksClick.activeDuration > 0, `Indicator must have transitionDuration > 0 when motion is allowed (got ${trackChecks.tasksClick.activeDuration})`);
+            helpers.assertTrue(trackChecks.tasksClick.hasDeformingClass, 'Indicator must apply liquid deformation class during travel in normal/intenso mode');
+
+            // Test prefers-reduced-motion: reduce
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+            const reducedCheck = await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('tasks');
+                const track = document.getElementById('tasks-filter-track');
+                const ind = track.querySelector('.segmented-glass-indicator');
+                track.querySelector('[data-task-filter="completed"]')?.click();
+                const dur = parseFloat(getComputedStyle(ind).transitionDuration) || 0;
+                const deforming = ind.classList.contains('is-deforming');
+                track.querySelector('[data-task-filter="all"]')?.click();
+                return { dur, deforming };
+            });
+            helpers.assertEqual(reducedCheck.dur, 0, 'With prefers-reduced-motion: reduce, transitionDuration must be 0');
+            helpers.assertFalse(reducedCheck.deforming, 'With prefers-reduced-motion: reduce, liquid deformation must not run');
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+        }
+    },
+    {
+        id: 'T2_F26_02_segmented_rerender_survival_contrast_and_overflow',
+        feature: 'F26',
+        name: 'Segmented indicator survives track innerHTML re-render, supports keyboard arrows, maintains WCAG >= 4.5:1 across themes/backgrounds, and has 0px overflow at 320/360/430px',
+        run: async (page, helpers) => {
+            // 1. Survives innerHTML re-render and animates from previous position, plus keyboard arrow navigation
+            const behaviorRes = await page.evaluate(async () => {
+                window.OrganizadorApp?.switchView?.('tasks');
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                const track = document.getElementById('tasks-filter-track');
+                const indBefore = track.querySelector('.segmented-glass-indicator');
+                const posBefore = indBefore.style.transform;
+
+                // Simulate a module rewriting track.innerHTML with a different active button ('completed')
+                track.innerHTML = `
+                    <button type="button" data-task-filter="all" class="touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold text-slate-600 dark:text-slate-300 transition-all">Todas</button>
+                    <button type="button" data-task-filter="pending" class="touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold text-slate-600 dark:text-slate-300 transition-all">Pendientes</button>
+                    <button type="button" data-task-filter="completed" class="touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-bold bg-indigo-600 text-white shadow-xs transition-all">Completadas</button>
+                `;
+                // Re-bind TasksModule filter listeners
+                document.querySelectorAll('[data-task-filter]').forEach(btn => {
+                    btn.onclick = () => window.TasksModule?.setFilter?.(btn.dataset.taskFilter);
+                });
+
+                const indAfter = track.querySelector('.segmented-glass-indicator');
+                const sameNode = indBefore === indAfter;
+                const posAfter = indAfter?.style.transform;
+
+                // Keyboard navigation: ArrowRight from 'completed' wraps to 'all'
+                const completedBtn = track.querySelector('[data-task-filter="completed"]');
+                completedBtn.focus();
+                track.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+                const activeAfterRight = track.querySelector('.seg-btn-active')?.dataset?.taskFilter;
+
+                return {
+                    sameNode,
+                    movedOnRerender: posBefore !== posAfter,
+                    activeAfterRight
+                };
+            });
+
+            helpers.assertTrue(behaviorRes.sameNode, 'Indicator DOM element must survive track.innerHTML re-render');
+            helpers.assertTrue(behaviorRes.movedOnRerender, 'Indicator must slide to new active button after track.innerHTML re-render');
+            helpers.assertEqual(behaviorRes.activeAfterRight, 'all', 'ArrowRight keydown must advance active segmented option');
+
+            // 2. WCAG >= 4.5:1 contrast for active and inactive buttons across Claro, Oscuro, Monocromático, and Vault themes
+            const contrastRes = await page.evaluate(() => {
+                const parseRgba = (str) => {
+                    if (!str) return null;
+                    const m = str.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/i);
+                    if (!m) return null;
+                    return { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 };
+                };
+                const blend = (fg, bg) => ({
+                    r: Math.round(fg.r * fg.a + bg.r * (1 - fg.a)),
+                    g: Math.round(fg.g * fg.a + bg.g * (1 - fg.a)),
+                    b: Math.round(fg.b * fg.a + bg.b * (1 - fg.a)),
+                    a: 1
+                });
+                const lum = ({ r, g, b }) => {
+                    const f = (c) => {
+                        const s = c / 255;
+                        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+                    };
+                    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+                };
+                const ratio = (c1, c2) => {
+                    const l1 = lum(c1);
+                    const l2 = lum(c2);
+                    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+                };
+
+                const themes = [
+                    { name: 'claro', dark: false, gray: false, special: 'default' },
+                    { name: 'oscuro', dark: true, gray: false, special: 'default' },
+                    { name: 'mono-claro', dark: false, gray: true, special: 'default' },
+                    { name: 'mono-oscuro', dark: true, gray: true, special: 'default' },
+                    { name: 'theme-matrix', dark: true, gray: false, special: 'theme-matrix' },
+                    { name: 'theme-sakura', dark: true, gray: false, special: 'theme-sakura' },
+                    { name: 'theme-arcade', dark: true, gray: false, special: 'theme-arcade' },
+                    { name: 'theme-starlight', dark: true, gray: false, special: 'theme-starlight' }
+                ];
+
+                const track = document.getElementById('tasks-filter-track');
+                const ind = track.querySelector('.segmented-glass-indicator');
+                const activeBtn = track.querySelector('.seg-btn-active') || track.querySelector('[data-task-filter="all"]');
+                const inactiveBtn = track.querySelector('.seg-btn-inactive') || track.querySelector('[data-task-filter="pending"]');
+
+                const failures = [];
+                for (const t of themes) {
+                    const root = document.documentElement;
+                    Array.from(root.classList).filter(c => c.startsWith('theme-')).forEach(c => root.classList.remove(c));
+                    root.classList.toggle('dark', t.dark);
+                    if (t.gray) root.classList.add('theme-gray');
+                    if (t.special !== 'default') root.classList.add(t.special);
+
+                    const indBg = parseRgba(getComputedStyle(ind).backgroundColor) || { r: 67, g: 56, b: 202, a: 0.96 };
+                    const trackBg = parseRgba(getComputedStyle(track).backgroundColor) || { r: 226, g: 232, b: 240, a: 0.88 };
+                    const activeColor = parseRgba(getComputedStyle(activeBtn).color);
+                    const inactiveColor = parseRgba(getComputedStyle(inactiveBtn).color);
+
+                    for (const base of [{ r: 255, g: 255, b: 255, a: 1 }, { r: 0, g: 0, b: 0, a: 1 }]) {
+                        const effTrack = blend(trackBg, base);
+                        const effInd = blend(indBg, effTrack);
+                        const rActive = ratio(activeColor, effInd);
+                        const rInactive = ratio(inactiveColor, effTrack);
+                        if (rActive < 4.5) failures.push(`${t.name} active ratio=${rActive.toFixed(2)}`);
+                        if (rInactive < 4.5) failures.push(`${t.name} inactive ratio=${rInactive.toFixed(2)}`);
+                    }
+                }
+
+                // Reset theme
+                const root = document.documentElement;
+                Array.from(root.classList).filter(c => c.startsWith('theme-')).forEach(c => root.classList.remove(c));
+                root.classList.remove('dark');
+
+                return failures;
+            });
+            helpers.assertEqual(contrastRes.length, 0, `All segmented active/inactive labels must have >= 4.5:1 contrast (${contrastRes.join('; ')})`);
+
+            // 3. Zero horizontal overflow at 320, 360, and 430px across views with segmented controls
+            for (const vw of [320, 360, 430]) {
+                await page.setViewport({ width: vw, height: 780, deviceScaleFactor: 2 });
+                const overflowIssues = await page.evaluate(async (w) => {
+                    const issues = [];
+                    for (const v of ['tasks', 'notes', 'archive', 'settings']) {
+                        window.OrganizadorApp?.switchView?.(v);
+                        if (v === 'settings') {
+                            document.querySelector('#settings-acc-appearance .settings-accordion-header')?.click();
+                        }
+                        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                        const docSw = document.documentElement.scrollWidth;
+                        if (docSw > w + 1) {
+                            issues.push(`${v}@${w}px: scrollWidth=${docSw}`);
+                        }
+                    }
+                    return issues;
+                }, vw);
+                helpers.assertEqual(overflowIssues.length, 0, `Zero horizontal overflow at ${vw}px (${overflowIssues.join(', ')})`);
+            }
+        }
     }
 ];
 

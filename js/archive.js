@@ -92,6 +92,30 @@ window.ArchiveModule = (() => {
         });
     }
 
+    function setFilter(nextFilter) {
+        const valid = ['all', 'tasks', 'notes'];
+        currentFilter = valid.includes(nextFilter) ? nextFilter : 'all';
+        const filterBtns = document.querySelectorAll('[data-archive-filter]');
+        let activeBtn = null;
+        filterBtns.forEach(b => {
+            const isActive = b.dataset.archiveFilter === currentFilter;
+            b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            if (isActive) {
+                activeBtn = b;
+                b.classList.add('bg-indigo-600', 'text-white', 'shadow-xs', 'active-archive-filter');
+                b.classList.remove('bg-slate-100', 'dark:bg-slate-700/60', 'text-slate-600', 'dark:text-slate-300');
+            } else {
+                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs', 'active-archive-filter', 'bg-slate-100', 'dark:bg-slate-700/60');
+                b.classList.add('text-slate-600', 'dark:text-slate-300');
+            }
+        });
+        const track = activeBtn?.closest('.segmented-control-track') || document.getElementById('archive-filter-track');
+        if (track) {
+            window.SegmentedControl?.sync?.(track);
+        }
+        render();
+    }
+
     function setupEventListeners() {
         // Filtros por pestaña (Todos, Tareas, Notas)
         const filterBtns = document.querySelectorAll('[data-archive-filter]');
@@ -99,14 +123,7 @@ window.ArchiveModule = (() => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 window.HapticsModule?.light();
-                filterBtns.forEach(b => {
-                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs', 'active-archive-filter', 'bg-slate-100', 'dark:bg-slate-700/60');
-                    b.classList.add('text-slate-600', 'dark:text-slate-300');
-                });
-                btn.classList.add('bg-indigo-600', 'text-white', 'shadow-xs', 'active-archive-filter');
-                btn.classList.remove('bg-slate-100', 'dark:bg-slate-700/60', 'text-slate-600', 'dark:text-slate-300');
-                currentFilter = btn.dataset.archiveFilter;
-                render();
+                setFilter(btn.dataset.archiveFilter);
             });
         });
 
@@ -527,6 +544,7 @@ window.ArchiveModule = (() => {
 
     return {
         init,
-        render
+        render,
+        setFilter
     };
 })();
