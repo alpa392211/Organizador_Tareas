@@ -33,6 +33,7 @@ window.StorageModule = (() => {
         ACCOUNT_TYPE: 'org_escolar_account_type',
         LONG_PRESS: 'org_escolar_long_press_enabled_v1',
         GALLERY_PHOTOS: 'org_escolar_gallery_photos',
+        GALLERY_IDB_INDEX: 'org_escolar_gallery_idb_index_v1',
         GLASS_INTENSITY: 'org_escolar_glass_intensity_v1',
         BACKGROUND_PRESET: 'org_escolar_background_v1',
         BACKGROUND_ANIMATED: 'org_escolar_background_animated_v1',
@@ -54,6 +55,157 @@ window.StorageModule = (() => {
     ];
 
     const MAX_SUBJECTS = 16;
+
+    const MEDIA_DB_NAME = 'OrganizadorTareasMediaDB';
+    const MEDIA_DB_VERSION = 2;
+    const NOTES_PHOTOS_STORE = 'notes_photos';
+    let galleryCache = [];
+    let galleryCacheHydrated = false;
+    let gallerySyncToken = null;
+
+    function dataUrlToBlob(dataUrl) {
+        try {
+            const parts = String(dataUrl || '').split(',');
+            if (parts.length < 2) return null;
+            const mimeMatch = parts[0].match(/data:([^;]+);/i);
+            const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+            const bin = atob(parts[1]);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return new Blob([bytes], { type: mime });
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function openMediaDatabase() {
+        return new Promise((resolve, reject) => {
+            if (typeof indexedDB === 'undefined') {
+                reject(new Error('IndexedDB unavailable'));
+                return;
+            }
+            const req = indexedDB.open(MEDIA_DB_NAME, MEDIA_DB_VERSION);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('backgrounds')) {
+                    db.createObjectStore('backgrounds', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains(NOTES_PHOTOS_STORE)) {
+                    db.createObjectStore(NOTES_PHOTOS_STORE, { keyPath: 'id' });
+                }
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error || new Error('IndexedDB open error'));
+        });
+    }
+
+    async function idbPutNotePhoto(record) {
+        const db = await openMediaDatabase();
+        try {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(NOTES_PHOTOS_STORE, 'readwrite');
+                tx.objectStore(NOTES_PHOTOS_STORE).put(record);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error || new Error('IDB write error'));
+            });
+            // Verificación de lectura posterior para migración/guardado seguro
+            const readBack = await new Promise((resolve, reject) => {
+                const tx = db.transaction(NOTES_PHOTOS_STORE, 'readonly');
+                const req = tx.objectStore(NOTES_PHOTOS_STORE).get(record.id);
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => reject(req.error || new Error('IDB readback error'));
+            });
+            return readBack;
+        } finally {
+            db.close();
+        }
+    }
+
+    async function idbGetNotePhoto(id) {
+        const db = await openMediaDatabase();
+        try {
+            return await new Promise((resolve, reject) => {
+                const tx = db.transaction(NOTES_PHOTOS_STORE, 'readonly');
+                const req = tx.objectStore(NOTES_PHOTOS_STORE).get(String(id));
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => reject(req.error || new Error('IDB read error'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    async function idbGetAllNotePhotos() {
+        const db = await openMediaDatabase();
+        try {
+            return await new Promise((resolve, reject) => {
+                const tx = db.transaction(NOTES_PHOTOS_STORE, 'readonly');
+                const req = tx.objectStore(NOTES_PHOTOS_STORE).getAll();
+                req.onsuccess = () => resolve(Array.isArray(req.result) ? req.result : []);
+                req.onerror = () => reject(req.error || new Error('IDB getAll error'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    async function idbDeleteNotePhoto(id) {
+        const db = await openMediaDatabase();
+        try {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(NOTES_PHOTOS_STORE, 'readwrite');
+                tx.objectStore(NOTES_PHOTOS_STORE).delete(String(id));
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error || new Error('IDB delete error'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    async function idbClearNotePhotos() {
+        const db = await openMediaDatabase();
+        try {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(NOTES_PHOTOS_STORE, 'readwrite');
+                tx.objectStore(NOTES_PHOTOS_STORE).clear();
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error || new Error('IDB clear error'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    function normalizeGalleryMeta(record) {
+        if (!record) return null;
+        return {
+            id: String(record.id),
+            name: record.name || record.fileName || 'Foto',
+            fileName: record.fileName || record.name || 'foto.jpg',
+            mimeType: record.mimeType || 'image/jpeg',
+            byteLength: typeof record.byteLength === 'number' ? record.byteLength : 0,
+            dataUrl: record.dataUrl || '',
+            thumbUrl: record.thumbUrl || record.dataUrl || '',
+            noteId: record.noteId ? String(record.noteId) : null,
+            noteTitle: record.noteTitle || '',
+            createdAt: Number(record.createdAt) || Date.now()
+        };
+    }
+
+    function persistIdbIndexMarker(items) {
+        try {
+            const ids = items.map(p => String(p.id));
+            if (ids.length > 0) {
+                const payload = JSON.stringify({ ids, v: 2, t: Date.now() });
+                localStorage.setItem(KEYS.GALLERY_IDB_INDEX, payload);
+                gallerySyncToken = payload;
+            } else {
+                localStorage.removeItem(KEYS.GALLERY_IDB_INDEX);
+                gallerySyncToken = null;
+            }
+        } catch (e) {}
+    }
 
     /**
      * Calcula fechas por defecto sugeridas para el ciclo escolar actual
@@ -243,7 +395,7 @@ window.StorageModule = (() => {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.1');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.2');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
@@ -577,35 +729,196 @@ window.StorageModule = (() => {
             return val;
         },
 
-        // --- Galería de fotos (materiales / notas) ---
+        // --- Galería de fotos (materiales / notas en IndexedDB v2 + compatibilidad localStorage) ---
         getGalleryPhotos() {
-            try {
-                const parsed = JSON.parse(localStorage.getItem(KEYS.GALLERY_PHOTOS) || '[]');
-                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
-            } catch (e) {
+            let lsArr = null;
+            const rawLs = localStorage.getItem(KEYS.GALLERY_PHOTOS);
+            if (rawLs !== null) {
+                try {
+                    const parsed = JSON.parse(rawLs || '[]');
+                    lsArr = Array.isArray(parsed) ? parsed.filter(Boolean).map(normalizeGalleryMeta).filter(Boolean) : [];
+                } catch (e) {
+                    lsArr = [];
+                }
+            }
+            const hasIndex = localStorage.getItem(KEYS.GALLERY_IDB_INDEX) !== null;
+            if (rawLs === '[]' && !hasIndex) {
+                galleryCache = [];
                 return [];
             }
+            if (!hasIndex && rawLs === null && galleryCacheHydrated && galleryCache.length > 0) {
+                // Respaldo borrado externamente (e.g. localStorage.clear)
+                galleryCache = [];
+                return [];
+            }
+            if (hasIndex && galleryCache.length > 0) {
+                if (lsArr && lsArr.length > 0) {
+                    const seen = new Set(galleryCache.map(p => String(p.id)));
+                    return [...galleryCache, ...lsArr.filter(p => !seen.has(String(p.id)))];
+                }
+                return galleryCache.slice();
+            }
+            return lsArr ? lsArr : galleryCache.slice();
         },
         saveGalleryPhoto(photo) {
             if (!photo || !photo.dataUrl) return false;
             const photos = this.getGalleryPhotos();
-            const entry = {
+            const entry = normalizeGalleryMeta({
+                ...photo,
                 id: photo.id || 'photo_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
-                name: photo.name || 'Foto',
-                dataUrl: photo.dataUrl,
                 createdAt: photo.createdAt || Date.now()
-            };
-            photos.unshift(entry);
+            });
+            const idx = photos.findIndex(p => String(p.id) === String(entry.id));
+            if (idx === -1) photos.unshift(entry);
+            else photos[idx] = entry;
             try {
                 localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(photos));
             } catch (e) {
                 return false;
             }
+            galleryCache = photos.slice();
+            galleryCacheHydrated = true;
             return entry;
         },
+        async saveGalleryPhotoToIdb(photo, rawBlob) {
+            if (!photo || !photo.dataUrl) return false;
+            const id = String(photo.id || ('photo_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5)));
+            const blob = rawBlob instanceof Blob ? rawBlob : dataUrlToBlob(photo.dataUrl);
+            const record = {
+                id,
+                name: photo.name || photo.fileName || 'Foto',
+                fileName: photo.fileName || photo.name || 'foto.jpg',
+                mimeType: (blob && blob.type) || photo.mimeType || 'image/jpeg',
+                byteLength: blob ? blob.size : 0,
+                blob: blob || null,
+                dataUrl: photo.dataUrl,
+                thumbUrl: photo.thumbUrl || photo.dataUrl,
+                noteId: photo.noteId ? String(photo.noteId) : null,
+                noteTitle: photo.noteTitle || '',
+                createdAt: Number(photo.createdAt) || Date.now()
+            };
+            try {
+                const readBack = await idbPutNotePhoto(record);
+                const expectedBytes = blob ? blob.size : 0;
+                const readBackOk = Boolean(
+                    readBack &&
+                    String(readBack.id) === id &&
+                    (!blob || (readBack.blob instanceof Blob && readBack.blob.size === expectedBytes))
+                );
+                if (!readBackOk) throw new Error('Read-back verification failed');
+
+                const meta = normalizeGalleryMeta(record);
+                const current = this.getGalleryPhotos().filter(p => String(p.id) !== id);
+                current.unshift(meta);
+                galleryCache = current;
+                galleryCacheHydrated = true;
+                persistIdbIndexMarker(galleryCache);
+                return meta;
+            } catch (e) {
+                // Respaldo seguro en localStorage si IndexedDB no está disponible
+                return this.saveGalleryPhoto({ ...record, id });
+            }
+        },
+        async getGalleryPhotoBlobFromIdb(id) {
+            const key = String(id || '');
+            if (!key) return null;
+            try {
+                const rec = await idbGetNotePhoto(key);
+                if (rec) {
+                    if (rec.blob instanceof Blob) {
+                        return { blob: rec.blob, record: rec };
+                    }
+                    if (rec.dataUrl) {
+                        return { blob: dataUrlToBlob(rec.dataUrl), record: rec };
+                    }
+                }
+            } catch (e) {}
+            const meta = this.getGalleryPhotos().find(p => String(p.id) === key);
+            if (meta && meta.dataUrl) {
+                return { blob: dataUrlToBlob(meta.dataUrl), record: meta };
+            }
+            return null;
+        },
+        async hydrateAndMigrateGalleryIdb() {
+            const rawLs = localStorage.getItem(KEYS.GALLERY_PHOTOS);
+            let legacyList = [];
+            if (rawLs) {
+                try {
+                    const parsed = JSON.parse(rawLs);
+                    if (Array.isArray(parsed)) legacyList = parsed.filter(p => p && p.dataUrl);
+                } catch (e) {
+                    legacyList = [];
+                }
+            }
+
+            let migrated = false;
+            let keptLegacy = Boolean(legacyList.length > 0);
+            try {
+                if (legacyList.length > 0) {
+                    let allVerified = true;
+                    for (const item of legacyList) {
+                        const id = String(item.id || ('photo_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5)));
+                        const blob = dataUrlToBlob(item.dataUrl);
+                        if (!blob || blob.size === 0) {
+                            allVerified = false;
+                            break;
+                        }
+                        const rec = {
+                            id,
+                            name: item.name || item.fileName || 'Foto',
+                            fileName: item.fileName || item.name || 'foto.jpg',
+                            mimeType: item.mimeType || blob.type || 'image/jpeg',
+                            byteLength: blob.size,
+                            blob,
+                            dataUrl: item.dataUrl,
+                            thumbUrl: item.thumbUrl || item.dataUrl,
+                            noteId: item.noteId ? String(item.noteId) : null,
+                            noteTitle: item.noteTitle || '',
+                            createdAt: Number(item.createdAt) || Date.now()
+                        };
+                        const readBack = await idbPutNotePhoto(rec);
+                        if (!readBack || !(readBack.blob instanceof Blob) || readBack.blob.size !== blob.size || readBack.byteLength !== blob.size) {
+                            allVerified = false;
+                            break;
+                        }
+                    }
+                    if (allVerified) {
+                        localStorage.removeItem(KEYS.GALLERY_PHOTOS);
+                        migrated = true;
+                        keptLegacy = false;
+                    }
+                }
+
+                const allIdb = await idbGetAllNotePhotos();
+                const normalized = allIdb
+                    .map(normalizeGalleryMeta)
+                    .filter(Boolean)
+                    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                galleryCache = normalized;
+                galleryCacheHydrated = true;
+                persistIdbIndexMarker(galleryCache);
+                return { ok: true, migrated, keptLegacy, count: galleryCache.length };
+            } catch (e) {
+                return { ok: false, migrated: false, keptLegacy: Boolean(rawLs), count: this.getGalleryPhotos().length };
+            }
+        },
+        async clearGalleryPhotosIdb() {
+            galleryCache = [];
+            galleryCacheHydrated = true;
+            try { localStorage.removeItem(KEYS.GALLERY_PHOTOS); } catch (e) {}
+            try { localStorage.removeItem(KEYS.GALLERY_IDB_INDEX); } catch (e) {}
+            try { await idbClearNotePhotos(); } catch (e) {}
+        },
         deleteGalleryPhoto(id) {
-            const photos = this.getGalleryPhotos().filter(p => String(p.id) !== String(id));
-            localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(photos));
+            const targetId = String(id);
+            const photos = this.getGalleryPhotos().filter(p => String(p.id) !== targetId);
+            galleryCache = photos.slice();
+            galleryCacheHydrated = true;
+            if (localStorage.getItem(KEYS.GALLERY_PHOTOS) !== null) {
+                try { localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(photos)); } catch (e) {}
+            }
+            persistIdbIndexMarker(photos);
+            idbDeleteNotePhoto(targetId).catch(() => {});
             return true;
         },
 
@@ -659,7 +972,7 @@ window.StorageModule = (() => {
             return chosen;
         },
 
-        // --- Intensidad del Cristal Liquid Glass (suave | normal | intenso) ---
+        // --- Intensidad de los Efectos de Transparencia Avanzados (suave | normal | intenso) ---
         getDefaultGlassIntensity() {
             try {
                 const cores = typeof navigator !== 'undefined' ? Number(navigator.hardwareConcurrency) : 0;
@@ -960,7 +1273,61 @@ window.StorageModule = (() => {
 
         isCodeUnlocked(codeId) {
             if (!codeId || typeof codeId !== 'string') return false;
-            return this.getUnlockedCodes().includes(codeId.trim().toUpperCase());
+            const normalized = codeId.trim().toUpperCase();
+            const codes = this.getUnlockedCodes();
+            return codes.includes(normalized) || codes.includes('KRONOS99');
+        },
+
+        isSpecialThemeUnlocked(themeId) {
+            if (!themeId || themeId === 'default') return true;
+            const map = {
+                'apollo': 'APOLLO11',
+                'starlight': '06062009',
+                'eduardo-gold': 'EDUARDO',
+                'penguin': 'PINGUINO',
+                'synthwave': 'RETRO80S',
+                'matrix': 'MATRIX99',
+                'sakura': 'ZENPEACE',
+                'coffee': 'COFFEE42',
+                'arcade': 'ARCADE90',
+                'hyperfocus': 'STUDYMAX'
+            };
+            const codeId = map[themeId];
+            return codeId ? this.isCodeUnlocked(codeId) : false;
+        },
+
+        isFontUnlocked(fontKey) {
+            if (!fontKey || typeof fontKey !== 'string') return true;
+            const map = {
+                'readable': 'READABLE',
+                'firacode': 'FIRACODE',
+                'playfair': 'PLAYFAIR',
+                'caveat': 'HANDNOTE',
+                'orbitron': 'ORBITRON'
+            };
+            const codeId = map[fontKey.trim().toLowerCase()];
+            return codeId ? this.isCodeUnlocked(codeId) : true;
+        },
+
+        isBackgroundPresetUnlocked(presetId) {
+            if (!presetId || typeof presetId !== 'string') return true;
+            if (presetId === 'vault_auto') {
+                return ['APOLLO11', '06062009', 'EDUARDO', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE', 'COFFEE42', 'ARCADE90', 'STUDYMAX'].some(c => this.isCodeUnlocked(c));
+            }
+            const map = {
+                'theme_matrix': 'MATRIX99',
+                'theme_sakura': 'ZENPEACE',
+                'theme_synthwave': 'RETRO80S',
+                'theme_starlight': '06062009',
+                'theme_arcade': 'ARCADE90',
+                'theme_coffee': 'COFFEE42',
+                'theme_apollo': 'APOLLO11',
+                'theme_eduardo-gold': 'EDUARDO',
+                'theme_penguin': 'PINGUINO',
+                'theme_hyperfocus': 'STUDYMAX'
+            };
+            const codeId = map[presetId];
+            return codeId ? this.isCodeUnlocked(codeId) : true;
         },
 
         unlockVaultCode(codeId) {
@@ -1075,11 +1442,12 @@ window.StorageModule = (() => {
             this.saveNotes([]);
             this.saveArchivedTasks([]);
             this.saveArchivedNotes([]);
+            this.clearGalleryPhotosIdb();
         },
 
         exportJson() {
             const data = {
-                version: '1.5.1',
+                version: '1.5.2',
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),
@@ -1125,9 +1493,39 @@ window.StorageModule = (() => {
                     throw new Error(`El archivo contiene más de ${MAX_SUBJECTS} materias.`);
                 }
                 if (data.theme) this.setTheme(data.theme);
-                if (data.fontFamily) this.setFontFamily(data.fontFamily);
                 if (typeof data.glassIntensity === 'string') this.setGlassIntensity(data.glassIntensity);
-                if (typeof data.backgroundPreset === 'string') this.setBackgroundPreset(data.backgroundPreset);
+
+                // Restaurar primero claves secretas y bóveda antes de evaluar estilos desbloqueables
+                if (typeof data.secretUnlocked === 'boolean' && data.secretUnlocked) {
+                    this.unlockSecret();
+                } else {
+                    localStorage.removeItem(KEYS.SECRET_UNLOCKED);
+                }
+                if (Array.isArray(data.unlockedCodes)) {
+                    const validCodes = data.unlockedCodes
+                        .filter(c => typeof c === 'string' && c.trim() && c.trim().toUpperCase() !== 'GATITOS_')
+                        .map(c => c.trim().toUpperCase());
+                    localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify([...new Set(validCodes)]));
+                } else {
+                    localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify([]));
+                }
+
+                // Evaluar elementos desbloqueables bajo el estado real restaurado
+                if (data.fontFamily) {
+                    this.setFontFamily(this.isFontUnlocked(data.fontFamily) ? data.fontFamily : 'calibri');
+                }
+                if (typeof data.backgroundPreset === 'string') {
+                    this.setBackgroundPreset(this.isBackgroundPresetUnlocked(data.backgroundPreset) ? data.backgroundPreset : 'default');
+                }
+                const canGray = this.isSecretUnlocked() || this.isCodeUnlocked('KRONOS99');
+                if (typeof data.grayMode === 'boolean') {
+                    this.setGrayModeEnabled(data.grayMode && canGray);
+                } else if (!canGray && this.getGrayModeEnabled()) {
+                    this.setGrayModeEnabled(false);
+                }
+                if (typeof data.activeSpecialTheme === 'string') {
+                    this.setActiveSpecialTheme(this.isSpecialThemeUnlocked(data.activeSpecialTheme) ? data.activeSpecialTheme : 'default');
+                }
                 if (typeof data.backgroundAnimated === 'boolean') this.setBackgroundAnimated(data.backgroundAnimated);
                 if (typeof data.backgroundBlur === 'number') this.setBackgroundBlur(data.backgroundBlur);
                 if (typeof data.backgroundScrim === 'number') this.setBackgroundScrim(data.backgroundScrim);
@@ -1143,22 +1541,28 @@ window.StorageModule = (() => {
                 if (typeof data.hapticsEnabled === 'boolean') this.setHapticsEnabled(data.hapticsEnabled);
                 if (typeof data.autoPurgeArchive === 'boolean') this.setAutoPurgeArchive(data.autoPurgeArchive);
                 if (typeof data.headerThemeBtnEnabled === 'boolean') this.setHeaderThemeBtnEnabled(data.headerThemeBtnEnabled);
-                if (typeof data.secretUnlocked === 'boolean' && data.secretUnlocked) this.unlockSecret();
-                if (typeof data.grayMode === 'boolean') this.setGrayModeEnabled(data.grayMode);
-                if (Array.isArray(data.unlockedCodes)) {
-                    const validCodes = data.unlockedCodes
-                        .filter(c => typeof c === 'string' && c.trim() && c.trim().toUpperCase() !== 'GATITOS_');
-                    localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify(validCodes));
-                }
-                if (typeof data.activeSpecialTheme === 'string') {
-                    this.setActiveSpecialTheme(data.activeSpecialTheme);
-                }
                 if (typeof data.apolloRocketsEnabled === 'boolean') {
                     this.setApolloRocketsEnabled(data.apolloRocketsEnabled);
                 }
                 if (typeof data.longPressEnabled === 'boolean') this.setLongPressEnabled(data.longPressEnabled);
                 if (Array.isArray(data.galleryPhotos)) {
-                    try { localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(data.galleryPhotos.filter(p => p && p.dataUrl))); } catch (e) {}
+                    const normalizedPhotos = data.galleryPhotos
+                        .filter(p => p && p.dataUrl)
+                        .map(normalizeGalleryMeta)
+                        .filter(Boolean);
+                    galleryCache = normalizedPhotos.slice();
+                    galleryCacheHydrated = true;
+                    persistIdbIndexMarker(galleryCache);
+                    try {
+                        localStorage.setItem(KEYS.GALLERY_PHOTOS, JSON.stringify(normalizedPhotos));
+                    } catch (e) {}
+                    // Guardar y migrar a IndexedDB de forma segura sin perder respaldo inmediato
+                    Promise.resolve().then(() => {
+                        idbClearNotePhotos()
+                            .then(() => this.hydrateAndMigrateGalleryIdb())
+                            .then(() => window.NotesModule?.renderGallery?.())
+                            .catch(() => {});
+                    });
                 }
                 if (typeof data.userName === 'string') {
                     this.setUserName(data.userName);

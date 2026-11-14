@@ -304,7 +304,7 @@
             this.applySpecialThemeFromStorage();
             this.updateApolloRockets();
 
-            // 4. Inicializar y aplicar tipografía e intensidad Liquid Glass
+            // 4. Inicializar y aplicar tipografía e intensidad de efectos de transparencia avanzados
             this.initFontFamily();
             this.initGlassIntensity();
             window.BackgroundsModule?.init?.();
@@ -392,9 +392,9 @@
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.5.1
+                // Comprobar changelog de versión 1.5.2
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.5.1') {
+                if (lastSeenVersion !== '1.5.2') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
@@ -575,7 +575,11 @@
            ======================================================== */
         initFontFamily() {
             const Storage = window.StorageModule;
-            const font = Storage.getFontFamily?.() || 'calibri';
+            let font = Storage.getFontFamily?.() || 'calibri';
+            if (Storage.isFontUnlocked && !Storage.isFontUnlocked(font)) {
+                font = 'calibri';
+                Storage.setFontFamily?.('calibri');
+            }
             this.syncSettingsFontButtons();
             this.applyFontFamily(font);
         }
@@ -1189,21 +1193,35 @@
             const drawer = document.getElementById('sidebar-drawer');
             const backdrop = document.getElementById('drawer-backdrop');
 
+            if (drawer) {
+                drawer.setAttribute('aria-hidden', drawer.classList.contains('-translate-x-full') ? 'true' : 'false');
+            }
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', drawer && !drawer.classList.contains('-translate-x-full') ? 'true' : 'false');
+            }
+
             const openDrawer = () => {
                 if (!drawer || !backdrop) return;
                 window.HapticsModule?.light();
                 drawer.classList.remove('-translate-x-full');
+                drawer.setAttribute('aria-hidden', 'false');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 backdrop.classList.add('opacity-100');
                 document.body.classList.add('overflow-hidden');
             };
 
-            const closeDrawer = () => {
+            const closeDrawer = (restoreFocus = false) => {
                 if (!drawer || !backdrop) return;
                 drawer.classList.add('-translate-x-full');
+                drawer.setAttribute('aria-hidden', 'true');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
                 backdrop.classList.add('opacity-0', 'pointer-events-none');
                 backdrop.classList.remove('opacity-100');
                 document.body.classList.remove('overflow-hidden');
+                if (restoreFocus && toggleBtn) {
+                    toggleBtn.focus?.();
+                }
             };
 
             this.closeSidebarDrawer = closeDrawer;
@@ -1211,9 +1229,17 @@
             if (toggleBtn) toggleBtn.onclick = openDrawer;
             if (closeBtn) closeBtn.onclick = () => {
                 window.HapticsModule?.light();
-                closeDrawer();
+                closeDrawer(true);
             };
-            if (backdrop) backdrop.onclick = closeDrawer;
+            if (backdrop) backdrop.onclick = () => closeDrawer(false);
+            if (!this._drawerKeyBound) {
+                this._drawerKeyBound = true;
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && drawer && !drawer.classList.contains('-translate-x-full')) {
+                        closeDrawer(true);
+                    }
+                });
+            }
         }
 
         setupBottomActionButton() {
@@ -1842,7 +1868,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.1') {
+                        if (lastSeenVersion !== '1.5.2') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -1884,7 +1910,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.1') {
+                        if (lastSeenVersion !== '1.5.2') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2406,7 +2432,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.5.1
+            // 11. Novedades de Versión 1.5.2
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -2435,7 +2461,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.5.1');
+                window.StorageModule.setLastSeenVersion('1.5.2');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
@@ -3029,19 +3055,24 @@
         applySpecialThemeFromStorage() {
             const Storage = window.StorageModule;
             if (!Storage?.getActiveSpecialTheme) return;
-            const current = Storage.getActiveSpecialTheme();
+            let current = Storage.getActiveSpecialTheme();
             const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
             specialClasses.forEach(c => document.documentElement.classList.remove(c));
 
             if (current && current !== 'default') {
-                const found = Object.values(VAULT_CATALOG).find(c => c.themeId === current);
-                if (found && found.themeClass) {
-                    document.documentElement.classList.add(found.themeClass);
-                }
-                if (current !== 'gray' && current !== 'theme-gray') {
-                    document.documentElement.classList.add('dark');
-                    Storage.setTheme('dark');
-                    this.updateThemeUI('dark', false);
+                if (Storage.isSpecialThemeUnlocked && !Storage.isSpecialThemeUnlocked(current)) {
+                    current = 'default';
+                    Storage.setActiveSpecialTheme?.('default');
+                } else {
+                    const found = Object.values(VAULT_CATALOG).find(c => c.themeId === current);
+                    if (found && found.themeClass) {
+                        document.documentElement.classList.add(found.themeClass);
+                    }
+                    if (current !== 'gray' && current !== 'theme-gray') {
+                        document.documentElement.classList.add('dark');
+                        Storage.setTheme('dark');
+                        this.updateThemeUI('dark', false);
+                    }
                 }
             }
             if (Storage?.getGrayModeEnabled?.()) {
@@ -3055,13 +3086,16 @@
             const container = document.getElementById('toast-container');
             if (!container) return;
 
+            const isMono = document.documentElement.classList.contains('theme-gray');
+            const toneClass = isMono
+                ? 'toast-glass-info shadow-slate-950/35'
+                : (type === 'success' ? 'toast-glass-success shadow-emerald-950/30' :
+                   type === 'warning' ? 'toast-glass-warning shadow-amber-950/30' :
+                   type === 'error' ? 'toast-glass-error shadow-rose-950/30' :
+                   'toast-glass-info shadow-slate-950/35');
+
             const toast = document.createElement('div');
-            toast.className = `flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold transition-all duration-300 transform translate-y-3 opacity-0 pointer-events-auto border ${
-                type === 'success' ? 'bg-emerald-600/90 text-white border-emerald-400/50 shadow-emerald-600/25' :
-                type === 'warning' ? 'bg-amber-600/90 text-white border-amber-400/50 shadow-amber-600/25' :
-                type === 'error' ? 'bg-rose-600/90 text-white border-rose-400/50 shadow-rose-600/25' :
-                'bg-slate-900/90 text-white border-white/15 shadow-slate-950/35'
-            }`;
+            toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold transition-all duration-300 transform translate-y-3 opacity-0 pointer-events-none border ${toneClass}`;
 
             const iconSvg = type === 'success' ? `
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>

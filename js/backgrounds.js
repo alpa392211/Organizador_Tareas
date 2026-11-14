@@ -8,8 +8,9 @@
     'use strict';
 
     const DB_NAME = 'OrganizadorTareasMediaDB';
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
     const STORE_NAME = 'backgrounds';
+    const NOTES_STORE_NAME = 'notes_photos';
     const CUSTOM_PHOTO_KEY = 'custom_bg_photo';
 
     const BASIC_PRESETS = [
@@ -234,6 +235,9 @@
                         if (!db.objectStoreNames.contains(STORE_NAME)) {
                             db.createObjectStore(STORE_NAME, { keyPath: 'id' });
                         }
+                        if (!db.objectStoreNames.contains(NOTES_STORE_NAME)) {
+                            db.createObjectStore(NOTES_STORE_NAME, { keyPath: 'id' });
+                        }
                     };
                     req.onsuccess = (e) => resolve(e.target.result);
                     req.onerror = (e) => reject(e.target?.error || new Error('Error al abrir IndexedDB'));
@@ -260,11 +264,24 @@
                 try {
                     const tx = db.transaction(STORE_NAME, 'readwrite');
                     const store = tx.objectStore(STORE_NAME);
+                    const cropState = (record.cropState && typeof record.cropState === 'object')
+                        ? {
+                            zoom: Number(record.cropState.zoom) || 1,
+                            rotation: Number(record.cropState.rotation) || 0,
+                            offsetXRatio: Number(record.cropState.offsetXRatio) || 0,
+                            offsetYRatio: Number(record.cropState.offsetYRatio) || 0
+                        }
+                        : { zoom: 1, rotation: 0, offsetXRatio: 0, offsetYRatio: 0 };
                     const payload = {
                         id: CUSTOM_PHOTO_KEY,
                         dataUrl: record.dataUrl,
+                        croppedDataUrl: record.croppedDataUrl || record.dataUrl,
+                        originalDataUrl: typeof record.originalDataUrl === 'string' ? record.originalDataUrl : '',
+                        cropState,
                         width: Number(record.width) || 0,
                         height: Number(record.height) || 0,
+                        croppedWidth: Number(record.croppedWidth) || Number(record.width) || 0,
+                        croppedHeight: Number(record.croppedHeight) || Number(record.height) || 0,
                         avgLuminance: typeof record.avgLuminance === 'number' ? record.avgLuminance : 0.5,
                         updatedAt: Date.now()
                     };
@@ -417,32 +434,47 @@
             });
         }
 
-        async saveCustomPhotoFromDataUrl(dataUrl, focalPoint = null, explicitDims = null) {
+        async saveCustomPhotoFromDataUrl(dataUrlOrPayload, focalPoint = null, explicitDims = null) {
             const Storage = window.StorageModule;
+            const payload = (dataUrlOrPayload && typeof dataUrlOrPayload === 'object')
+                ? dataUrlOrPayload
+                : { dataUrl: dataUrlOrPayload };
+            const primarySrc = payload.dataUrl || payload.croppedDataUrl || '';
+            const renderSrc = payload.croppedDataUrl || primarySrc;
+            const adjustOnly = Boolean(payload.adjustOnly);
+            const resolvedFocal = focalPoint || payload.focalPoint || null;
+
             const dims = explicitDims || await new Promise((res) => {
                 const im = new Image();
                 im.onload = () => res({ width: im.naturalWidth || 0, height: im.naturalHeight || 0 });
                 im.onerror = () => res({ width: 0, height: 0 });
-                im.src = dataUrl;
+                im.src = primarySrc;
             });
-            const avgLuminance = await this.computeAverageLuminance(dataUrl);
+            const avgLuminance = await this.computeAverageLuminance(renderSrc);
             const recommendedScrim = this.getRecommendedScrim(avgLuminance);
 
             await this.saveCustomPhotoRecord({
-                dataUrl,
+                dataUrl: primarySrc,
+                croppedDataUrl: renderSrc,
+                originalDataUrl: typeof payload.originalDataUrl === 'string' ? payload.originalDataUrl : '',
+                cropState: payload.cropState || null,
                 width: dims.width,
                 height: dims.height,
+                croppedWidth: payload.croppedWidth || dims.width,
+                croppedHeight: payload.croppedHeight || dims.height,
                 avgLuminance
             });
 
             if (Storage) {
-                if (focalPoint) {
+                if (resolvedFocal) {
                     Storage.setBackgroundFocalPoint({
-                        x: focalPoint.x <= 1 ? focalPoint.x * 100 : focalPoint.x,
-                        y: focalPoint.y <= 1 ? focalPoint.y * 100 : focalPoint.y
+                        x: resolvedFocal.x <= 1 ? resolvedFocal.x * 100 : resolvedFocal.x,
+                        y: resolvedFocal.y <= 1 ? resolvedFocal.y * 100 : resolvedFocal.y
                     });
                 }
-                Storage.setBackgroundScrim(recommendedScrim);
+                if (!adjustOnly) {
+                    Storage.setBackgroundScrim(recommendedScrim);
+                }
                 Storage.setBackgroundPreset('custom_photo');
             }
             await this.applyBackground();
@@ -450,13 +482,15 @@
             return { avgLuminance, recommendedScrim, width: dims.width, height: dims.height };
         }
 
-        async handleCustomPhotoUpload({ file = null, src = null, adjustOnly = false } = {}) {
+        async handleCustomPhotoUpload({ file = null, src = null, adjustOnly = false, existingOriginalSrc = null, initialCropState = null } = {}) {
             const Storage = window.StorageModule;
             if (this.isMonochromeActive()) {
                 window.OrganizadorApp?.showToast?.('En Modo Monocromático solo se permiten fondos en escala de grises.', 'warning');
                 return false;
             }
-            const ar = (typeof window !== 'undefined' && window.innerWidth >= 640) ? 16 / 9 : 9 / 16;
+            const vw = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 390;
+            const vh = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 844;
+            const ar = Math.max(0.45, Math.min(2.2, vw / Math.max(320, vh)));
             const currentFocal = Storage?.getBackgroundFocalPoint?.() || { x: 50, y: 50 };
 
             try {
@@ -468,25 +502,40 @@
                         aspectRatio: ar,
                         shape: 'rect',
                         maxDim: 1600,
+                        cropOutput: true,
+                        preserveOriginalMaxDim: 2400,
+                        originalQuality: 0.88,
+                        existingOriginalSrc,
+                        initialState: initialCropState,
                         mimeType: 'image/jpeg',
                         quality: 0.88,
                         initialFocalPoint: currentFocal,
                         title: adjustOnly ? 'Reencuadrar foto de fondo' : 'Encuadrar foto de fondo',
-                        subtitle: 'Ajusta el punto de enfoque para móvil y escritorio (máx. 1600 px, sin recorte rígido).',
-                        confirmLabel: 'Usar de fondo'
+                        subtitle: 'Arrastra, haz zoom o gira para adaptar tu foto a la pantalla.',
+                        confirmLabel: adjustOnly ? 'Guardar encuadre' : 'Usar de fondo'
                     });
                     if (!finalResult) return false;
                 } else if (file) {
                     const direct = await this.compressFileDirectly(file, 1600, 0.88);
-                    finalResult = { dataUrl: direct.dataUrl, focalPoint: { x: 0.5, y: 0.5 } };
+                    finalResult = { dataUrl: direct.dataUrl, croppedDataUrl: direct.dataUrl, originalDataUrl: direct.dataUrl, focalPoint: { x: 0.5, y: 0.5 } };
                 } else if (src) {
-                    finalResult = { dataUrl: src, focalPoint: currentFocal };
+                    finalResult = { dataUrl: src, croppedDataUrl: src, originalDataUrl: existingOriginalSrc || src, focalPoint: currentFocal };
                 }
 
-                if (!finalResult?.dataUrl) return false;
-                const savedInfo = await this.saveCustomPhotoFromDataUrl(finalResult.dataUrl, finalResult.focalPoint);
+                if (!finalResult?.dataUrl && !finalResult?.croppedDataUrl) return false;
+                const savedInfo = await this.saveCustomPhotoFromDataUrl({
+                    dataUrl: finalResult.dataUrl || finalResult.croppedDataUrl,
+                    croppedDataUrl: finalResult.croppedDataUrl || finalResult.dataUrl,
+                    originalDataUrl: finalResult.originalDataUrl || existingOriginalSrc || '',
+                    cropState: finalResult.cropState || null,
+                    croppedWidth: finalResult.croppedWidth || 0,
+                    croppedHeight: finalResult.croppedHeight || 0,
+                    adjustOnly
+                }, finalResult.focalPoint);
                 window.OrganizadorApp?.showToast?.(
-                    `Foto de fondo guardada localmente (oscurecimiento inicial: ${savedInfo.recommendedScrim}%).`,
+                    adjustOnly
+                        ? 'Encuadre de foto de fondo actualizado.'
+                        : `Foto de fondo guardada localmente (oscurecimiento inicial: ${savedInfo.recommendedScrim}%).`,
                     'success'
                 );
                 return true;
@@ -523,11 +572,8 @@
 
         getUnlockedThematicPresets() {
             const Storage = window.StorageModule;
-            const unlockedCodes = Storage?.getUnlockedCodes?.() || [];
-            const activeSpecial = Storage?.getActiveSpecialTheme?.() || 'default';
-            return THEMATIC_PRESETS.filter(p =>
-                unlockedCodes.includes(p.codeId) || p.themeId === activeSpecial
-            );
+            if (!Storage?.isCodeUnlocked) return [];
+            return THEMATIC_PRESETS.filter(p => Storage.isCodeUnlocked(p.codeId));
         }
 
         getAllThematicPresets() {
@@ -561,8 +607,8 @@
                 if (this.isThematicPreset(currentBg)) {
                     Storage.setBackgroundPreset('default');
                 }
-            } else if (!isMono) {
-                // Al activar un tema de la Bóveda, si estaba en predeterminado o automático, seguir el tema activo
+            } else if (!isMono && (!Storage.isSpecialThemeUnlocked || Storage.isSpecialThemeUnlocked(nextThemeId))) {
+                // Al activar un tema de la Bóveda desbloqueado, seguir el tema activo si estaba en predeterminado/automático
                 if (currentBg === 'default' || currentBg === 'vault_auto') {
                     Storage.setBackgroundPreset('vault_auto');
                 }
@@ -597,10 +643,14 @@
             }
 
             if (stored === 'vault_auto') {
+                if (this.getUnlockedThematicPresets().length === 0) {
+                    Storage?.setBackgroundPreset?.('default');
+                    return 'default';
+                }
                 const activeSpecial = Storage?.getActiveSpecialTheme?.() || 'default';
-                if (activeSpecial && activeSpecial !== 'default') {
+                if (activeSpecial && activeSpecial !== 'default' && (!Storage?.isSpecialThemeUnlocked || Storage.isSpecialThemeUnlocked(activeSpecial))) {
                     const match = THEMATIC_PRESETS.find(t => t.themeId === activeSpecial);
-                    if (match) return match.id;
+                    if (match && (!Storage?.isCodeUnlocked || Storage.isCodeUnlocked(match.codeId))) return match.id;
                 }
                 return 'default';
             }
@@ -608,7 +658,16 @@
             if (stored === 'custom_photo') return 'custom_photo';
             if (BASIC_PRESETS.some(b => b.id === stored)) return stored;
             if (MONO_PRESETS.some(m => m.id === stored)) return stored;
-            if (THEMATIC_PRESETS.some(t => t.id === stored)) return stored;
+            if (THEMATIC_PRESETS.some(t => t.id === stored)) {
+                const unlocked = Storage?.isBackgroundPresetUnlocked ? Storage.isBackgroundPresetUnlocked(stored) : true;
+                const syntheticThemeClass = stored.replace('_', '-');
+                const explicitThemeForced = document.documentElement.classList.contains(syntheticThemeClass);
+                if (!unlocked && !explicitThemeForced) {
+                    Storage?.setBackgroundPreset?.('default');
+                    return 'default';
+                }
+                return stored;
+            }
             return 'default';
         }
 
@@ -923,9 +982,10 @@
             const focal = Storage?.getBackgroundFocalPoint?.() || { x: 50, y: 50 };
             const blur = Storage?.getBackgroundBlur?.() ?? 0;
             const scrim = Storage?.getBackgroundScrim?.() ?? 35;
+            const displayUrl = record.croppedDataUrl || record.dataUrl;
 
             this.gradientEl.style.backgroundImage = '';
-            this.photoEl.style.backgroundImage = `url("${record.dataUrl}")`;
+            this.photoEl.style.backgroundImage = `url("${displayUrl}")`;
             this.photoEl.style.backgroundSize = 'cover';
             this.photoEl.style.backgroundRepeat = 'no-repeat';
             this.photoEl.style.backgroundPosition = `${focal.x}% ${focal.y}%`;
@@ -957,13 +1017,13 @@
             const resolvedId = this.resolveEffectiveBackgroundId();
 
             if (resolvedId === 'custom_photo') {
-                if (!this._forceFailIdbForTest && this._customPhotoLoaded && this._customPhotoRecord?.dataUrl) {
+                if (!this._forceFailIdbForTest && this._customPhotoLoaded && (this._customPhotoRecord?.croppedDataUrl || this._customPhotoRecord?.dataUrl)) {
                     this._renderCustomPhotoLayers(this._customPhotoRecord);
                     return;
                 }
                 try {
                     const record = await this.loadCustomPhotoRecord();
-                    if (!record || !record.dataUrl) {
+                    if (!record || (!record.croppedDataUrl && !record.dataUrl)) {
                         throw new Error('La foto de fondo no está disponible en IndexedDB.');
                     }
                     this._renderCustomPhotoLayers(record);
@@ -1046,15 +1106,17 @@
             const rawPreset = Storage.getBackgroundPreset();
             const effectiveId = this.resolveEffectiveBackgroundId();
             const isMono = this.isMonochromeActive();
+            const unlockedThemes = this.getUnlockedThematicPresets();
 
             // Pill de estado en cabecera del acordeón
             const pill = document.getElementById('settings-bg-pill');
             if (pill) {
                 let label = 'Predeterminado';
                 if (rawPreset === 'custom_photo' && effectiveId === 'custom_photo') label = 'Mi foto';
-                else if (rawPreset === 'vault_auto') label = 'Automático (tema)';
+                else if (rawPreset === 'vault_auto' && unlockedThemes.length > 0) label = 'Automático (tema)';
                 else {
-                    const found = [...BASIC_PRESETS, ...MONO_PRESETS, ...THEMATIC_PRESETS].find(p => p.id === rawPreset);
+                    const visiblePool = [...BASIC_PRESETS, ...MONO_PRESETS, ...unlockedThemes];
+                    const found = visiblePool.find(p => p.id === rawPreset);
                     if (found) label = found.name;
                 }
                 pill.textContent = label;
@@ -1108,12 +1170,11 @@
                 });
             }
 
-            // Sección Experimental (Bóveda)
+            // Sección Experimental (solo existe en DOM cuando hay temas de Bóveda desbloqueados)
             const expSection = document.getElementById('settings-bg-experimental-section');
-            const expGrid = document.getElementById('settings-bg-experimental-grid');
-            const unlockedThemes = this.getUnlockedThematicPresets();
-            if (expSection && expGrid) {
+            if (expSection) {
                 if (unlockedThemes.length === 0) {
+                    expSection.innerHTML = '';
                     expSection.classList.add('hidden');
                 } else {
                     expSection.classList.remove('hidden');
@@ -1140,8 +1201,14 @@
                             </button>`;
                     }).join('');
 
-                    expGrid.innerHTML = autoBtn + manualCards;
-                    expGrid.querySelectorAll('[data-bg-preset]').forEach(btn => {
+                    expSection.innerHTML = `
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Fondos temáticos de Bóveda</p>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">Experimental</span>
+                        </div>
+                        <div id="settings-bg-experimental-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">${autoBtn}${manualCards}</div>`;
+
+                    expSection.querySelectorAll('[data-bg-preset]').forEach(btn => {
                         btn.onclick = () => {
                             if (btn.disabled) return;
                             window.HapticsModule?.light?.();
@@ -1154,7 +1221,7 @@
             }
 
             // Controles "Mi foto"
-            const hasPhoto = Boolean(this._customPhotoRecord && this._customPhotoRecord.dataUrl);
+            const hasPhoto = Boolean(this._customPhotoRecord && (this._customPhotoRecord.croppedDataUrl || this._customPhotoRecord.dataUrl));
             const uploadBtn = document.getElementById('settings-bg-photo-upload-btn');
             const usePhotoBtn = document.getElementById('settings-bg-photo-use-btn');
             const adjustPhotoBtn = document.getElementById('settings-bg-photo-adjust-btn');
@@ -1183,7 +1250,8 @@
             const scrim = Storage.getBackgroundScrim();
 
             if (focalPreview && hasPhoto) {
-                focalPreview.style.backgroundImage = `url("${this._customPhotoRecord.dataUrl}")`;
+                const previewUrl = this._customPhotoRecord.croppedDataUrl || this._customPhotoRecord.dataUrl;
+                focalPreview.style.backgroundImage = `url("${previewUrl}")`;
                 focalPreview.style.backgroundSize = 'cover';
                 focalPreview.style.backgroundPosition = `${focal.x}% ${focal.y}%`;
             }
@@ -1272,11 +1340,21 @@
             if (adjustBtn) {
                 adjustBtn.onclick = async () => {
                     const rec = await this.loadCustomPhotoRecord().catch(() => null);
-                    if (!rec?.dataUrl) {
+                    const fallbackSrc = rec?.croppedDataUrl || rec?.dataUrl || '';
+                    if (!fallbackSrc) {
                         window.OrganizadorApp?.showToast?.('Primero sube una foto de fondo.', 'info');
                         return;
                     }
-                    await this.handleCustomPhotoUpload({ src: rec.dataUrl, adjustOnly: true });
+                    const hasOriginal = Boolean(rec.originalDataUrl && typeof rec.originalDataUrl === 'string' && rec.originalDataUrl.length > 0);
+                    if (!hasOriginal) {
+                        window.OrganizadorApp?.showToast?.('Foto heredada: se reencuadrará desde la copia guardada.', 'info');
+                    }
+                    await this.handleCustomPhotoUpload({
+                        src: hasOriginal ? rec.originalDataUrl : fallbackSrc,
+                        existingOriginalSrc: hasOriginal ? rec.originalDataUrl : null,
+                        initialCropState: rec.cropState || null,
+                        adjustOnly: true
+                    });
                 };
             }
 

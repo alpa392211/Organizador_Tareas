@@ -11,6 +11,11 @@
         outputWidth: 512,
         outputHeight: 512,
         maxDim: null, // Si se especifica > 0, limita dimensión máx proporcionalmente en export
+        cropOutput: false, // Si es true, exporta recorte al aspecto del visor además de originalDataUrl
+        preserveOriginalMaxDim: 2400,
+        originalQuality: 0.88,
+        existingOriginalSrc: null,
+        initialState: null, // { zoom, rotation, offsetXRatio, offsetYRatio }
         mimeType: 'image/jpeg',
         quality: 0.88,
         title: 'Ajustar foto de perfil',
@@ -441,11 +446,19 @@
             const focalY = metrics.maxOffsetY > 0.5
                 ? Math.min(1, Math.max(0, 0.5 - this.state.offsetY / (2 * metrics.maxOffsetY)))
                 : 0.5;
+            const offsetXRatio = metrics.maxOffsetX > 0.5
+                ? Math.min(1, Math.max(-1, this.state.offsetX / metrics.maxOffsetX))
+                : 0;
+            const offsetYRatio = metrics.maxOffsetY > 0.5
+                ? Math.min(1, Math.max(-1, this.state.offsetY / metrics.maxOffsetY))
+                : 0;
             return {
                 zoom: this.state.zoom,
                 rotation: this.state.rotation,
                 offsetX: this.state.offsetX,
                 offsetY: this.state.offsetY,
+                offsetXRatio: Number(offsetXRatio.toFixed(5)),
+                offsetYRatio: Number(offsetYRatio.toFixed(5)),
                 minZoom: MIN_ZOOM,
                 maxZoom: MAX_ZOOM,
                 baseScale: metrics.baseScale,
@@ -555,6 +568,67 @@
             ctx.restore();
         }
 
+        exportOriginalDataUrl(maxDim = 2400, quality = 0.88) {
+            if (!this.img) return { dataUrl: '', width: 0, height: 0 };
+            const iw = this.img.naturalWidth || this.img.width || 1;
+            const ih = this.img.naturalHeight || this.img.height || 1;
+            if (this.options.existingOriginalSrc && typeof this.options.existingOriginalSrc === 'string') {
+                return { dataUrl: this.options.existingOriginalSrc, width: iw, height: ih };
+            }
+            const cap = Math.max(512, Number(maxDim) || 2400);
+            const longest = Math.max(iw, ih);
+            const scaleDown = longest > cap ? cap / longest : 1;
+            const outW = Math.max(1, Math.round(iw * scaleDown));
+            const outH = Math.max(1, Math.round(ih * scaleDown));
+            const origCanvas = document.createElement('canvas');
+            origCanvas.width = outW;
+            origCanvas.height = outH;
+            const oCtx = origCanvas.getContext('2d');
+            oCtx.fillStyle = '#0f172a';
+            oCtx.fillRect(0, 0, outW, outH);
+            oCtx.drawImage(this.img, 0, 0, outW, outH);
+            const q = Math.max(0.85, Math.min(0.95, Number(quality) || 0.88));
+            return { dataUrl: origCanvas.toDataURL('image/jpeg', q), width: outW, height: outH };
+        }
+
+        exportCroppedDataUrl(maxDim = 1600, mimeType = null, quality = null) {
+            if (!this.img) return { dataUrl: '', width: 0, height: 0 };
+            this._clampState();
+            const { iw, ih } = this._getRotatedDimensions();
+            const { totalScale } = this._computeMetrics();
+            const cropW = Math.max(1, this.viewport.cropW);
+            const cropH = Math.max(1, this.viewport.cropH);
+            const targetAr = Number(this.options.aspectRatio) > 0 ? Number(this.options.aspectRatio) : (cropW / cropH);
+            const cap = Math.max(320, Number(maxDim) || Number(this.options.maxDim) || 1600);
+            let outW, outH;
+            if (targetAr >= 1) {
+                outW = cap;
+                outH = Math.max(1, Math.round(cap / targetAr));
+            } else {
+                outH = cap;
+                outW = Math.max(1, Math.round(cap * targetAr));
+            }
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = outW;
+            exportCanvas.height = outH;
+            const eCtx = exportCanvas.getContext('2d');
+            eCtx.fillStyle = '#0f172a';
+            eCtx.fillRect(0, 0, outW, outH);
+            const ratioX = outW / cropW;
+            const ratioY = outH / cropH;
+            const ratio = (ratioX + ratioY) / 2;
+            const outScale = totalScale * ratio;
+            eCtx.save();
+            eCtx.translate(outW / 2 + this.state.offsetX * ratioX, outH / 2 + this.state.offsetY * ratioY);
+            eCtx.rotate((this.state.rotation * Math.PI) / 180);
+            eCtx.scale(outScale, outScale);
+            eCtx.drawImage(this.img, -iw / 2, -ih / 2, iw, ih);
+            eCtx.restore();
+            const mime = mimeType || this.options.mimeType || 'image/jpeg';
+            const q = Math.max(0.85, typeof quality === 'number' ? quality : (typeof this.options.quality === 'number' ? this.options.quality : 0.88));
+            return { dataUrl: exportCanvas.toDataURL(mime, q), width: outW, height: outH };
+        }
+
         exportDataUrl() {
             if (!this.img) return '';
             this._clampState();
@@ -565,7 +639,7 @@
             let outW = Number(this.options.outputWidth) || 512;
             let outH = Number(this.options.outputHeight) || 512;
 
-            // Modo proporcional opcional (ej. Etapa 3 "Mi foto" con maxDim = 1600 sin recorte rígido)
+            // Modo proporcional opcional (ej. "Mi foto" con maxDim = 1600)
             const maxDim = Number(this.options.maxDim) || 0;
             if (maxDim > 0 && !this.options.forceFixedOutput) {
                 const longest = Math.max(rotW, rotH);
@@ -656,7 +730,10 @@
                 labelEl.textContent = this.options.confirmLabel || DEFAULT_OPTS.confirmLabel;
             }
             if (this.hintEl) {
-                if (this.options.maxDim) {
+                if (this.options.cropOutput) {
+                    const cap = Number(this.options.maxDim) || 1600;
+                    this.hintEl.textContent = `Recorte ajustado · Máx. ${cap} px · Original conservado para reencuadrar`;
+                } else if (this.options.maxDim) {
                     this.hintEl.textContent = `Máx. ${this.options.maxDim} px · Punto focal ajustable`;
                 } else {
                     const qPct = Math.round((this.options.quality ?? 0.88) * 100);
@@ -684,7 +761,22 @@
             document.body.classList.add('overflow-hidden');
 
             this._measureViewport();
-            if (this.options.initialFocalPoint && typeof this.options.initialFocalPoint === 'object') {
+            const initState = this.options.initialState;
+            if (initState && typeof initState === 'object') {
+                const rot = Number(initState.rotation) || 0;
+                this.state.rotation = ((rot % 360) + 360) % 360;
+                this.state.rotation = Math.round(this.state.rotation / 90) * 90 % 360;
+                this.state.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Number(initState.zoom) || MIN_ZOOM));
+                const metrics = this._computeMetrics();
+                const rx = Number(initState.offsetXRatio);
+                const ry = Number(initState.offsetYRatio);
+                if (Number.isFinite(rx) && metrics.maxOffsetX > 0.5) {
+                    this.state.offsetX = Math.min(1, Math.max(-1, rx)) * metrics.maxOffsetX;
+                }
+                if (Number.isFinite(ry) && metrics.maxOffsetY > 0.5) {
+                    this.state.offsetY = Math.min(1, Math.max(-1, ry)) * metrics.maxOffsetY;
+                }
+            } else if (this.options.initialFocalPoint && typeof this.options.initialFocalPoint === 'object') {
                 const rawFx = Number(this.options.initialFocalPoint.x);
                 const rawFy = Number(this.options.initialFocalPoint.y);
                 const fx = Number.isFinite(rawFx) ? (rawFx > 1 ? rawFx / 100 : rawFx) : 0.5;
@@ -720,13 +812,65 @@
                 return null;
             }
             const originalSrc = this.img.src || '';
-            const dataUrl = this.exportDataUrl();
             const stateSnapshot = this.getState();
+            const cropState = {
+                zoom: Number(stateSnapshot.zoom.toFixed(4)),
+                rotation: stateSnapshot.rotation,
+                offsetXRatio: stateSnapshot.offsetXRatio,
+                offsetYRatio: stateSnapshot.offsetYRatio
+            };
+
+            let dataUrl = '';
+            let croppedDataUrl = '';
+            let originalDataUrl = '';
+            let outWidth = this.options.outputWidth;
+            let outHeight = this.options.outputHeight;
+            let croppedWidth = outWidth;
+            let croppedHeight = outHeight;
+
+            if (this.options.cropOutput) {
+                const cropped = this.exportCroppedDataUrl(
+                    this.options.maxDim || 1600,
+                    this.options.mimeType || 'image/jpeg',
+                    Math.max(0.85, this.options.quality ?? 0.88)
+                );
+                const orig = this.exportOriginalDataUrl(
+                    this.options.preserveOriginalMaxDim || 2400,
+                    this.options.originalQuality ?? 0.88
+                );
+                croppedDataUrl = cropped.dataUrl;
+                originalDataUrl = orig.dataUrl;
+                croppedWidth = cropped.width;
+                croppedHeight = cropped.height;
+                const hasCustomTransform = (
+                    cropState.zoom > 1.005 ||
+                    cropState.rotation !== 0 ||
+                    Math.abs(cropState.offsetXRatio) > 0.015 ||
+                    Math.abs(cropState.offsetYRatio) > 0.015 ||
+                    Boolean(this.options.existingOriginalSrc)
+                );
+                if (this.options.maxDim && !this.options.forceFixedOutput && !hasCustomTransform) {
+                    dataUrl = this.exportDataUrl();
+                } else {
+                    dataUrl = croppedDataUrl;
+                    outWidth = cropped.width;
+                    outHeight = cropped.height;
+                }
+            } else {
+                dataUrl = this.exportDataUrl();
+                croppedDataUrl = dataUrl;
+            }
+
             const result = {
                 dataUrl,
+                croppedDataUrl,
+                originalDataUrl,
                 originalSrc,
-                width: this.options.outputWidth,
-                height: this.options.outputHeight,
+                cropState,
+                width: outWidth,
+                height: outHeight,
+                croppedWidth,
+                croppedHeight,
                 mimeType: this.options.mimeType,
                 quality: this.options.quality,
                 focalPoint: stateSnapshot.focalPoint,

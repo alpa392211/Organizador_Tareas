@@ -56,11 +56,11 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.1">
-    <link rel="stylesheet" href="css/styles.css?v=1.5.1">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.2">
+    <link rel="stylesheet" href="css/styles.css?v=1.5.2">
 </head>
 <body class="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
-    <!-- Capa de fondo ambiental fija para transparencia Liquid Glass -->
+    <!-- Capa de fondo ambiental fija para efectos de transparencia avanzados -->
     <div id="app-background" aria-hidden="true"></div>
 
     <!-- ========================================== -->
@@ -159,15 +159,15 @@
     <!-- ========================================== -->
     <!-- MENÚ LATERAL DESLIZABLE (SIDEBAR / DRAWER) -->
     <!-- ========================================== -->
-    <div id="drawer-backdrop" class="app-modal-backdrop fixed inset-0 z-40 bg-slate-900/45 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="drawer-backdrop" class="app-modal-backdrop fixed inset-0 z-40 bg-slate-900/35 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
     <aside id="sidebar-drawer"
-        class="liquid-glass-drawer fixed top-0 bottom-0 left-0 z-50 w-[82vw] sm:w-80 max-w-sm bg-white dark:bg-slate-800 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between border-r border-white/60 dark:border-white/10">
+        class="liquid-glass-drawer fixed top-0 bottom-0 left-0 z-50 w-[82vw] sm:w-80 max-w-sm shadow-2xl transform -translate-x-full flex flex-col justify-between">
         
         <!-- Contenido Superior del Drawer (Página Completa) -->
-        <div class="p-5 sm:p-6 flex-1 overflow-y-auto">
+        <div class="drawer-inner-scroll p-5 sm:p-6 flex-1 overflow-y-auto relative z-[1]">
             <!-- Cabecera del Drawer -->
-            <div class="flex items-center justify-between gap-2 pb-5 border-b border-slate-100 dark:border-slate-700/60">
+            <div class="flex items-center justify-between gap-2 pb-5 border-b border-slate-300/40 dark:border-white/10">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <div id="drawer-inst-logo" class="shrink-0 flex items-center justify-center">
                         <!-- Avatar o foto de perfil -->
@@ -190,7 +190,7 @@
                 </div>
                 <!-- Botón Cerrar Drawer -->
                 <button type="button" id="drawer-close-btn"
-                    class="touch-target-44 min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 tap-effect transition-colors shrink-0"
+                    class="touch-target-44 min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-full text-slate-500 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 tap-effect transition-colors shrink-0"
                     aria-label="Cerrar menú">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/>
@@ -199,86 +199,86 @@
             </div>
 
             <!-- Enlaces de Navegación Principal -->
-            <nav class="mt-6 space-y-2">
-                <div class="px-2 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+            <nav class="mt-5 space-y-1.5">
+                <div class="px-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
                     Navegación
                 </div>
 
                 <!-- 1. Materias / Actividades -->
                 <button type="button" data-view-target="subjects"
-                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 hover:text-indigo-600 tap-effect transition-all text-left">
+                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/55 dark:hover:bg-white/10 hover:text-indigo-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <span class="w-8 h-8 rounded-full bg-indigo-500/12 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                         </span>
                         <span class="truncate">Materias / Actividades</span>
                     </div>
-                    <span id="drawer-sub-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">0</span>
+                    <span id="drawer-sub-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-slate-200/70 dark:bg-white/12 text-slate-700 dark:text-slate-200">0</span>
                 </button>
 
                 <!-- 2. Tareas -->
                 <button type="button" data-view-target="tasks"
-                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 hover:text-indigo-600 tap-effect transition-all text-left">
+                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/55 dark:hover:bg-white/10 hover:text-indigo-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <span class="w-8 h-8 rounded-full bg-emerald-500/12 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                             </svg>
                         </span>
                         <span class="truncate">Tareas Escolares</span>
                     </div>
-                    <span id="drawer-task-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600">0</span>
+                    <span id="drawer-task-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/12 text-rose-600 dark:text-rose-300">0</span>
                 </button>
 
                 <!-- 3. Notas Rápidas -->
                 <button type="button" data-view-target="notes"
-                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-slate-700/60 hover:text-amber-600 tap-effect transition-all text-left">
+                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/55 dark:hover:bg-white/10 hover:text-amber-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <span class="w-8 h-8 rounded-full bg-amber-500/12 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
                         </span>
                         <span class="truncate">Notas Rápidas</span>
                     </div>
-                    <span id="drawer-note-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">0</span>
+                    <span id="drawer-note-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/12 text-amber-700 dark:text-amber-300">0</span>
                 </button>
 
                 <!-- 4. Calendario (Menú y Vista Completa) -->
                 <button type="button" data-view-target="calendar"
-                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 hover:text-indigo-600 tap-effect transition-all text-left">
+                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/55 dark:hover:bg-white/10 hover:text-indigo-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                        <span class="w-8 h-8 rounded-full bg-violet-500/12 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </span>
                         <span class="truncate">Calendario Escolar</span>
                     </div>
-                    <span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600">Ver</span>
+                    <span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/12 text-indigo-700 dark:text-indigo-300">Ver</span>
                 </button>
 
                 <!-- 5. Baúl de Archivados (Tareas y Notas) -->
                 <button type="button" data-view-target="archive"
-                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-slate-700/60 hover:text-amber-600 tap-effect transition-all text-left">
+                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/55 dark:hover:bg-white/10 hover:text-amber-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <span class="w-8 h-8 rounded-full bg-amber-500/12 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
                             </svg>
                         </span>
                         <span class="truncate">Baúl de Archivados</span>
                     </div>
-                    <span id="drawer-archive-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">0</span>
+                    <span id="drawer-archive-count" class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/12 text-amber-700 dark:text-amber-300">0</span>
                 </button>
 
                 <!-- 6. Configuración -->
                 <button type="button" data-view-target="settings"
-                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700/60 hover:text-indigo-600 tap-effect transition-all text-left">
+                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/55 dark:hover:bg-white/10 hover:text-indigo-600 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-400 flex items-center justify-center shrink-0">
+                        <span class="w-8 h-8 rounded-full bg-slate-500/12 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -290,9 +290,9 @@
 
                 <!-- Opción PWA en Drawer -->
                 <button type="button" id="drawer-pwa-install-btn"
-                    class="nav-link-btn touch-target-44 min-h-[44px] hidden w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-sm font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50/70 dark:bg-indigo-950/40 hover:bg-indigo-100/70 tap-effect transition-all text-left">
+                    class="nav-link-btn touch-target-44 min-h-[44px] hidden w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-500/12 hover:bg-indigo-500/20 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         </span>
                         <span class="truncate">Instalar Aplicación</span>
@@ -305,13 +305,13 @@
         <!-- ======================================================== -->
         <!-- PIE DEL DRAWER: APOYO Y SALIDA DE LA APLICACIÓN          -->
         <!-- ======================================================== -->
-        <div id="sidebar-drawer-footer" class="p-5 border-t border-slate-200/80 dark:border-slate-700/60 bg-white dark:bg-slate-800">
+        <div id="sidebar-drawer-footer" class="p-5 border-t border-slate-300/35 dark:border-white/10 relative z-[1]">
             <div class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 text-center mb-2">
                 ¿Te gusta el organizador escolar?
             </div>
             
             <a href="https://ko-fi.com/edrx_ngl" target="_blank" rel="noopener noreferrer"
-                class="kofi-btn touch-target-44 min-h-[44px] w-full py-3 px-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2.5 shadow-lg tap-effect group"
+                class="kofi-btn touch-target-44 min-h-[44px] w-full py-3 px-4 rounded-full text-white font-bold text-sm flex items-center justify-center gap-2.5 shadow-lg tap-effect group border border-white/25"
                 title="Apóyame en Ko-fi invitándome un café">
                 <!-- Icono oficial taza de café Ko-fi en SVG -->
                 <svg class="w-5 h-5 fill-white transition-transform group-hover:rotate-6 shrink-0" viewBox="0 0 24 24">
@@ -323,7 +323,7 @@
 
             <!-- Botón de Salida Segura de la Aplicación -->
             <button type="button" id="app-exit-btn"
-                class="touch-target-44 min-h-[44px] w-full mt-2.5 py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-700/60 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold flex items-center justify-center gap-2 border border-slate-200/80 dark:border-slate-700 transition-colors tap-effect"
+                class="touch-target-44 min-h-[44px] w-full mt-2.5 py-2.5 px-4 rounded-full bg-white/55 dark:bg-white/10 hover:bg-rose-500/15 dark:hover:bg-rose-500/20 text-slate-700 dark:text-slate-100 hover:text-rose-700 dark:hover:text-rose-300 text-xs font-bold flex items-center justify-center gap-2 border border-white/60 dark:border-white/15 backdrop-blur-md transition-colors tap-effect"
                 title="Cerrar la aplicación">
                 <svg class="w-4 h-4 stroke-[2.2] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
@@ -510,7 +510,7 @@
         <!-- ========================================================= -->
         <section id="view-notes" class="view-transition hidden space-y-6">
             
-            <!-- Barra Superior de Notas: Título, Filtros de Categoría y Botón CTA -->
+            <!-- Barra Superior de Notas: Título, Selector Notas/Galería, Filtros y Botón CTA -->
             <div class="glass-panel bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="min-w-0">
@@ -523,7 +523,7 @@
                             </span>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                            Guarda ideas, pendientes, apuntes de clase y recordatorios en cualquier momento.
+                            Guarda ideas, pendientes, apuntes de clase y fotos de tus materiales.
                         </p>
                     </div>
 
@@ -545,8 +545,26 @@
                     </div>
                 </div>
 
+                <!-- Control segmentado Notas | Galería (estilo Apple HIG) -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <div id="notes-view-tabs" role="tablist" aria-label="Secciones de notas"
+                        class="notes-segmented-control inline-flex items-center p-1 rounded-2xl bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 w-full sm:w-auto">
+                        <button type="button" id="notes-tab-notes" role="tab" aria-selected="true" data-notes-tab="notes"
+                            class="notes-seg-btn notes-seg-active touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            <span>📝</span>
+                            <span>Notas</span>
+                        </button>
+                        <button type="button" id="notes-tab-gallery" role="tab" aria-selected="false" data-notes-tab="gallery"
+                            class="notes-seg-btn touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            <span>🖼️</span>
+                            <span>Galería</span>
+                            <span id="notes-gallery-count" class="px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">0</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Barra de Búsqueda y Filtros de Categoría -->
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 items-center">
+                <div id="notes-search-filter-bar" class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 items-center">
                     <!-- Buscador en Vivo -->
                     <div class="sm:col-span-5 relative min-w-0">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -590,16 +608,34 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)] gap-6 items-start">
-            <!-- Galería de materiales (izquierda) -->
-            <aside id="notes-gallery-panel" class="glass-panel bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-3 min-w-0">
-                <div class="flex items-center justify-between gap-2">
-                    <h2 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">🖼️ Galería de materiales</h2>
-                    <label for="notes-photo-input" class="touch-target-44 min-h-[44px] inline-flex items-center tap-effect cursor-pointer shrink-0 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold">+ Foto</label>
-                    <input type="file" id="notes-photo-input" accept="image/*" class="hidden">
+            <!-- Panel Galería de fotos de notas (vista dedicada en pestaña Galería) -->
+            <section id="notes-gallery-panel" class="hidden glass-panel bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-4 min-w-0" aria-labelledby="notes-gallery-heading">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <h2 id="notes-gallery-heading" class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>🖼️</span>
+                            <span>Galería de materiales</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            Se conservan con su calidad original sin saturar la memoria rápida. Toca una foto para ampliar o descargar.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+                        <select id="notes-photo-note-select" aria-label="Vincular foto a una nota"
+                            class="min-h-[44px] max-w-[200px] px-3 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                            <option value="">Sin vincular a nota</option>
+                        </select>
+                        <label for="notes-photo-input"
+                            class="touch-target-44 min-h-[44px] inline-flex items-center justify-center gap-1.5 tap-effect cursor-pointer shrink-0 px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm">
+                            <span>+ Foto</span>
+                        </label>
+                        <input type="file" id="notes-photo-input" accept="image/*" class="hidden">
+                    </div>
                 </div>
-                <div id="notes-gallery-grid" class="grid grid-cols-2 gap-2 min-w-0"></div>
-            </aside>
+                <div id="notes-gallery-grid" class="grid grid-cols-2 min-[360px]:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 min-w-0"></div>
+            </section>
+
+            <!-- Panel Tarjetas de Notas -->
             <div id="notes-cards-panel" class="space-y-6 min-w-0">
             <!-- Empty State de Notas -->
             <div id="notes-empty-state" class="glass-panel hidden text-center py-12 px-6 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
@@ -622,7 +658,6 @@
             <!-- Grid de Tarjetas de Notas -->
             <div id="notes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Inyectado por notes.js -->
-            </div>
             </div>
             </div>
         </section>
@@ -977,7 +1012,7 @@
                             </div>
                         </div>
 
-                        <!-- Intensidad del Cristal (Liquid Glass Apple / iOS 26) -->
+                        <!-- Intensidad del Cristal (Efectos de transparencia avanzados) -->
                         <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0">
                             <div class="flex items-center justify-between gap-2 flex-wrap min-w-0">
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -1073,7 +1108,7 @@
                             <span class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center text-lg shrink-0">🖼️</span>
                             <div class="min-w-0 flex-1">
                                 <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Fondo</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Fondos ambientales, temáticos y "Mi foto" personalizada.</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Fondos ambientales y «Mi foto» personalizada.</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0 ml-2">
@@ -1097,21 +1132,13 @@
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                                     Escala de grises
                                 </label>
-                                <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Apto para modo monocromático</span>
+                                <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Contraste neutro y suave</span>
                             </div>
                             <div id="settings-bg-mono-grid" class="grid grid-cols-3 gap-2.5 min-w-0"></div>
                         </div>
 
-                        <!-- 3. Modo Experimental (Temáticos de la Bóveda desbloqueados) -->
-                        <div id="settings-bg-experimental-section" class="hidden pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                    Fondos temáticos de Bóveda
-                                </label>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">Experimental</span>
-                            </div>
-                            <div id="settings-bg-experimental-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 min-w-0"></div>
-                        </div>
+                        <!-- 3. Opciones desbloqueadas dinámicamente desde JS cuando existan códigos activos -->
+                        <div id="settings-bg-experimental-section" class="hidden pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0"></div>
 
                         <!-- 4. Mi foto (IndexedDB local únicamente) -->
                         <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-3 min-w-0">
@@ -1511,17 +1538,17 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.5.1 -->
+                <!-- VERSIÓN HASTA ABAJO v1.5.2 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.5.1</span>
+                        <span>Versión 1.5.2</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="touch-target-44 min-h-[44px] px-3 tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.5.1</span>
+                        <span>✨ Ver novedades de la versión 1.5.2</span>
                     </button>
                 </div>
             </div>
@@ -2028,6 +2055,19 @@
                     </div>
                 </div>
 
+                <!-- Fotos adjuntas a la nota -->
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">🖼️ Fotos adjuntas</span>
+                        <label for="note-modal-photo-input"
+                            class="touch-target-44 min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold cursor-pointer tap-effect border border-indigo-200/70 dark:border-indigo-700/50">
+                            <span>+ Adjuntar foto</span>
+                        </label>
+                        <input type="file" id="note-modal-photo-input" accept="image/*" class="hidden">
+                    </div>
+                    <div id="note-modal-photos-list" class="flex flex-wrap gap-2"></div>
+                </div>
+
                 <div class="pt-4 flex flex-wrap items-center justify-end gap-2.5 border-t border-slate-100 dark:border-slate-700">
                     <button type="button" id="cancel-note-btn"
                         class="touch-target-44 min-h-[44px] px-5 py-2.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs tap-effect transition-colors">
@@ -2311,7 +2351,7 @@
             <!-- Icono / Símbolo Enigmático Desbloqueado (Cascada 1) -->
             <div class="vault-cascade-1 flex flex-col items-center">
                 <div id="vault-reveal-icon" class="w-20 h-20 rounded-3xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-4xl shadow-xl shadow-purple-950/80 mb-2">
-                    🚀
+                    🗝️
                 </div>
                 <span id="vault-reveal-badge" class="text-[10px] font-mono font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">
                     PROTOCOLO CLASIFICADO
@@ -2321,17 +2361,17 @@
             <!-- Título y Frase Conmemorativa (Cascada 2) -->
             <div class="vault-cascade-2 space-y-1.5">
                 <h2 id="vault-reveal-title" class="text-xl font-black text-white tracking-tight leading-snug drop-shadow-md">
-                    Misión Espacial Apollo 11
+                    Protocolo Desbloqueado
                 </h2>
                 <p id="vault-reveal-phrase" class="text-xs font-serif italic text-purple-200/90 leading-relaxed px-2">
-                    «Un pequeño paso para el estudiante, un gran salto para tu semestre»
+                    Recompensa clasificada lista para activarse.
                 </p>
             </div>
 
             <!-- Descripción del Desbloqueo (Cascada 3) -->
             <div class="vault-cascade-3">
                 <p id="vault-reveal-desc" class="text-xs text-slate-300 leading-relaxed bg-black/40 border border-purple-500/20 p-3.5 rounded-2xl text-left">
-                    Has desbloqueado el diseño cósmico interestelar.
+                    El protocolo seleccionado ha sido descifrado correctamente.
                 </p>
             </div>
 
@@ -2339,7 +2379,7 @@
             <div class="vault-cascade-4 pt-1 space-y-2">
                 <button type="button" id="vault-reveal-action-btn"
                     class="touch-target-44 min-h-[44px] tap-effect w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-purple-900/50 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                    <span>Activar Tema Ahora 🚀</span>
+                    <span>Activar Recompensa</span>
                 </button>
                 <button type="button" id="vault-reveal-dismiss-btn"
                     class="touch-target-44 min-h-[44px] tap-effect w-full py-2.5 px-4 rounded-2xl bg-white/10 hover:bg-white/15 text-purple-200 font-bold text-xs transition-colors cursor-pointer">
@@ -2393,10 +2433,10 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.5.1                     -->
+    <!-- MODAL DE NOVEDADES DE LA VERSIÓN                           -->
     <!-- ========================================================= -->
     <div id="changelog-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-[70] hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div id="changelog-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
+        <div id="changelog-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"></div>
 
         <div class="modal-dialog mobile-bottom-sheet relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-indigo-200 dark:border-indigo-800/80 overflow-hidden flex flex-col max-h-[90vh]">
             <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
@@ -2409,14 +2449,14 @@
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                                Novedades de la Versión 1.5.1
+                                Novedades de la Versión 1.5.2
                             </h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                                v1.5.1
+                                v1.5.2
                             </span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            ¡Descubre el rediseño Liquid Glass, editor de foto de perfil y fondos personalizables!
+                            ¡Descubre los efectos de transparencia avanzados en toda la app, reencuadre de fondos y galería fotográfica en Notas!
                         </p>
                     </div>
                 </div>
@@ -2426,9 +2466,9 @@
                     <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">🫧</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Liquid Glass Intenso y Tipografía Inter</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Efectos de transparencia avanzados</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Barras cápsula, paneles traslúcidos con reflejos especulares, selector de intensidad del cristal (Suave, Normal o Intenso) y tipografía Inter variable integrada sin conexión.
+                                Menú lateral, hojas inferiores, popovers y notificaciones flotantes con cristal real traslúcido, intensidad ajustable (Suave, Normal o Intenso) y tipografía Inter variable.
                             </p>
                         </div>
                     </div>
@@ -2436,19 +2476,19 @@
                     <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">🖼️</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Editor de Foto de Perfil con Reencuadre</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Reencuadre de foto de fondo y perfil</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Recorta, arrastra, haz zoom y rota tu foto de perfil al subirla desde Configuraciones o bienvenida, con opción directa para reajustar tu foto actual.
+                                Arrastra, haz zoom y gira tus imágenes libremente con conservación del original en el dispositivo para volver a reencuadrar cuando quieras.
                             </p>
                         </div>
                     </div>
 
                     <div class="p-3 rounded-2xl bg-violet-50/60 dark:bg-violet-950/30 border border-violet-100 dark:border-violet-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">🎨</span>
+                        <span class="text-xl shrink-0 select-none">📸</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Fondos Básicos, Temáticos y «Mi foto»</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Galería fotográfica en Notas con zoom y descarga</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Elige entre degradados básicos o en escala de grises, fondos temáticos de la Bóveda (automáticos o manuales) o tu propia foto guardada localmente con punto de enfoque, desenfoque y contraste ajustables.
+                                Explora tus fotos en cuadrícula o desliza a pantalla completa con zoom táctil y controles precisos, descarga el archivo original o abre su nota en un toque.
                             </p>
                         </div>
                     </div>
@@ -2456,9 +2496,9 @@
                     <div class="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">✨</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Correcciones Visuales y Mayor Legibilidad</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Privacidad visual y contraste impecable</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Mejor contraste en filtros de Notas y todos los temas, menú contextual elevado sin recortes, hojas inferiores deslizables en móvil y ajuste sin desbordamiento horizontal.
+                                Personalización ordenada sin funciones ocultas visibles antes de descubrirlas y legibilidad asegurada sobre cualquier fondo en claro u oscuro.
                             </p>
                         </div>
                     </div>
@@ -2477,28 +2517,79 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/storage.js?v=1.5.1"></script>
-    <script src="js/haptics.js?v=1.5.1"></script>
-    <script src="js/notifications.js?v=1.5.1"></script>
-    <script src="js/widgets.js?v=1.5.1"></script>
-    <script src="js/subjects.js?v=1.5.1"></script>
-    <script src="js/tasks.js?v=1.5.1"></script>
-    <script src="js/notes.js?v=1.5.1"></script>
-    <script src="js/calendar.js?v=1.5.1"></script>
-    <script src="js/archive.js?v=1.5.1"></script>
-    <script src="js/photo-editor.js?v=1.5.1"></script>
-    <script src="js/backgrounds.js?v=1.5.1"></script>
-    <script src="js/app.js?v=1.5.1"></script>
+    <script src="js/storage.js?v=1.5.2"></script>
+    <script src="js/haptics.js?v=1.5.2"></script>
+    <script src="js/notifications.js?v=1.5.2"></script>
+    <script src="js/widgets.js?v=1.5.2"></script>
+    <script src="js/subjects.js?v=1.5.2"></script>
+    <script src="js/tasks.js?v=1.5.2"></script>
+    <script src="js/notes.js?v=1.5.2"></script>
+    <script src="js/calendar.js?v=1.5.2"></script>
+    <script src="js/archive.js?v=1.5.2"></script>
+    <script src="js/photo-editor.js?v=1.5.2"></script>
+    <script src="js/backgrounds.js?v=1.5.2"></script>
+    <script src="js/app.js?v=1.5.2"></script>
 
-    <!-- Visor de fotos de la galería -->
-    <div id="photo-preview-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
-        <div id="photo-preview-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/80 backdrop-blur-xs"></div>
-        <div class="relative max-w-md w-full space-y-2 z-10">
-            <img id="photo-preview-img" alt="Foto de la galería" class="w-full max-h-[75vh] object-contain rounded-2xl bg-slate-900">
-            <div class="flex items-center justify-between gap-2">
-                <span id="photo-preview-name" class="text-xs font-bold text-white truncate min-w-0"></span>
-                <button type="button" id="photo-preview-close" class="tap-effect touch-target-44 min-h-[44px] shrink-0 px-4 py-2 rounded-xl bg-white text-slate-800 text-xs font-bold">Cerrar</button>
+    <!-- Visor de fotos de la galería a pantalla completa -->
+    <div id="photo-preview-modal" class="modal-overlay photo-viewer-overlay fixed inset-0 z-[70] hidden flex-col" role="dialog" aria-modal="true" aria-labelledby="photo-preview-name" aria-hidden="true">
+        <div id="photo-preview-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/92 backdrop-blur-md"></div>
+
+        <div class="modal-dialog photo-viewer-shell relative z-10 flex flex-col w-full h-full">
+            <!-- Barra superior translúcida con safe-area -->
+            <header id="photo-preview-topbar" class="photo-viewer-bar flex items-center justify-between gap-3 px-3 sm:px-5 pb-2.5 shrink-0">
+                <div class="min-w-0 flex-1">
+                    <h3 id="photo-preview-name" class="text-sm font-bold text-white truncate"></h3>
+                    <p id="photo-preview-meta" class="text-[11px] text-slate-300 truncate"></p>
+                </div>
+                <button type="button" id="photo-preview-close" aria-label="Cerrar visor"
+                    class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] shrink-0 px-3 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold inline-flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span class="hidden sm:inline">Cerrar</span>
+                </button>
+            </header>
+
+            <!-- Escenario interactivo (zoom/pan por gestos y botones) -->
+            <div id="photo-preview-stage" class="photo-viewer-stage relative flex-1 min-h-0 flex items-center justify-center overflow-hidden select-none p-2 sm:p-4" data-zoom="1" data-pan-x="0" data-pan-y="0">
+                <img id="photo-preview-img" alt="Foto de la galería" draggable="false" class="photo-viewer-img max-w-full max-h-full object-contain select-none">
+                <span id="photo-preview-zoom-badge" class="hidden pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-slate-900/75 text-white text-[11px] font-mono font-bold tabular-nums border border-white/15">100%</span>
             </div>
+
+            <!-- Barra inferior translúcida con controles de zoom, navegación y descarga -->
+            <footer id="photo-preview-toolbar" class="photo-viewer-bar photo-viewer-bottom-bar flex flex-wrap items-center justify-between gap-2 px-3 sm:px-5 pt-2.5 shrink-0">
+                <div class="flex items-center gap-1.5">
+                    <button type="button" id="photo-preview-prev" aria-label="Foto anterior"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">‹</button>
+                    <button type="button" id="photo-preview-zoom-out" aria-label="Alejar"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">−</button>
+                    <button type="button" id="photo-preview-zoom-reset" aria-label="Restablecer zoom a 100%"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] px-3 rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-xs font-mono font-bold tabular-nums inline-flex items-center justify-center">100%</button>
+                    <button type="button" id="photo-preview-zoom-in" aria-label="Acercar"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">+</button>
+                    <button type="button" id="photo-preview-next" aria-label="Foto siguiente"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">›</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <button type="button" id="photo-preview-goto-note"
+                        class="hidden tap-effect touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-sm">
+                        <span>📝</span>
+                        <span>Ir a la nota</span>
+                    </button>
+                    <button type="button" id="photo-preview-download"
+                        class="tap-effect touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-sm">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        <span>Descargar</span>
+                    </button>
+                    <button type="button" id="photo-preview-share"
+                        class="hidden tap-effect touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold inline-flex items-center justify-center gap-1.5">
+                        <span>Compartir</span>
+                    </button>
+                    <button type="button" id="photo-preview-delete" aria-label="Eliminar foto"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-rose-600/85 hover:bg-rose-600 text-white border border-rose-300/30 text-xs font-bold inline-flex items-center justify-center">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+            </footer>
         </div>
     </div>
 

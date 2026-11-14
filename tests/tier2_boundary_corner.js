@@ -9,16 +9,16 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.1 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.5.2 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver 1.5.1',
+        name: 'package.json version matches strict semver 1.5.2',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.1', 'package.json version must be 1.5.1');
+            helpers.assertEqual(pkg.version, '1.5.2', 'package.json version must be 1.5.2');
         }
     },
     {
@@ -30,7 +30,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.5.1';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.5.2';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -38,14 +38,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target 1.5.1 version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.5.2 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.OrganizadorApp?.openChangelogModal?.();
                 document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.5.1', 'LocalStorage must record version 1.5.1');
+            helpers.assertEqual(saved, '1.5.2', 'LocalStorage must record version 1.5.2');
         }
     },
     {
@@ -865,10 +865,10 @@ const tests = [
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setOnboardingCompleted?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.5.1');
+                window.StorageModule?.setLastSeenVersion?.('1.5.2');
             });
             const lastSeen = await page.evaluate(() => window.StorageModule?.getLastSeenVersion?.());
-            helpers.assertEqual(lastSeen, '1.5.1', 'Last seen version should be 1.5.1');
+            helpers.assertEqual(lastSeen, '1.5.2', 'Last seen version should be 1.5.2');
         }
     },
     {
@@ -3108,6 +3108,798 @@ const tests = [
             });
 
             helpers.assertEqual(overflowFailures.length, 0, `Mobile horizontal overflow detected: ${overflowFailures.join('; ')}`);
+        }
+    },
+
+    // =========================================================================
+    // F23: v1.5.2 Temáticos Ocultos, Sin 'Liquid Glass', Cristal en Drawer/Hojas/Toasts
+    // =========================================================================
+    {
+        id: 'T2_F23_01_locked_dom_hides_vault_themes_and_liquid_glass',
+        feature: 'F23',
+        name: 'Locked app DOM exposes zero Vault theme names, zero Experimental/Auto background labels, and zero visible Liquid Glass text',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+            const result = await page.evaluate(() => {
+                document.getElementById('cycle-welcome-modal')?.classList.add('hidden');
+                window.OrganizadorApp?.switchView?.('settings');
+                const acc = document.getElementById('settings-acc-background');
+                if (acc) acc.classList.add('open');
+                window.BackgroundsModule?.renderSettingsUI?.();
+
+                const bodyText = document.body.innerText || '';
+                const rawHtmlNoScripts = Array.from(document.body.querySelectorAll(':scope > *:not(script)'))
+                    .map(el => el.textContent || '')
+                    .join('\n');
+                const forbidden = [
+                    'Apollo 11', 'Starlight', 'Terminal Matrix', 'Synthwave',
+                    'Arcade Gamer', 'Dark Roast', 'Hiperenfoque', 'Eduardo',
+                    'Automático (según tema)', 'Liquid Glass'
+                ];
+                const leaked = forbidden.filter(term =>
+                    bodyText.toLowerCase().includes(term.toLowerCase()) ||
+                    rawHtmlNoScripts.toLowerCase().includes(term.toLowerCase())
+                );
+                const expSection = document.getElementById('settings-bg-experimental-section');
+                const expHasChildren = expSection ? expSection.children.length > 0 : false;
+                return { leaked, expHasChildren };
+            });
+            helpers.assertEqual(result.leaked.length, 0, `Leaked forbidden strings when locked: ${result.leaked.join(', ')}`);
+            helpers.assertFalse(result.expHasChildren, '#settings-bg-experimental-section must have 0 children when locked');
+        }
+    },
+    {
+        id: 'T2_F23_02_import_json_ignores_locked_vault_items',
+        feature: 'F23',
+        name: 'Storage.importJson strips locked special theme, background preset, vault font, and grayMode when codes are missing',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+            const state = await page.evaluate(() => {
+                const payload = {
+                    version: '1.5.2',
+                    subjects: [],
+                    tasks: [],
+                    notes: [],
+                    secretUnlocked: false,
+                    unlockedCodes: [],
+                    activeSpecialTheme: 'matrix',
+                    backgroundPreset: 'theme_matrix',
+                    fontFamily: 'Orbitron',
+                    grayMode: true
+                };
+                window.StorageModule.importJson(JSON.stringify(payload));
+                return {
+                    activeSpecialTheme: window.StorageModule.getActiveSpecialTheme(),
+                    backgroundPreset: window.StorageModule.getBackgroundPreset(),
+                    fontFamily: window.StorageModule.getFontFamily(),
+                    grayMode: window.StorageModule.getGrayModeEnabled()
+                };
+            });
+            helpers.assertEqual(state.activeSpecialTheme, 'default', 'Locked special theme must reset to default on import');
+            helpers.assertEqual(state.backgroundPreset, 'default', 'Locked thematic background must reset to default on import');
+            helpers.assertEqual(state.fontFamily, 'calibri', 'Locked font must reset to calibri on import');
+            helpers.assertFalse(state.grayMode, 'Locked grayMode must reset to false on import');
+        }
+    },
+    {
+        id: 'T2_F23_03_unlocking_single_code_reveals_only_that_theme',
+        feature: 'F23',
+        name: 'Unlocking a single Vault code reveals only that thematic background and hides all other locked themes',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+            const res = await page.evaluate(() => {
+                window.StorageModule.unlockCode('MATRIX99');
+                window.BackgroundsModule.renderSettingsUI();
+                const expCards = Array.from(document.querySelectorAll('#settings-bg-experimental-section [data-bg-preset]'))
+                    .map(el => el.getAttribute('data-bg-preset'));
+                const expText = document.getElementById('settings-bg-experimental-section')?.textContent || '';
+                return { expCards, expText };
+            });
+            helpers.assertTrue(res.expCards.includes('vault_auto'), 'vault_auto must appear once 1 theme is unlocked');
+            helpers.assertTrue(res.expCards.includes('theme_matrix'), 'theme_matrix must appear when MATRIX99 is unlocked');
+            helpers.assertEqual(res.expCards.length, 2, 'Only vault_auto and unlocked theme_matrix should appear');
+            helpers.assertFalse(res.expText.includes('Sakura'), 'Locked Sakura must stay hidden');
+            helpers.assertFalse(res.expText.includes('Synthwave'), 'Locked Synthwave must stay hidden');
+            await helpers.resetPageState(page);
+        }
+    },
+    {
+        id: 'T2_F23_04_drawer_sheets_popup_toasts_real_crystal_and_no_overflow',
+        feature: 'F23',
+        name: 'Drawer, bottom sheets, longpress popup, and toasts have real backdropFilter, no backdrop-root traps, transparent drawer footer, and >= 4.5:1 contrast across mobile viewports',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+
+            for (const w of [320, 360, 430]) {
+                await page.setViewport({ width: w, height: 800, deviceScaleFactor: 2 });
+                const closedDrawer = await page.evaluate(() => {
+                    window.OrganizadorApp?.closeSidebarDrawer?.(false);
+                    const drawer = document.getElementById('sidebar-drawer');
+                    const footer = document.getElementById('sidebar-drawer-footer');
+                    return {
+                        rectRight: drawer ? drawer.getBoundingClientRect().right : 999,
+                        drawerBf: drawer ? getComputedStyle(drawer).backdropFilter : 'none',
+                        footerBg: footer ? getComputedStyle(footer).backgroundColor : ''
+                    };
+                });
+                helpers.assertTrue(closedDrawer.rectRight <= 0, `Closed drawer must sit fully offscreen at w=${w} (got right=${closedDrawer.rectRight})`);
+                helpers.assertTrue(closedDrawer.drawerBf && closedDrawer.drawerBf !== 'none', `Drawer must have real backdropFilter at w=${w}`);
+                helpers.assertEqual(closedDrawer.footerBg, 'rgba(0, 0, 0, 0)', `#sidebar-drawer-footer must be transparent at w=${w}`);
+
+                const modalAndToastMetrics = await page.evaluate(() => {
+                    window.SubjectsModule?.openAddModal?.();
+                    const subModal = document.getElementById('subject-modal');
+                    const subDialog = subModal?.querySelector('.modal-dialog');
+                    const subOverlayCs = subModal ? getComputedStyle(subModal) : null;
+                    const subDialogCs = subDialog ? getComputedStyle(subDialog) : null;
+                    window.SubjectsModule?.closeModal?.();
+
+                    window.OrganizadorApp?.showToast?.('Prueba de cristal en notificación', 'success');
+                    const toastEl = document.querySelector('#toast-container > div:last-child');
+                    const toastCs = toastEl ? getComputedStyle(toastEl) : null;
+
+                    const popup = document.getElementById('card-dynamic-popup');
+                    const popupCs = popup ? getComputedStyle(popup) : null;
+
+                    const parseRgba = (str) => {
+                        const m = String(str || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+                        return m ? { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 } : null;
+                    };
+                    const over = (fg, bg) => ({
+                        r: fg.r * fg.a + bg.r * (1 - fg.a),
+                        g: fg.g * fg.a + bg.g * (1 - fg.a),
+                        b: fg.b * fg.a + bg.b * (1 - fg.a),
+                        a: 1
+                    });
+                    const lum = (c) => {
+                        const f = v => { const n = v / 255; return n <= 0.03928 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4); };
+                        return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+                    };
+                    const cr = (c1, c2) => {
+                        const l1 = lum(c1), l2 = lum(c2);
+                        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+                    };
+
+                    const toastBg = toastCs ? parseRgba(toastCs.backgroundColor) : null;
+                    const toastFg = toastCs ? parseRgba(toastCs.color) : null;
+                    const toastRatioWhite = (toastBg && toastFg) ? cr(toastFg, over(toastBg, { r: 255, g: 255, b: 255, a: 1 })) : 0;
+                    const toastRatioBlack = (toastBg && toastFg) ? cr(toastFg, over(toastBg, { r: 0, g: 0, b: 0, a: 1 })) : 0;
+
+                    return {
+                        overlayOpacity: subOverlayCs?.opacity,
+                        overlayFilter: subOverlayCs?.filter,
+                        overlayBf: subOverlayCs?.backdropFilter,
+                        dialogBf: subDialogCs?.backdropFilter,
+                        popupOpacity: popupCs?.opacity,
+                        popupFilter: popupCs?.filter,
+                        popupBf: popupCs?.backdropFilter,
+                        toastBf: toastCs?.backdropFilter,
+                        toastRatioWhite,
+                        toastRatioBlack
+                    };
+                });
+
+                helpers.assertEqual(modalAndToastMetrics.overlayOpacity, '1', '.modal-overlay opacity must stay 1 (no backdrop-root trap)');
+                helpers.assertEqual(modalAndToastMetrics.overlayFilter, 'none', '.modal-overlay filter must be none');
+                helpers.assertEqual(modalAndToastMetrics.overlayBf, 'none', '.modal-overlay parent must not have backdrop-filter');
+                helpers.assertTrue(modalAndToastMetrics.dialogBf && modalAndToastMetrics.dialogBf !== 'none', '.modal-dialog must have real backdropFilter');
+                helpers.assertEqual(modalAndToastMetrics.popupOpacity, '1', '#card-dynamic-popup opacity must stay 1');
+                helpers.assertEqual(modalAndToastMetrics.popupFilter, 'none', '#card-dynamic-popup filter must be none');
+                helpers.assertEqual(modalAndToastMetrics.popupBf, 'none', '#card-dynamic-popup parent must not have backdrop-filter');
+                helpers.assertTrue(modalAndToastMetrics.toastBf && modalAndToastMetrics.toastBf !== 'none', 'Toast must have real backdropFilter');
+                helpers.assertTrue(modalAndToastMetrics.toastRatioWhite >= 4.5 && modalAndToastMetrics.toastRatioBlack >= 4.5,
+                    `Toast contrast must be >= 4.5:1 on white/black (got ${modalAndToastMetrics.toastRatioWhite.toFixed(2)}, ${modalAndToastMetrics.toastRatioBlack.toFixed(2)})`);
+            }
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+        }
+    },
+    // --- F24: Mi foto reencuadre con original reducido y estado guardado (v1.5.2 Etapa 2) ---
+    {
+        id: 'T2_F24_01_mi_foto_crop_and_original_preservation',
+        feature: 'F24',
+        name: 'Mi foto stores viewport-cropped JPEG (<= 1600px), reduced original (<= 2400px), and cropState in IndexedDB with zero bytes in localStorage/JSON',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                const header = document.querySelector('#settings-acc-background .settings-accordion-header');
+                if (header && !document.getElementById('settings-acc-background')?.classList.contains('open')) {
+                    header.click();
+                }
+            });
+            await page.waitForSelector('#settings-bg-photo-input', { timeout: 5000 });
+
+            try {
+                await helpers.simulateFileUpload(page, '#settings-bg-photo-input', {
+                    width: 2600,
+                    height: 1600,
+                    color: '#4F46E5',
+                    fileName: 'bg_reframe_src.png',
+                    mimeType: 'image/png'
+                });
+                await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 6000 });
+                await new Promise(r => setTimeout(r, 350));
+
+                // Apply zoom 1.8 and save
+                await page.evaluate(() => {
+                    const slider = document.getElementById('photo-editor-zoom');
+                    if (slider) {
+                        slider.value = '1.8';
+                        slider.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    window.PhotoEditorModule?.panBy?.(36, -24);
+                });
+                await page.click('#photo-editor-save-btn');
+                await new Promise(r => setTimeout(r, 450));
+
+                const result = await page.evaluate(async () => {
+                    const rec = await window.BackgroundsModule?.loadCustomPhotoRecord?.(true);
+                    const measure = (src) => new Promise((res) => {
+                        if (!src) return res({ w: 0, h: 0 });
+                        const im = new Image();
+                        im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight });
+                        im.onerror = () => res({ w: 0, h: 0 });
+                        im.src = src;
+                    });
+                    const croppedDims = await measure(rec?.croppedDataUrl);
+                    const origDims = await measure(rec?.originalDataUrl);
+
+                    let lsHasPhoto = false;
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const val = localStorage.getItem(localStorage.key(i)) || '';
+                        if (val.includes('data:image')) lsHasPhoto = true;
+                    }
+                    const jsonExport = window.StorageModule?.exportJson?.() || '';
+                    const bgUrl = document.getElementById('app-bg-photo')?.style.backgroundImage || '';
+                    return {
+                        hasCropped: Boolean(rec?.croppedDataUrl?.startsWith('data:image/jpeg')),
+                        hasOrig: Boolean(rec?.originalDataUrl?.startsWith('data:image/jpeg')),
+                        croppedDims,
+                        origDims,
+                        cropState: rec?.cropState || null,
+                        lsHasPhoto,
+                        jsonHasPhoto: jsonExport.includes('data:image'),
+                        bgShowsCropped: Boolean(rec?.croppedDataUrl && bgUrl.includes(rec.croppedDataUrl.slice(0, 64)))
+                    };
+                });
+
+                helpers.assertTrue(result.hasCropped, 'Mi foto record must include croppedDataUrl JPEG');
+                helpers.assertTrue(result.hasOrig, 'Mi foto record must include originalDataUrl JPEG');
+                helpers.assertEqual(result.croppedDims.w, 1600, 'Cropped Mi foto longest side must be <= 1600px (1600w for landscape)');
+                helpers.assertEqual(result.croppedDims.h, 1000, 'Cropped Mi foto height must match 1280x800 viewport aspect (1000h)');
+                helpers.assertEqual(result.origDims.w, 2400, 'Reduced originalDataUrl must cap longest side at 2400px');
+                helpers.assertTrue(result.origDims.h <= 2400 && result.origDims.h > 1400, `Reduced original height (${result.origDims.h}) must keep proportional dimensions`);
+                helpers.assertTrue(result.cropState && Math.abs(result.cropState.zoom - 1.8) < 0.05, `cropState.zoom must persist ~1.8 (got ${result.cropState?.zoom})`);
+                helpers.assertFalse(result.lsHasPhoto, 'Mi foto bytes must never be saved to localStorage');
+                helpers.assertFalse(result.jsonHasPhoto, 'Mi foto bytes must never appear in JSON exports');
+                helpers.assertTrue(result.bgShowsCropped, '#app-bg-photo must render croppedDataUrl');
+            } finally {
+                // no temp file needed
+            }
+        }
+    },
+    {
+        id: 'T2_F24_02_mi_foto_reencuadrar_and_legacy_fallback',
+        feature: 'F24',
+        name: 'Reencuadrar restores originalDataUrl and cropState with zero empty gaps, and handles legacy v1.5.1 records without errors',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                const header = document.querySelector('#settings-acc-background .settings-accordion-header');
+                if (header && !document.getElementById('settings-acc-background')?.classList.contains('open')) {
+                    header.click();
+                }
+            });
+            await page.waitForSelector('#settings-bg-photo-input', { timeout: 5000 });
+
+            // Upload 2200x1400 image with zoom 1.8
+            await helpers.simulateFileUpload(page, '#settings-bg-photo-input', {
+                width: 2200,
+                height: 1400,
+                color: '#0F172A',
+                fileName: 'reframe_step.png',
+                mimeType: 'image/png'
+            });
+            await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 6000 });
+            await new Promise(r => setTimeout(r, 300));
+            await page.evaluate(() => {
+                window.PhotoEditorModule?.setZoom?.(1.8);
+                window.PhotoEditorModule?.panBy?.(30, -20);
+            });
+            await page.click('#photo-editor-save-btn');
+            await new Promise(r => setTimeout(r, 450));
+
+            await page.evaluate(() => {
+                const header = document.querySelector('#settings-acc-background .settings-accordion-header');
+                if (header && !document.getElementById('settings-acc-background')?.classList.contains('open')) {
+                    header.click();
+                }
+                document.getElementById('settings-bg-photo-adjust-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+            await page.waitForSelector('#settings-bg-photo-adjust-btn:not(.hidden)', { timeout: 5000 });
+            await page.click('#settings-bg-photo-adjust-btn');
+            await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 5000 });
+            await new Promise(r => setTimeout(r, 250));
+
+            const restored = await page.evaluate(() => {
+                const st = window.PhotoEditorModule?.getState?.();
+                const zoomVal = document.getElementById('photo-editor-zoom')?.value || '';
+                const imgSrc = window.PhotoEditorModule?.img?.src || '';
+                const recOrig = window.BackgroundsModule?._customPhotoRecord?.originalDataUrl || '';
+                // Rotate 90° and zoom to 2.4 with pan
+                window.PhotoEditorModule?.rotate90?.();
+                window.PhotoEditorModule?.setZoom?.(2.4);
+                window.PhotoEditorModule?.panBy?.(500, 500);
+                const after = window.PhotoEditorModule?.getState?.();
+                return {
+                    restoredZoom: st?.zoom || 0,
+                    sliderVal: zoomVal,
+                    loadedOriginal: Boolean(recOrig && imgSrc === recOrig),
+                    noEmptyGapsAfterRotateAndPan: Boolean(
+                        after &&
+                        after.drawnW >= after.cropW - 0.5 &&
+                        after.drawnH >= after.cropH - 0.5 &&
+                        Math.abs(after.offsetX) <= after.maxOffsetX + 0.5 &&
+                        Math.abs(after.offsetY) <= after.maxOffsetY + 0.5
+                    ),
+                    origBeforeSave: recOrig
+                };
+            });
+
+            helpers.assertTrue(Math.abs(restored.restoredZoom - 1.8) < 0.05, `Reencuadrar must restore saved zoom 1.8 (got ${restored.restoredZoom})`);
+            helpers.assertTrue(restored.loadedOriginal, 'Reencuadrar must load reduced originalDataUrl instead of cropped copy');
+            helpers.assertTrue(restored.noEmptyGapsAfterRotateAndPan, 'Editor must enforce zero empty gaps across 90° rotation, zoom, and max pan');
+
+            await page.click('#photo-editor-save-btn');
+            await new Promise(r => setTimeout(r, 450));
+
+            const afterReframe = await page.evaluate(async (prevOrig) => {
+                const rec = await window.BackgroundsModule?.loadCustomPhotoRecord?.(true);
+                return {
+                    rotation: rec?.cropState?.rotation,
+                    zoom: rec?.cropState?.zoom,
+                    origPreserved: rec?.originalDataUrl === prevOrig,
+                    hasCropped: Boolean(rec?.croppedDataUrl?.startsWith('data:image/jpeg'))
+                };
+            }, restored.origBeforeSave);
+
+            helpers.assertEqual(afterReframe.rotation, 90, 'Reframed cropState must persist 90° rotation');
+            helpers.assertTrue(Math.abs((afterReframe.zoom || 0) - 2.4) < 0.05, `Reframed cropState must persist zoom 2.4 (got ${afterReframe.zoom})`);
+            helpers.assertTrue(afterReframe.origPreserved, 'Reframing must preserve existing originalDataUrl without re-encoding');
+            helpers.assertTrue(afterReframe.hasCropped, 'Reframing must produce updated croppedDataUrl');
+
+            // Legacy v1.5.1 record without originalDataUrl
+            const legacyCheck = await page.evaluate(async () => {
+                const rec = await window.BackgroundsModule.loadCustomPhotoRecord(true);
+                await window.BackgroundsModule.saveCustomPhotoRecord({
+                    dataUrl: rec.dataUrl,
+                    width: rec.width,
+                    height: rec.height,
+                    avgLuminance: rec.avgLuminance
+                });
+                const loadedLegacy = await window.BackgroundsModule.loadCustomPhotoRecord(true);
+                return { hasOrig: Boolean(loadedLegacy?.originalDataUrl) };
+            });
+            helpers.assertFalse(legacyCheck.hasOrig, 'Legacy record setup must lack originalDataUrl');
+
+            await page.evaluate(() => {
+                document.getElementById('settings-bg-photo-adjust-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+            await page.click('#settings-bg-photo-adjust-btn');
+            await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 5000 });
+            await new Promise(r => setTimeout(r, 200));
+
+            const legacyToastText = await page.evaluate(() => document.getElementById('toast-container')?.textContent || '');
+            helpers.assertIncludes(legacyToastText, 'heredada', 'Reencuadrar on legacy v1.5.1 photo must show non-blocking info notice');
+
+            await page.click('#photo-editor-save-btn');
+            await new Promise(r => setTimeout(r, 400));
+            await page.evaluate(async () => {
+                await window.BackgroundsModule?.clearCustomPhoto?.();
+            });
+        }
+    },
+
+    // =========================================================================
+    // F25: Notes Gallery Segmented Tabs, Fullscreen Zoom Viewer, Exact Download & IDB v2 (v1.5.2 Etapa 3)
+    // =========================================================================
+    {
+        id: 'T2_F25_01_notes_gallery_segmented_tabs_and_empty_state',
+        feature: 'F25',
+        name: 'Notas | Galería segmented tabs toggle cleanly, render square thumbnails, empty state, count badge, and delete',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.switchNotesTab?.('notes');
+                window.NotesModule?.renderGallery?.();
+            });
+
+            const initialState = await page.evaluate(() => {
+                const tabNotes = document.getElementById('notes-tab-notes');
+                const tabGallery = document.getElementById('notes-tab-gallery');
+                const count = document.getElementById('notes-gallery-count')?.textContent?.trim();
+                const galleryHidden = document.getElementById('notes-gallery-panel')?.classList.contains('hidden');
+                return {
+                    hasTabs: Boolean(tabNotes && tabGallery),
+                    notesSelected: tabNotes?.getAttribute('aria-selected') === 'true',
+                    gallerySelected: tabGallery?.getAttribute('aria-selected') === 'false',
+                    count,
+                    galleryHidden
+                };
+            });
+            helpers.assertTrue(initialState.hasTabs, 'Segmented tabs #notes-tab-notes and #notes-tab-gallery must exist');
+            helpers.assertTrue(initialState.notesSelected, 'Notas tab must be selected initially');
+            helpers.assertEqual(initialState.count, '0', 'Initial gallery badge count must be 0');
+            helpers.assertTrue(initialState.galleryHidden, 'Gallery panel must be hidden on Notas tab');
+
+            await page.setViewport({ width: 360, height: 640 });
+            await page.click('#notes-tab-gallery');
+            await new Promise(r => setTimeout(r, 120));
+
+            const emptyGallery = await page.evaluate(() => {
+                const grid = document.getElementById('notes-gallery-grid');
+                const galleryPanel = document.getElementById('notes-gallery-panel');
+                const cardsPanel = document.getElementById('notes-cards-panel');
+                return {
+                    emptyMsg: (grid?.textContent || '').includes('Aún no tienes fotos en tus notas'),
+                    galleryVisible: !galleryPanel?.classList.contains('hidden'),
+                    cardsHidden: cardsPanel?.classList.contains('hidden'),
+                    noOverflow: document.documentElement.scrollWidth <= window.innerWidth + 2
+                };
+            });
+            helpers.assertTrue(emptyGallery.emptyMsg, 'Empty gallery must display "Aún no tienes fotos en tus notas"');
+            helpers.assertTrue(emptyGallery.galleryVisible, 'Gallery panel must be visible on Galería tab');
+            helpers.assertTrue(emptyGallery.cardsHidden, 'Notes cards panel must be hidden on Galería tab');
+            helpers.assertTrue(emptyGallery.noOverflow, 'Gallery view must not overflow horizontally at 360px');
+
+            await helpers.simulateFileUpload(page, '#notes-photo-input', {
+                width: 900,
+                height: 600,
+                color: '#4F46E5',
+                fileName: 'diagrama_fisica.png'
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            const afterUpload = await page.evaluate(() => {
+                const thumb = document.querySelector('#notes-gallery-grid .gallery-thumb');
+                const rect = thumb ? thumb.getBoundingClientRect() : null;
+                const count = document.getElementById('notes-gallery-count')?.textContent?.trim();
+                const img = thumb?.querySelector('img');
+                return {
+                    count,
+                    hasImg: Boolean(img && img.getAttribute('src') && img.getAttribute('loading') === 'lazy'),
+                    squareRatio: rect ? Math.abs(rect.width - rect.height) <= 2 : false
+                };
+            });
+            helpers.assertEqual(afterUpload.count, '1', 'Gallery badge count must update to 1 after upload');
+            helpers.assertTrue(afterUpload.hasImg, 'Gallery card must render lazy img');
+            helpers.assertTrue(afterUpload.squareRatio, 'Gallery thumbnail must have 1:1 square aspect ratio');
+
+            await page.click('#notes-gallery-grid [data-photo-del]');
+            await new Promise(r => setTimeout(r, 150));
+            const afterDeleteCount = await page.evaluate(() => document.getElementById('notes-gallery-count')?.textContent?.trim());
+            helpers.assertEqual(afterDeleteCount, '0', 'Deleting photo must reset gallery counter to 0');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.NotesModule?.switchNotesTab?.('notes');
+            });
+            await page.setViewport({ width: 1280, height: 800 });
+        }
+    },
+    {
+        id: 'T2_F25_02_fullscreen_photo_viewer_zoom_pan_nav_and_goto_note',
+        feature: 'F25',
+        name: 'Fullscreen crystal viewer supports zoom (1x-6x), pan clamping, prev/next, Ir a la nota, and Escape focus restore',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.StorageModule?.saveNotes?.([
+                    { id: 'note_gal_1', title: 'Resumen Álgebra', content: 'Matrices y determinantes', type: 'apunte', createdAt: Date.now() },
+                    { id: 'note_gal_2', title: 'Pendiente Lab', content: 'Traer bata', type: 'pendiente', createdAt: Date.now() }
+                ]);
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.render?.();
+                window.NotesModule?.switchNotesTab?.('gallery');
+                const sel = document.getElementById('notes-photo-note-select');
+                if (sel) sel.value = 'note_gal_1';
+            });
+
+            await helpers.simulateFileUpload(page, '#notes-photo-input', {
+                width: 1400,
+                height: 1000,
+                color: '#10B981',
+                fileName: 'matrices.jpg',
+                mimeType: 'image/jpeg'
+            });
+            await new Promise(r => setTimeout(r, 250));
+
+            await page.evaluate(() => {
+                const sel = document.getElementById('notes-photo-note-select');
+                if (sel) sel.value = '';
+            });
+            await helpers.simulateFileUpload(page, '#notes-photo-input', {
+                width: 1000,
+                height: 1200,
+                color: '#F59E0B',
+                fileName: 'bata_lista.png'
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            // Click first thumbnail button (bata_lista.png)
+            await page.click('#notes-gallery-grid [data-photo-open]');
+            await page.waitForSelector('#photo-preview-modal:not(.hidden)', { timeout: 3000 });
+            await new Promise(r => setTimeout(r, 150));
+
+            const viewerOpenCheck = await page.evaluate(() => {
+                const ids = ['photo-preview-close', 'photo-preview-prev', 'photo-preview-next', 'photo-preview-zoom-in', 'photo-preview-zoom-out', 'photo-preview-zoom-reset', 'photo-preview-download'];
+                const minTouchOk = ids.every(id => {
+                    const r = document.getElementById(id)?.getBoundingClientRect();
+                    return r && r.width >= 44 && r.height >= 44;
+                });
+                const st = window.NotesModule?.getViewerState?.();
+                return { minTouchOk, total: st?.total || 0, index: st?.index ?? -1, scale: st?.scale || 0 };
+            });
+            helpers.assertTrue(viewerOpenCheck.minTouchOk, 'All viewer action buttons must meet 44x44 touch target minimum');
+            helpers.assertEqual(viewerOpenCheck.total, 2, 'Viewer must track both uploaded photos');
+            helpers.assertEqual(viewerOpenCheck.scale, 1, 'Viewer must start at 1x zoom');
+
+            // Zoom in + clamped zoom test up to 6x max
+            await page.click('#photo-preview-zoom-in');
+            await page.click('#photo-preview-zoom-in');
+            const zoomedState = await page.evaluate(() => {
+                const st = window.NotesModule?.getViewerState?.();
+                window.NotesModule?.setViewerZoom?.(9); // debe acotar a 6x
+                const clampedMax = window.NotesModule?.getViewerState?.();
+                return { stepZoom: st?.scale, maxZoom: clampedMax?.scale, resetLabel: document.getElementById('photo-preview-zoom-reset')?.textContent?.trim() };
+            });
+            helpers.assertEqual(zoomedState.stepZoom, 2, 'Two zoom-in clicks from 1x must yield 2x');
+            helpers.assertEqual(zoomedState.maxZoom, 6, 'Zoom above 6x must clamp to 6x');
+            helpers.assertEqual(zoomedState.resetLabel, '600%', 'Zoom badge must display 600%');
+
+            // Reset zoom & navigate to linked note photo
+            await page.click('#photo-preview-zoom-reset');
+            await page.click('#photo-preview-next');
+            await new Promise(r => setTimeout(r, 120));
+
+            const linkedViewerState = await page.evaluate(() => {
+                const gotoBtn = document.getElementById('photo-preview-goto-note');
+                const metaText = document.getElementById('photo-preview-meta')?.textContent || '';
+                return {
+                    gotoVisible: Boolean(gotoBtn && !gotoBtn.classList.contains('hidden')),
+                    metaHasNote: metaText.includes('Resumen Álgebra'),
+                    scaleAfterNav: window.NotesModule?.getViewerState?.()?.scale
+                };
+            });
+            helpers.assertTrue(linkedViewerState.gotoVisible, 'Ir a la nota button must be visible on note-linked photo');
+            helpers.assertTrue(linkedViewerState.metaHasNote, 'Viewer metadata must show linked note title');
+            helpers.assertEqual(linkedViewerState.scaleAfterNav, 1, 'Navigating photos must reset zoom to 1x');
+
+            // Escape closes viewer & restores focus to originating thumbnail button
+            await page.keyboard.press('Escape');
+            await new Promise(r => setTimeout(r, 120));
+            const focusRestored = await page.evaluate(() => {
+                const modalHidden = document.getElementById('photo-preview-modal')?.classList.contains('hidden');
+                const activeHasAttr = document.activeElement?.hasAttribute('data-photo-open');
+                return { modalHidden, activeHasAttr };
+            });
+            helpers.assertTrue(focusRestored.modalHidden, 'Escape key must close fullscreen viewer');
+            helpers.assertTrue(focusRestored.activeHasAttr, 'Closing viewer must restore focus to originating gallery thumbnail button');
+
+            // Reopen linked photo via note card badge and jump via "Ir a la nota"
+            await page.evaluate(() => {
+                window.NotesModule?.switchNotesTab?.('notes');
+            });
+            await new Promise(r => setTimeout(r, 100));
+            await page.click('[data-note-open-photos="note_gal_1"]');
+            await page.waitForSelector('#photo-preview-modal:not(.hidden)', { timeout: 3000 });
+            await page.click('#photo-preview-goto-note');
+            await new Promise(r => setTimeout(r, 150));
+
+            const afterGoto = await page.evaluate(() => ({
+                viewerClosed: document.getElementById('photo-preview-modal')?.classList.contains('hidden'),
+                cardsVisible: !document.getElementById('notes-cards-panel')?.classList.contains('hidden'),
+                cardHighlighted: document.querySelector('[data-note-id="note_gal_1"]')?.classList.contains('note-card-highlight')
+            }));
+            helpers.assertTrue(afterGoto.viewerClosed, 'Ir a la nota must close viewer');
+            helpers.assertTrue(afterGoto.cardsVisible, 'Ir a la nota must switch back to Notas tab');
+            helpers.assertTrue(afterGoto.cardHighlighted, 'Ir a la nota must highlight target note card');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+        }
+    },
+    {
+        id: 'T2_F25_03_gallery_exact_byte_download_and_filename',
+        feature: 'F25',
+        name: 'Downloading a photo from gallery returns exact uploaded original bytes and formatted nota-{slug}-{YYYYMMDD}-{HHmm}.{ext} filename',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.StorageModule?.saveNotes?.([
+                    { id: 'note_dl_1', title: 'Fórmulas de Cálculo I', content: 'Derivadas', type: 'apunte', createdAt: Date.now() }
+                ]);
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.render?.();
+                window.NotesModule?.switchNotesTab?.('gallery');
+                const sel = document.getElementById('notes-photo-note-select');
+                if (sel) sel.value = 'note_dl_1';
+            });
+
+            // Upload an exact custom PNG File preserving custom bytes & verify exact equality on download
+            const uploadMeta = await page.evaluate(async () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 180;
+                canvas.height = 120;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#312e81';
+                ctx.fillRect(0, 0, 180, 120);
+                const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                const origBytes = new Uint8Array(await pngBlob.arrayBuffer());
+                // Append recognizable trailing signature bytes to guarantee exact original Blob (not re-encoded canvas!)
+                const marker = new Uint8Array([0x50, 0x4b, 0x31, 0x35, 0x32, 0x45, 0x58, 0x41, 0x43, 0x54]);
+                const combined = new Uint8Array(origBytes.length + marker.length);
+                combined.set(origBytes, 0);
+                combined.set(marker, origBytes.length);
+
+                const file = new File([combined], 'pizarron_exacto.png', { type: 'image/png' });
+                const input = document.getElementById('notes-photo-input');
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                window.__uploadedExactBytes = Array.from(combined);
+                return { size: combined.length };
+            });
+
+            await new Promise(r => setTimeout(r, 350));
+
+            await page.click('#notes-gallery-grid [data-photo-open]');
+            await page.waitForSelector('#photo-preview-modal:not(.hidden)', { timeout: 3000 });
+
+            const downloadCheck = await page.evaluate(async () => {
+                window.__capturedDownload = null;
+                const origClick = HTMLAnchorElement.prototype.click;
+                HTMLAnchorElement.prototype.click = function () {
+                    window.__capturedDownload = {
+                        download: this.getAttribute('download'),
+                        href: this.getAttribute('href')
+                    };
+                };
+                try {
+                    const photoId = document.getElementById('photo-preview-stage')?.dataset?.photoId;
+                    const res = await window.NotesModule?.downloadPhotoById?.(photoId);
+                    const cap = window.__capturedDownload;
+                    if (!cap || !cap.href) return { ok: false, reason: 'No anchor click captured' };
+                    const resp = await fetch(cap.href);
+                    const buf = await resp.arrayBuffer();
+                    const dlBytes = Array.from(new Uint8Array(buf));
+                    const expected = window.__uploadedExactBytes || [];
+                    const exactMatch = dlBytes.length === expected.length &&
+                        dlBytes.every((b, i) => b === expected[i]);
+                    return {
+                        ok: true,
+                        filename: cap.download || res?.filename || '',
+                        exactMatch,
+                        expectedLen: expected.length,
+                        dlLen: dlBytes.length
+                    };
+                } finally {
+                    HTMLAnchorElement.prototype.click = origClick;
+                }
+            });
+
+            helpers.assertTrue(downloadCheck.ok, 'Download button must generate blob download anchor');
+            helpers.assertTrue(downloadCheck.exactMatch, `Downloaded bytes (${downloadCheck.dlLen}) must match uploaded original bytes (${downloadCheck.expectedLen}) bit-for-bit (expected ${uploadMeta.size})`);
+            helpers.assertMatch(downloadCheck.filename, /^nota-formulas-de-calculo-i-\d{8}-\d{4}\.png$/,
+                `Filename "${downloadCheck.filename}" must match nota-{slug}-{AAAAMMDD}-{HHmm}.{ext}`);
+
+            await page.evaluate(async () => {
+                window.NotesModule?.closePhotoPreview?.();
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+        }
+    },
+    {
+        id: 'T2_F25_04_idb_non_destructive_migration_and_json_backup',
+        feature: 'F25',
+        name: 'Legacy gallery migrates non-destructively to IndexedDB with read-back check, keeps LS on IDB error, and survives JSON backup round-trip',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+
+            const sampleDataUrl = await page.evaluate(() => {
+                const c = document.createElement('canvas');
+                c.width = 64;
+                c.height = 64;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#6366F1';
+                ctx.fillRect(0, 0, 64, 64);
+                return c.toDataURL('image/png');
+            });
+
+            // Case 1: Mock IDB failure -> legacy localStorage MUST NOT be deleted
+            const failMigration = await page.evaluate(async (url) => {
+                const legacyPayload = JSON.stringify([
+                    { id: 'legacy_photo_1', name: 'Apunte Viejo.png', dataUrl: url, createdAt: 1700000000000 }
+                ]);
+                localStorage.setItem('org_escolar_gallery_photos', legacyPayload);
+
+                const origOpen = indexedDB.open.bind(indexedDB);
+                indexedDB.open = function () {
+                    const req = {};
+                    setTimeout(() => {
+                        if (typeof req.onerror === 'function') req.onerror(new Event('error'));
+                    }, 5);
+                    return req;
+                };
+                try {
+                    const res = await window.StorageModule.hydrateAndMigrateGalleryIdb();
+                    return {
+                        migrated: res.migrated,
+                        keptLegacy: res.keptLegacy,
+                        lsIntact: localStorage.getItem('org_escolar_gallery_photos') === legacyPayload
+                    };
+                } finally {
+                    indexedDB.open = origOpen;
+                }
+            }, sampleDataUrl);
+
+            helpers.assertFalse(failMigration.migrated, 'Failed IDB migration must report migrated=false');
+            helpers.assertTrue(failMigration.keptLegacy, 'Failed IDB migration must keep legacy marker true');
+            helpers.assertTrue(failMigration.lsIntact, 'Failed IDB migration must NOT delete legacy localStorage gallery');
+
+            // Case 2: Successful migration -> verified readback in IDB removes legacy LS key
+            const okMigration = await page.evaluate(async () => {
+                const res = await window.StorageModule.hydrateAndMigrateGalleryIdb();
+                const blobInfo = await window.StorageModule.getGalleryPhotoBlobFromIdb('legacy_photo_1');
+                return {
+                    ok: res.ok,
+                    migrated: res.migrated,
+                    lsRemoved: localStorage.getItem('org_escolar_gallery_photos') === null,
+                    hasIdbBlob: Boolean(blobInfo && blobInfo.blob instanceof Blob && blobInfo.blob.size > 0)
+                };
+            });
+            helpers.assertTrue(okMigration.ok && okMigration.migrated, 'Valid IDB migration must succeed');
+            helpers.assertTrue(okMigration.lsRemoved, 'Legacy localStorage gallery key must be removed ONLY after IDB verification');
+            helpers.assertTrue(okMigration.hasIdbBlob, 'Migrated photo blob must be readable from IndexedDB notes_photos');
+
+            // Case 3: JSON Backup export/import + full page reload persistence
+            const backupJson = await page.evaluate(() => window.StorageModule.exportJson());
+            const parsedBackup = JSON.parse(backupJson);
+            helpers.assertTrue(Array.isArray(parsedBackup.galleryPhotos) && parsedBackup.galleryPhotos.length === 1,
+                'exportJson() must include migrated Notes gallery photos');
+
+            await page.evaluate(async () => {
+                await window.StorageModule.clearAll();
+            });
+            await page.evaluate((json) => {
+                window.StorageModule.importJson(json);
+            }, backupJson);
+            await new Promise(r => setTimeout(r, 300));
+
+            await page.reload({ waitUntil: 'load' });
+            await new Promise(r => setTimeout(r, 350));
+
+            const afterReloadCount = await page.evaluate(async () => {
+                await window.StorageModule?.hydrateAndMigrateGalleryIdb?.();
+                return (window.StorageModule?.getGalleryPhotos?.() || []).length;
+            });
+            helpers.assertEqual(afterReloadCount, 1, 'Notes gallery photos restored via JSON backup must persist across page reload');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
         }
     }
 ];
