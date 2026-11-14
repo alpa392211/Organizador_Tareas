@@ -395,7 +395,7 @@ window.StorageModule = (() => {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.1');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.2');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
@@ -1447,7 +1447,7 @@ window.StorageModule = (() => {
 
         exportJson() {
             const data = {
-                version: '1.5.1',
+                version: '1.5.2',
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),

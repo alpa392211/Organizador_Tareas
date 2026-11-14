@@ -392,9 +392,9 @@
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.5.1
+                // Comprobar changelog de versión 1.5.2
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.5.1') {
+                if (lastSeenVersion !== '1.5.2') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
@@ -1868,7 +1868,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.1') {
+                        if (lastSeenVersion !== '1.5.2') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -1910,7 +1910,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.1') {
+                        if (lastSeenVersion !== '1.5.2') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2432,7 +2432,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.5.1
+            // 11. Novedades de Versión 1.5.2
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -2461,7 +2461,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.5.1');
+                window.StorageModule.setLastSeenVersion('1.5.2');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;

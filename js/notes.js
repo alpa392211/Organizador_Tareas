@@ -500,6 +500,7 @@ window.NotesModule = (() => {
             const backdrop = document.getElementById('photo-preview-backdrop');
             if (backdrop) {
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.display = '';
                 backdrop.style.opacity = '';
             }
             modal.classList.remove('hidden');

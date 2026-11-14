@@ -9,63 +9,63 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.1 & Scoped Changelog
+    // F01: Version Bump 1.5.2 & Scoped Changelog
     // =========================================================================
     {
         id: 'T1_F01_01_package_json_version',
         feature: 'F01',
-        name: 'package.json specifies version 1.5.1',
+        name: 'package.json specifies version 1.5.2',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             helpers.assert(fs.existsSync(pkgPath), 'package.json must exist');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.1', 'package.json version must be 1.5.1');
+            helpers.assertEqual(pkg.version, '1.5.2', 'package.json version must be 1.5.2');
             helpers.assertEqual(typeof pkg.version, 'string', 'package.json version must be string');
         }
     },
     {
         id: 'T1_F01_02_index_html_query_param_version',
         feature: 'F01',
-        name: 'index.html asset tags include versioned query parameter v=1.5.1 without stage suffixes',
+        name: 'index.html asset tags include versioned query parameter v=1.5.2 without stage suffixes',
         run: async (page, helpers) => {
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const html = fs.readFileSync(htmlPath, 'utf8');
-            const hasVersionedStyles = html.includes('css/styles.css?v=1.5.1');
-            const hasVersionedTailwind = html.includes('css/tailwind.min.css?v=1.5.1');
-            helpers.assertTrue(hasVersionedStyles, 'styles.css must reference v=1.5.1 query parameter');
-            helpers.assertTrue(hasVersionedTailwind, 'tailwind.min.css must reference v=1.5.1 query parameter');
+            const hasVersionedStyles = html.includes('css/styles.css?v=1.5.2');
+            const hasVersionedTailwind = html.includes('css/tailwind.min.css?v=1.5.2');
+            helpers.assertTrue(hasVersionedStyles, 'styles.css must reference v=1.5.2 query parameter');
+            helpers.assertTrue(hasVersionedTailwind, 'tailwind.min.css must reference v=1.5.2 query parameter');
             helpers.assertFalse(/\?v=[^\s"']*(-e\d+|-ui)/i.test(html), 'index.html must not contain temporary -e or -ui version suffixes');
         }
     },
     {
         id: 'T1_F01_03_settings_version_badge',
         feature: 'F01',
-        name: 'Settings view contains version indicator with target 1.5.1 version',
+        name: 'Settings view contains version indicator with target 1.5.2 version',
         run: async (page, helpers) => {
             const versionText = await page.evaluate(() => {
                 const pill = document.getElementById('settings-version-pill') || document.querySelector('[data-version-pill]');
                 return pill ? pill.textContent.trim() : null;
             });
             helpers.assert(versionText !== null, 'Settings version pill element must exist');
-            helpers.assert(versionText.includes('1.5.1'), 'Version indicator must display 1.5.1');
+            helpers.assert(versionText.includes('1.5.2'), 'Version indicator must display 1.5.2');
         }
     },
     {
         id: 'T1_F01_04_sw_cache_name_and_assets',
         feature: 'F01',
-        name: 'sw.js specifies v1.5.1 cache identifier, v=1.5.1 assets, and precaches photo-editor.js and backgrounds.js',
+        name: 'sw.js specifies v1.5.2 cache identifier, v=1.5.2 assets, and precaches photo-editor.js and backgrounds.js',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const swCode = fs.readFileSync(swPath, 'utf8');
             const htmlCode = fs.readFileSync(htmlPath, 'utf8');
-            const hasTargetCache = swCode.includes("const CACHE_NAME = 'organizador-tareas-cache-v1.5.1';");
-            helpers.assertTrue(hasTargetCache, 'sw.js must specify organizador-tareas-cache-v1.5.1 cache name');
-            helpers.assertTrue(swCode.includes('?v=1.5.1'), 'sw.js precache assets must use ?v=1.5.1 query parameter');
-            helpers.assertTrue(htmlCode.includes('?v=1.5.1'), 'index.html assets must use ?v=1.5.1 query parameter');
+            const hasTargetCache = swCode.includes("const CACHE_NAME = 'organizador-tareas-cache-v1.5.2';");
+            helpers.assertTrue(hasTargetCache, 'sw.js must specify organizador-tareas-cache-v1.5.2 cache name');
+            helpers.assertTrue(swCode.includes('?v=1.5.2'), 'sw.js precache assets must use ?v=1.5.2 query parameter');
+            helpers.assertTrue(htmlCode.includes('?v=1.5.2'), 'index.html assets must use ?v=1.5.2 query parameter');
             helpers.assertFalse(/\?v=[^\s'"]*(-e\d+|-ui)/i.test(swCode), 'sw.js must not contain temporary -e or -ui query suffixes');
-            helpers.assertTrue(swCode.includes('js/photo-editor.js?v=1.5.1'), 'sw.js must precache js/photo-editor.js?v=1.5.1');
-            helpers.assertTrue(swCode.includes('js/backgrounds.js?v=1.5.1'), 'sw.js must precache js/backgrounds.js?v=1.5.1');
+            helpers.assertTrue(swCode.includes('js/photo-editor.js?v=1.5.2'), 'sw.js must precache js/photo-editor.js?v=1.5.2');
+            helpers.assertTrue(swCode.includes('js/backgrounds.js?v=1.5.2'), 'sw.js must precache js/backgrounds.js?v=1.5.2');
         }
     },
     {

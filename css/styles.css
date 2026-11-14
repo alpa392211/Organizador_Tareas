@@ -378,7 +378,7 @@ html:not(.dark):not([class*="theme-"]) #sidebar-drawer {
     border: 1px solid rgba(255, 255, 255, 0.88) !important;
     box-shadow: var(--shadow-glass-lg), var(--lg-specular) !important;
 }
-html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
 html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
     background-color: var(--lg-modal-bg) !important;
     background-image: var(--lg-modal-scrim) !important;
@@ -504,7 +504,7 @@ html.dark:not([class*="theme-"]) #app-exit-btn {
     border-color: rgba(255, 255, 255, 0.18) !important;
     color: #f1f5f9 !important;
 }
-html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
 html.dark:not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
     background-color: var(--lg-modal-bg) !important;
     background-image: var(--lg-modal-scrim) !important;
@@ -566,7 +566,7 @@ html:not(.dark).theme-gray .bg-white:not(header):not(#bottom-nav):not(#sidebar-d
     border: 1px solid rgba(255, 255, 255, 0.85) !important;
     box-shadow: var(--shadow-glass-md) !important;
 }
-html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
 html:not(.dark).theme-gray #card-dynamic-popup .modal-dialog {
     background-color: rgba(241, 244, 249, 0.52) !important;
     background-image: linear-gradient(180deg, rgba(248, 250, 252, 0.72) 0%, rgba(241, 244, 249, 0.58) 100%) !important;
@@ -653,7 +653,7 @@ html.dark.theme-gray .settings-accordion-card {
     border-color: rgba(255, 255, 255, 0.15) !important;
     box-shadow: var(--shadow-glass-md) !important;
 }
-html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
 html.dark.theme-gray #card-dynamic-popup .modal-dialog {
     background-color: rgba(30, 33, 41, 0.48) !important;
     background-image: linear-gradient(180deg, rgba(20, 22, 28, 0.82) 0%, rgba(30, 33, 41, 0.70) 100%) !important;
@@ -2725,25 +2725,43 @@ html[class*="theme-"]:not(.theme-gray) .notes-seg-btn.notes-seg-active #notes-ga
     margin: 0;
     padding: 0;
 }
-.photo-viewer-shell {
+html body #photo-preview-modal #photo-preview-backdrop {
+    background-color: rgba(2, 6, 23, 0.92) !important;
+    background-image: none !important;
+}
+html body #photo-preview-modal .photo-viewer-shell {
     width: 100%;
     height: 100%;
+    max-width: 100% !important;
+    max-height: 100% !important;
     background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     transform: none !important;
 }
-.photo-viewer-bar {
-    background: rgba(15, 23, 42, 0.72);
+html body #photo-preview-modal .photo-viewer-bar,
+html body #photo-preview-modal #photo-preview-topbar {
+    background-color: rgba(15, 23, 42, 0.78) !important;
+    background-image: none !important;
     backdrop-filter: blur(18px) saturate(150%);
     -webkit-backdrop-filter: blur(18px) saturate(150%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: none !important;
+    color: #f8fafc !important;
     padding-top: max(0.65rem, env(safe-area-inset-top, 0px));
 }
-.photo-viewer-bottom-bar {
-    border-bottom: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
+html body #photo-preview-modal #photo-preview-name {
+    color: #ffffff !important;
+}
+html body #photo-preview-modal #photo-preview-meta {
+    color: #cbd5e1 !important;
+}
+html body #photo-preview-modal .photo-viewer-bottom-bar {
+    border-bottom: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
     padding-top: 0.65rem;
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
@@ -3009,7 +3027,7 @@ html.dark .modal-sheet-grabber-bar {
     .liquid-glass-popover,
     .glass-panel,
     .settings-accordion-card,
-    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     #card-dynamic-popup .modal-dialog {
         background-color: #ffffff !important;
     }
@@ -3019,7 +3037,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark .liquid-glass-popover,
     html.dark .glass-panel,
     html.dark .settings-accordion-card,
-    html.dark .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     html.dark #card-dynamic-popup .modal-dialog {
         background-color: #0f172a !important;
     }
@@ -3029,7 +3047,7 @@ html.dark .modal-sheet-grabber-bar {
     html.theme-gray .liquid-glass-popover,
     html.theme-gray .glass-panel,
     html.theme-gray .settings-accordion-card,
-    html.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     html.theme-gray #card-dynamic-popup .modal-dialog {
         background-color: #edf1f6 !important;
     }
@@ -3039,7 +3057,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark.theme-gray .liquid-glass-popover,
     html.dark.theme-gray .glass-panel,
     html.dark.theme-gray .settings-accordion-card,
-    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     html.dark.theme-gray #card-dynamic-popup .modal-dialog {
         background-color: #252830 !important;
     }
@@ -3055,7 +3073,7 @@ html.dark .modal-sheet-grabber-bar {
     #bottom-nav.liquid-glass-bottom,
     .liquid-glass-drawer,
     .liquid-glass-popover,
-    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     #card-dynamic-popup .modal-dialog,
     .glass-panel,
     .settings-accordion-card,
@@ -3071,7 +3089,7 @@ html.dark .modal-sheet-grabber-bar {
     html:not(.dark):not([class*="theme-"]) #bottom-nav.liquid-glass-bottom,
     html:not(.dark):not([class*="theme-"]) .liquid-glass-drawer,
     html:not(.dark):not([class*="theme-"]) .liquid-glass-popover,
-    html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
     html:not(.dark):not([class*="theme-"]) .glass-panel,
     html:not(.dark):not([class*="theme-"]) .settings-accordion-card,
@@ -3082,7 +3100,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark:not([class*="theme-"]) #bottom-nav.liquid-glass-bottom,
     html.dark:not([class*="theme-"]) .liquid-glass-drawer,
     html.dark:not([class*="theme-"]) .liquid-glass-popover,
-    html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     html.dark:not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
     html.dark:not([class*="theme-"]) .glass-panel,
     html.dark:not([class*="theme-"]) .settings-accordion-card,
@@ -3093,7 +3111,7 @@ html.dark .modal-sheet-grabber-bar {
     html:not(.dark).theme-gray #bottom-nav.liquid-glass-bottom,
     html:not(.dark).theme-gray .liquid-glass-drawer,
     html:not(.dark).theme-gray .liquid-glass-popover,
-    html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     html:not(.dark).theme-gray #card-dynamic-popup .modal-dialog,
     html:not(.dark).theme-gray .glass-panel,
     html:not(.dark).theme-gray .settings-accordion-card,
@@ -3104,7 +3122,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark.theme-gray #bottom-nav.liquid-glass-bottom,
     html.dark.theme-gray .liquid-glass-drawer,
     html.dark.theme-gray .liquid-glass-popover,
-    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
     html.dark.theme-gray #card-dynamic-popup .modal-dialog,
     html.dark.theme-gray .glass-panel,
     html.dark.theme-gray .settings-accordion-card,
