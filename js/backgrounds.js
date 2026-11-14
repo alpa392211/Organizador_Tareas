@@ -523,11 +523,8 @@
 
         getUnlockedThematicPresets() {
             const Storage = window.StorageModule;
-            const unlockedCodes = Storage?.getUnlockedCodes?.() || [];
-            const activeSpecial = Storage?.getActiveSpecialTheme?.() || 'default';
-            return THEMATIC_PRESETS.filter(p =>
-                unlockedCodes.includes(p.codeId) || p.themeId === activeSpecial
-            );
+            if (!Storage?.isCodeUnlocked) return [];
+            return THEMATIC_PRESETS.filter(p => Storage.isCodeUnlocked(p.codeId));
         }
 
         getAllThematicPresets() {
@@ -561,8 +558,8 @@
                 if (this.isThematicPreset(currentBg)) {
                     Storage.setBackgroundPreset('default');
                 }
-            } else if (!isMono) {
-                // Al activar un tema de la Bóveda, si estaba en predeterminado o automático, seguir el tema activo
+            } else if (!isMono && (!Storage.isSpecialThemeUnlocked || Storage.isSpecialThemeUnlocked(nextThemeId))) {
+                // Al activar un tema de la Bóveda desbloqueado, seguir el tema activo si estaba en predeterminado/automático
                 if (currentBg === 'default' || currentBg === 'vault_auto') {
                     Storage.setBackgroundPreset('vault_auto');
                 }
@@ -597,10 +594,14 @@
             }
 
             if (stored === 'vault_auto') {
+                if (this.getUnlockedThematicPresets().length === 0) {
+                    Storage?.setBackgroundPreset?.('default');
+                    return 'default';
+                }
                 const activeSpecial = Storage?.getActiveSpecialTheme?.() || 'default';
-                if (activeSpecial && activeSpecial !== 'default') {
+                if (activeSpecial && activeSpecial !== 'default' && (!Storage?.isSpecialThemeUnlocked || Storage.isSpecialThemeUnlocked(activeSpecial))) {
                     const match = THEMATIC_PRESETS.find(t => t.themeId === activeSpecial);
-                    if (match) return match.id;
+                    if (match && (!Storage?.isCodeUnlocked || Storage.isCodeUnlocked(match.codeId))) return match.id;
                 }
                 return 'default';
             }
@@ -608,7 +609,16 @@
             if (stored === 'custom_photo') return 'custom_photo';
             if (BASIC_PRESETS.some(b => b.id === stored)) return stored;
             if (MONO_PRESETS.some(m => m.id === stored)) return stored;
-            if (THEMATIC_PRESETS.some(t => t.id === stored)) return stored;
+            if (THEMATIC_PRESETS.some(t => t.id === stored)) {
+                const unlocked = Storage?.isBackgroundPresetUnlocked ? Storage.isBackgroundPresetUnlocked(stored) : true;
+                const syntheticThemeClass = stored.replace('_', '-');
+                const explicitThemeForced = document.documentElement.classList.contains(syntheticThemeClass);
+                if (!unlocked && !explicitThemeForced) {
+                    Storage?.setBackgroundPreset?.('default');
+                    return 'default';
+                }
+                return stored;
+            }
             return 'default';
         }
 
@@ -1046,15 +1056,17 @@
             const rawPreset = Storage.getBackgroundPreset();
             const effectiveId = this.resolveEffectiveBackgroundId();
             const isMono = this.isMonochromeActive();
+            const unlockedThemes = this.getUnlockedThematicPresets();
 
             // Pill de estado en cabecera del acordeón
             const pill = document.getElementById('settings-bg-pill');
             if (pill) {
                 let label = 'Predeterminado';
                 if (rawPreset === 'custom_photo' && effectiveId === 'custom_photo') label = 'Mi foto';
-                else if (rawPreset === 'vault_auto') label = 'Automático (tema)';
+                else if (rawPreset === 'vault_auto' && unlockedThemes.length > 0) label = 'Automático (tema)';
                 else {
-                    const found = [...BASIC_PRESETS, ...MONO_PRESETS, ...THEMATIC_PRESETS].find(p => p.id === rawPreset);
+                    const visiblePool = [...BASIC_PRESETS, ...MONO_PRESETS, ...unlockedThemes];
+                    const found = visiblePool.find(p => p.id === rawPreset);
                     if (found) label = found.name;
                 }
                 pill.textContent = label;
@@ -1108,12 +1120,11 @@
                 });
             }
 
-            // Sección Experimental (Bóveda)
+            // Sección Experimental (solo existe en DOM cuando hay temas de Bóveda desbloqueados)
             const expSection = document.getElementById('settings-bg-experimental-section');
-            const expGrid = document.getElementById('settings-bg-experimental-grid');
-            const unlockedThemes = this.getUnlockedThematicPresets();
-            if (expSection && expGrid) {
+            if (expSection) {
                 if (unlockedThemes.length === 0) {
+                    expSection.innerHTML = '';
                     expSection.classList.add('hidden');
                 } else {
                     expSection.classList.remove('hidden');
@@ -1140,8 +1151,14 @@
                             </button>`;
                     }).join('');
 
-                    expGrid.innerHTML = autoBtn + manualCards;
-                    expGrid.querySelectorAll('[data-bg-preset]').forEach(btn => {
+                    expSection.innerHTML = `
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Fondos temáticos de Bóveda</p>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">Experimental</span>
+                        </div>
+                        <div id="settings-bg-experimental-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">${autoBtn}${manualCards}</div>`;
+
+                    expSection.querySelectorAll('[data-bg-preset]').forEach(btn => {
                         btn.onclick = () => {
                             if (btn.disabled) return;
                             window.HapticsModule?.light?.();

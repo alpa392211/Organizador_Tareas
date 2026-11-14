@@ -3109,6 +3109,193 @@ const tests = [
 
             helpers.assertEqual(overflowFailures.length, 0, `Mobile horizontal overflow detected: ${overflowFailures.join('; ')}`);
         }
+    },
+
+    // =========================================================================
+    // F23: v1.5.2 Temáticos Ocultos, Sin 'Liquid Glass', Cristal en Drawer/Hojas/Toasts
+    // =========================================================================
+    {
+        id: 'T2_F23_01_locked_dom_hides_vault_themes_and_liquid_glass',
+        feature: 'F23',
+        name: 'Locked app DOM exposes zero Vault theme names, zero Experimental/Auto background labels, and zero visible Liquid Glass text',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+            const result = await page.evaluate(() => {
+                document.getElementById('cycle-welcome-modal')?.classList.add('hidden');
+                window.OrganizadorApp?.switchView?.('settings');
+                const acc = document.getElementById('settings-acc-background');
+                if (acc) acc.classList.add('open');
+                window.BackgroundsModule?.renderSettingsUI?.();
+
+                const bodyText = document.body.innerText || '';
+                const rawHtmlNoScripts = Array.from(document.body.querySelectorAll(':scope > *:not(script)'))
+                    .map(el => el.textContent || '')
+                    .join('\n');
+                const forbidden = [
+                    'Apollo 11', 'Starlight', 'Terminal Matrix', 'Synthwave',
+                    'Arcade Gamer', 'Dark Roast', 'Hiperenfoque', 'Eduardo',
+                    'Automático (según tema)', 'Liquid Glass'
+                ];
+                const leaked = forbidden.filter(term =>
+                    bodyText.toLowerCase().includes(term.toLowerCase()) ||
+                    rawHtmlNoScripts.toLowerCase().includes(term.toLowerCase())
+                );
+                const expSection = document.getElementById('settings-bg-experimental-section');
+                const expHasChildren = expSection ? expSection.children.length > 0 : false;
+                return { leaked, expHasChildren };
+            });
+            helpers.assertEqual(result.leaked.length, 0, `Leaked forbidden strings when locked: ${result.leaked.join(', ')}`);
+            helpers.assertFalse(result.expHasChildren, '#settings-bg-experimental-section must have 0 children when locked');
+        }
+    },
+    {
+        id: 'T2_F23_02_import_json_ignores_locked_vault_items',
+        feature: 'F23',
+        name: 'Storage.importJson strips locked special theme, background preset, vault font, and grayMode when codes are missing',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+            const state = await page.evaluate(() => {
+                const payload = {
+                    version: '1.5.2',
+                    subjects: [],
+                    tasks: [],
+                    notes: [],
+                    secretUnlocked: false,
+                    unlockedCodes: [],
+                    activeSpecialTheme: 'matrix',
+                    backgroundPreset: 'theme_matrix',
+                    fontFamily: 'Orbitron',
+                    grayMode: true
+                };
+                window.StorageModule.importJson(JSON.stringify(payload));
+                return {
+                    activeSpecialTheme: window.StorageModule.getActiveSpecialTheme(),
+                    backgroundPreset: window.StorageModule.getBackgroundPreset(),
+                    fontFamily: window.StorageModule.getFontFamily(),
+                    grayMode: window.StorageModule.getGrayModeEnabled()
+                };
+            });
+            helpers.assertEqual(state.activeSpecialTheme, 'default', 'Locked special theme must reset to default on import');
+            helpers.assertEqual(state.backgroundPreset, 'default', 'Locked thematic background must reset to default on import');
+            helpers.assertEqual(state.fontFamily, 'calibri', 'Locked font must reset to calibri on import');
+            helpers.assertFalse(state.grayMode, 'Locked grayMode must reset to false on import');
+        }
+    },
+    {
+        id: 'T2_F23_03_unlocking_single_code_reveals_only_that_theme',
+        feature: 'F23',
+        name: 'Unlocking a single Vault code reveals only that thematic background and hides all other locked themes',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+            const res = await page.evaluate(() => {
+                window.StorageModule.unlockCode('MATRIX99');
+                window.BackgroundsModule.renderSettingsUI();
+                const expCards = Array.from(document.querySelectorAll('#settings-bg-experimental-section [data-bg-preset]'))
+                    .map(el => el.getAttribute('data-bg-preset'));
+                const expText = document.getElementById('settings-bg-experimental-section')?.textContent || '';
+                return { expCards, expText };
+            });
+            helpers.assertTrue(res.expCards.includes('vault_auto'), 'vault_auto must appear once 1 theme is unlocked');
+            helpers.assertTrue(res.expCards.includes('theme_matrix'), 'theme_matrix must appear when MATRIX99 is unlocked');
+            helpers.assertEqual(res.expCards.length, 2, 'Only vault_auto and unlocked theme_matrix should appear');
+            helpers.assertFalse(res.expText.includes('Sakura'), 'Locked Sakura must stay hidden');
+            helpers.assertFalse(res.expText.includes('Synthwave'), 'Locked Synthwave must stay hidden');
+            await helpers.resetPageState(page);
+        }
+    },
+    {
+        id: 'T2_F23_04_drawer_sheets_popup_toasts_real_crystal_and_no_overflow',
+        feature: 'F23',
+        name: 'Drawer, bottom sheets, longpress popup, and toasts have real backdropFilter, no backdrop-root traps, transparent drawer footer, and >= 4.5:1 contrast across mobile viewports',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+
+            for (const w of [320, 360, 430]) {
+                await page.setViewport({ width: w, height: 800, deviceScaleFactor: 2 });
+                const closedDrawer = await page.evaluate(() => {
+                    window.OrganizadorApp?.closeSidebarDrawer?.(false);
+                    const drawer = document.getElementById('sidebar-drawer');
+                    const footer = document.getElementById('sidebar-drawer-footer');
+                    return {
+                        rectRight: drawer ? drawer.getBoundingClientRect().right : 999,
+                        drawerBf: drawer ? getComputedStyle(drawer).backdropFilter : 'none',
+                        footerBg: footer ? getComputedStyle(footer).backgroundColor : ''
+                    };
+                });
+                helpers.assertTrue(closedDrawer.rectRight <= 0, `Closed drawer must sit fully offscreen at w=${w} (got right=${closedDrawer.rectRight})`);
+                helpers.assertTrue(closedDrawer.drawerBf && closedDrawer.drawerBf !== 'none', `Drawer must have real backdropFilter at w=${w}`);
+                helpers.assertEqual(closedDrawer.footerBg, 'rgba(0, 0, 0, 0)', `#sidebar-drawer-footer must be transparent at w=${w}`);
+
+                const modalAndToastMetrics = await page.evaluate(() => {
+                    window.SubjectsModule?.openAddModal?.();
+                    const subModal = document.getElementById('subject-modal');
+                    const subDialog = subModal?.querySelector('.modal-dialog');
+                    const subOverlayCs = subModal ? getComputedStyle(subModal) : null;
+                    const subDialogCs = subDialog ? getComputedStyle(subDialog) : null;
+                    window.SubjectsModule?.closeModal?.();
+
+                    window.OrganizadorApp?.showToast?.('Prueba de cristal en notificación', 'success');
+                    const toastEl = document.querySelector('#toast-container > div:last-child');
+                    const toastCs = toastEl ? getComputedStyle(toastEl) : null;
+
+                    const popup = document.getElementById('card-dynamic-popup');
+                    const popupCs = popup ? getComputedStyle(popup) : null;
+
+                    const parseRgba = (str) => {
+                        const m = String(str || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+                        return m ? { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 } : null;
+                    };
+                    const over = (fg, bg) => ({
+                        r: fg.r * fg.a + bg.r * (1 - fg.a),
+                        g: fg.g * fg.a + bg.g * (1 - fg.a),
+                        b: fg.b * fg.a + bg.b * (1 - fg.a),
+                        a: 1
+                    });
+                    const lum = (c) => {
+                        const f = v => { const n = v / 255; return n <= 0.03928 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4); };
+                        return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+                    };
+                    const cr = (c1, c2) => {
+                        const l1 = lum(c1), l2 = lum(c2);
+                        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+                    };
+
+                    const toastBg = toastCs ? parseRgba(toastCs.backgroundColor) : null;
+                    const toastFg = toastCs ? parseRgba(toastCs.color) : null;
+                    const toastRatioWhite = (toastBg && toastFg) ? cr(toastFg, over(toastBg, { r: 255, g: 255, b: 255, a: 1 })) : 0;
+                    const toastRatioBlack = (toastBg && toastFg) ? cr(toastFg, over(toastBg, { r: 0, g: 0, b: 0, a: 1 })) : 0;
+
+                    return {
+                        overlayOpacity: subOverlayCs?.opacity,
+                        overlayFilter: subOverlayCs?.filter,
+                        overlayBf: subOverlayCs?.backdropFilter,
+                        dialogBf: subDialogCs?.backdropFilter,
+                        popupOpacity: popupCs?.opacity,
+                        popupFilter: popupCs?.filter,
+                        popupBf: popupCs?.backdropFilter,
+                        toastBf: toastCs?.backdropFilter,
+                        toastRatioWhite,
+                        toastRatioBlack
+                    };
+                });
+
+                helpers.assertEqual(modalAndToastMetrics.overlayOpacity, '1', '.modal-overlay opacity must stay 1 (no backdrop-root trap)');
+                helpers.assertEqual(modalAndToastMetrics.overlayFilter, 'none', '.modal-overlay filter must be none');
+                helpers.assertEqual(modalAndToastMetrics.overlayBf, 'none', '.modal-overlay parent must not have backdrop-filter');
+                helpers.assertTrue(modalAndToastMetrics.dialogBf && modalAndToastMetrics.dialogBf !== 'none', '.modal-dialog must have real backdropFilter');
+                helpers.assertEqual(modalAndToastMetrics.popupOpacity, '1', '#card-dynamic-popup opacity must stay 1');
+                helpers.assertEqual(modalAndToastMetrics.popupFilter, 'none', '#card-dynamic-popup filter must be none');
+                helpers.assertEqual(modalAndToastMetrics.popupBf, 'none', '#card-dynamic-popup parent must not have backdrop-filter');
+                helpers.assertTrue(modalAndToastMetrics.toastBf && modalAndToastMetrics.toastBf !== 'none', 'Toast must have real backdropFilter');
+                helpers.assertTrue(modalAndToastMetrics.toastRatioWhite >= 4.5 && modalAndToastMetrics.toastRatioBlack >= 4.5,
+                    `Toast contrast must be >= 4.5:1 on white/black (got ${modalAndToastMetrics.toastRatioWhite.toFixed(2)}, ${modalAndToastMetrics.toastRatioBlack.toFixed(2)})`);
+            }
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+        }
     }
 ];
 

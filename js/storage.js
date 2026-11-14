@@ -659,7 +659,7 @@ window.StorageModule = (() => {
             return chosen;
         },
 
-        // --- Intensidad del Cristal Liquid Glass (suave | normal | intenso) ---
+        // --- Intensidad de los Efectos de Transparencia Avanzados (suave | normal | intenso) ---
         getDefaultGlassIntensity() {
             try {
                 const cores = typeof navigator !== 'undefined' ? Number(navigator.hardwareConcurrency) : 0;
@@ -960,7 +960,61 @@ window.StorageModule = (() => {
 
         isCodeUnlocked(codeId) {
             if (!codeId || typeof codeId !== 'string') return false;
-            return this.getUnlockedCodes().includes(codeId.trim().toUpperCase());
+            const normalized = codeId.trim().toUpperCase();
+            const codes = this.getUnlockedCodes();
+            return codes.includes(normalized) || codes.includes('KRONOS99');
+        },
+
+        isSpecialThemeUnlocked(themeId) {
+            if (!themeId || themeId === 'default') return true;
+            const map = {
+                'apollo': 'APOLLO11',
+                'starlight': '06062009',
+                'eduardo-gold': 'EDUARDO',
+                'penguin': 'PINGUINO',
+                'synthwave': 'RETRO80S',
+                'matrix': 'MATRIX99',
+                'sakura': 'ZENPEACE',
+                'coffee': 'COFFEE42',
+                'arcade': 'ARCADE90',
+                'hyperfocus': 'STUDYMAX'
+            };
+            const codeId = map[themeId];
+            return codeId ? this.isCodeUnlocked(codeId) : false;
+        },
+
+        isFontUnlocked(fontKey) {
+            if (!fontKey || typeof fontKey !== 'string') return true;
+            const map = {
+                'readable': 'READABLE',
+                'firacode': 'FIRACODE',
+                'playfair': 'PLAYFAIR',
+                'caveat': 'HANDNOTE',
+                'orbitron': 'ORBITRON'
+            };
+            const codeId = map[fontKey.trim().toLowerCase()];
+            return codeId ? this.isCodeUnlocked(codeId) : true;
+        },
+
+        isBackgroundPresetUnlocked(presetId) {
+            if (!presetId || typeof presetId !== 'string') return true;
+            if (presetId === 'vault_auto') {
+                return ['APOLLO11', '06062009', 'EDUARDO', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE', 'COFFEE42', 'ARCADE90', 'STUDYMAX'].some(c => this.isCodeUnlocked(c));
+            }
+            const map = {
+                'theme_matrix': 'MATRIX99',
+                'theme_sakura': 'ZENPEACE',
+                'theme_synthwave': 'RETRO80S',
+                'theme_starlight': '06062009',
+                'theme_arcade': 'ARCADE90',
+                'theme_coffee': 'COFFEE42',
+                'theme_apollo': 'APOLLO11',
+                'theme_eduardo-gold': 'EDUARDO',
+                'theme_penguin': 'PINGUINO',
+                'theme_hyperfocus': 'STUDYMAX'
+            };
+            const codeId = map[presetId];
+            return codeId ? this.isCodeUnlocked(codeId) : true;
         },
 
         unlockVaultCode(codeId) {
@@ -1125,9 +1179,39 @@ window.StorageModule = (() => {
                     throw new Error(`El archivo contiene más de ${MAX_SUBJECTS} materias.`);
                 }
                 if (data.theme) this.setTheme(data.theme);
-                if (data.fontFamily) this.setFontFamily(data.fontFamily);
                 if (typeof data.glassIntensity === 'string') this.setGlassIntensity(data.glassIntensity);
-                if (typeof data.backgroundPreset === 'string') this.setBackgroundPreset(data.backgroundPreset);
+
+                // Restaurar primero claves secretas y bóveda antes de evaluar estilos desbloqueables
+                if (typeof data.secretUnlocked === 'boolean' && data.secretUnlocked) {
+                    this.unlockSecret();
+                } else {
+                    localStorage.removeItem(KEYS.SECRET_UNLOCKED);
+                }
+                if (Array.isArray(data.unlockedCodes)) {
+                    const validCodes = data.unlockedCodes
+                        .filter(c => typeof c === 'string' && c.trim() && c.trim().toUpperCase() !== 'GATITOS_')
+                        .map(c => c.trim().toUpperCase());
+                    localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify([...new Set(validCodes)]));
+                } else {
+                    localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify([]));
+                }
+
+                // Evaluar elementos desbloqueables bajo el estado real restaurado
+                if (data.fontFamily) {
+                    this.setFontFamily(this.isFontUnlocked(data.fontFamily) ? data.fontFamily : 'calibri');
+                }
+                if (typeof data.backgroundPreset === 'string') {
+                    this.setBackgroundPreset(this.isBackgroundPresetUnlocked(data.backgroundPreset) ? data.backgroundPreset : 'default');
+                }
+                const canGray = this.isSecretUnlocked() || this.isCodeUnlocked('KRONOS99');
+                if (typeof data.grayMode === 'boolean') {
+                    this.setGrayModeEnabled(data.grayMode && canGray);
+                } else if (!canGray && this.getGrayModeEnabled()) {
+                    this.setGrayModeEnabled(false);
+                }
+                if (typeof data.activeSpecialTheme === 'string') {
+                    this.setActiveSpecialTheme(this.isSpecialThemeUnlocked(data.activeSpecialTheme) ? data.activeSpecialTheme : 'default');
+                }
                 if (typeof data.backgroundAnimated === 'boolean') this.setBackgroundAnimated(data.backgroundAnimated);
                 if (typeof data.backgroundBlur === 'number') this.setBackgroundBlur(data.backgroundBlur);
                 if (typeof data.backgroundScrim === 'number') this.setBackgroundScrim(data.backgroundScrim);
@@ -1143,16 +1227,6 @@ window.StorageModule = (() => {
                 if (typeof data.hapticsEnabled === 'boolean') this.setHapticsEnabled(data.hapticsEnabled);
                 if (typeof data.autoPurgeArchive === 'boolean') this.setAutoPurgeArchive(data.autoPurgeArchive);
                 if (typeof data.headerThemeBtnEnabled === 'boolean') this.setHeaderThemeBtnEnabled(data.headerThemeBtnEnabled);
-                if (typeof data.secretUnlocked === 'boolean' && data.secretUnlocked) this.unlockSecret();
-                if (typeof data.grayMode === 'boolean') this.setGrayModeEnabled(data.grayMode);
-                if (Array.isArray(data.unlockedCodes)) {
-                    const validCodes = data.unlockedCodes
-                        .filter(c => typeof c === 'string' && c.trim() && c.trim().toUpperCase() !== 'GATITOS_');
-                    localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify(validCodes));
-                }
-                if (typeof data.activeSpecialTheme === 'string') {
-                    this.setActiveSpecialTheme(data.activeSpecialTheme);
-                }
                 if (typeof data.apolloRocketsEnabled === 'boolean') {
                     this.setApolloRocketsEnabled(data.apolloRocketsEnabled);
                 }

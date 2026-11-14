@@ -71,14 +71,15 @@ const tests = [
     {
         id: 'T1_F01_05_scoped_changelog_content',
         feature: 'F01',
-        name: 'Changelog modal announces 1.5.1 design updates with zero secret code leaks',
+        name: 'Changelog modal announces 1.5.2 design updates without visible Liquid Glass or secret code leaks',
         run: async (page, helpers) => {
             const modalText = await page.evaluate(() => {
                 const modal = document.getElementById('changelog-modal');
                 return modal ? modal.textContent : '';
             });
-            helpers.assertTrue(modalText.includes('1.5.1'), 'Changelog modal must display version 1.5.1');
-            helpers.assertTrue(modalText.includes('Liquid Glass'), 'Changelog modal must mention Liquid Glass');
+            helpers.assertTrue(modalText.includes('1.5.2'), 'Changelog modal must display version 1.5.2');
+            helpers.assertTrue(/efectos de transparencia avanzados/i.test(modalText), 'Changelog modal must mention Efectos de transparencia avanzados');
+            helpers.assertFalse(/liquid glass/i.test(modalText), 'Changelog must not expose visible Liquid Glass string');
             helpers.assertFalse(modalText.includes('EDUARDO'), 'Changelog must not leak EDUARDO secret code');
             helpers.assertFalse(modalText.includes('06062009'), 'Changelog must not leak 06062009 secret code');
             helpers.assertFalse(modalText.includes('KRONOS99'), 'Changelog must not leak KRONOS99 secret code');

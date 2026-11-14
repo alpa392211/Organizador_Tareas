@@ -54,8 +54,8 @@
     --transition-normal: 0.26s var(--ease-smooth);
 
     /* ========================================================
-       LIQUID GLASS APPLE / iOS 26 TOKENS (v1.5.1 Etapa 1)
-       - Cristal claro lechoso en barras y chips (alfa ~0.34-0.44)
+       EFECTOS DE TRANSPARENCIA AVANZADOS v1.5.2 (CRISTAL REAL)
+       - Cristal claro lechoso en barras, cajón lateral, hojas y toasts
        - Velo interno (scrim) bajo zonas de texto para garantizar >= 4.5:1
          aún en el peor caso (sobre #ffffff o #000000 puro)
        - Blur marcado (30-40px) y saturación alta (185-215%) solo en capas
@@ -64,7 +64,7 @@
     --lg-blur-nav: 36px;
     --lg-blur-panel: 26px;
     --lg-blur-modal: 40px;
-    --lg-blur-backdrop: 20px;
+    --lg-blur-backdrop: 18px;
     --lg-sat-nav: 215%;
     --lg-sat-panel: 190%;
     --lg-sheen-opacity: 1;
@@ -74,8 +74,8 @@
     --lg-nav-border: rgba(255, 255, 255, 0.90);
     --lg-nav-ring: rgba(15, 23, 42, 0.08);
 
-    --lg-drawer-bg: rgba(248, 250, 252, 0.46);
-    --lg-drawer-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.74) 0%, rgba(248, 250, 252, 0.68) 100%);
+    --lg-drawer-bg: rgba(248, 250, 252, 0.44);
+    --lg-drawer-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(248, 250, 252, 0.68) 100%);
 
     --lg-panel-bg: rgba(255, 255, 255, 0.44);
     --lg-panel-scrim: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.44) 76%, rgba(255, 255, 255, 0.22) 100%);
@@ -85,10 +85,10 @@
     --lg-card-border: rgba(255, 255, 255, 0.90);
     --lg-card-stroke: rgba(15, 23, 42, 0.07);
 
-    --lg-modal-bg: rgba(255, 255, 255, 0.48);
-    --lg-modal-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.66) 100%);
+    --lg-modal-bg: rgba(255, 255, 255, 0.46);
+    --lg-modal-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0.66) 100%);
     --lg-popover-bg: rgba(255, 255, 255, 0.46);
-    --lg-popover-scrim: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.48) 100%);
+    --lg-popover-scrim: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0.50) 100%);
 
     --lg-indicator-bg: rgba(255, 255, 255, 0.92);
     --lg-indicator-border: rgba(99, 102, 241, 0.24);
@@ -106,14 +106,16 @@
     --lg-blur-nav: 28px;
     --lg-blur-panel: 20px;
     --lg-blur-modal: 32px;
-    --lg-blur-backdrop: 16px;
+    --lg-blur-backdrop: 15px;
     --lg-sat-nav: 190%;
     --lg-sat-panel: 175%;
     --lg-sheen-opacity: 0.72;
     --lg-nav-bg: rgba(255, 255, 255, 0.50);
+    --lg-drawer-bg: rgba(248, 250, 252, 0.54);
     --lg-panel-bg: rgba(255, 255, 255, 0.54);
     --lg-card-bg: rgba(255, 255, 255, 0.58);
     --lg-modal-bg: rgba(255, 255, 255, 0.58);
+    --lg-popover-bg: rgba(255, 255, 255, 0.56);
 }
 :root[data-glass-intensity="suave"] {
     --lg-blur-nav: 12px;
@@ -194,7 +196,7 @@ body {
     font-family: var(--font-sans);
 }
 
-/* Modo Claro: Fondo ambiental con profundidad sutil para refracción Liquid Glass */
+/* Modo Claro: Fondo ambiental con profundidad sutil para efectos de transparencia avanzados */
 body {
     background-color: #e6ebf5;
     color: #0f172a;
@@ -362,7 +364,7 @@ html:not(.dark):not([class*="theme-"]) .card-hover {
     box-shadow: var(--shadow-glass-md) !important;
 }
 
-/* Modo Claro Estándar: Navegación flotante y modales Liquid Glass */
+/* Modo Claro Estándar: Navegación flotante, cajón lateral y modales con cristal traslúcido */
 html:not(.dark):not([class*="theme-"]) header,
 html:not(.dark):not([class*="theme-"]) #bottom-nav {
     background-color: var(--lg-nav-bg) !important;
@@ -370,11 +372,11 @@ html:not(.dark):not([class*="theme-"]) #bottom-nav {
     border-color: var(--lg-nav-border) !important;
     box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring) !important;
 }
-html:not(.dark):not([class*="theme-"]) #sidebar-drawer,
-html:not(.dark):not([class*="theme-"]) #sidebar-drawer-footer {
+html:not(.dark):not([class*="theme-"]) #sidebar-drawer {
     background-color: var(--lg-drawer-bg) !important;
     background-image: var(--lg-drawer-scrim) !important;
-    border-color: rgba(255, 255, 255, 0.82) !important;
+    border: 1px solid rgba(255, 255, 255, 0.88) !important;
+    box-shadow: var(--shadow-glass-lg), var(--lg-specular) !important;
 }
 html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
 html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
@@ -440,9 +442,11 @@ html.dark {
 }
 html.dark[data-glass-intensity="normal"] {
     --lg-nav-bg: rgba(15, 23, 42, 0.46);
+    --lg-drawer-bg: rgba(15, 23, 42, 0.48);
     --lg-panel-bg: rgba(15, 23, 42, 0.54);
     --lg-card-bg: rgba(18, 27, 48, 0.56);
     --lg-modal-bg: rgba(15, 23, 42, 0.54);
+    --lg-popover-bg: rgba(15, 23, 42, 0.52);
 }
 html.dark[data-glass-intensity="suave"] {
     --lg-nav-bg: rgba(15, 23, 42, 0.86);
@@ -458,7 +462,7 @@ html.dark body {
     color: #f8fafc;
 }
 
-/* Modo Oscuro Estándar: Tarjetas/paneles semitransparentes, Nav/Drawer/Modales Liquid Glass */
+/* Modo Oscuro Estándar: Tarjetas/paneles semitransparentes, Nav/Drawer/Modales con cristal real */
 html.dark:not([class*="theme-"]) .glass-panel,
 html.dark:not([class*="theme-"]) #view-subjects > div.bg-white,
 html.dark:not([class*="theme-"]) #view-tasks > div.bg-white,
@@ -486,18 +490,18 @@ html.dark:not([class*="theme-"]) #bottom-nav {
     border-color: var(--lg-nav-border) !important;
     box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring) !important;
 }
-html.dark:not([class*="theme-"]) #sidebar-drawer,
-html.dark:not([class*="theme-"]) #sidebar-drawer-footer {
+html.dark:not([class*="theme-"]) #sidebar-drawer {
     background-color: var(--lg-drawer-bg) !important;
     background-image: var(--lg-drawer-scrim) !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.20) !important;
+    box-shadow: var(--shadow-glass-lg), var(--lg-specular) !important;
 }
 html.dark:not([class*="theme-"]) #sidebar-drawer-footer > div {
     color: #cbd5e1 !important;
 }
 html.dark:not([class*="theme-"]) #app-exit-btn {
-    background-color: rgba(30, 41, 59, 0.78) !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
+    background-color: rgba(255, 255, 255, 0.10) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
     color: #f1f5f9 !important;
 }
 html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
@@ -513,11 +517,11 @@ html.dark:not([class*="theme-"]) .liquid-glass-popover {
 }
 
 /* ========================================================
-   MODO MONOCROMÁTICO (GRIS ELEGANTE) - LIQUID GLASS
+   MODO MONOCROMÁTICO (GRIS ELEGANTE) - CRISTAL TRASLÚCIDO
    Adaptado meticulosamente a Modo Claro y Modo Oscuro
    ======================================================== */
 
-/* Caso 1: Modo Monocromático en MODO CLARO (Silver & Slate Liquid Glass) */
+/* Caso 1: Modo Monocromático en MODO CLARO (Silver & Slate Glass) */
 html:not(.dark).theme-gray {
     color-scheme: light;
     --lg-indicator-bg: rgba(255, 255, 255, 0.92);
@@ -538,11 +542,10 @@ html:not(.dark).theme-gray #bottom-nav.bg-white {
     box-shadow: var(--shadow-glass-lg), 0 0 0 1px rgba(100, 116, 139, 0.12) !important;
 }
 html:not(.dark).theme-gray #sidebar-drawer,
-html:not(.dark).theme-gray #sidebar-drawer.bg-white,
-html:not(.dark).theme-gray #sidebar-drawer-footer {
-    background-color: rgba(235, 239, 246, 0.56) !important;
-    background-image: linear-gradient(180deg, rgba(244, 247, 251, 0.68) 0%, rgba(235, 239, 246, 0.56) 100%) !important;
-    border-color: rgba(255, 255, 255, 0.76) !important;
+html:not(.dark).theme-gray #sidebar-drawer.bg-white {
+    background-color: rgba(235, 239, 246, 0.48) !important;
+    background-image: linear-gradient(180deg, rgba(244, 247, 251, 0.74) 0%, rgba(235, 239, 246, 0.64) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.82) !important;
 }
 html:not(.dark).theme-gray nav {
     border-color: rgba(148, 163, 184, 0.35) !important;
@@ -613,7 +616,7 @@ html.dark.theme-gray #bottom-main-label {
     color: #e2e8f0 !important;
 }
 
-/* Caso 2: Modo Monocromático en MODO OSCURO (Titanium & Slate Liquid Glass) */
+/* Caso 2: Modo Monocromático en MODO OSCURO (Titanium & Slate Glass) */
 html.dark.theme-gray {
     color-scheme: dark;
     --lg-indicator-bg: rgba(255, 255, 255, 0.14);
@@ -634,11 +637,10 @@ html.dark.theme-gray #bottom-nav.dark\:bg-slate-900 {
     box-shadow: var(--shadow-glass-lg), 0 0 0 1px rgba(0, 0, 0, 0.4) !important;
 }
 html.dark.theme-gray #sidebar-drawer,
-html.dark.theme-gray #sidebar-drawer.dark\:bg-slate-900,
-html.dark.theme-gray #sidebar-drawer-footer {
-    background-color: rgba(28, 31, 38, 0.48) !important;
+html.dark.theme-gray #sidebar-drawer.dark\:bg-slate-900 {
+    background-color: rgba(28, 31, 38, 0.44) !important;
     background-image: linear-gradient(180deg, rgba(20, 22, 28, 0.80) 0%, rgba(28, 31, 38, 0.68) 100%) !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
 }
 html.dark.theme-gray .bg-white,
 html.dark.theme-gray .dark\:bg-slate-800,
@@ -744,16 +746,43 @@ section.hidden, .modal-overlay.hidden {
     animation: viewGlassEnter 0.34s var(--ease-out-expo) both;
 }
 
-/* 2. Modales Dinámicos con Rebote Elástico (Backdrop + Dialog) */
+/* 2. Modales Dinámicos con Cristal Real (sin trampa de backdrop-root en el contenedor padre) */
 .modal-overlay {
-    opacity: 0;
+    opacity: 1;
+    filter: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    mask: none;
+    will-change: auto;
     pointer-events: none;
-    transition: opacity 0.26s var(--ease-smooth);
+}
+
+.modal-overlay:not(.hidden) {
+    opacity: 1 !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    mask: none !important;
+    will-change: auto !important;
+    transition: none !important;
 }
 
 .modal-overlay.active {
     opacity: 1;
     pointer-events: auto;
+}
+
+.modal-overlay .app-modal-backdrop {
+    opacity: 0;
+    transition: opacity 0.24s var(--ease-smooth), backdrop-filter 0.24s var(--ease-smooth);
+}
+
+.modal-overlay.active .app-modal-backdrop {
+    opacity: 1;
+}
+
+.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .app-modal-backdrop {
+    background-color: rgba(15, 23, 42, 0.34) !important;
 }
 
 .modal-dialog {
@@ -767,7 +796,7 @@ section.hidden, .modal-overlay.hidden {
     transform: none;
 }
 
-/* 3. Menú Lateral Liquid Glass (Sidebar Drawer) */
+/* 3. Menú Lateral Cristal Real (Sidebar Drawer) */
 #sidebar-drawer {
     transition: transform 0.38s var(--ease-drawer);
     will-change: transform;
@@ -775,6 +804,15 @@ section.hidden, .modal-overlay.hidden {
 
 #drawer-backdrop {
     transition: opacity 0.32s var(--ease-smooth);
+}
+
+html #sidebar-drawer #sidebar-drawer-footer {
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
 }
 
 /* 4. Efecto Dinámico Staggered Fade-in para Tarjetas (Grid Items) */
@@ -828,9 +866,9 @@ section.hidden, .modal-overlay.hidden {
 }
 
 /* ========================================================
-   CAPA LIQUID GLASS REAL v1.5.1 (APPLE iOS 26)
+   CAPA DE CRISTAL REAL v1.5.2 (TRANSPARENCIA AVANZADA)
    Blur intenso (30–40px) y saturación alta (190–215%) en nav,
-   drawer, modales y popovers; blur medio (20–26px) en paneles;
+   drawer, modales, toasts y popovers; blur medio (20–26px) en paneles;
    0px en .stagger-card para scroll a 60fps en móvil.
    ======================================================== */
 .liquid-glass-nav,
@@ -840,6 +878,33 @@ section.hidden, .modal-overlay.hidden {
 .toast-floating-stack > div {
     backdrop-filter: blur(var(--lg-blur-nav)) saturate(var(--lg-sat-nav)) contrast(1.05);
     -webkit-backdrop-filter: blur(var(--lg-blur-nav)) saturate(var(--lg-sat-nav)) contrast(1.05);
+}
+
+.toast-floating-stack > div {
+    box-shadow: var(--shadow-glass-lg), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    border-width: 1px;
+    color: #ffffff;
+}
+
+.toast-floating-stack > div.toast-glass-success {
+    background-color: rgba(6, 95, 70, 0.88);
+    border-color: rgba(110, 231, 183, 0.45);
+}
+
+.toast-floating-stack > div.toast-glass-warning {
+    background-color: rgba(146, 64, 14, 0.90);
+    border-color: rgba(252, 211, 77, 0.45);
+}
+
+.toast-floating-stack > div.toast-glass-error {
+    background-color: rgba(190, 18, 60, 0.88);
+    border-color: rgba(253, 164, 175, 0.45);
+}
+
+.toast-floating-stack > div.toast-glass-info,
+html.theme-gray .toast-floating-stack > div {
+    background-color: rgba(15, 23, 42, 0.82);
+    border-color: rgba(255, 255, 255, 0.28);
 }
 
 .glass-panel,
@@ -856,7 +921,7 @@ section.hidden, .modal-overlay.hidden {
     -webkit-backdrop-filter: none !important;
 }
 
-.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog,
 #card-dynamic-popup .modal-dialog {
     backdrop-filter: blur(var(--lg-blur-modal)) saturate(var(--lg-sat-nav)) contrast(1.05);
     -webkit-backdrop-filter: blur(var(--lg-blur-modal)) saturate(var(--lg-sat-nav)) contrast(1.05);
@@ -878,7 +943,7 @@ html.animated-bg-running[data-glass-intensity="normal"] {
     box-shadow: var(--shadow-glass-lg), var(--lg-specular), 0 0 0 1px var(--lg-nav-ring);
 }
 
-/* Barra inferior flotante estilo cápsula Apple con safe-area-inset-bottom (sin overflow:hidden para no recortar el FAB central -mt-7) */
+/* Barra inferior flotante estilo cápsula con safe-area-inset-bottom (sin overflow:hidden para no recortar el FAB central -mt-7) */
 #bottom-nav.liquid-glass-bottom {
     position: fixed;
     bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
@@ -889,17 +954,50 @@ html.animated-bg-running[data-glass-intensity="normal"] {
 }
 
 #sidebar-drawer.liquid-glass-drawer {
+    overflow: hidden;
+    border-radius: 0 1.75rem 1.75rem 0;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     padding-left: env(safe-area-inset-left, 0px);
 }
 
+#sidebar-drawer.liquid-glass-drawer.-translate-x-full {
+    transform: translate3d(calc(-100% - 2.5rem), 0, 0) !important;
+    pointer-events: none;
+}
+
+@media (max-width: 639px) {
+    #sidebar-drawer.liquid-glass-drawer {
+        top: calc(0.625rem + env(safe-area-inset-top, 0px));
+        bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
+        left: calc(0.625rem + env(safe-area-inset-left, 0px));
+        width: min(84vw, 336px);
+        max-width: calc(100vw - 1.25rem);
+        border-radius: 1.75rem !important;
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-left: 0;
+    }
+}
+
+/* Legibilidad garantizada para listas nativas <select> dentro de hojas con cristal */
+select option {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+html.dark select option,
+html[class*="theme-"]:not(.theme-gray) select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
 /* Borde especular degradado de 1px para cápsulas y cristales curvos (mask-composite exclude) */
 .liquid-glass-nav::before,
 #bottom-nav.liquid-glass-bottom::before,
+.liquid-glass-drawer::before,
 .glass-panel::before,
 .settings-accordion-card::before,
-.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog::before {
+.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal) .modal-dialog::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -1873,7 +1971,7 @@ html:not(.dark).theme-gray #cal-days-grid button span {
 }
 
 /* ========================================================
-   TEMAS ESPECIALES CLASIFICADOS DE LA BÓVEDA (v1.5.1 Liquid Glass)
+   TEMAS ESPECIALES CLASIFICADOS DE LA BÓVEDA (v1.5.2 Cristal Traslúcido)
    Cristal ahumado traslúcido, velo protector de contraste >= 4.5:1
    sobre blanco/negro puros y halos especulares integrados
    ======================================================== */
@@ -1885,8 +1983,7 @@ html.theme-apollo body {
 }
 html.theme-apollo header,
 html.theme-apollo #bottom-nav,
-html.theme-apollo #sidebar-drawer,
-html.theme-apollo #sidebar-drawer-footer {
+html.theme-apollo #sidebar-drawer {
     background-color: rgba(10, 15, 35, 0.38) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(8, 12, 30, 0.80) 0%, rgba(10, 15, 35, 0.48) 76%, rgba(10, 15, 35, 0.24) 100%) !important;
     border-color: rgba(129, 140, 248, 0.36) !important;
@@ -2434,7 +2531,7 @@ html body #vault-reveal-modal .modal-dialog {
     pointer-events: none !important;
 }
 
-/* ===== v1.5.1: Popup dinámico (pulsación larga), clon elevado y backdrops desenfocados ===== */
+/* ===== v1.5.2: Popup dinámico (pulsación larga), clon elevado y backdrops desenfocados ===== */
 #card-dynamic-popup .modal-dialog,
 #note-unlock-modal .modal-dialog {
     opacity: 1;
@@ -2448,11 +2545,22 @@ html body #vault-reveal-modal .modal-dialog {
     transition: opacity 0.24s var(--ease-smooth), backdrop-filter 0.24s var(--ease-smooth);
 }
 
-#card-dynamic-popup {
+#card-dynamic-popup:not(.hidden) {
+    opacity: 1 !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    mask: none !important;
+    will-change: auto !important;
+    transition: none !important;
+}
+
+#card-dynamic-popup #card-dynamic-popup-backdrop {
     opacity: 0;
+    background-color: rgba(15, 23, 42, 0.34);
     transition: opacity 0.2s var(--ease-smooth);
 }
-#card-dynamic-popup.active {
+#card-dynamic-popup.active #card-dynamic-popup-backdrop {
     opacity: 1;
 }
 
