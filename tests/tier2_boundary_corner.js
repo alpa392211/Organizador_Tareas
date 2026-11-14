@@ -9,16 +9,16 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.0 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.5.1 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver X.Y.Z pattern',
+        name: 'package.json version matches strict semver 1.5.1',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.0', 'package.json version must be 1.5.0');
+            helpers.assertEqual(pkg.version, '1.5.1', 'package.json version must be 1.5.1');
         }
     },
     {
@@ -30,7 +30,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.5.0';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.5.1';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -38,13 +38,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.5.1 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                window.StorageModule?.setLastSeenVersion?.('1.5.0');
+                window.OrganizadorApp?.openChangelogModal?.();
+                document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.5.0', 'LocalStorage must record version 1.5.0');
+            helpers.assertEqual(saved, '1.5.1', 'LocalStorage must record version 1.5.1');
         }
     },
     {
@@ -864,10 +865,10 @@ const tests = [
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setOnboardingCompleted?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.5.0');
+                window.StorageModule?.setLastSeenVersion?.('1.5.1');
             });
             const lastSeen = await page.evaluate(() => window.StorageModule?.getLastSeenVersion?.());
-            helpers.assertEqual(lastSeen, '1.5.0', 'Last seen version should be 1.5.0');
+            helpers.assertEqual(lastSeen, '1.5.1', 'Last seen version should be 1.5.1');
         }
     },
     {
@@ -2717,6 +2718,45 @@ const tests = [
                 monoBtn?.click();
                 const chosenMonoPreset = Storage.getBackgroundPreset();
 
+                // Turn off Monochrome before verifying all 10 thematic Vault backgrounds
+                window.OrganizadorApp.applyGrayMode(false);
+                // Verify all 10 thematic Vault backgrounds render cleanly without errors or blank canvas
+                const allThematicIds = [
+                    { code: 'MATRIX99', themeId: 'matrix', presetId: 'theme_matrix' },
+                    { code: 'RETRO80S', themeId: 'synthwave', presetId: 'theme_synthwave' },
+                    { code: 'ZENPEACE', themeId: 'sakura', presetId: 'theme_sakura' },
+                    { code: '06062009', themeId: 'starlight', presetId: 'theme_starlight' },
+                    { code: 'ARCADE90', themeId: 'arcade', presetId: 'theme_arcade' },
+                    { code: 'COFFEE42', themeId: 'coffee', presetId: 'theme_coffee' },
+                    { code: 'APOLLO11', themeId: 'apollo', presetId: 'theme_apollo' },
+                    { code: 'EDUARDO', themeId: 'eduardo-gold', presetId: 'theme_eduardo-gold' },
+                    { code: 'PINGUINO', themeId: 'penguin', presetId: 'theme_penguin' },
+                    { code: 'STUDYMAX', themeId: 'hyperfocus', presetId: 'theme_hyperfocus' }
+                ];
+                const thematicFailures = [];
+                allThematicIds.forEach(item => {
+                    Storage.unlockCode(item.code);
+                    Storage.setActiveSpecialTheme(item.themeId);
+                    Storage.setBackgroundPreset('vault_auto');
+                    Bg.onSpecialThemeChanged(item.themeId);
+                    const eff = Bg.resolveEffectiveBackgroundId();
+                    const grad = document.getElementById('app-bg-gradient')?.style.backgroundImage || '';
+                    const canvasEl = document.getElementById('app-bg-canvas');
+                    const cHidden = !canvasEl || canvasEl.classList.contains('hidden');
+                    let nonEmptyPixels = false;
+                    if (canvasEl && canvasEl.width > 0 && canvasEl.height > 0) {
+                        const ctx2d = canvasEl.getContext('2d');
+                        const data = ctx2d.getImageData(0, 0, canvasEl.width, canvasEl.height).data;
+                        for (let i = 3; i < data.length; i += 16) {
+                            if (data[i] > 0) { nonEmptyPixels = true; break; }
+                        }
+                    }
+                    if (eff !== item.presetId || !grad.length || cHidden || !nonEmptyPixels) {
+                        thematicFailures.push(`${item.themeId}(eff=${eff},grad=${grad.length},hidden=${cHidden},px=${nonEmptyPixels})`);
+                    }
+                });
+                Storage.setActiveSpecialTheme('default');
+
                 // Cleanup
                 window.OrganizadorApp.applyGrayMode(false);
                 Storage.setBackgroundPreset('default');
@@ -2736,7 +2776,8 @@ const tests = [
                     indigoDisabled,
                     uploadDisabled,
                     monoDisabled,
-                    chosenMonoPreset
+                    chosenMonoPreset,
+                    thematicFailures
                 };
             });
 
@@ -2754,6 +2795,7 @@ const tests = [
             helpers.assertTrue(res.uploadDisabled, 'Mi foto upload must be disabled in Monochrome mode');
             helpers.assertFalse(res.monoDisabled, 'Grayscale presets must remain enabled in Monochrome mode');
             helpers.assertEqual(res.chosenMonoPreset, 'mono_titanium', 'Grayscale preset mono_titanium must be selectable in Monochrome mode');
+            helpers.assertEqual(res.thematicFailures.length, 0, `All 10 thematic backgrounds must render non-empty gradient & canvas: ${res.thematicFailures.join(', ')}`);
         }
     },
     {
