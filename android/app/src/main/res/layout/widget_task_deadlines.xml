@@ -31,7 +31,7 @@
             android:background="@drawable/widget_badge_background"
             android:paddingHorizontal="8dp"
             android:paddingVertical="3dp"
-            android:text="UNAM"
+            android:text="Mi Agenda"
             android:textColor="@color/widget_text_white"
             android:textSize="10sp"
             android:textStyle="bold" />

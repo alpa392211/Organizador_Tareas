@@ -1,6 +1,6 @@
 /**
  * tier3_cross_feature.js - Tier 3: Pairwise Cross-Feature Combinations
- * Pairwise interaction matrix validating cross-feature interoperability for v1.4.4
+ * Pairwise interaction matrix validating cross-feature interoperability for v1.5.0
  * 22 comprehensive integration tests
  */
 
@@ -15,7 +15,7 @@ const tests = [
             await page.evaluate(() => {
                 localStorage.clear();
                 window.StorageModule?.setOnboardingCompleted?.(false);
-                window.StorageModule?.setLastSeenVersion?.('1.4.1');
+                window.StorageModule?.setLastSeenVersion?.('1.4.4');
             });
             // Prior to registration: changelog must NOT be open
             const changelogBefore = await page.evaluate(() => {
@@ -80,9 +80,9 @@ const tests = [
             helpers.assertTrue(isUnlocked, 'APOLLO11 must be unlocked via continuous input');
 
             const hasStandardButtons = await page.evaluate(() => {
-                const catsBtn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
-                if (!catsBtn) return false;
-                return catsBtn.tagName.toLowerCase() === 'button';
+                const grayBtn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
+                if (!grayBtn) return false;
+                return grayBtn.tagName.toLowerCase() === 'button';
             });
             helpers.assertTrue(hasStandardButtons, 'Controls must exist and use standard button element');
         }
@@ -407,9 +407,9 @@ const tests = [
         name: 'Standard Button Design System unified across Vault and Settings',
         run: async (page, helpers) => {
             const unified = await page.evaluate(() => {
-                const catsBtn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
-                if (!catsBtn) return false;
-                return catsBtn.tagName.toLowerCase() === 'button';
+                const grayBtn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
+                if (!grayBtn) return false;
+                return grayBtn.tagName.toLowerCase() === 'button';
             });
             helpers.assertTrue(unified, 'Buttons must adhere to unified standard design system');
         }
@@ -451,34 +451,40 @@ const tests = [
     },
 
     // -------------------------------------------------------------------------
-    // COMB 21: F08 (Account Type) + F16 (Dynamic Card Popup in Institution Mode)
+    // COMB 21: F16 (Subjects View) + F15 (Long-Press Dynamic Card Popup)
     // -------------------------------------------------------------------------
     {
-        id: 'T3_COMB_21_institution_mode_subject_card_popup',
-        name: 'Account Type "Institution" configures Subject Cards with Dynamic Popup',
+        id: 'T3_COMB_21_subjects_view_card_popup',
+        name: 'Subjects View renders Subject Cards with Long-Press Dynamic Popup support',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                window.StorageModule?.setAccountType?.('institution');
+                window.StorageModule?.setLongPressEnabled?.(true);
                 window.OrganizadorApp?.switchView?.('subjects');
             });
-            const accType = await page.evaluate(() => window.StorageModule?.getAccountType?.());
-            helpers.assertEqual(accType, 'institution', 'Account type must be institution');
+            const active = await page.evaluate(() => {
+                const view = document.getElementById('view-subjects');
+                return view ? !view.classList.contains('hidden') : false;
+            });
+            helpers.assertTrue(active, 'Subjects view must become active');
         }
     },
 
     // -------------------------------------------------------------------------
-    // COMB 22: F08 (Account Type) + F16 (Dynamic Card Popup in Activities Mode)
+    // COMB 22: F16 (Tasks View) + F15 (Long-Press Dynamic Card Popup)
     // -------------------------------------------------------------------------
     {
-        id: 'T3_COMB_22_activities_mode_task_card_popup',
-        name: 'Account Type "Activities" configures Task Cards with Dynamic Popup',
+        id: 'T3_COMB_22_tasks_view_card_popup',
+        name: 'Tasks View renders Task Cards with Long-Press Dynamic Popup support',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                window.StorageModule?.setAccountType?.('organizer');
+                window.StorageModule?.setLongPressEnabled?.(true);
                 window.OrganizadorApp?.switchView?.('tasks');
             });
-            const accType = await page.evaluate(() => window.StorageModule?.getAccountType?.());
-            helpers.assertEqual(accType, 'organizer', 'Account type must be organizer');
+            const active = await page.evaluate(() => {
+                const view = document.getElementById('view-tasks');
+                return view ? !view.classList.contains('hidden') : false;
+            });
+            helpers.assertTrue(active, 'Tasks view must become active');
         }
     }
 ];

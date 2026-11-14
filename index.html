@@ -56,19 +56,19 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.4.4">
-    <link rel="stylesheet" href="css/styles.css?v=1.4.4">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.0">
+    <link rel="stylesheet" href="css/styles.css?v=1.5.0">
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
     <!-- ========================================== -->
-    <!-- ENCABEZADO INSTITUCIONAL Y BARRA SUPERIOR -->
+    <!-- ENCABEZADO Y BARRA SUPERIOR                -->
     <!-- ========================================== -->
     <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 gap-3">
                 
-                <!-- Lado Izquierdo: Botón Hamburguesa + Logo/Insignia Institucional -->
+                <!-- Lado Izquierdo: Botón Hamburguesa + Perfil y Periodo -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     <!-- Botón Hamburguesa (Abre Sidebar Drawer) -->
                     <button type="button" id="drawer-toggle-btn"
@@ -79,27 +79,21 @@
                         </svg>
                     </button>
 
-                    <!-- Insignia y Datos de la Institución con Periodo Adaptado -->
+                    <!-- Avatar, Nombre del Perfil y Periodo (Solo lectura en cabecera) -->
                     <div class="flex items-center gap-2.5">
-                        <div id="header-inst-logo" class="shrink-0 flex items-center justify-center cursor-pointer tap-effect transition-transform hover:scale-105 active:scale-95"
-                             title="Tu perfil">
-                            <!-- Inyectado dinámicamente con escudo oficial en contenedor blanco -->
+                        <div id="header-inst-logo" class="shrink-0 flex items-center justify-center" title="Tu perfil">
+                            <!-- Inyectado dinámicamente con foto de perfil o avatar por defecto -->
                         </div>
                         <div class="flex flex-col">
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <span id="header-inst-name" class="text-sm sm:text-base font-black text-slate-900 dark:text-white tracking-tight">
-                                    UNAM
+                                    Mi Organizador
                                 </span>
-                                <span class="text-slate-300 dark:text-slate-600 hidden xs:inline">•</span>
-                                <span id="header-inst-period" style="display:none" class="hidden text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                                    1.º Semestre
-                                </span>
+                                <span id="header-period-sep" class="hidden text-slate-300 dark:text-slate-600">•</span>
+                                <span id="header-inst-period" class="hidden text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400"></span>
                             </div>
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <span id="header-user-name" style="display:none" class="hidden text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[160px]"></span>
-                                <span id="header-inst-type" style="display:none" class="hidden text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                                    Semestral
-                                </span>
+                                <span id="header-user-name" class="hidden text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[160px]"></span>
                                 <span id="header-cycle-warning" class="hidden text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 animate-pulse">
                                     ⚠️ Ciclo provisional
                                 </span>
@@ -108,32 +102,8 @@
                     </div>
                 </div>
 
-                <!-- Lado Derecho: Selectores Dinámicos + Tema -->
+                <!-- Lado Derecho: Tema + Navegación -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    
-                    <!-- Selector Institucional Oficial (UNAM, IPN, UAM, CCH, ENP, CECyT, Colbach, General) -->
-                    <div class="relative hidden" style="display:none">
-                        <select id="header-institution-select"
-                            class="appearance-none bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold pl-3 pr-8 py-2 rounded-2xl border border-transparent focus:border-indigo-500 focus:outline-none cursor-pointer transition-colors"
-                            title="Cambiar institución educativa">
-                            <!-- Opciones cargadas por JS -->
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- Selector Dinámico de Grado/Periodo/Semestre Adaptable -->
-                    <div class="relative hidden md:block">
-                        <select id="header-period-select"
-                            class="appearance-none bg-indigo-50 dark:bg-slate-700/60 hover:bg-indigo-100/80 text-indigo-700 dark:text-indigo-300 text-xs font-bold pl-3 pr-8 py-2 rounded-2xl border border-indigo-200/60 dark:border-slate-600 focus:outline-none cursor-pointer transition-colors"
-                            title="Cambiar semestre o periodo">
-                            <!-- Opciones adaptadas según institución -->
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-indigo-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </div>
 
                     <!-- Interruptor Rápido de Modo Oscuro / Claro (Header) -->
                     <button type="button" id="theme-toggle-btn"
@@ -197,20 +167,16 @@
             <div class="flex items-center justify-between pb-5 border-b border-slate-100 dark:border-slate-700/60">
                 <div class="flex items-center gap-3 min-w-0">
                     <div id="drawer-inst-logo" class="shrink-0 flex items-center justify-center">
-                        <!-- Logo institucional oficial en contenedor blanco -->
+                        <!-- Avatar o foto de perfil -->
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5 flex-wrap">
                             <h2 id="drawer-inst-name" class="text-sm font-black text-slate-900 dark:text-white truncate">
-                                UNAM
+                                Mi Organizador
                             </h2>
-                            <span id="drawer-inst-period" style="display:none" class="hidden text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                                1.º Semestre
-                            </span>
+                            <span id="drawer-inst-period" class="hidden text-xs font-bold text-indigo-600 dark:text-indigo-400"></span>
                         </div>
-                        <p id="drawer-inst-slogan" style="display:none" class="hidden text-[11px] text-slate-600 dark:text-slate-400 italic truncate">
-                            Por mi raza hablará el espíritu
-                        </p>
+                        <p id="drawer-inst-slogan" class="hidden text-[11px] text-slate-600 dark:text-slate-400 italic truncate"></p>
                         <div id="drawer-cycle-text" class="text-[10px] text-slate-600 dark:text-slate-300 font-mono mt-0.5">
                             <!-- Ciclo escolar -->
                         </div>
@@ -828,33 +794,47 @@
                     </p>
                 </div>
 
-                <!-- 1. Acordeón: Institución Educativa y Nivel / Semestre -->
+                <!-- 1. Acordeón: Perfil y Periodo -->
                 <div class="settings-accordion-card open rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800">
                     <button type="button" class="settings-accordion-header w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
                         <div class="flex items-center gap-3 min-w-0">
-                            <span class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg shrink-0">🎓</span>
+                            <span class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg shrink-0">👤</span>
                             <div class="min-w-0">
-                                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Institución Educativa y Periodo</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Escudos oficiales, grados lectivos y efecto dinámico.</p>
+                                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Perfil y Periodo</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Foto de perfil, nombre de estudiante y periodo manual.</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0 ml-2">
-                            <span id="settings-inst-badge-pill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hidden sm:inline">UNAM</span>
+                            <span id="settings-inst-badge-pill" class="hidden text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"></span>
                             <svg class="settings-accordion-chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </button>
                     <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-3 sm:p-5 space-y-3.5 bg-slate-50/40 dark:bg-slate-800/40">
-                        <!-- Tarjeta Activa -->
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 shadow-xs">
-                            <div id="settings-inst-logo-container" class="shrink-0 flex items-center justify-center"></div>
+                        <!-- Tarjeta de Perfil y Foto -->
+                        <div class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 shadow-xs flex-wrap sm:flex-nowrap">
+                            <div id="settings-inst-logo-container" class="shrink-0 flex items-center justify-center">
+                                <div id="settings-photo-placeholder" class="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-slate-700 flex items-center justify-center text-2xl leading-none select-none">👤</div>
+                                <img id="settings-photo-preview" class="hidden w-14 h-14 rounded-2xl object-cover border border-indigo-500/60 shadow-sm" alt="Foto de perfil">
+                            </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <h4 id="settings-inst-name" class="text-base font-black text-slate-900 dark:text-white">UNAM</h4>
-                                    <span id="settings-inst-type-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Semestral</span>
-                                    <span id="settings-inst-period-badge" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">1.º Semestre</span>
+                                    <h4 id="settings-inst-name" class="text-base font-black text-slate-900 dark:text-white truncate">Mi Organizador</h4>
+                                    <span id="settings-inst-period-badge" class="hidden text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400"></span>
                                 </div>
-                                <p id="settings-inst-fullname" class="text-xs text-slate-600 dark:text-slate-400 truncate mt-0.5">Universidad Nacional Autónoma de México</p>
-                                <p id="settings-inst-slogan" class="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold truncate">Estudiante</p>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Sube o cambia tu foto de perfil en cualquier momento (máx. 256×256 px).
+                                </p>
+                                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                    <input type="file" id="settings-photo-input" accept="image/*" class="hidden">
+                                    <button type="button" id="settings-photo-upload-btn"
+                                        class="tap-effect px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-colors">
+                                        Subir foto
+                                    </button>
+                                    <button type="button" id="settings-photo-clear-btn"
+                                        class="hidden tap-effect px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 font-bold text-xs transition-colors">
+                                        Quitar foto
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -872,68 +852,29 @@
                                 </button>
                             </div>
                             <p class="text-[10px] text-slate-500 dark:text-slate-400">
-                                Tu nombre sustituye los lemas escolares en toda la aplicación.
+                                Tu nombre se mostrará en el encabezado y en el menú lateral.
                             </p>
                         </div>
 
-                        <!-- Selector Rápido de Institución (con Filtro por País y Creador) -->
-                        <div id="settings-school-selector-block" class="hidden space-y-2.5 pt-1" style="display:none" aria-hidden="true">
-                            <div class="flex items-center justify-between flex-wrap gap-2">
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                    Selector de Casa de Estudios (con Escudo Oficial)
-                                </label>
-                                <button type="button" id="open-create-school-btn"
-                                    class="tap-effect inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                    <span>+ Crear Escuela</span>
-                                </button>
-                            </div>
-
-                            <!-- Píldoras de Filtro por País y Mis Escuelas -->
-                            <div id="settings-country-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar scroll-smooth">
-                                <!-- Generado por JS -->
-                            </div>
-
-                            <div id="settings-institution-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-96 overflow-y-auto pr-1"></div>
-                        </div>
-
-                        <!-- Semestre o Periodo con Botones Píldora -->
+                        <!-- Campo de texto libre para Semestre / Trimestre / Cuatrimestre / Periodo -->
                         <div class="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-700/60">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                Semestre o Periodo Lectivo Activo
+                            <label for="custom-period-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                Semestre, Trimestre o Periodo (Opcional)
                             </label>
-                            <div id="settings-period-pills" class="flex flex-wrap gap-2 pt-0.5"></div>
-                            <select id="settings-period-select" class="hidden"></select>
-
-                            <!-- Entrada manual de periodo personalizado -->
-                            <div class="pt-2">
-                                <label for="custom-period-input" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
-                                    ¿Tu grado o periodo no está en la lista? Escríbelo aquí (ej. 3.er Cuatrimestre, Módulo 2):
-                                </label>
-                                <div class="flex gap-2">
-                                    <input type="text" id="custom-period-input" placeholder="Ej: 3.er Cuatrimestre, Trimestre 5, Módulo 2..."
-                                        class="flex-1 px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
-                                    <button type="button" id="save-custom-period-btn"
-                                        class="tap-effect px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all">
-                                        Aplicar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Toggle de Efecto Dinámico al Tocar Logo (Alineado con settings-switch-row) -->
-                        <div class="settings-switch-row">
-                            <div class="settings-switch-label">
-                                <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Efecto dinámico al tocar logo institucional</span>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400">Al pulsar el escudo, se agranda hacia el centro mostrando lema y ciclo con resplandor temático.</span>
-                            </div>
-                            <div class="settings-switch-toggle">
-                                <label class="app-switch" for="settings-logo-expand-toggle">
-                                    <input type="checkbox" id="settings-logo-expand-toggle" checked>
-                                    <div class="app-switch-track">
-                                        <span class="app-switch-thumb"></span>
-                                    </div>
-                                </label>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                Escribe tu periodo actual (ej. 3.er Semestre, Cuatrimestre 2, Trimestre 5, Módulo 2). Déjalo vacío para ocultarlo de la cabecera.
+                            </p>
+                            <div class="flex gap-2">
+                                <input type="text" id="custom-period-input" placeholder="Ej: 3.er Semestre, Cuatrimestre 2, Trimestre 5..."
+                                    class="flex-1 px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                                <button type="button" id="save-custom-period-btn"
+                                    class="tap-effect px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all">
+                                    Guardar
+                                </button>
+                                <button type="button" id="clear-custom-period-btn"
+                                    class="hidden tap-effect px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all">
+                                    Limpiar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1335,7 +1276,7 @@
                 <div class="pt-4 border-t border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
                         <h4 class="text-xs font-bold text-slate-800 dark:text-white">Desarrollado con pasión para la comunidad estudiantil</h4>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Compatible con UNAM, IPN, UAM, CCH, ENP, CECyT y Bachilleratos.</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Organizador personal 100% offline para tus materias, tareas, notas y horarios.</p>
                     </div>
                     <a href="https://ko-fi.com/edrx_ngl" target="_blank" rel="noopener noreferrer" class="kofi-btn px-4 py-2.5 rounded-xl text-white font-bold text-xs flex items-center gap-2 shadow-md tap-effect" title="Apóyame en Ko-fi invitándome un café">
                         <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M2 3h16v8a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V3zm16 2v4a3 3 0 0 0 3-3V6a1 1 0 0 0-1-1h-2zM4 19h14v2H4v-2z"/><path d="M9.5 7.5a1.5 1.5 0 0 0-2.12 0 1.5 1.5 0 0 0 0 2.12L9.5 11.74l2.12-2.12a1.5 1.5 0 0 0 0-2.12 1.5 1.5 0 0 0-2.12 0l-.5.5-.5-.5z"/></svg>
@@ -1384,17 +1325,17 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.4.4 -->
+                <!-- VERSIÓN HASTA ABAJO v1.5.0 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.4.4 🐦</span>
+                        <span>Versión 1.5.0</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.4.4</span>
+                        <span>✨ Ver novedades de la versión 1.5.0</span>
                     </button>
                 </div>
             </div>
@@ -1433,7 +1374,7 @@
                 </div>
                 <div class="flex items-center justify-between text-[11px] text-purple-700 dark:text-purple-300">
                     <span id="vault-next-unlock-text">Completa tareas para desbloquear el próximo código</span>
-                    <span id="vault-unlocked-count-text" class="hidden font-mono font-bold">0 / 14</span>
+                    <span id="vault-unlocked-count-text" class="hidden font-mono font-bold">0 / 13</span>
                 </div>
                 <p id="vault-secret-notice" class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-purple-100 dark:border-purple-900/50 pt-1.5">
                     Cumple 5 tareas y se te dará un código
@@ -1497,7 +1438,6 @@
             </div>
 
             <!-- Proxies ocultos para compatibilidad con suites de pruebas heredadas -->
-            <input type="checkbox" id="settings-cats-toggle" style="display:none;" aria-hidden="true">
             <input type="checkbox" id="settings-gray-mode-toggle" style="display:none;" aria-hidden="true">
             <button type="button" id="vault-verify-btn" style="display:none;" aria-hidden="true"></button>
 
@@ -1510,24 +1450,8 @@
                     </h3>
                 </div>
                 <div class="space-y-3">
-                    <!-- Gatitos -->
-                    <div class="flex items-center justify-between gap-3">
-                        <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                                <span>🐾</span> Efecto Gatitos
-                            </span>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
-                                Añade pequeños gatitos interactivos en los botones de acción rápida.
-                            </p>
-                        </div>
-                        <button type="button" id="settings-cats-btn"
-                            class="tap-effect shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50">
-                            Activar
-                        </button>
-                    </div>
-
                     <!-- Modo Monocromático / Escala de Grises -->
-                    <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between gap-3">
                         <div class="min-w-0">
                             <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                                 <span>🔲</span> Modo Monocromático
@@ -2056,232 +1980,6 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- MODAL CONSTRUCTOR DE ESCUELA PERSONALIZADA               -->
-    <!-- ========================================================= -->
-    <div id="custom-school-modal" class="modal-overlay fixed inset-0 z-[60] hidden items-center justify-center p-4">
-        <div id="custom-school-backdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"></div>
-
-        <div class="modal-dialog relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
-            <!-- Encabezado del modal -->
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                <div class="flex items-center gap-3">
-                    <span class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl shrink-0">
-                        🎨
-                    </span>
-                    <div>
-                        <h2 id="custom-school-modal-title" class="text-base font-black text-slate-900 dark:text-white">
-                            Constructor de Escuela Personalizada
-                        </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">
-                            Crea o edita la identidad de tu institución escolar.
-                        </p>
-                    </div>
-                </div>
-                <button type="button" id="custom-school-close-btn" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 tap-effect">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-
-            <!-- Formulario de la escuela -->
-            <form id="custom-school-form" class="space-y-4">
-                <input type="hidden" id="custom-school-id" value="">
-
-                <!-- 1. Nombre Corto y Siglas -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label for="custom-school-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                            Nombre Corto / Siglas *
-                        </label>
-                        <input type="text" id="custom-school-name" required placeholder="Ej: ITSON, TecMilenio..."
-                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label for="custom-school-shortbadge" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                            Insignia (Badge) *
-                        </label>
-                        <input type="text" id="custom-school-shortbadge" required placeholder="Ej: ITSON" maxlength="10"
-                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                </div>
-
-                <!-- 2. Nombre Completo -->
-                <div>
-                    <label for="custom-school-fullname" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                        Nombre Completo Oficial *
-                    </label>
-                    <input type="text" id="custom-school-fullname" required placeholder="Ej: Instituto Tecnológico de Sonora"
-                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
-                </div>
-
-                <!-- 3. Lema o Slogan -->
-                <div>
-                    <label for="custom-school-slogan" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                        Lema o Slogan Institucional
-                    </label>
-                    <input type="text" id="custom-school-slogan" placeholder="Ej: Educar para Trascender"
-                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
-                </div>
-
-                <!-- 4. País y Sistema Académico -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label for="custom-school-country" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                            País *
-                        </label>
-                        <select id="custom-school-country" required
-                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
-                            <!-- Opciones inyectadas por JS -->
-                        </select>
-                    </div>
-                    <div>
-                        <label for="custom-school-system" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                            Sistema Académico *
-                        </label>
-                        <select id="custom-school-system" required
-                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer">
-                            <option value="Semestral">Semestral (10 Semestres)</option>
-                            <option value="Cuatrimestral">Cuatrimestral (10 Cuatrimestres)</option>
-                            <option value="Trimestral">Trimestral (12 Trimestres)</option>
-                            <option value="Anual">Anual (5 Años)</option>
-                            <option value="Modular">Modular (8 Módulos)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- 5. Color Institucional Principal con Paleta Rápida -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-                        Color Institucional y Resplandor *
-                    </label>
-                    <div class="flex items-center gap-3">
-                        <input type="color" id="custom-school-color" value="#4F46E5"
-                            class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer p-0.5 bg-white">
-                        <div id="custom-school-color-presets" class="flex flex-wrap gap-1.5 items-center">
-                            <!-- Botones preset de color -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6. Logo / Escudo (Subida con Downsampling Canvas) -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-                        Escudo o Logo Oficial (PNG, JPG, SVG)
-                    </label>
-                    <div class="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-                        <div id="custom-school-logo-preview" class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center p-1 overflow-hidden shrink-0">
-                            <!-- Preview de imagen -->
-                            <span class="text-2xl text-slate-400">🏫</span>
-                        </div>
-                        <div class="flex-1 min-w-0 space-y-1">
-                            <input type="file" id="custom-school-logo-input" accept="image/png, image/jpeg, image/svg+xml, image/webp"
-                                class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500">
-                                Se optimiza automáticamente en el navegador a máximo 256×256 px (&lt;30 KB).
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Canvas oculto para downsampling -->
-                    <canvas id="custom-school-canvas" class="hidden"></canvas>
-                </div>
-
-                <!-- Botones de Acción -->
-                <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 gap-2">
-                    <button type="button" id="custom-school-delete-btn" class="hidden py-2.5 px-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 font-bold text-xs tap-effect transition-all flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        <span>Eliminar</span>
-                    </button>
-                    <div class="flex items-center gap-2 ml-auto">
-                        <button type="button" id="custom-school-cancel-btn" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs tap-effect transition-all">
-                            Cancelar
-                        </button>
-                        <button type="submit" id="custom-school-save-btn" class="py-2.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 tap-effect transition-all flex items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            <span>Guardar Escuela</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- MODAL DE IDENTIDAD INSTITUCIONAL (LOGO DINÁMICO ZOOM & GLOW) -->
-    <!-- ========================================================= -->
-    <div id="school-identity-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div id="school-identity-backdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"></div>
-        
-        <div id="school-identity-card"
-            class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 sm:p-8 flex flex-col items-center text-center overflow-hidden transition-all duration-300">
-            
-            <!-- Botón cerrar superior -->
-            <button type="button" id="close-school-identity-btn"
-                class="absolute top-4 right-4 p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 tap-effect transition-colors z-20"
-                aria-label="Cerrar ventana">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-
-            <!-- Resplandor dinámico irradiando detrás del escudo -->
-            <div id="school-identity-glow"
-                class="absolute top-10 w-44 h-44 rounded-full blur-3xl opacity-50 pointer-events-none transition-all duration-500"></div>
-
-            <!-- Escudo institucional ampliado en marco blanco con sombra -->
-            <div id="school-identity-logo-wrapper"
-                class="relative z-10 w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-white p-3 shadow-2xl ring-4 ring-white/80 dark:ring-slate-700/80 flex items-center justify-center transition-all">
-                <div id="school-identity-logo-content" class="w-full h-full flex items-center justify-center">
-                    <!-- Escudo inyectado dinámicamente -->
-                </div>
-            </div>
-
-            <!-- Nombre e Información de la Institución -->
-            <div class="relative z-10 mt-5 space-y-1.5 w-full">
-                <span id="school-identity-system-badge"
-                    class="inline-block text-[11px] font-black uppercase tracking-wider px-3 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                    Semestral
-                </span>
-                <h2 id="school-identity-name" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                    UNAM
-                </h2>
-                <p id="school-identity-fullname" class="text-xs text-slate-600 dark:text-slate-400 font-semibold max-w-xs mx-auto">
-                    Universidad Nacional Autónoma de México
-                </p>
-            </div>
-
-            <!-- Lema / Eslogan Institucional -->
-            <div class="relative z-10 my-4 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60 w-full">
-                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-                    Nombre o Apodo
-                </span>
-                <p id="school-identity-slogan" class="text-sm font-bold italic text-indigo-600 dark:text-indigo-400">
-                    "Por mi raza hablará el espíritu"
-                </p>
-            </div>
-
-            <!-- Ciclo Escolar Activo -->
-            <div class="relative z-10 w-full p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between text-left">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
-                        📅 Ciclo Escolar Activo
-                    </span>
-                    <span id="school-identity-cycle-dates" class="text-xs font-extrabold text-slate-900 dark:text-white font-mono">
-                        2026-08-10 al 2026-12-18
-                    </span>
-                </div>
-                <span id="school-identity-cycle-badge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-xs">
-                    Vigente
-                </span>
-            </div>
-
-            <!-- Botón de Cierre -->
-            <button type="button" id="school-identity-action-btn"
-                class="relative z-10 mt-5 w-full py-3 px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-black tap-effect transition-all shadow-md">
-                Entendido
-            </button>
-        </div>
-    </div>
-
-    <!-- ========================================================= -->
     <!-- MODAL DE BIENVENIDA Y CONFIGURACIÓN INICIAL (ONBOARDING)  -->
     <!-- ========================================================= -->
     <div id="cycle-setup-modal" class="modal-overlay fixed inset-0 w-full bg-slate-900 dark:bg-slate-950 text-white z-50 overflow-y-auto hidden flex-col justify-start" style="height:100dvh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain">
@@ -2307,66 +2005,21 @@
                 Personaliza tu perfil y delimita tus fechas para comenzar:
             </p>
 
-            <!-- Compatibilidad con tests heredados (elementos vacíos ocultos) -->
-            <div id="welcome-country-grid" class="hidden"></div>
-            <div id="welcome-schools-grid" class="hidden"></div>
-            <div id="welcome-country-pills" class="hidden"></div>
-            <button type="button" id="welcome-create-school-btn" class="hidden" aria-hidden="true"></button>
-            <div id="welcome-schools-section" class="hidden"></div>
-            <div id="welcome-selected-school-box" class="hidden"></div>
-            <div id="welcome-period-container" class="hidden"></div>
-            <div id="welcome-period-chips" class="hidden"></div>
-            <span id="welcome-selected-period-badge" class="hidden"></span>
-
             <form id="cycle-setup-welcome-form" class="space-y-5 pt-1">
-                <!-- 1. Selección de modalidad: oculta hasta la reestructuración (ver docs/REESTRUCTURACION_FUTURA.md) -->
-                <div class="hidden space-y-2" style="display:none" aria-hidden="true">
-                    <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
-                        1. Selecciona tu Modalidad *
-                    </label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <!-- Rama 1: Institución -->
-                        <div id="welcome-type-institution" data-type="institution" role="button" tabindex="0"
-                            class="tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-indigo-500 bg-indigo-500/10 text-white shadow-lg shadow-indigo-950/40">
-                            <div class="flex items-center justify-between">
-                                <span class="text-2xl select-none">🏛️</span>
-                                <span class="welcome-type-check text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-500 text-white">✓ Activo</span>
-                            </div>
-                            <div>
-                                <h3 class="text-xs font-black uppercase tracking-wide">Institución</h3>
-                                <p class="text-[11px] text-slate-300">Escuela, preparatoria o universidad con materias y semestres.</p>
-                            </div>
-                        </div>
-
-                        <!-- Rama 2: Organizador de Actividades -->
-                        <div id="welcome-type-activities" data-type="activities" role="button" tabindex="0"
-                            class="tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-slate-700 bg-slate-800/60 text-slate-400 hover:border-slate-600">
-                            <div class="flex items-center justify-between">
-                                <span class="text-2xl select-none">📋</span>
-                                <span class="welcome-type-check text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-700 text-slate-400 hidden">✓ Activo</span>
-                            </div>
-                            <div>
-                                <h3 class="text-xs font-black uppercase tracking-wide">Organizador de actividades</h3>
-                                <p class="text-[11px] text-slate-400">Tareas personales, proyectos, hábitos y agenda diaria.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Nombre de Usuario o Identidad -->
+                <!-- 1. Nombre de Usuario o Identidad -->
                 <div class="space-y-1.5">
                     <label for="welcome-user-name" class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
                         Tu Nombre o Apodo Estudiantil *
                     </label>
                     <input type="text" id="welcome-user-name" required placeholder="Ej: Sofía Ramírez, Alex, Carlos..."
                         class="w-full px-3.5 py-3 bg-slate-800/80 border border-slate-700 rounded-2xl text-xs sm:text-sm font-bold text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 transition-all">
-                    <p class="text-[10px] text-slate-400">Tu nombre se mostrará en el encabezado y menú principal en lugar de lemas escolares genéricos.</p>
+                    <p class="text-[10px] text-slate-400">Tu nombre se mostrará en el encabezado y menú principal para personalizar tu experiencia.</p>
                 </div>
 
-                <!-- 3. Foto de Perfil o Logo Institucional (Canvas Downsampling) -->
+                <!-- 2. Foto de Perfil (Canvas Downsampling) -->
                 <div class="space-y-2">
                     <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
-                        Foto de Perfil o Logo (Opcional)
+                        Foto de Perfil (Opcional)
                     </label>
                     <div class="flex items-center gap-3.5">
                         <div class="relative shrink-0">
@@ -2380,7 +2033,7 @@
                             <input type="file" id="welcome-photo-input" accept="image/*"
                                 class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer cursor-pointer">
                             <div class="flex items-center gap-2">
-                                <span class="text-[10px] text-slate-400">Compresión automática a máx 256×256 px (&lt; 30 KB)</span>
+                                <span class="text-[10px] text-slate-400">Compresión automática a máx 256×256 px (&lt; 30 KB). También puedes subirla o cambiarla en Configuraciones.</span>
                                 <button type="button" id="welcome-photo-clear-btn" class="hidden text-[11px] font-bold text-rose-400 hover:text-rose-300 transition-colors">
                                     ✕ Quitar
                                 </button>
@@ -2542,7 +2195,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.4.4                     -->
+    <!-- MODAL DE NOVEDADES DE LA VERSIÓN 1.5.0                     -->
     <!-- ========================================================= -->
     <div id="changelog-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
         <div id="changelog-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
@@ -2556,24 +2209,15 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                            Novedades de la Versión 1.4.4 🐦
+                            Novedades de la Versión 1.5.0
                         </h2>
                         <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                            v1.4.4 🐦
+                            v1.5.0
                         </span>
                     </div>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
-                        ¡Descubre las mejoras de diseño y optimizaciones de esta versión!
+                        ¡Descubre las mejoras de estabilidad, perfil y calidad de esta versión!
                     </p>
-                </div>
-            </div>
-
-            <!-- Aviso temporal v1.4.4 (borrar después de 1.4.4: ver docs/BORRAR_AVISO_INESTABILIDAD_1.4.4.md) -->
-            <div id="changelog-instability-notice" class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/80 flex gap-3">
-                <span class="text-xl shrink-0 select-none">⚠️</span>
-                <div class="text-xs text-amber-950 dark:text-amber-100 leading-relaxed">
-                    <strong class="block font-extrabold">Aviso importante: versión 1.4.4 en desarrollo</strong>
-                    La app sigue en desarrollo, no es estable y todavía contiene varios errores. Te invitamos a probar la versión <strong>1.5.0</strong> dentro de unos <strong>5 días</strong>.
                 </div>
             </div>
 
@@ -2582,89 +2226,39 @@
                 <div class="p-3 rounded-2xl bg-teal-50/60 dark:bg-teal-950/30 border border-teal-100 dark:border-teal-900/50 flex gap-3">
                     <span class="text-xl shrink-0 select-none">🧹</span>
                     <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Inicio Más Limpio y Centrado</h4>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Experiencia Más Ligera y Directa</h4>
                         <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            Bienvenida con textos y emojis centrados, sin panel de control inicial ni logos de escuela automáticos. Tu nombre y tu foto son ahora la identidad de la app.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded-2xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">🛠️</span>
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Corrección en la Primera Apertura</h4>
-                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            La pantalla de bienvenida ahora se desplaza por completo y permite llegar a todos los botones inferiores.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">🙋</span>
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Tu Nombre en Lugar del Lema</h4>
-                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            La tarjeta de identidad muestra tu nombre o apodo en lugar del lema oficial. Además, el diseño de los botones de personalización es ahora uniforme.
+                            Se eliminaron módulos obsoletos y listas heredadas para ofrecer una interfaz más rápida, enfocada en tu nombre y foto de perfil.
                         </p>
                     </div>
                 </div>
 
                 <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">🎓</span>
+                    <span class="text-xl shrink-0 select-none">✏️</span>
                     <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Identidad Estudiantil e Institucional Renovada</h4>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Periodo Manual con Texto Libre</h4>
                         <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            Diseño perfeccionado para la insignia escolar, nombre personalizado del estudiante y lema institucional en el encabezado y menú lateral.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">📱</span>
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Configuración a Pantalla Completa</h4>
-                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            Panel de configuración optimizado que aprovecha todo el espacio disponible en dispositivos móviles y tabletas sin elementos superpuestos.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">👆</span>
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Menú Contextual Dinámico</h4>
-                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            Acceso inmediato mediante pulsación prolongada para editar o eliminar materias, tareas y notas de manera rápida y fluida.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">🔤</span>
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Selector Tipográfico Continuo</h4>
-                        <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            Visualización homogénea y selección instantánea de familias tipográficas adaptadas a la lectura académica prolongada.
+                            Escribe libremente tu semestre, trimestre, cuatrimestre o módulo desde Configuraciones. Si lo dejas vacío, se oculta automáticamente de la cabecera.
                         </p>
                     </div>
                 </div>
 
                 <div class="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">📚</span>
+                    <span class="text-xl shrink-0 select-none">📸</span>
                     <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Galería de Materiales y Notas Privadas</h4>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Fotos en Notas con Alta Nitidez</h4>
                         <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            Visualizador enriquecido de apuntes, notas y archivos adjuntos con mayor contraste y legibilidad tanto en modo claro como oscuro.
+                            Las imágenes adjuntas en Notas conservan mayor resolución (hasta 1600 px) y calidad (88%), con aviso claro si se llena el almacenamiento local.
                         </p>
                     </div>
                 </div>
 
-                <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex gap-3">
-                    <span class="text-xl shrink-0 select-none">🛠️</span>
+                <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3">
+                    <span class="text-xl shrink-0 select-none">👤</span>
                     <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Correcciones Mayores de Diseño</h4>
+                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">Foto de Perfil Editable en Configuraciones</h4>
                         <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                            Ajustes finos de contraste visual WCAG AA, bordes redondeados consistentes y optimización en transiciones de navegación.
+                            Ahora puedes subir, cambiar o quitar tu foto de perfil en cualquier momento desde Configuraciones, incluso si la omitiste en la bienvenida.
                         </p>
                     </div>
                 </div>
@@ -2681,34 +2275,17 @@
         </div>
     </div>
 
-    <!-- AVISO TEMPORAL DE INESTABILIDAD 1.4.4 (BORRAR DESPUÉS DE 1.4.4: docs/BORRAR_AVISO_INESTABILIDAD_1.4.4.md) -->
-    <div id="dev-instability-modal" class="fixed inset-0 z-[65] hidden items-center justify-center p-4" style="display:none">
-        <div id="dev-instability-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-xs"></div>
-        <div class="modal-dialog dynamic-popup-in relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-amber-300 dark:border-amber-700/80 p-6 space-y-4 text-center">
-            <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl mx-auto select-none">⚠️</div>
-            <h3 class="text-base font-black text-slate-900 dark:text-white">Versión 1.4.4 en desarrollo</h3>
-            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Esta aplicación sigue en desarrollo, <strong>no es estable</strong> y aún contiene varios errores.<br><br>
-                Te invitamos a probar la versión <strong>1.5.0</strong> dentro de unos <strong>5 días</strong>.
-            </p>
-            <button type="button" id="dev-instability-close-btn" class="tap-effect w-full py-2.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md">
-                Entendido
-            </button>
-        </div>
-    </div>
-
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/institutions.js?v=1.4.4"></script>
-    <script src="js/storage.js?v=1.4.4"></script>
-    <script src="js/haptics.js?v=1.4.4"></script>
-    <script src="js/notifications.js?v=1.4.4"></script>
-    <script src="js/widgets.js?v=1.4.4"></script>
-    <script src="js/subjects.js?v=1.4.4"></script>
-    <script src="js/tasks.js?v=1.4.4"></script>
-    <script src="js/notes.js?v=1.4.4"></script>
-    <script src="js/calendar.js?v=1.4.4"></script>
-    <script src="js/archive.js?v=1.4.4"></script>
-    <script src="js/app.js?v=1.4.4"></script>
+    <script src="js/storage.js?v=1.5.0"></script>
+    <script src="js/haptics.js?v=1.5.0"></script>
+    <script src="js/notifications.js?v=1.5.0"></script>
+    <script src="js/widgets.js?v=1.5.0"></script>
+    <script src="js/subjects.js?v=1.5.0"></script>
+    <script src="js/tasks.js?v=1.5.0"></script>
+    <script src="js/notes.js?v=1.5.0"></script>
+    <script src="js/calendar.js?v=1.5.0"></script>
+    <script src="js/archive.js?v=1.5.0"></script>
+    <script src="js/app.js?v=1.5.0"></script>
 
     <!-- Visor de fotos de la galería -->
     <div id="photo-preview-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">

@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-11T05:39:20.791Z",
-  "version": "1.4.4",
+  "timestamp": "2026-11-14T07:12:54.787Z",
+  "version": "1.5.0",
   "total": 212,
   "passed": 212,
   "failed": 0,
   "skipped": 0,
-  "durationMs": 13233,
+  "durationMs": 10930,
   "tiers": {
     "tier1": {
       "name": "Tier 1: Feature Coverage (Equivalence Classes)",
@@ -42,10 +42,10 @@
     {
       "tier": 1,
       "id": "T1_F01_01_package_json_version",
-      "name": "package.json specifies version 1.4.4",
+      "name": "package.json specifies version 1.5.0",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -54,22 +54,22 @@
       "name": "index.html asset tags include versioned query parameter",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 2,
-      "error": null
-    },
-    {
-      "tier": 1,
-      "id": "T1_F01_03_settings_version_badge",
-      "name": "Settings view contains version indicator with target 1.4.x version",
-      "feature": "F01",
-      "status": "PASS",
       "durationMs": 1,
       "error": null
     },
     {
       "tier": 1,
+      "id": "T1_F01_03_settings_version_badge",
+      "name": "Settings view contains version indicator with target 1.5.0 version",
+      "feature": "F01",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
       "id": "T1_F01_04_sw_cache_name_and_assets",
-      "name": "sw.js specifies v1.4.x cache identifier",
+      "name": "sw.js specifies v1.5.0 cache identifier",
       "feature": "F01",
       "status": "PASS",
       "durationMs": 1,
@@ -90,7 +90,7 @@
       "name": "Vault inventory cards outer wrapper does not have truncate class",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -99,7 +99,7 @@
       "name": "Active font card uses concise button label without overflow",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -131,8 +131,8 @@
     },
     {
       "tier": 1,
-      "id": "T1_F03_01_cats_control_is_standard_button",
-      "name": "Cats effect control is a standard button matching app controls",
+      "id": "T1_F03_01_cats_control_removed",
+      "name": "Obsolete cats effect control and storage getter are completely removed",
       "feature": "F03",
       "status": "PASS",
       "durationMs": 1,
@@ -158,11 +158,11 @@
     },
     {
       "tier": 1,
-      "id": "T1_F03_04_cats_button_toggle_interaction",
-      "name": "Clicking cats button toggles cat effect on/off and updates text",
+      "id": "T1_F03_04_gray_mode_button_updates_text_and_theme_gray_class",
+      "name": "Clicking gray mode button toggles theme-gray class and updates button label",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -171,7 +171,7 @@
       "name": "Clicking gray mode button toggles monochrome state on/off",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 12,
       "error": null
     },
     {
@@ -180,7 +180,7 @@
       "name": "Vault notice informs user that completing 5 tasks gives a code",
       "feature": "F04",
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -189,7 +189,7 @@
       "name": "Vault notice does NOT disclose EDUARDO confidential code",
       "feature": "F04",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -213,10 +213,10 @@
     {
       "tier": 1,
       "id": "T1_F04_05_no_fraction_count_badge",
-      "name": "Notice does not display fraction count badges like \"14 / 14\"",
+      "name": "Notice does not display fraction count badges like \"13 / 13\"",
       "feature": "F04",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -225,7 +225,7 @@
       "name": "Empty state does not use dark translucency (bg-black/40) in light mode",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -243,7 +243,7 @@
       "name": "Unlocked card titles have dark high-contrast color in light mode",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -252,7 +252,7 @@
       "name": "Category badges have distinct styling and readable contrast in light mode",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -261,7 +261,7 @@
       "name": "Switching between dark and light mode dynamically updates vault contrast classes",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -270,7 +270,7 @@
       "name": "Single continuous code input field exists in vault terminal",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -279,7 +279,7 @@
       "name": "Entering a full code continuously unlocks secret protocol",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -297,7 +297,7 @@
       "name": "Input normalizes lowercase text to uppercase automatically",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -324,7 +324,7 @@
       "name": "manifest.json name suppresses bottom splash text title",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -333,7 +333,7 @@
       "name": "manifest.webmanifest mirrors splash suppression properties",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -360,13 +360,22 @@
       "name": "Onboarding setup modal has full-screen layout classes",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
       "tier": 1,
-      "id": "T1_F08_02_institution_option_present",
-      "name": "Onboarding presents Institution selection option",
+      "id": "T1_F08_02_obsolete_account_type_cards_removed",
+      "name": "Obsolete Institution and Activities selection cards are removed from onboarding",
+      "feature": "F08",
+      "status": "PASS",
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "tier": 1,
+      "id": "T1_F08_03_onboarding_core_inputs_present",
+      "name": "Onboarding presents user name, photo upload, and cycle date inputs",
       "feature": "F08",
       "status": "PASS",
       "durationMs": 1,
@@ -374,26 +383,17 @@
     },
     {
       "tier": 1,
-      "id": "T1_F08_03_activities_option_present",
-      "name": "Onboarding presents Activities Organizer selection option",
+      "id": "T1_F08_04_onboarding_allows_skipping_photo",
+      "name": "User can complete onboarding cleanly without uploading a profile photo",
       "feature": "F08",
       "status": "PASS",
       "durationMs": 1,
-      "error": null
-    },
-    {
-      "tier": 1,
-      "id": "T1_F08_04_account_type_selection_toggle",
-      "name": "Selecting between Institution and Activities toggles selection state",
-      "feature": "F08",
-      "status": "PASS",
-      "durationMs": 3,
       "error": null
     },
     {
       "tier": 1,
       "id": "T1_F08_05_account_type_persistence",
-      "name": "StorageModule persists and retrieves account type",
+      "name": "StorageModule persists and retrieves account type fallback cleanly",
       "feature": "F08",
       "status": "PASS",
       "durationMs": 1,
@@ -401,20 +401,20 @@
     },
     {
       "tier": 1,
-      "id": "T1_F09_01_no_countries_catalog_in_onboarding",
-      "name": "Onboarding DOM does not render country selection grid",
+      "id": "T1_F09_01_no_schools_or_countries_catalog_in_dom",
+      "name": "Obsolete countries, predefined schools, and school modals are removed from DOM",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
       "tier": 1,
-      "id": "T1_F09_02_no_predefined_schools_grid",
-      "name": "Onboarding DOM does not render predefined schools grid",
+      "id": "T1_F09_02_manual_period_free_text_and_header_hide_when_empty",
+      "name": "Free-text period updates header label and hides label when empty",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -429,7 +429,7 @@
     {
       "tier": 1,
       "id": "T1_F09_04_user_name_replaces_slogan_in_header",
-      "name": "User name is saved and rendered where slogan was previously displayed",
+      "name": "User name is saved and rendered in header",
       "feature": "F09",
       "status": "PASS",
       "durationMs": 2,
@@ -441,13 +441,13 @@
       "name": "Academic/activity cycle start and end date inputs are present",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
       "tier": 1,
       "id": "T1_F10_01_photo_input_accepts_images",
-      "name": "Photo file input exists and specifies accept=\"image/*\"",
+      "name": "Photo file inputs in onboarding and settings accept image files",
       "feature": "F10",
       "status": "PASS",
       "durationMs": 1,
@@ -455,17 +455,17 @@
     },
     {
       "tier": 1,
-      "id": "T1_F10_02_photo_preview_container",
-      "name": "Photo preview element exists in onboarding DOM",
+      "id": "T1_F10_02_photo_preview_and_settings_buttons_exist",
+      "name": "Photo preview and Settings upload/clear controls exist in DOM",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
       "tier": 1,
       "id": "T1_F10_03_canvas_downsample_dimensions",
-      "name": "Downsampling function constraints image dimensions to <= 256x256",
+      "name": "Downsampling function constrains profile photo dimensions to <= 256x256",
       "feature": "F10",
       "status": "PASS",
       "durationMs": 4,
@@ -473,11 +473,11 @@
     },
     {
       "tier": 1,
-      "id": "T1_F10_04_downsampled_data_size_under_30kb",
-      "name": "Downsampled image data URL size is strictly less than 30KB",
+      "id": "T1_F10_04_settings_photo_upload_even_if_skipped_at_onboarding",
+      "name": "Profile photo can be uploaded, changed, and cleared from Settings even if skipped initially",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 246,
       "error": null
     },
     {
@@ -486,7 +486,7 @@
       "name": "StorageModule persists user photo and renders in header logo",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 8,
       "error": null
     },
     {
@@ -495,7 +495,7 @@
       "name": "On fresh install onboarding setup modal is displayed first",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -504,7 +504,7 @@
       "name": "Changelog modal is suppressed before onboarding registration completes",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -513,7 +513,7 @@
       "name": "Notification permission is NOT requested prior to completing onboarding",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -531,7 +531,7 @@
       "name": "Subsequent visits with completed onboarding bypass onboarding modal",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -540,7 +540,7 @@
       "name": "Celebration progress bar element exists in onboarding DOM",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -549,7 +549,7 @@
       "name": "Progress bar supports transition from 0% to 100%",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -567,7 +567,7 @@
       "name": "Celebration container includes congratulatory emojis",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -576,7 +576,7 @@
       "name": "Completing celebration transitions to dashboard view",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -585,7 +585,7 @@
       "name": "Expanding a settings accordion adds .open class to the card",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 37,
+      "durationMs": 16,
       "error": null
     },
     {
@@ -612,7 +612,7 @@
       "name": "Navigating via bottom navigation bar triggers settings submenu auto-close",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 19,
+      "durationMs": 21,
       "error": null
     },
     {
@@ -639,7 +639,7 @@
       "name": "Clicking a font button does NOT close or collapse appearance accordion card",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 462,
+      "durationMs": 463,
       "error": null
     },
     {
@@ -648,7 +648,7 @@
       "name": "Auditioning 3 different fonts sequentially keeps accordion card open throughout",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 165,
+      "durationMs": 175,
       "error": null
     },
     {
@@ -657,7 +657,7 @@
       "name": "The currently active font button receives active visual indicator",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 21,
+      "durationMs": 29,
       "error": null
     },
     {
@@ -684,7 +684,7 @@
       "name": "StorageModule.isLongPressEnabled defaults to true",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -693,7 +693,7 @@
       "name": "Toggling long-press setting persists new boolean value in StorageModule",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -702,7 +702,7 @@
       "name": "When long-press is disabled, cards render visible static action buttons",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -711,7 +711,7 @@
       "name": "When long-press is enabled, static action buttons are hidden",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -720,7 +720,7 @@
       "name": "Long-press on a subject card triggers dynamic configuration popup",
       "feature": "F16",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -738,7 +738,7 @@
       "name": "Dynamic popup employs bouncy or spring CSS animation",
       "feature": "F16",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -765,7 +765,7 @@
       "name": "Left photo gallery panel exists in notes view DOM",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 8,
       "error": null
     },
     {
@@ -774,7 +774,7 @@
       "name": "Gallery photo upload input accepts image files",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -788,11 +788,11 @@
     },
     {
       "tier": 1,
-      "id": "T1_F17_04_gallery_photo_canvas_downsample",
-      "name": "Gallery photo downsampling maintains size under 30KB",
+      "id": "T1_F17_04_gallery_photo_high_res_and_quota_guard",
+      "name": "Gallery photo preserves MAX_DIM=1600 quality>=0.85 and warns cleanly on localStorage quota overflow",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -810,7 +810,7 @@
       "name": "Note modal contains password protection toggle/checkbox",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -819,7 +819,7 @@
       "name": "Saving a private note persists hasPassword: true in note data",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -828,7 +828,7 @@
       "name": "Protected note card masks content and displays lock indicator",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 10,
+      "durationMs": 11,
       "error": null
     },
     {
@@ -837,7 +837,7 @@
       "name": "Clicking locked note card displays PIN unlock modal",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -846,7 +846,7 @@
       "name": "Entering correct PIN unlocks note and reveals plaintext content",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -873,7 +873,7 @@
       "name": "Dismissing changelog modal records target version in LocalStorage",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -882,7 +882,7 @@
       "name": "sw.js contains zero references to obsolete versions like v=1.3.5 or v=1.3.1",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 0,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -891,7 +891,7 @@
       "name": "Changelog modal renders safely without executing dynamic script tags",
       "feature": "F01",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 8,
       "error": null
     },
     {
@@ -909,7 +909,7 @@
       "name": "Card with very long protocol title does not overlap action buttons",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -927,7 +927,7 @@
       "name": "Rapidly toggling a protocol button 10 times consecutively maintains button label consistency",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 260,
+      "durationMs": 286,
       "error": null
     },
     {
@@ -936,16 +936,16 @@
       "name": "Vault inventory rendering handles missing or arbitrary code IDs without throwing error",
       "feature": "F02",
       "status": "PASS",
-      "durationMs": 12,
+      "durationMs": 13,
       "error": null
     },
     {
       "tier": 2,
-      "id": "T2_F03_01_cats_button_rapid_jitter_clicks",
-      "name": "Clicking cats button 25 times in rapid succession does not crash or corrupt state",
+      "id": "T2_F03_01_cats_completely_removed_and_gray_ready",
+      "name": "Obsolete cats control is absent while gray-mode button handles 25 rapid clicks",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 38,
       "error": null
     },
     {
@@ -954,34 +954,34 @@
       "name": "Clicking gray mode button 25 times in rapid succession maintains deterministic state",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 35,
+      "durationMs": 69,
       "error": null
     },
     {
       "tier": 2,
-      "id": "T2_F03_03_both_buttons_active_simultaneously",
-      "name": "Activating both cats and gray mode simultaneously operates safely without interference",
+      "id": "T2_F03_03_gray_mode_coexists_with_dark_and_light",
+      "name": "Monochrome mode operates safely alongside dark and light modes",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 73,
+      "durationMs": 22,
       "error": null
     },
     {
       "tier": 2,
       "id": "T2_F03_04_reload_persistence_under_active_controls",
-      "name": "Active state of standard buttons persists across page reload",
+      "name": "Active state of monochrome control persists across page reload",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 213,
+      "durationMs": 157,
       "error": null
     },
     {
       "tier": 2,
       "id": "T2_F03_05_deactivation_cleans_dom_side_effects",
-      "name": "Deactivating gray mode completely cleans grayscale filter from DOM",
+      "name": "Deactivating gray mode completely cleans theme-gray class from DOM",
       "feature": "F03",
       "status": "PASS",
-      "durationMs": 12,
+      "durationMs": 19,
       "error": null
     },
     {
@@ -1008,7 +1008,7 @@
       "name": "Completing exactly 5 tasks triggers automatic unlock of a pool code in StorageModule",
       "feature": "F04",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1044,7 +1044,7 @@
       "name": "System preference light mode override maintains light background on vault inventory",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1053,7 +1053,7 @@
       "name": "Card category badge in light mode has distinct border and background",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -1062,7 +1062,7 @@
       "name": "Hovering over action buttons in light mode maintains contrast without washing out text",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1071,7 +1071,7 @@
       "name": "Unlocking first code transitions smoothly from empty state to filled grid",
       "feature": "F05",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -1116,7 +1116,7 @@
       "name": "Submitting empty continuous input does not trigger false positive unlock",
       "feature": "F06",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -1125,7 +1125,7 @@
       "name": "manifest.json parses as strictly valid JSON with icons array",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1134,7 +1134,7 @@
       "name": "manifest.webmanifest parses as strictly valid JSON",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1152,7 +1152,7 @@
       "name": "Manifest display property specifies \"standalone\"",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1161,7 +1161,7 @@
       "name": "apple-mobile-web-app-title meta tag exists in index.html head",
       "feature": "F07",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1170,7 +1170,7 @@
       "name": "On mobile viewport (375x667), onboarding modal occupies 100% dimensions",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 18,
+      "durationMs": 21,
       "error": null
     },
     {
@@ -1179,7 +1179,7 @@
       "name": "On desktop viewport (1280x800), onboarding fills screen with dark backdrop",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1188,13 +1188,13 @@
       "name": "Clicking outside onboarding form does not dismiss the full-screen onboarding wizard",
       "feature": "F08",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 1,
       "error": null
     },
     {
       "tier": 2,
-      "id": "T2_F08_04_rapid_toggling_account_types",
-      "name": "Rapidly toggling between Institution and Activities 10 times preserves clean form state",
+      "id": "T2_F08_04_obsolete_type_buttons_removed_and_rapid_inputs",
+      "name": "Obsolete account type buttons are removed and rapid cycle/name edits stay clean",
       "feature": "F08",
       "status": "PASS",
       "durationMs": 2,
@@ -1215,7 +1215,7 @@
       "name": "Submitting onboarding with empty user name is rejected or requires valid input",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1233,7 +1233,7 @@
       "name": "User name with accents, apostrophes, and emojis persists and renders accurately",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1242,7 +1242,7 @@
       "name": "Cycle dates where end date is before start date are validated safely",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1251,7 +1251,7 @@
       "name": "Updating user name in settings updates all header and drawer elements reactively",
       "feature": "F09",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1260,7 +1260,7 @@
       "name": "Giant synthetic image (4000x3000) is downsampled to <= 256x256 and < 30KB",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 1616,
+      "durationMs": 288,
       "error": null
     },
     {
@@ -1269,7 +1269,7 @@
       "name": "Tiny 16x16 icon is handled cleanly without corruption or forced upscaling",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 1205,
+      "durationMs": 215,
       "error": null
     },
     {
@@ -1287,7 +1287,7 @@
       "name": "Transparent PNG image produces data:image/png scheme",
       "feature": "F10",
       "status": "PASS",
-      "durationMs": 205,
+      "durationMs": 207,
       "error": null
     },
     {
@@ -1305,7 +1305,7 @@
       "name": "Refreshing page before completing onboarding restores onboarding on next reload",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 113,
+      "durationMs": 101,
       "error": null
     },
     {
@@ -1314,7 +1314,7 @@
       "name": "Changelog modal only displays at most once after onboarding completion",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1323,7 +1323,7 @@
       "name": "Denying notification permission does not break app flow or throw uncaught errors",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -1332,7 +1332,7 @@
       "name": "Attempting to switch views before completing onboarding keeps onboarding visible",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1341,7 +1341,7 @@
       "name": "Purging localStorage restores presentation-first flow on reload",
       "feature": "F11",
       "status": "PASS",
-      "durationMs": 144,
+      "durationMs": 116,
       "error": null
     },
     {
@@ -1350,7 +1350,7 @@
       "name": "Double-clicking setup submit button triggers celebration animation only once",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 7,
       "error": null
     },
     {
@@ -1359,7 +1359,7 @@
       "name": "Haptics invocation during celebration handles missing navigator.vibrate gracefully",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1377,7 +1377,7 @@
       "name": "Celebration progress bar handles instant transition when animation duration is zero",
       "feature": "F12",
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1395,7 +1395,7 @@
       "name": "Opening multiple settings accordion cards and switching views collapses all of them",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 20,
+      "durationMs": 23,
       "error": null
     },
     {
@@ -1404,7 +1404,7 @@
       "name": "Calling closeAllSettingsSubmenus() multiple times when already closed is safe no-op",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1422,7 +1422,7 @@
       "name": "Navigating via external trigger or view change auto-closes open accordion submenus",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 29,
+      "durationMs": 28,
       "error": null
     },
     {
@@ -1431,7 +1431,7 @@
       "name": "Switching rapidly between settings and dashboard 10 times leaves settings collapsed",
       "feature": "F13",
       "status": "PASS",
-      "durationMs": 109,
+      "durationMs": 97,
       "error": null
     },
     {
@@ -1440,7 +1440,7 @@
       "name": "Sequentially clicking all font buttons keeps appearance card open without glitching",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 12,
+      "durationMs": 37,
       "error": null
     },
     {
@@ -1449,7 +1449,7 @@
       "name": "Toast notification displayed on font selection does not trigger accordion auto-close",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 6,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1458,7 +1458,7 @@
       "name": "Setting non-existent font string in storage falls back gracefully without crash",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1467,7 +1467,7 @@
       "name": "Reloading page restores selected font family in StorageModule",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 108,
+      "durationMs": 112,
       "error": null
     },
     {
@@ -1476,7 +1476,7 @@
       "name": "Auditioning fonts does not cause viewport scroll jump or jitter",
       "feature": "F14",
       "status": "PASS",
-      "durationMs": 9,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1485,7 +1485,7 @@
       "name": "Toggling long-press setting immediately updates visible cards without page reload",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1494,7 +1494,7 @@
       "name": "Clicking static edit button ([data-action=\"edit\"]) opens subject modal directly",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1503,7 +1503,7 @@
       "name": "Clicking static delete button ([data-action=\"delete\"]) triggers deletion prompt",
       "feature": "F15",
       "status": "PASS",
-      "durationMs": 17,
+      "durationMs": 14,
       "error": null
     },
     {
@@ -1530,7 +1530,7 @@
       "name": "Tapping a card for < 200ms does NOT trigger dynamic configuration popup",
       "feature": "F16",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1548,7 +1548,7 @@
       "name": "Dynamic popup remains completely within viewport on small 320px screen",
       "feature": "F16",
       "status": "PASS",
-      "durationMs": 26,
+      "durationMs": 23,
       "error": null
     },
     {
@@ -1566,7 +1566,7 @@
       "name": "Pressing Escape key closes dynamic configuration popup",
       "feature": "F16",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1584,7 +1584,7 @@
       "name": "Deleting a gallery photo frees storage and removes item from array",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1593,7 +1593,7 @@
       "name": "On mobile viewport (360x640), notes gallery layout does not cause horizontal overflow",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 27,
+      "durationMs": 28,
       "error": null
     },
     {
@@ -1602,7 +1602,7 @@
       "name": "Photo with 100-character name renders cleanly with truncation or wrap",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1611,7 +1611,7 @@
       "name": "Lightbox modal preview closes cleanly upon Escape key press",
       "feature": "F17",
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1620,7 +1620,7 @@
       "name": "Entering wrong PIN fails unlock, preserves lock state, and keeps content masked",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 4,
+      "durationMs": 1,
       "error": null
     },
     {
@@ -1629,7 +1629,7 @@
       "name": "Submitting empty PIN does not unlock private note",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -1647,7 +1647,7 @@
       "name": "Reloading page restores locked state on all password-protected notes",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 130,
+      "durationMs": 110,
       "error": null
     },
     {
@@ -1656,7 +1656,7 @@
       "name": "Locked note DOM elements do not expose note plaintext in attributes or title tooltips",
       "feature": "F18",
       "status": "PASS",
-      "durationMs": 9,
+      "durationMs": 12,
       "error": null
     },
     {
@@ -1674,7 +1674,7 @@
       "name": "Vault Item Text Wrapping + Light Mode Background Contrast Coexistence",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1683,7 +1683,7 @@
       "name": "Continuous Code Entry (APOLLO11) + Standard Push Button Controls in Vault",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1692,7 +1692,7 @@
       "name": "Concealed Secret Codes (EDUARDO) unlocked via Continuous Input without UI leak",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1701,7 +1701,7 @@
       "name": "Full-Screen Onboarding Layout + Canvas Downsampled Photo Upload",
       "feature": null,
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -1710,7 +1710,7 @@
       "name": "Full-Screen Setup Submission updates Header and Drawer with User Name",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1719,7 +1719,7 @@
       "name": "Onboarding Submission detonas 0% -> 100% Progress Bar + Celebration Message",
       "feature": null,
       "status": "PASS",
-      "durationMs": 21,
+      "durationMs": 22,
       "error": null
     },
     {
@@ -1737,7 +1737,7 @@
       "name": "User Photo Upload + Notes Photo Gallery maintain Storage Quota under 100KB",
       "feature": null,
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1746,7 +1746,7 @@
       "name": "Celebration Progress finishes 100% before Dashboard View is activated",
       "feature": null,
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1755,7 +1755,7 @@
       "name": "Font Auditioning keeps Accordion Open in Settings but Collapses on View Exit",
       "feature": null,
       "status": "PASS",
-      "durationMs": 31,
+      "durationMs": 23,
       "error": null
     },
     {
@@ -1764,7 +1764,7 @@
       "name": "Toggling Long-Press Mode in Settings collapses submenus on navigation",
       "feature": null,
       "status": "PASS",
-      "durationMs": 15,
+      "durationMs": 23,
       "error": null
     },
     {
@@ -1773,7 +1773,7 @@
       "name": "Settings Font Selection and Vault Typography Activation operate harmoniously",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 3,
       "error": null
     },
     {
@@ -1782,7 +1782,7 @@
       "name": "Disabling Long-Press Mode restores 1-Click Action Buttons bypassing Dynamic Popup",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 4,
       "error": null
     },
     {
@@ -1800,7 +1800,7 @@
       "name": "Notes View 2-Column Layout: Left Gallery + Right Private Notes Grid",
       "feature": null,
       "status": "PASS",
-      "durationMs": 7,
+      "durationMs": 6,
       "error": null
     },
     {
@@ -1809,7 +1809,7 @@
       "name": "Continuous Code Input Field maintains High Contrast in Light Mode",
       "feature": null,
       "status": "PASS",
-      "durationMs": 2,
+      "durationMs": 5,
       "error": null
     },
     {
@@ -1818,7 +1818,7 @@
       "name": "Standard Button Design System unified across Vault and Settings",
       "feature": null,
       "status": "PASS",
-      "durationMs": 3,
+      "durationMs": 0,
       "error": null
     },
     {
@@ -1827,7 +1827,7 @@
       "name": "User Photo and Custom Typography Family persist across reload",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1,
+      "durationMs": 2,
       "error": null
     },
     {
@@ -1841,8 +1841,8 @@
     },
     {
       "tier": 3,
-      "id": "T3_COMB_21_institution_mode_subject_card_popup",
-      "name": "Account Type \"Institution\" configures Subject Cards with Dynamic Popup",
+      "id": "T3_COMB_21_subjects_view_card_popup",
+      "name": "Subjects View renders Subject Cards with Long-Press Dynamic Popup support",
       "feature": null,
       "status": "PASS",
       "durationMs": 3,
@@ -1850,47 +1850,47 @@
     },
     {
       "tier": 3,
-      "id": "T3_COMB_22_activities_mode_task_card_popup",
-      "name": "Account Type \"Activities\" configures Task Cards with Dynamic Popup",
+      "id": "T3_COMB_22_tasks_view_card_popup",
+      "name": "Tasks View renders Task Cards with Long-Press Dynamic Popup support",
       "feature": null,
       "status": "PASS",
-      "durationMs": 5,
+      "durationMs": 4,
       "error": null
     },
     {
       "tier": 4,
       "id": "T4_SCENARIO_1_new_student_fresh_onboarding",
-      "name": "Scenario 1: New Student Fresh Onboarding (Activities Mode -> Name -> Photo Upload -> Celebration -> Dashboard Display)",
+      "name": "Scenario 1: New Student Fresh Onboarding (Name -> Photo Upload -> Cycle Dates -> Celebration -> Dashboard Display)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 229,
+      "durationMs": 224,
       "error": null
     },
     {
       "tier": 4,
-      "id": "T4_SCENARIO_2_institution_setup_and_subject_creation",
-      "name": "Scenario 2: Institution Setup & Subject Creation (Institution Mode -> Logo -> Dynamic Popup Long-Press -> Toggle Legacy Buttons)",
+      "id": "T4_SCENARIO_2_profile_period_and_subject_creation",
+      "name": "Scenario 2: Settings Profile Photo + Free-Text Period + Subject Long-Press & Persistent Buttons",
       "feature": null,
       "status": "PASS",
-      "durationMs": 614,
+      "durationMs": 833,
       "error": null
     },
     {
       "tier": 4,
       "id": "T4_SCENARIO_3_study_materials_and_private_notes_workflow",
-      "name": "Scenario 3: Study Materials & Private Notes (Left Gallery Upload -> Canvas Downsample -> Password Protected Note -> PIN Unlock)",
+      "name": "Scenario 3: Study Materials & Private Notes (High-Res Gallery Upload >=0.85 JPEG -> Quota Guard -> Password Protected Note -> PIN Unlock)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 249,
+      "durationMs": 365,
       "error": null
     },
     {
       "tier": 4,
       "id": "T4_SCENARIO_4_secret_vault_easter_egg_discovery",
-      "name": "Scenario 4: Secret Vault Easter Egg Discovery (5 Task Auto Unlock -> Continuous Input -> Standard Push Buttons -> Light Mode Contrast)",
+      "name": "Scenario 4: Secret Vault Easter Egg Discovery (5 Task Auto Unlock -> Continuous Input -> Monochrome Button -> Light Mode Contrast)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 964,
+      "durationMs": 975,
       "error": null
     },
     {
@@ -1899,16 +1899,16 @@
       "name": "Scenario 5: Settings Customization & View Switching (Audition Multiple Fonts -> Expand Accordion -> Navigate to Dashboard -> Verify Auto-Close)",
       "feature": null,
       "status": "PASS",
-      "durationMs": 245,
+      "durationMs": 233,
       "error": null
     },
     {
       "tier": 5,
-      "id": "T5_ADV_01_rapid_jitter_school_switching",
-      "name": "25 Rapid Jitter School Transitions preserve header, drawer, and storage synchronization",
+      "id": "T5_ADV_01_rapid_jitter_manual_period_sync",
+      "name": "25 Rapid Jitter Manual Period Transitions preserve header, drawer, visibility, and storage synchronization",
       "feature": null,
       "status": "PASS",
-      "durationMs": 741,
+      "durationMs": 486,
       "error": null
     },
     {
@@ -1917,25 +1917,25 @@
       "name": "Live Mobile Drawer DOM Mutation while drawer is open updates smoothly without desync",
       "feature": null,
       "status": "PASS",
-      "durationMs": 893,
+      "durationMs": 889,
       "error": null
     },
     {
       "tier": 5,
-      "id": "T5_ADV_03_modal_stacking_context_and_backdrop_clicks",
-      "name": "Modal stacking context: z-[60] custom school modal isolates clicks over z-50 welcome modal",
+      "id": "T5_ADV_03_settings_profile_photo_and_modal_stacking",
+      "name": "Profile photo can be uploaded in Settings after skipping onboarding, and modals isolate stacking contexts",
       "feature": null,
       "status": "PASS",
-      "durationMs": 468,
+      "durationMs": 535,
       "error": null
     },
     {
       "tier": 5,
-      "id": "T5_ADV_04_hard_reload_persistence_under_edge_states",
-      "name": "Hard page reload preserves unconfigured and custom states with zero state drift",
+      "id": "T5_ADV_04_legacy_cleanup_and_hard_reload_persistence",
+      "name": "Legacy localStorage keys are cleaned at startup while v1.5.0 profile, period, and monochrome mode persist across reload",
       "feature": null,
       "status": "PASS",
-      "durationMs": 1075,
+      "durationMs": 561,
       "error": null
     },
     {
@@ -1944,7 +1944,7 @@
       "name": "Fail-closed runtime error audit: comprehensive DOM mutations with zero uncaught errors",
       "feature": null,
       "status": "PASS",
-      "durationMs": 44,
+      "durationMs": 93,
       "error": null
     }
   ]

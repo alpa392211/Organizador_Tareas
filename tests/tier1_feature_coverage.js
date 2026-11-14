@@ -1,7 +1,7 @@
 /**
  * tier1_feature_coverage.js - Tier 1: Feature Coverage (Equivalence Classes)
  * Features F01 through F18 (5 distinct tests per feature, 90 total tests)
- * Requirement-driven and opaque-box test suite for Organizador_Tareas v1.4.4
+ * Requirement-driven and opaque-box test suite for Organizador_Tareas v1.5.0
  */
 
 const fs = require('fs');
@@ -9,17 +9,17 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.4.4 & Scoped Changelog
+    // F01: Version Bump 1.5.0 & Scoped Changelog
     // =========================================================================
     {
         id: 'T1_F01_01_package_json_version',
         feature: 'F01',
-        name: 'package.json specifies version 1.4.4',
+        name: 'package.json specifies version 1.5.0',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             helpers.assert(fs.existsSync(pkgPath), 'package.json must exist');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.4.4', 'package.json version must be 1.4.4');
+            helpers.assertEqual(pkg.version, '1.5.0', 'package.json version must be 1.5.0');
             helpers.assertEqual(typeof pkg.version, 'string', 'package.json version must be string');
         }
     },
@@ -30,32 +30,32 @@ const tests = [
         run: async (page, helpers) => {
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const html = fs.readFileSync(htmlPath, 'utf8');
-            const hasVersionedStyles = html.includes('css/styles.css?v=1.4.4') || html.includes('css/styles.css?v=1.4.1');
-            helpers.assertTrue(hasVersionedStyles, 'styles.css must reference version query parameter');
+            const hasVersionedStyles = html.includes('css/styles.css?v=1.5.0');
+            helpers.assertTrue(hasVersionedStyles, 'styles.css must reference v=1.5.0 query parameter');
         }
     },
     {
         id: 'T1_F01_03_settings_version_badge',
         feature: 'F01',
-        name: 'Settings view contains version indicator with target 1.4.x version',
+        name: 'Settings view contains version indicator with target 1.5.0 version',
         run: async (page, helpers) => {
             const versionText = await page.evaluate(() => {
                 const pill = document.getElementById('settings-version-pill') || document.querySelector('[data-version-pill]');
                 return pill ? pill.textContent.trim() : null;
             });
             helpers.assert(versionText !== null, 'Settings version pill element must exist');
-            helpers.assert(versionText.includes('1.4.4') || versionText.includes('1.4.1'), 'Version indicator must display 1.4.x');
+            helpers.assert(versionText.includes('1.5.0'), 'Version indicator must display 1.5.0');
         }
     },
     {
         id: 'T1_F01_04_sw_cache_name_and_assets',
         feature: 'F01',
-        name: 'sw.js specifies v1.4.x cache identifier',
+        name: 'sw.js specifies v1.5.0 cache identifier',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const swCode = fs.readFileSync(swPath, 'utf8');
-            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.4.4') || swCode.includes('organizador-tareas-cache-v1.4.1');
-            helpers.assertTrue(hasTargetCache, 'sw.js must specify v1.4.x cache name');
+            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.5.0');
+            helpers.assertTrue(hasTargetCache, 'sw.js must specify v1.5.0 cache name');
         }
     },
     {
@@ -182,19 +182,22 @@ const tests = [
     },
 
     // =========================================================================
-    // F03: Secret Vault Standard Button Controls
+    // F03: Secret Vault Standard Button Controls (Cats Removed, Monochrome Preserved)
     // =========================================================================
     {
-        id: 'T1_F03_01_cats_control_is_standard_button',
+        id: 'T1_F03_01_cats_control_removed',
         feature: 'F03',
-        name: 'Cats effect control is a standard button matching app controls',
+        name: 'Obsolete cats effect control and storage getter are completely removed',
         run: async (page, helpers) => {
-            const btn = await page.evaluate(() => {
-                const b = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
-                return b ? { tag: b.tagName.toLowerCase(), id: b.id } : null;
+            const state = await page.evaluate(() => {
+                const catsBtn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
+                return {
+                    catsBtnMissing: catsBtn === null,
+                    catsGetterMissing: typeof window.StorageModule?.getSecretCatsEnabled === 'undefined'
+                };
             });
-            helpers.assert(btn !== null, 'Cats control button element must exist in DOM');
-            helpers.assertEqual(btn.tag, 'button', 'Cats control must be a button element');
+            helpers.assertTrue(state.catsBtnMissing, '#settings-cats-btn must be removed from DOM');
+            helpers.assertTrue(state.catsGetterMissing, 'StorageModule.getSecretCatsEnabled must be removed');
         }
     },
     {
@@ -225,17 +228,28 @@ const tests = [
         }
     },
     {
-        id: 'T1_F03_04_cats_button_toggle_interaction',
+        id: 'T1_F03_04_gray_mode_button_updates_text_and_theme_gray_class',
         feature: 'F03',
-        name: 'Clicking cats button toggles cat effect on/off and updates text',
+        name: 'Clicking gray mode button toggles theme-gray class and updates button label',
         run: async (page, helpers) => {
-            const initial = await page.evaluate(() => window.StorageModule?.getSecretCatsEnabled?.() || false);
-            await page.evaluate(() => {
-                const btn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
-                if (btn) btn.click();
+            const res = await page.evaluate(() => {
+                window.StorageModule?.setGrayModeEnabled?.(false);
+                window.OrganizadorApp?.applyGrayMode?.(false);
+                const btn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
+                if (!btn) return { found: false };
+                btn.click();
+                const afterEnableText = btn.textContent.trim();
+                const hasThemeGray = document.documentElement.classList.contains('theme-gray');
+                btn.click();
+                const afterDisableText = btn.textContent.trim();
+                const removedThemeGray = !document.documentElement.classList.contains('theme-gray');
+                return { found: true, afterEnableText, hasThemeGray, afterDisableText, removedThemeGray };
             });
-            const toggled = await page.evaluate(() => window.StorageModule?.getSecretCatsEnabled?.() || false);
-            helpers.assertEqual(toggled, !initial, 'Clicking cats button must toggle stored cats setting');
+            helpers.assertTrue(res.found, '#settings-gray-mode-btn must exist');
+            helpers.assertTrue(res.hasThemeGray, 'Enabling gray mode must add theme-gray class');
+            helpers.assertTrue(res.afterEnableText.includes('Desactivar') || res.afterEnableText.includes('Activado'), 'Button label must reflect enabled state');
+            helpers.assertTrue(res.removedThemeGray, 'Disabling gray mode must remove theme-gray class');
+            helpers.assertTrue(res.afterDisableText.includes('Activar'), 'Button label must reflect disabled state');
         }
     },
     {
@@ -309,13 +323,13 @@ const tests = [
     {
         id: 'T1_F04_05_no_fraction_count_badge',
         feature: 'F04',
-        name: 'Notice does not display fraction count badges like "14 / 14"',
+        name: 'Notice does not display fraction count badges like "13 / 13"',
         run: async (page, helpers) => {
             const noticeText = await page.evaluate(() => {
                 const notice = document.getElementById('vault-secret-notice') || document.querySelector('.vault-terminal-notice');
                 return notice ? notice.textContent : '';
             });
-            helpers.assertFalse(noticeText.includes('/ 14') || noticeText.includes('/14'), 'Notice must not display total codes fraction');
+            helpers.assertFalse(noticeText.includes('/ 13') || noticeText.includes('/13'), 'Notice must not display total codes fraction');
         }
     },
 
@@ -578,55 +592,54 @@ const tests = [
         }
     },
     {
-        id: 'T1_F08_02_institution_option_present',
+        id: 'T1_F08_02_obsolete_account_type_cards_removed',
         feature: 'F08',
-        name: 'Onboarding presents Institution selection option',
+        name: 'Obsolete Institution and Activities selection cards are removed from onboarding',
         run: async (page, helpers) => {
-            const hasInstitutionOption = await page.evaluate(() => {
-                const opt = document.getElementById('welcome-type-institution') ||
-                            document.querySelector('[data-type="institution"]') ||
-                            document.querySelector('input[value="institution"]');
-                return opt !== null;
+            const removed = await page.evaluate(() => {
+                return document.getElementById('welcome-type-institution') === null &&
+                       document.getElementById('welcome-type-activities') === null &&
+                       document.querySelector('[data-type="institution"]') === null &&
+                       document.querySelector('[data-type="activities"]') === null;
             });
-            helpers.assertTrue(hasInstitutionOption, 'Institution option element must exist in onboarding');
+            helpers.assertTrue(removed, 'Obsolete account type selection cards must not exist in DOM');
         }
     },
     {
-        id: 'T1_F08_03_activities_option_present',
+        id: 'T1_F08_03_onboarding_core_inputs_present',
         feature: 'F08',
-        name: 'Onboarding presents Activities Organizer selection option',
+        name: 'Onboarding presents user name, photo upload, and cycle date inputs',
         run: async (page, helpers) => {
-            const hasActivitiesOption = await page.evaluate(() => {
-                const opt = document.getElementById('welcome-type-activities') ||
-                            document.querySelector('[data-type="activities"]') ||
-                            document.querySelector('input[value="activities"]');
-                return opt !== null;
+            const present = await page.evaluate(() => {
+                return document.getElementById('welcome-user-name') !== null &&
+                       document.getElementById('welcome-photo-input') !== null &&
+                       document.getElementById('welcome-cycle-start') !== null &&
+                       document.getElementById('welcome-cycle-end') !== null &&
+                       document.getElementById('welcome-cycle-save-btn') !== null &&
+                       document.getElementById('welcome-cycle-later-btn') !== null;
             });
-            helpers.assertTrue(hasActivitiesOption, 'Activities organizer option must exist in onboarding');
+            helpers.assertTrue(present, 'Core simplified onboarding fields and buttons must exist');
         }
     },
     {
-        id: 'T1_F08_04_account_type_selection_toggle',
+        id: 'T1_F08_04_onboarding_allows_skipping_photo',
         feature: 'F08',
-        name: 'Selecting between Institution and Activities toggles selection state',
+        name: 'User can complete onboarding cleanly without uploading a profile photo',
         run: async (page, helpers) => {
-            const result = await page.evaluate(() => {
-                const inst = document.getElementById('welcome-type-institution');
-                const act = document.getElementById('welcome-type-activities');
-                if (!inst || !act) {
-                    return { found: false, toggled: false };
-                }
-                act.click();
-                return { found: true, toggled: true };
+            const ok = await page.evaluate(() => {
+                window.StorageModule?.setUserPhoto?.('');
+                window.StorageModule?.setUserName?.('Usuario Sin Foto');
+                window.OrganizadorApp?.renderHeader?.();
+                const logo = document.getElementById('header-inst-logo');
+                return logo !== null && logo.querySelector('img') === null;
             });
-            helpers.assertTrue(result.found, '#welcome-type-institution and #welcome-type-activities must exist in DOM');
-            helpers.assertTrue(result.toggled, 'User must be able to select account type');
+            helpers.assertTrue(ok, 'Header must render cleanly with fallback avatar when no photo is uploaded');
         }
     },
     {
         id: 'T1_F08_05_account_type_persistence',
         feature: 'F08',
-        name: 'StorageModule persists and retrieves account type',
+        name: 'StorageModule persists and retrieves account type fallback cleanly',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setAccountType?.('organizer');
@@ -637,30 +650,47 @@ const tests = [
     },
 
     // =========================================================================
-    // F09: Removal of Countries and Schools Catalog + User Name
+    // F09: Removal of Schools/Countries/Selects + Manual Period + User Name
     // =========================================================================
     {
-        id: 'T1_F09_01_no_countries_catalog_in_onboarding',
+        id: 'T1_F09_01_no_schools_or_countries_catalog_in_dom',
         feature: 'F09',
-        name: 'Onboarding DOM does not render country selection grid',
+        name: 'Obsolete countries, predefined schools, and school modals are removed from DOM',
         run: async (page, helpers) => {
-            const hasCountryGrid = await page.evaluate(() => {
-                const grid = document.getElementById('welcome-country-grid');
-                return grid !== null && grid.children.length > 0;
+            const allRemoved = await page.evaluate(() => {
+                return document.getElementById('welcome-country-grid') === null &&
+                       document.getElementById('welcome-schools-grid') === null &&
+                       document.getElementById('header-institution-select') === null &&
+                       document.getElementById('header-period-select') === null &&
+                       document.getElementById('school-identity-modal') === null &&
+                       document.getElementById('custom-school-modal') === null;
             });
-            helpers.assertFalse(hasCountryGrid, 'Country selection grid must be removed from onboarding');
+            helpers.assertTrue(allRemoved, 'All obsolete school/country/select DOM nodes must be removed');
         }
     },
     {
-        id: 'T1_F09_02_no_predefined_schools_grid',
+        id: 'T1_F09_02_manual_period_free_text_and_header_hide_when_empty',
         feature: 'F09',
-        name: 'Onboarding DOM does not render predefined schools grid',
+        name: 'Free-text period updates header label and hides label when empty',
         run: async (page, helpers) => {
-            const hasSchoolsGrid = await page.evaluate(() => {
-                const grid = document.getElementById('welcome-schools-grid');
-                return grid !== null && grid.children.length > 0;
+            const res = await page.evaluate(() => {
+                const inp = document.getElementById('custom-period-input');
+                const saveBtn = document.getElementById('save-custom-period-btn');
+                const clearBtn = document.getElementById('clear-custom-period-btn');
+                const headerPeriod = document.getElementById('header-inst-period');
+                if (!inp || !saveBtn || !clearBtn || !headerPeriod) return { found: false };
+                inp.value = 'Trimestre Primavera 2026';
+                saveBtn.click();
+                const textWhenSet = headerPeriod.textContent.trim();
+                const visibleWhenSet = !headerPeriod.classList.contains('hidden');
+                clearBtn.click();
+                const hiddenWhenEmpty = headerPeriod.classList.contains('hidden');
+                return { found: true, textWhenSet, visibleWhenSet, hiddenWhenEmpty };
             });
-            helpers.assertFalse(hasSchoolsGrid, 'Predefined schools grid must be removed from onboarding');
+            helpers.assertTrue(res.found, 'Free-text period input, save/clear buttons, and header label must exist');
+            helpers.assertEqual(res.textWhenSet, 'Trimestre Primavera 2026', 'Header period label must display custom text');
+            helpers.assertTrue(res.visibleWhenSet, 'Header period label must be visible when non-empty');
+            helpers.assertTrue(res.hiddenWhenEmpty, 'Header period label must be hidden when empty');
         }
     },
     {
@@ -678,7 +708,7 @@ const tests = [
     {
         id: 'T1_F09_04_user_name_replaces_slogan_in_header',
         feature: 'F09',
-        name: 'User name is saved and rendered where slogan was previously displayed',
+        name: 'User name is saved and rendered in header',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setUserName?.('María García');
@@ -689,6 +719,7 @@ const tests = [
                 return header ? header.textContent.includes('María García') : false;
             });
             const nameInStorage = await page.evaluate(() => window.StorageModule?.getUserName?.());
+            helpers.assertTrue(headerContains, 'Header must display user name');
             helpers.assertEqual(nameInStorage, 'María García', 'User name must be stored in StorageModule');
         }
     },
@@ -707,39 +738,44 @@ const tests = [
     },
 
     // =========================================================================
-    // F10: Institution / Personal Photo Upload (Canvas downsampled to 256x256, <30KB)
+    // F10: Personal Photo Upload in Onboarding & Settings (256x256, <30KB)
     // =========================================================================
     {
         id: 'T1_F10_01_photo_input_accepts_images',
         feature: 'F10',
-        name: 'Photo file input exists and specifies accept="image/*"',
+        name: 'Photo file inputs in onboarding and settings accept image files',
         run: async (page, helpers) => {
             const accepts = await page.evaluate(() => {
-                const inp = document.getElementById('welcome-photo-input') || document.querySelector('input[type="file"][accept*="image"]');
-                return inp ? inp.getAttribute('accept') : null;
+                const welcomeInp = document.getElementById('welcome-photo-input');
+                const settingsInp = document.getElementById('settings-photo-input');
+                return Boolean(
+                    welcomeInp?.getAttribute('accept')?.includes('image') &&
+                    settingsInp?.getAttribute('accept')?.includes('image')
+                );
             });
-            helpers.assert(accepts !== null && accepts.includes('image'), 'Photo input must accept image files');
+            helpers.assertTrue(accepts, 'Both onboarding and settings photo inputs must accept image files');
         }
     },
     {
-        id: 'T1_F10_02_photo_preview_container',
+        id: 'T1_F10_02_photo_preview_and_settings_buttons_exist',
         feature: 'F10',
-        name: 'Photo preview element exists in onboarding DOM',
+        name: 'Photo preview and Settings upload/clear controls exist in DOM',
         run: async (page, helpers) => {
-            const hasPreview = await page.evaluate(() => {
-                const p = document.getElementById('welcome-photo-preview') || document.querySelector('.photo-preview');
-                return p !== null;
+            const hasControls = await page.evaluate(() => {
+                return document.getElementById('welcome-photo-preview') !== null &&
+                       document.getElementById('settings-photo-preview') !== null &&
+                       document.getElementById('settings-photo-upload-btn') !== null &&
+                       document.getElementById('settings-photo-clear-btn') !== null;
             });
-            helpers.assertTrue(hasPreview, 'Photo preview container must exist in DOM');
+            helpers.assertTrue(hasControls, 'Onboarding and Settings profile photo preview/action controls must exist');
         }
     },
     {
         id: 'T1_F10_03_canvas_downsample_dimensions',
         feature: 'F10',
-        name: 'Downsampling function constraints image dimensions to <= 256x256',
+        name: 'Downsampling function constrains profile photo dimensions to <= 256x256',
         run: async (page, helpers) => {
             const maxDim = await page.evaluate(async () => {
-                // Test Canvas downsampling logic directly
                 const canvas = document.createElement('canvas');
                 canvas.width = 1000;
                 canvas.height = 800;
@@ -764,21 +800,34 @@ const tests = [
         }
     },
     {
-        id: 'T1_F10_04_downsampled_data_size_under_30kb',
+        id: 'T1_F10_04_settings_photo_upload_even_if_skipped_at_onboarding',
         feature: 'F10',
-        name: 'Downsampled image data URL size is strictly less than 30KB',
+        name: 'Profile photo can be uploaded, changed, and cleared from Settings even if skipped initially',
         run: async (page, helpers) => {
-            const bytes = await page.evaluate(async () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 256;
-                canvas.height = 256;
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#4F46E5';
-                ctx.fillRect(0, 0, 256, 256);
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                return Math.round(dataUrl.length * 0.75);
+            await page.evaluate(() => {
+                window.StorageModule?.setUserPhoto?.('');
+                window.OrganizadorApp?.switchView?.('settings');
+                window.OrganizadorApp?.refreshSettingsProfileUI?.();
             });
-            helpers.assert(bytes < 30 * 1024, `Downsampled image must be under 30KB, was ${bytes} bytes`);
+            await helpers.simulateFileUpload(page, '#settings-photo-input', {
+                width: 300,
+                height: 300,
+                color: '#10B981',
+                fileName: 'settings_avatar.png'
+            });
+            await new Promise(r => setTimeout(r, 200));
+            const afterUpload = await page.evaluate(() => ({
+                stored: window.StorageModule?.getUserPhoto?.() || '',
+                btnText: document.getElementById('settings-photo-upload-btn')?.textContent?.trim() || ''
+            }));
+            helpers.assert(afterUpload.stored.startsWith('data:image/'), 'Settings photo upload must store image URL');
+            helpers.assertEqual(afterUpload.btnText, 'Cambiar foto', 'Upload button label must update to Cambiar foto');
+
+            await page.evaluate(() => {
+                document.getElementById('settings-photo-clear-btn')?.click();
+            });
+            const afterClear = await page.evaluate(() => window.StorageModule?.getUserPhoto?.() || '');
+            helpers.assertEqual(afterClear, '', 'Clearing photo in Settings must remove stored photo');
         }
     },
     {
@@ -789,9 +838,12 @@ const tests = [
             const dummyDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
             await page.evaluate(photo => {
                 window.StorageModule?.setUserPhoto?.(photo);
+                window.OrganizadorApp?.renderHeader?.();
             }, dummyDataUrl);
             const saved = await page.evaluate(() => window.StorageModule?.getUserPhoto?.() || '');
+            const headerImgSrc = await page.evaluate(() => document.querySelector('#header-inst-logo img')?.src || '');
             helpers.assertEqual(saved, dummyDataUrl, 'User photo must persist in storage');
+            helpers.assert(headerImgSrc.startsWith('data:image/'), 'Header must render saved user photo');
         }
     },
 
@@ -1302,7 +1354,7 @@ const tests = [
     },
 
     // =========================================================================
-    // F17: Materials Photo Gallery on the Left (<30KB Canvas downsampled)
+    // F17: Materials Photo Gallery on the Left (MAX_DIM=1600, quality>=0.85, Quota Guard)
     // =========================================================================
     {
         id: 'T1_F17_01_notes_gallery_panel_exists',
@@ -1344,21 +1396,44 @@ const tests = [
         }
     },
     {
-        id: 'T1_F17_04_gallery_photo_canvas_downsample',
+        id: 'T1_F17_04_gallery_photo_high_res_and_quota_guard',
         feature: 'F17',
-        name: 'Gallery photo downsampling maintains size under 30KB',
+        name: 'Gallery photo preserves MAX_DIM=1600 quality>=0.85 and warns cleanly on localStorage quota overflow',
         run: async (page, helpers) => {
+            const notesSrc = fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'js', 'notes.js'), 'utf8');
+            helpers.assert(notesSrc.includes('MAX_DIM = 1600'), 'notes.js must set MAX_DIM = 1600');
+            helpers.assert(notesSrc.includes('0.88') || notesSrc.includes('0.85'), 'notes.js must compress JPEG at quality >= 0.85');
+
             const samplePhoto = {
                 id: 'photo_test_1',
                 name: 'Pizarrón Álgebra',
-                dataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+                dataUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==',
                 createdAt: Date.now()
             };
             await page.evaluate(p => {
                 window.StorageModule?.saveGalleryPhoto?.(p);
             }, samplePhoto);
             const saved = await page.evaluate(() => window.StorageModule?.getGalleryPhotos?.() || []);
-            helpers.assert(Array.isArray(saved), 'getGalleryPhotos must return an array');
+            helpers.assert(Array.isArray(saved) && saved.length > 0, 'getGalleryPhotos must store and return array');
+
+            const overflowHandled = await page.evaluate(() => {
+                const orig = Storage.prototype.setItem;
+                Storage.prototype.setItem = function () {
+                    throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+                };
+                try {
+                    const ok = window.StorageModule?.saveGalleryPhoto?.({
+                        id: 'photo_overflow',
+                        name: 'Full.jpg',
+                        dataUrl: 'data:image/jpeg;base64,AAAA',
+                        createdAt: Date.now()
+                    });
+                    return ok === false;
+                } finally {
+                    Storage.prototype.setItem = orig;
+                }
+            });
+            helpers.assertTrue(overflowHandled, 'saveGalleryPhoto must return false when localStorage throws QuotaExceededError');
         }
     },
     {

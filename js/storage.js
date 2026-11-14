@@ -1,13 +1,12 @@
 /**
  * Módulo de Almacenamiento Local (LocalStorage)
  * Gestiona la persistencia de materias, tareas, notas rápidas, ciclo escolar,
- * preferencias de botón principal inferior, respuesta háptica e institución.
+ * preferencias de botón principal inferior, respuesta háptica y perfil de usuario.
  * Inicia de forma completamente limpia (sin datos precargados).
  */
 
 window.StorageModule = (() => {
     const KEYS = {
-        INSTITUTION: 'org_escolar_institution',
         ACADEMIC_PERIOD: 'org_escolar_period',
         ACADEMIC_CYCLE: 'org_escolar_cycle',
         SUBJECTS: 'org_escolar_subjects',
@@ -20,27 +19,33 @@ window.StorageModule = (() => {
         ARCHIVED_TASKS: 'org_escolar_archived_tasks',
         ARCHIVED_NOTES: 'org_escolar_archived_notes',
         AUTO_PURGE_ARCHIVE: 'org_escolar_auto_purge_archive',
-        LOGO_EXPAND: 'org_escolar_logo_expand',
         HEADER_THEME_BTN: 'org_escolar_header_theme_btn',
         CYCLE_CONFIGURED: 'org_escolar_cycle_configured_v1',
         SECRET_UNLOCKED: 'org_escolar_secret_unlocked_v1',
         GRAY_MODE: 'org_escolar_gray_mode_v1',
-        CATS_ENABLED: 'org_escolar_cats_enabled_v1',
-        CUSTOM_SCHOOLS: 'org_escolar_custom_schools',
         INITIALIZED: 'org_escolar_initialized_v3',
         VAULT_UNLOCKED: 'org_escolar_vault_unlocked_codes_v2',
         ACTIVE_SPECIAL_THEME: 'org_escolar_active_special_theme_v1',
         APOLLO_ROCKETS_ENABLED: 'org_escolar_apollo_rockets_v1',
-        SCHOOL_SKIPPED: 'org_escolar_school_skipped_v1',
         USER_NAME: 'org_escolar_user_name',
-        USER_COUNTRY: 'org_escolar_user_country',
-        COUNTRY_LOCKED: 'org_escolar_country_locked',
         LAST_SEEN_VERSION: 'org_escolar_last_version',
         USER_PHOTO: 'org_escolar_user_photo',
         ACCOUNT_TYPE: 'org_escolar_account_type',
         LONG_PRESS: 'org_escolar_long_press_enabled_v1',
         GALLERY_PHOTOS: 'org_escolar_gallery_photos'
     };
+
+    const LEGACY_KEYS = [
+        'org_escolar_institution',
+        'org_escolar_logo_expand',
+        'org_escolar_cats_enabled_v1',
+        'org_escolar_custom_schools',
+        'org_escolar_custom_institutions',
+        'org_escolar_school_skipped_v1',
+        'org_escolar_user_country',
+        'org_escolar_country_locked',
+        'org_escolar_dev_notice_144_seen'
+    ];
 
     const MAX_SUBJECTS = 16;
 
@@ -64,7 +69,6 @@ window.StorageModule = (() => {
     }
 
     const DEMO_DATA = {
-        institution: 'unam',
         period: '4.º Semestre',
         subjects: [
             {
@@ -155,52 +159,45 @@ window.StorageModule = (() => {
     const Storage = {
         MAX_SUBJECTS,
 
-        // --- Institución y Grado/Periodo ---
-        isSchoolSkipped() {
-            return localStorage.getItem(KEYS.SCHOOL_SKIPPED) === 'true';
-        },
-        setSchoolSkipped(skipped) {
-            localStorage.setItem(KEYS.SCHOOL_SKIPPED, skipped ? 'true' : 'false');
-            if (skipped) {
-                localStorage.setItem(KEYS.INSTITUTION, 'unconfigured');
-            }
+        cleanupLegacyKeys() {
+            LEGACY_KEYS.forEach(k => {
+                try {
+                    localStorage.removeItem(k);
+                } catch (_) {}
+            });
+
+            try {
+                const rawCodes = localStorage.getItem(KEYS.VAULT_UNLOCKED);
+                if (rawCodes) {
+                    const parsed = JSON.parse(rawCodes);
+                    if (Array.isArray(parsed)) {
+                        const cleaned = parsed.filter(c => typeof c === 'string' && c.trim().toUpperCase() !== 'GATITOS_');
+                        if (cleaned.length !== parsed.length) {
+                            localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify(cleaned));
+                        }
+                    }
+                }
+            } catch (_) {}
+
+            try {
+                const special = localStorage.getItem(KEYS.ACTIVE_SPECIAL_THEME);
+                if (special === 'theme_cats' || special === 'cats') {
+                    localStorage.setItem(KEYS.ACTIVE_SPECIAL_THEME, 'default');
+                }
+            } catch (_) {}
         },
 
-        getInstitution() {
-            if (this.isSchoolSkipped?.()) {
-                return 'unconfigured';
-            }
-            const stored = localStorage.getItem(KEYS.INSTITUTION);
-            if (stored === 'general') {
-                localStorage.setItem(KEYS.INSTITUTION, 'unam');
-                return 'unam';
-            }
-            if (stored === 'unconfigured' || stored === '') {
-                return 'unconfigured';
-            }
-            return stored || 'unconfigured';
-        },
-        setInstitution(id) {
-            if (id && id !== 'unconfigured') {
-                this.setSchoolSkipped(false);
-            }
-            localStorage.setItem(KEYS.INSTITUTION, id);
-        },
-
+        // --- Grado / Periodo Lectivo (Texto Libre) ---
         getAcademicPeriod() {
-            const instId = this.getInstitution();
-            const inst = window.InstitutionsModule?.getInstitution(instId);
-            const savedPeriod = localStorage.getItem(KEYS.ACADEMIC_PERIOD);
-            if (typeof savedPeriod === 'string' && savedPeriod.length > 0) {
-                return savedPeriod;
-            }
-            if (this.isSchoolSkipped?.() || instId === 'unconfigured') {
-                return 'Sin periodo';
-            }
-            return inst?.defaultPeriod || '1.º Semestre';
+            return (localStorage.getItem(KEYS.ACADEMIC_PERIOD) || '').trim();
         },
         setAcademicPeriod(period) {
-            localStorage.setItem(KEYS.ACADEMIC_PERIOD, period);
+            const clean = typeof period === 'string' ? period.trim() : '';
+            if (clean) {
+                localStorage.setItem(KEYS.ACADEMIC_PERIOD, clean);
+            } else {
+                localStorage.removeItem(KEYS.ACADEMIC_PERIOD);
+            }
         },
 
         // --- Nombre de Usuario e Identidad Estudiantil ---
@@ -213,9 +210,9 @@ window.StorageModule = (() => {
             }
         },
 
-        // --- Tipo de Cuenta (Institución u Organizador de actividades) ---
+        // --- Tipo de Cuenta ---
         getAccountType() {
-            return localStorage.getItem(KEYS.ACCOUNT_TYPE) || 'institution';
+            return localStorage.getItem(KEYS.ACCOUNT_TYPE) || 'organizer';
         },
         setAccountType(type) {
             if (typeof type === 'string' && type.trim()) {
@@ -223,7 +220,7 @@ window.StorageModule = (() => {
             }
         },
 
-        // --- Foto de Perfil / Logotipo Personal o Institucional ---
+        // --- Foto de Perfil ---
         getUserPhoto() {
             return localStorage.getItem(KEYS.USER_PHOTO) || '';
         },
@@ -235,34 +232,12 @@ window.StorageModule = (() => {
             }
         },
 
-        // --- País del Usuario y Bloqueo Permanente para México ---
-        getUserCountry() {
-            return localStorage.getItem(KEYS.USER_COUNTRY) || null;
-        },
-        setUserCountry(code) {
-            if (typeof code === 'string') {
-                const upper = code.trim().toUpperCase();
-                localStorage.setItem(KEYS.USER_COUNTRY, upper);
-                if (upper === 'MX') {
-                    this.setCountryLocked(true);
-                }
-            }
-        },
-        isCountryLocked() {
-            const locked = localStorage.getItem(KEYS.COUNTRY_LOCKED) === 'true';
-            const country = this.getUserCountry();
-            return locked || country === 'MX';
-        },
-        setCountryLocked(locked = true) {
-            localStorage.setItem(KEYS.COUNTRY_LOCKED, locked ? 'true' : 'false');
-        },
-
         // --- Control de Versión y Changelog de Novedades ---
         getLastSeenVersion() {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.4.4');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.0');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
@@ -279,7 +254,7 @@ window.StorageModule = (() => {
             // EXCLUSIÓN ESTRICTA: 'EDUARDO' y '06062009' NUNCA se auto-desbloquean (requerimiento explícito)
             const AUTO_UNLOCK_POOL = [
                 'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
-                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'GATITOS_', 'READABLE',
+                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'READABLE',
                 'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON'
             ];
 
@@ -298,111 +273,6 @@ window.StorageModule = (() => {
                 }
             }
             return null;
-        },
-
-        // --- Escuelas Personalizadas (Custom School Builder) ---
-        getCustomSchools() {
-            try {
-                let raw = localStorage.getItem(KEYS.CUSTOM_SCHOOLS);
-                if (!raw) {
-                    raw = localStorage.getItem('org_escolar_custom_institutions');
-                }
-                if (!raw) return [];
-                const parsed = JSON.parse(raw);
-                return Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                console.warn('Error al leer escuelas personalizadas:', e);
-                return [];
-            }
-        },
-
-        saveCustomSchool(schoolData) {
-            if (!schoolData || typeof schoolData !== 'object') {
-                throw new Error('Datos de institución escolar inválidos');
-            }
-
-            const schools = this.getCustomSchools();
-            const id = schoolData.id || ('custom_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7));
-
-            const colorVal = schoolData.colors?.primary || '#4F46E5';
-            const periods = Array.isArray(schoolData.periods) && schoolData.periods.length > 0
-                ? schoolData.periods
-                : [
-                    '1.º Semestre', '2.º Semestre', '3.º Semestre', '4.º Semestre',
-                    '5.º Semestre', '6.º Semestre', '7.º Semestre', '8.º Semestre',
-                    '9.º Semestre', '10.º Semestre'
-                ];
-
-            const cleanSchool = {
-                id: id,
-                name: (schoolData.name || 'Mi Escuela').trim(),
-                fullName: (schoolData.fullName || schoolData.name || 'Mi Institución Escolar').trim(),
-                shortBadge: (schoolData.shortBadge || schoolData.name || 'ESC').trim(),
-                slogan: (schoolData.slogan || 'Construyendo el futuro').trim(),
-                country: schoolData.country || 'Personalizado',
-                countryCode: schoolData.countryCode || 'XX',
-                countryFlag: schoolData.countryFlag || '⭐',
-                systemType: schoolData.systemType || 'Semestral',
-                icon: schoolData.icon || 'assets/unam.svg',
-                colors: {
-                    primary: colorVal,
-                    secondary: schoolData.colors?.secondary || '#FFFFFF',
-                    accent: schoolData.colors?.accent || colorVal,
-                    aura: schoolData.colors?.aura || colorVal,
-                    badgeBg: schoolData.colors?.badgeBg || `bg-[${colorVal}]`,
-                    badgeText: schoolData.colors?.badgeText || 'text-white'
-                },
-                periods: periods,
-                defaultPeriod: schoolData.defaultPeriod || periods[0] || '1.º Semestre',
-                isCustom: true,
-                updatedAt: Date.now()
-            };
-
-            const existingIndex = schools.findIndex(s => s.id === id);
-            if (existingIndex >= 0) {
-                schools[existingIndex] = cleanSchool;
-            } else {
-                schools.push(cleanSchool);
-            }
-
-            const serialized = JSON.stringify(schools);
-            try {
-                localStorage.setItem(KEYS.CUSTOM_SCHOOLS, serialized);
-                localStorage.setItem('org_escolar_custom_institutions', serialized);
-            } catch (e) {
-                if (e.name === 'QuotaExceededError' || e.code === 22 || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                    throw new Error('Memoria de almacenamiento llena. Elimina otras escuelas o datos.');
-                }
-                throw e;
-            }
-
-            try {
-                window.dispatchEvent(new CustomEvent('custom-schools-updated', { detail: cleanSchool }));
-            } catch (_) {}
-
-            return cleanSchool;
-        },
-
-        deleteCustomSchool(schoolId) {
-            if (!schoolId) return false;
-            const schools = this.getCustomSchools();
-            const filtered = schools.filter(s => s.id !== schoolId);
-            const serialized = JSON.stringify(filtered);
-            localStorage.setItem(KEYS.CUSTOM_SCHOOLS, serialized);
-            localStorage.setItem('org_escolar_custom_institutions', serialized);
-
-            try {
-                window.dispatchEvent(new CustomEvent('custom-schools-updated', { detail: { deletedId: schoolId } }));
-            } catch (_) {}
-
-            if (this.getInstitution() === schoolId) {
-                this.setInstitution('unam');
-                const unamInst = window.InstitutionsModule?.getInstitution('unam');
-                if (unamInst) {
-                    this.setAcademicPeriod(unamInst.defaultPeriod || '1.º Semestre');
-                }
-            }
-            return true;
         },
 
         isOnboardingCompleted() {
@@ -935,15 +805,6 @@ window.StorageModule = (() => {
             return 0;
         },
 
-        // --- Preferencia de animación dinámica del logo institucional (Desactivable) ---
-        getLogoExpandEnabled() {
-            const val = localStorage.getItem(KEYS.LOGO_EXPAND);
-            return val === null ? true : val === 'true';
-        },
-        setLogoExpandEnabled(enabled) {
-            localStorage.setItem(KEYS.LOGO_EXPAND, enabled ? 'true' : 'false');
-        },
-
         // --- Preferencia de visibilidad del botón de tema en Header (Ocultable) ---
         getHeaderThemeBtnEnabled() {
             const val = localStorage.getItem(KEYS.HEADER_THEME_BTN);
@@ -953,7 +814,7 @@ window.StorageModule = (() => {
             localStorage.setItem(KEYS.HEADER_THEME_BTN, enabled ? 'true' : 'false');
         },
 
-        // --- Función Secreta: Desbloqueo, Modo Grises y Gatitos ---
+        // --- Función Secreta: Desbloqueo y Modo Monocromático ---
         isSecretUnlocked() {
             return localStorage.getItem(KEYS.SECRET_UNLOCKED) === 'true';
         },
@@ -967,13 +828,6 @@ window.StorageModule = (() => {
         setGrayModeEnabled(enabled) {
             localStorage.setItem(KEYS.GRAY_MODE, enabled ? 'true' : 'false');
         },
-        getSecretCatsEnabled() {
-            const val = localStorage.getItem(KEYS.CATS_ENABLED);
-            return val === null ? true : val === 'true';
-        },
-        setSecretCatsEnabled(enabled) {
-            localStorage.setItem(KEYS.CATS_ENABLED, enabled ? 'true' : 'false');
-        },
 
         // --- Bóveda de Códigos Secretos v2.0 (Milestone 2) ---
         getUnlockedCodes() {
@@ -981,7 +835,9 @@ window.StorageModule = (() => {
                 const data = localStorage.getItem(KEYS.VAULT_UNLOCKED);
                 if (!data) return [];
                 const parsed = JSON.parse(data);
-                return Array.isArray(parsed) ? parsed.filter(c => typeof c === 'string' && c.trim()) : [];
+                return Array.isArray(parsed)
+                    ? parsed.filter(c => typeof c === 'string' && c.trim() && c.trim().toUpperCase() !== 'GATITOS_')
+                    : [];
             } catch (e) {
                 return [];
             }
@@ -990,6 +846,7 @@ window.StorageModule = (() => {
         unlockCode(codeId) {
             if (!codeId || typeof codeId !== 'string') return false;
             const normalized = codeId.trim().toUpperCase();
+            if (normalized === 'GATITOS_') return false;
             const codes = this.getUnlockedCodes();
             if (!codes.includes(normalized)) {
                 codes.push(normalized);
@@ -1016,11 +873,13 @@ window.StorageModule = (() => {
         },
 
         getActiveSpecialTheme() {
-            return localStorage.getItem(KEYS.ACTIVE_SPECIAL_THEME) || 'default';
+            const val = localStorage.getItem(KEYS.ACTIVE_SPECIAL_THEME) || 'default';
+            return (val === 'theme_cats' || val === 'cats') ? 'default' : val;
         },
 
         setActiveSpecialTheme(themeId) {
-            const val = (themeId && typeof themeId === 'string') ? themeId : 'default';
+            let val = (themeId && typeof themeId === 'string') ? themeId : 'default';
+            if (val === 'theme_cats' || val === 'cats') val = 'default';
             localStorage.setItem(KEYS.ACTIVE_SPECIAL_THEME, val);
         },
 
@@ -1070,10 +929,10 @@ window.StorageModule = (() => {
          * Inicialización limpia: subjects: [], tasks: [], notes: []
          */
         initIfFirstTime() {
+            this.cleanupLegacyKeys();
             const isInitialized = localStorage.getItem(KEYS.INITIALIZED);
             if (!isInitialized) {
-                this.setInstitution('unam');
-                this.setAcademicPeriod('1.º Semestre');
+                this.setAcademicPeriod('');
                 this.getAcademicCycle();
                 this.saveSubjects([]);
                 this.saveTasks([]);
@@ -1088,7 +947,6 @@ window.StorageModule = (() => {
         },
 
         loadDemo() {
-            this.setInstitution(DEMO_DATA.institution);
             this.setAcademicPeriod(DEMO_DATA.period);
             const cycle = this.getAcademicCycle();
 
@@ -1118,38 +976,32 @@ window.StorageModule = (() => {
 
         exportJson() {
             const data = {
-                version: '3.1.0',
+                version: '1.5.0',
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),
-                institution: this.getInstitution(),
                 academicPeriod: this.getAcademicPeriod(),
                 academicCycle: this.getAcademicCycle(),
                 isCycleConfigured: this.isCycleConfigured(),
                 bottomAction: this.getBottomAction(),
                 hapticsEnabled: this.getHapticsEnabled(),
                 autoPurgeArchive: this.getAutoPurgeArchive(),
-                logoExpandEnabled: this.getLogoExpandEnabled(),
                 headerThemeBtnEnabled: this.getHeaderThemeBtnEnabled(),
                 secretUnlocked: this.isSecretUnlocked(),
                 grayMode: this.getGrayModeEnabled(),
-                secretCatsEnabled: this.getSecretCatsEnabled(),
                 unlockedCodes: this.getUnlockedCodes(),
                 activeSpecialTheme: this.getActiveSpecialTheme(),
                 apolloRocketsEnabled: this.getApolloRocketsEnabled(),
                 userName: this.getUserName(),
                 accountType: this.getAccountType(),
                 userPhoto: this.getUserPhoto(),
-                userCountry: this.getUserCountry(),
-                countryLocked: this.isCountryLocked(),
                 longPressEnabled: this.isLongPressEnabled(),
                 galleryPhotos: this.getGalleryPhotos(),
                 subjects: this.getSubjects(),
                 tasks: this.getTasks(),
                 notes: this.getNotes(),
                 archivedTasks: this.getArchivedTasks(),
-                archivedNotes: this.getArchivedNotes(),
-                customSchools: this.getCustomSchools()
+                archivedNotes: this.getArchivedNotes()
             };
             return JSON.stringify(data, null, 2);
         },
@@ -1165,8 +1017,7 @@ window.StorageModule = (() => {
                 }
                 if (data.theme) this.setTheme(data.theme);
                 if (data.fontFamily) this.setFontFamily(data.fontFamily);
-                if (data.institution) this.setInstitution(data.institution);
-                if (data.academicPeriod) this.setAcademicPeriod(data.academicPeriod);
+                if (typeof data.academicPeriod === 'string') this.setAcademicPeriod(data.academicPeriod);
                 if (data.academicCycle && data.academicCycle.startDate && data.academicCycle.endDate) {
                     this.setAcademicCycle(data.academicCycle.startDate, data.academicCycle.endDate);
                 }
@@ -1176,13 +1027,12 @@ window.StorageModule = (() => {
                 if (data.bottomAction) this.setBottomAction(data.bottomAction);
                 if (typeof data.hapticsEnabled === 'boolean') this.setHapticsEnabled(data.hapticsEnabled);
                 if (typeof data.autoPurgeArchive === 'boolean') this.setAutoPurgeArchive(data.autoPurgeArchive);
-                if (typeof data.logoExpandEnabled === 'boolean') this.setLogoExpandEnabled(data.logoExpandEnabled);
                 if (typeof data.headerThemeBtnEnabled === 'boolean') this.setHeaderThemeBtnEnabled(data.headerThemeBtnEnabled);
                 if (typeof data.secretUnlocked === 'boolean' && data.secretUnlocked) this.unlockSecret();
                 if (typeof data.grayMode === 'boolean') this.setGrayModeEnabled(data.grayMode);
-                if (typeof data.secretCatsEnabled === 'boolean') this.setSecretCatsEnabled(data.secretCatsEnabled);
                 if (Array.isArray(data.unlockedCodes)) {
-                    const validCodes = data.unlockedCodes.filter(c => typeof c === 'string' && c.trim());
+                    const validCodes = data.unlockedCodes
+                        .filter(c => typeof c === 'string' && c.trim() && c.trim().toUpperCase() !== 'GATITOS_');
                     localStorage.setItem(KEYS.VAULT_UNLOCKED, JSON.stringify(validCodes));
                 }
                 if (typeof data.activeSpecialTheme === 'string') {
@@ -1204,12 +1054,6 @@ window.StorageModule = (() => {
                 if (typeof data.userPhoto === 'string') {
                     this.setUserPhoto(data.userPhoto);
                 }
-                if (typeof data.userCountry === 'string') {
-                    this.setUserCountry(data.userCountry);
-                }
-                if (typeof data.countryLocked === 'boolean') {
-                    this.setCountryLocked(data.countryLocked);
-                }
 
                 this.saveSubjects(data.subjects);
                 this.saveTasks(data.tasks);
@@ -1222,12 +1066,7 @@ window.StorageModule = (() => {
                 if (Array.isArray(data.archivedNotes)) {
                     this.saveArchivedNotes(data.archivedNotes);
                 }
-                const customList = Array.isArray(data.customSchools) ? data.customSchools : (Array.isArray(data.customInstitutions) ? data.customInstitutions : null);
-                if (customList) {
-                    const serialized = JSON.stringify(customList);
-                    localStorage.setItem(KEYS.CUSTOM_SCHOOLS, serialized);
-                    localStorage.setItem('org_escolar_custom_institutions', serialized);
-                }
+                this.cleanupLegacyKeys();
                 return true;
             } catch (e) {
                 throw new Error('Error al importar archivo: ' + e.message);

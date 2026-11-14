@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.4.4
+ * sw.js - Service Worker for Organizador_Tareas v1.5.0
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.4.4';
+const CACHE_NAME = 'organizador-tareas-cache-v1.5.0';
 
 const PRECACHE_ASSETS = [
     './',
@@ -12,20 +12,19 @@ const PRECACHE_ASSETS = [
     './manifest.json',
     './favicon.ico',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.4.4',
-    './css/styles.css?v=1.4.4',
+    './css/tailwind.min.css?v=1.5.0',
+    './css/styles.css?v=1.5.0',
     // JavaScript application modules
-    './js/institutions.js?v=1.4.4',
-    './js/storage.js?v=1.4.4',
-    './js/haptics.js?v=1.4.4',
-    './js/notifications.js?v=1.4.4',
-    './js/widgets.js?v=1.4.4',
-    './js/subjects.js?v=1.4.4',
-    './js/tasks.js?v=1.4.4',
-    './js/notes.js?v=1.4.4',
-    './js/calendar.js?v=1.4.4',
-    './js/archive.js?v=1.4.4',
-    './js/app.js?v=1.4.4',
+    './js/storage.js?v=1.5.0',
+    './js/haptics.js?v=1.5.0',
+    './js/notifications.js?v=1.5.0',
+    './js/widgets.js?v=1.5.0',
+    './js/subjects.js?v=1.5.0',
+    './js/tasks.js?v=1.5.0',
+    './js/notes.js?v=1.5.0',
+    './js/calendar.js?v=1.5.0',
+    './js/archive.js?v=1.5.0',
+    './js/app.js?v=1.5.0',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
@@ -34,16 +33,7 @@ const PRECACHE_ASSETS = [
     './assets/icons/apple-touch-icon.png',
     './assets/icons/favicon-32x32.png',
     './assets/icons/favicon-16x16.png',
-    './assets/icons/favicon.ico',
-    // Core school identity badges
-    './assets/general.svg',
-    './assets/unam.svg',
-    './assets/ipn.svg',
-    './assets/uam.svg',
-    './assets/cch.png',
-    './assets/cecyt.svg',
-    './assets/enp.svg',
-    './assets/colbach.svg'
+    './assets/icons/favicon.ico'
 ];
 
 // Install Event: Precaches core assets using Promise.allSettled for maximum fault tolerance
@@ -57,7 +47,7 @@ self.addEventListener('install', event => {
                     })
                 )
             );
-            console.log(`[SW v1.4.4] Precaching complete. Processed ${results.length} assets.`);
+            console.log(`[SW v1.5.0] Precaching complete. Processed ${results.length} assets.`);
         }).then(() => self.skipWaiting())
     );
 });
@@ -69,7 +59,7 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(name => {
                     if (name !== CACHE_NAME) {
-                        console.log(`[SW v1.4.4] Purging deprecated cache: ${name}`);
+                        console.log(`[SW v1.5.0] Purging deprecated cache: ${name}`);
                         return caches.delete(name);
                     }
                 })
@@ -97,7 +87,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[SW v1.4.4] Navigation offline. Serving cached index.html fallback.');
+                    console.log('[SW v1.5.0] Navigation offline. Serving cached index.html fallback.');
                     const cachedNav = await caches.match(request);
                     if (cachedNav) return cachedNav;
                     return caches.match('./index.html') || caches.match('index.html');

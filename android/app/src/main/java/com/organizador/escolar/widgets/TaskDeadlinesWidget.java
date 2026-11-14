@@ -25,12 +25,12 @@ public class TaskDeadlinesWidget extends AppWidgetProvider {
 
     public static void updateWidgets(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         JSONObject payload = WidgetDataSync.getParsedPayload(context);
-        String instName = "UNAM";
+        String instName = "Mi Agenda";
 
         if (payload != null) {
             JSONObject instObj = payload.optJSONObject("institution");
             if (instObj != null) {
-                instName = instObj.optString("name", "UNAM");
+                instName = instObj.optString("name", "Mi Agenda");
             }
         }
 

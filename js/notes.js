@@ -88,6 +88,8 @@ window.NotesModule = (() => {
 
     // --- Galería de materiales ---
     function compressImage(file) {
+        const MAX_DIM = 1600;
+        const QUALITY = 0.88;
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onerror = () => reject(new Error('read'));
@@ -95,19 +97,13 @@ window.NotesModule = (() => {
                 const img = new Image();
                 img.onerror = () => reject(new Error('img'));
                 img.onload = () => {
-                    let size = 480;
-                    let quality = 0.7;
-                    let dataUrl = '';
-                    for (let i = 0; i < 12; i++) {
-                        const ratio = Math.min(1, size / Math.max(img.width, img.height));
-                        const canvas = document.createElement('canvas');
-                        canvas.width = Math.max(1, Math.round(img.width * ratio));
-                        canvas.height = Math.max(1, Math.round(img.height * ratio));
-                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        dataUrl = canvas.toDataURL('image/jpeg', quality);
-                        if (dataUrl.length * 0.75 < 30 * 1024) break;
-                        if (quality > 0.35) quality -= 0.1; else size = Math.round(size * 0.75);
-                    }
+                    const maxSide = Math.max(img.width || 1, img.height || 1);
+                    const ratio = Math.min(1, MAX_DIM / maxSide);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(img.width * ratio));
+                    canvas.height = Math.max(1, Math.round(img.height * ratio));
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', QUALITY);
                     resolve(dataUrl);
                 };
                 img.src = reader.result;
@@ -129,7 +125,7 @@ window.NotesModule = (() => {
             if (saved) {
                 window.showNotification?.('Foto agregada a la galería.', 'success');
             } else {
-                window.showNotification?.('No hay espacio para guardar la foto.', 'warning');
+                window.showNotification?.('Almacenamiento lleno (localStorage). Elimina fotos anteriores para liberar espacio.', 'warning');
             }
         } catch (e) {
             window.showNotification?.('No se pudo procesar la imagen.', 'warning');

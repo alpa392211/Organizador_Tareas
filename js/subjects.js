@@ -130,6 +130,7 @@ window.SubjectsModule = (() => {
         window.HapticsModule?.light();
         const modal = document.getElementById('subject-modal');
         if (modal) {
+            modal.style.display = '';
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');

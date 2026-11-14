@@ -140,8 +140,7 @@ html.dark:not([class*="theme-"]) #app-exit-btn {
     border-color: #334155 !important;
     color: #f1f5f9 !important;
 }
-html.dark:not([class*="theme-"]) .modal-dialog,
-html.dark:not([class*="theme-"]) #school-modal > div {
+html.dark:not([class*="theme-"]) .modal-dialog {
     background-color: #0f172a !important;
     border-color: #1e293b !important;
     color: #f8fafc !important;
@@ -190,7 +189,6 @@ html:not(.dark).theme-gray #view-notes > div.bg-white,
 html:not(.dark).theme-gray #view-settings > div.bg-white,
 html:not(.dark).theme-gray .settings-accordion-card,
 html:not(.dark).theme-gray .modal-dialog,
-html:not(.dark).theme-gray #school-modal > div,
 html:not(.dark).theme-gray .bg-white:not(header):not(#bottom-nav):not(#sidebar-drawer):not(#sidebar-drawer-footer) {
     background-color: #edf1f6 !important;
     border: 1px solid #c2c9d4 !important;
@@ -327,52 +325,6 @@ img[src*="assets/"] {
 
 section.hidden, .modal-overlay.hidden {
     display: none !important;
-}
-
-.school-logo-frame {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: #ffffff !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-}
-
-.school-logo-frame img {
-    max-width: 90% !important;
-    max-height: 90% !important;
-    width: auto !important;
-    height: auto !important;
-    object-fit: contain !important;
-    background-color: transparent !important;
-    display: block !important;
-}
-
-#header-inst-logo .school-logo-frame {
-    width: 2.75rem !important;
-    height: 2.75rem !important;
-}
-
-#drawer-inst-logo .school-logo-frame {
-    width: 3rem !important;
-    height: 3rem !important;
-}
-
-#settings-inst-logo-container .school-logo-frame {
-    width: 3.5rem !important;
-    height: 3.5rem !important;
-}
-
-#school-identity-logo-content .school-logo-frame {
-    width: 6rem !important;
-    height: 6rem !important;
-}
-
-.inst-grid-card .school-logo-frame {
-    width: 2rem !important;       /* 32px (down from 48px) */
-    height: 2rem !important;      /* 32px (down from 48px) */
-    border-radius: 0.5rem !important; /* rounded-lg */
-    padding: 0.125rem !important; /* p-0.5 */
 }
 
 
@@ -652,17 +604,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(0.8);
 }
 
-/* Marco con Contenedor de Fondo Blanco Sólido para Escudos Oficiales */
-.school-logo-frame {
-    background-color: #ffffff !important;
-}
-
-.school-logo-frame img {
-    background-color: transparent !important;
-    max-width: 100%;
-    max-height: 100%;
-}
-
 /* ========================================================
    ANIMACIÓN DE CELEBRACIÓN DE TAREAS (EMOJIS FIESTA)
    ======================================================== */
@@ -693,41 +634,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 1.6rem;
     animation: emojiFloatBurst 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     will-change: transform, opacity;
-}
-
-/* ========================================================
-   ANIMACIÓN DEL LOGO INSTITUCIONAL (ZOOM, GLOW Y SALIDA A LA IZQUIERDA)
-   ======================================================== */
-@keyframes schoolIdentityEnter {
-    0% {
-        opacity: 0;
-        transform: scale(0.65) translate3d(var(--origin-x, 0px), var(--origin-y, -30px), 0);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) translate3d(0, 0, 0);
-    }
-}
-
-.school-identity-card-anim {
-    animation: schoolIdentityEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    will-change: transform, opacity;
-}
-
-@keyframes schoolIdentityExitRightAnim {
-    0% {
-        opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-    }
-    100% {
-        opacity: 0;
-        transform: translate3d(160%, 0, 0) scale(0.9) rotate(5deg);
-    }
-}
-
-.school-identity-exit-right {
-    animation: schoolIdentityExitRightAnim 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-    pointer-events: none;
 }
 
 /* ========================================================
@@ -1160,22 +1066,6 @@ html:not(.dark) .vault-inventory-card button[data-vault-toggle][class*="emerald"
     animation: vaultShakeAnim 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-/* Micro-gatito escondido en botones cuando catsEnabled está activo */
-.hidden-kitty-badge {
-    position: absolute;
-    bottom: -6px;
-    right: -4px;
-    font-size: 0.9rem;
-    pointer-events: none;
-    opacity: 0.85;
-    transform: rotate(12deg);
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-.hidden-kitty-badge:hover {
-    transform: rotate(0deg) scale(1.2);
-    opacity: 1;
-}
-
 /* ========================================================
    BLOQUEO DE ORIENTACIÓN HORIZONTAL EN CELULARES
    (Sólo activa en pantallas móviles con altura reducida;
@@ -1378,7 +1268,6 @@ html.theme-apollo .stagger-card,
 html.theme-apollo .card-hover,
 html.theme-apollo .settings-accordion-card,
 html.theme-apollo .modal-dialog,
-html.theme-apollo #school-modal > div,
 html.theme-apollo #view-subjects > div.bg-white,
 html.theme-apollo #view-tasks > div.bg-white,
 html.theme-apollo #view-notes > div.bg-white,
@@ -1418,7 +1307,6 @@ html.theme-eduardo-gold .stagger-card,
 html.theme-eduardo-gold .card-hover,
 html.theme-eduardo-gold .settings-accordion-card,
 html.theme-eduardo-gold .modal-dialog,
-html.theme-eduardo-gold #school-modal > div,
 html.theme-eduardo-gold #view-subjects > div.bg-white,
 html.theme-eduardo-gold #view-tasks > div.bg-white,
 html.theme-eduardo-gold #view-notes > div.bg-white,
@@ -1458,7 +1346,6 @@ html.theme-penguin .stagger-card,
 html.theme-penguin .card-hover,
 html.theme-penguin .settings-accordion-card,
 html.theme-penguin .modal-dialog,
-html.theme-penguin #school-modal > div,
 html.theme-penguin #view-subjects > div.bg-white,
 html.theme-penguin #view-tasks > div.bg-white,
 html.theme-penguin #view-notes > div.bg-white,
@@ -1498,7 +1385,6 @@ html.theme-synthwave .stagger-card,
 html.theme-synthwave .card-hover,
 html.theme-synthwave .settings-accordion-card,
 html.theme-synthwave .modal-dialog,
-html.theme-synthwave #school-modal > div,
 html.theme-synthwave #view-subjects > div.bg-white,
 html.theme-synthwave #view-tasks > div.bg-white,
 html.theme-synthwave #view-notes > div.bg-white,
@@ -1538,7 +1424,6 @@ html.theme-matrix .stagger-card,
 html.theme-matrix .card-hover,
 html.theme-matrix .settings-accordion-card,
 html.theme-matrix .modal-dialog,
-html.theme-matrix #school-modal > div,
 html.theme-matrix #view-subjects > div.bg-white,
 html.theme-matrix #view-tasks > div.bg-white,
 html.theme-matrix #view-notes > div.bg-white,
@@ -1579,7 +1464,6 @@ html.theme-sakura .stagger-card,
 html.theme-sakura .card-hover,
 html.theme-sakura .settings-accordion-card,
 html.theme-sakura .modal-dialog,
-html.theme-sakura #school-modal > div,
 html.theme-sakura #view-subjects > div.bg-white,
 html.theme-sakura #view-tasks > div.bg-white,
 html.theme-sakura #view-notes > div.bg-white,
@@ -1619,7 +1503,6 @@ html.theme-coffee .stagger-card,
 html.theme-coffee .card-hover,
 html.theme-coffee .settings-accordion-card,
 html.theme-coffee .modal-dialog,
-html.theme-coffee #school-modal > div,
 html.theme-coffee #view-subjects > div.bg-white,
 html.theme-coffee #view-tasks > div.bg-white,
 html.theme-coffee #view-notes > div.bg-white,
@@ -1659,7 +1542,6 @@ html.theme-arcade .stagger-card,
 html.theme-arcade .card-hover,
 html.theme-arcade .settings-accordion-card,
 html.theme-arcade .modal-dialog,
-html.theme-arcade #school-modal > div,
 html.theme-arcade #view-subjects > div.bg-white,
 html.theme-arcade #view-tasks > div.bg-white,
 html.theme-arcade #view-notes > div.bg-white,
@@ -1699,7 +1581,6 @@ html.theme-hyperfocus .stagger-card,
 html.theme-hyperfocus .card-hover,
 html.theme-hyperfocus .settings-accordion-card,
 html.theme-hyperfocus .modal-dialog,
-html.theme-hyperfocus #school-modal > div,
 html.theme-hyperfocus #view-subjects > div.bg-white,
 html.theme-hyperfocus #view-tasks > div.bg-white,
 html.theme-hyperfocus #view-notes > div.bg-white,
@@ -1739,7 +1620,6 @@ html.theme-starlight .stagger-card,
 html.theme-starlight .card-hover,
 html.theme-starlight .settings-accordion-card,
 html.theme-starlight .modal-dialog,
-html.theme-starlight #school-modal > div,
 html.theme-starlight #view-subjects > div.bg-white,
 html.theme-starlight #view-tasks > div.bg-white,
 html.theme-starlight #view-notes > div.bg-white,

@@ -1,10 +1,10 @@
 /**
  * Aplicación Principal - Orquestador
- * Integra UI, navegación por Drawer, selector institucional oficial,
- * selector dinámico de periodos/semestres, ciclo escolar obligatorio, notas rápidas,
+ * Integra UI, navegación por Drawer, perfil de usuario y periodo manual,
+ * ciclo escolar obligatorio, notas rápidas con galería de fotos,
  * baúl de archivados con depuración de 60 días y telarañas decorativas,
  * selector de 5 tipografías mediante botones interactivos, sistema háptico,
- * botón central de atajo de acción rápida personalizable, animación de logo escolar y widgets nativos.
+ * botón central de atajo de acción rápida personalizable y widgets nativos.
  */
 
 (() => {
@@ -139,19 +139,6 @@
             themeClass: 'theme-hyperfocus',
             supportsRockets: false
         },
-        'GATITOS_': {
-            id: 'GATITOS_',
-            name: 'Felinos & Escala de Grises',
-            icon: '🐱',
-            category: 'EASTER EGG CLÁSICO',
-            themeId: 'gray',
-            badgeClass: 'bg-slate-500/20 text-slate-300 border-slate-400/30',
-            phrase: '«Miau... El modo secreto original del organizador»',
-            description: 'Desbloquea directamente desde la bóveda el clásico modo escala de grises monocromático y la celebración con gatitos juguetones 🐾 en cada tarea cumplida.',
-            actionLabel: 'Activar Gatitos y Modo Gris 🐱',
-            themeClass: 'theme-gray',
-            supportsRockets: false
-        },
         'READABLE': {
             id: 'READABLE',
             name: 'Tipografía Lexend Hiperlegible',
@@ -229,7 +216,7 @@
             category: 'PROTOCOLO MAESTRO • ACCESO TOTAL',
             badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
             phrase: '«ACCESO TOTAL CONCEDIDO • 100% PROTOCOLOS Y FUENTES DESBLOQUEADOS»',
-            description: '¡Has descifrado la clave maestra universal! Se han desbloqueado simultáneamente los 11 temas de personalización, el tributo estelar Starlight y las 5 familias tipográficas secretas en tu organizador.',
+            description: '¡Has descifrado la clave maestra universal! Se han desbloqueado simultáneamente los 10 temas de personalización, el modo monocromático, el tributo estelar Starlight y las 5 familias tipográficas secretas en tu organizador.',
             actionLabel: 'Explorar Bóveda Completa 🔓',
             themeId: null,
             themeClass: null,
@@ -260,8 +247,6 @@
         'ARCADE90': 'ARCADE90', 'PIXEL8BT': 'ARCADE90', 'GAMEBOY_': 'ARCADE90', 'ARCADE__': 'ARCADE90', 'ARCADE': 'ARCADE90',
         // STUDYMAX
         'STUDYMAX': 'STUDYMAX', 'EINSTEIN': 'STUDYMAX', 'HYPERFOC': 'STUDYMAX', 'STUDY___': 'STUDYMAX', 'STUDY': 'STUDYMAX',
-        // GATITOS_
-        'GATITOS_': 'GATITOS_', 'GATITOS': 'GATITOS_', 'NEKOLUCK': 'GATITOS_', 'MEOWMEOW': 'GATITOS_', 'GATITO': 'GATITOS_',
         // READABLE (Lexend)
         'READABLE': 'READABLE', 'LEXEND24': 'READABLE', 'DYSLEXIC': 'READABLE', 'LEXEND__': 'READABLE', 'READWELL': 'READABLE', 'LECTURA_': 'READABLE', 'LEXEND': 'READABLE',
         // FIRACODE (Fira Code)
@@ -287,13 +272,10 @@
     class App {
         constructor() {
             this.currentView = 'subjects'; // 'subjects' | 'tasks' | 'notes' | 'calendar' | 'archive' | 'settings'
-            this.activeInstitution = null;
-            this.selectedCountryFilter = 'all';
         }
 
         init() {
             const Storage = window.StorageModule;
-            const InstitutionsModule = window.InstitutionsModule;
             const SubjectsModule = window.SubjectsModule;
             const TasksModule = window.TasksModule;
             const CalendarModule = window.CalendarModule;
@@ -303,7 +285,8 @@
             const NotificationsModule = window.NotificationsModule;
             const WidgetSyncModule = window.WidgetSyncModule;
 
-            // 1. Inicialización limpia en localStorage
+            // 1. Limpieza de claves heredadas e inicialización en localStorage
+            Storage.cleanupLegacyKeys?.();
             Storage.initIfFirstTime();
 
             // Depuración de archivados de 60 días y auto-archivo de tareas de 30 días
@@ -321,17 +304,13 @@
             this.applySpecialThemeFromStorage();
             this.updateApolloRockets();
 
-            // 4. Inicializar y aplicar tipografía seleccionada (5 opciones con botones)
+            // 4. Inicializar y aplicar tipografía seleccionada
             this.initFontFamily();
 
             // Bloqueo de orientación horizontal en teléfonos móviles (Portrait Lock)
             this.initOrientationLock();
 
-            // 5. Cargar institución y periodo activo
-            const instId = Storage.getInstitution();
-            this.setInstitution(instId);
-
-            // 6. Inicializar submódulos
+            // 5. Inicializar submódulos
             SubjectsModule?.init?.();
             TasksModule?.init?.();
             NotesModule?.init?.();
@@ -339,19 +318,19 @@
             ArchiveModule?.init?.();
             WidgetSyncModule?.init?.();
 
-            // 7. Configurar navegación, drawer, selectores, botón principal de atajo, modales y confirmación de salida
+            // 6. Configurar navegación, drawer, botón principal de atajo, modales y confirmación de salida
             this.setupNavigation();
             this.setupSidebarDrawer();
-            this.setupInstitutionAndPeriodSelectors();
             this.setupBottomActionButton();
             this.setupModalsAndShortcuts();
-            this.setupSchoolIdentityModal();
-            this.setupCustomSchoolModal();
             this.setupCycleWelcomeModal();
             this.setupExitModal();
             this.setupSettingsView();
             this.setupSecretVault();
             this.initPwa();
+
+            // 7. Sincronizar UI inicial de perfil y periodo
+            this.syncPeriodUI();
 
             // 8. Exponer funciones globales para interacción fluida entre módulos
             window.onDataChanged = () => this.refreshAll();
@@ -394,9 +373,6 @@
             if (urlParams.get('openExit') === '1') {
                 setTimeout(() => document.getElementById('app-exit-btn')?.click(), 50);
             }
-            if (urlParams.get('openSchoolModal') === '1') {
-                setTimeout(() => document.getElementById('header-inst-logo')?.click(), 80);
-            }
 
             // 11. Renderizado inicial completo
             this.refreshAll();
@@ -404,23 +380,20 @@
 
             // 12. Flujo de inicio de presentación (Presentation-First Flow Ordering)
             // Si el onboarding NO se ha completado: NO solicitar notificaciones ni mostrar changelog; abrir bienvenida primero
-            if ((!Storage.isOnboardingCompleted?.() || !Storage.isCycleConfigured?.()) && urlParams.get('openSchoolModal') !== '1') {
+            if (!Storage.isOnboardingCompleted?.() || !Storage.isCycleConfigured?.()) {
                 this.openCycleWelcomeModal?.();
             } else {
                 // Si el onboarding YA está completado:
-                // Permisos de notificaciones al abrir la app
                 if (window.NotificationsModule?.requestPermission) {
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.4.4
+                // Comprobar changelog de versión 1.5.0
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.4.4') {
+                if (lastSeenVersion !== '1.5.0') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
-                } else {
-                    setTimeout(() => this.openInstabilityNoticeIfNeeded?.(), 600);
                 }
             }
         }
@@ -428,6 +401,8 @@
         refreshAll() {
             this.renderHeader();
             this.renderDrawer();
+            this.syncPeriodUI();
+            this.refreshSettingsProfileUI?.();
             window.SubjectsModule?.render?.();
             window.TasksModule?.render?.();
             window.NotesModule?.render?.();
@@ -440,23 +415,16 @@
 
         renderHeader() {
             const Storage = window.StorageModule;
-            const InstitutionsModule = window.InstitutionsModule;
             if (!Storage) return;
 
-            const instId = Storage.getInstitution?.() || 'unam';
-            const inst = InstitutionsModule?.getInstitution?.(instId) || { name: 'Sin institución', colors: { primary: '#4F46E5' } };
-            const userName = Storage.getUserName?.() || '';
+            const userName = (Storage.getUserName?.() || '').trim();
             const userPhoto = Storage.getUserPhoto?.() || '';
-            const period = Storage.getAcademicPeriod?.() || inst.defaultPeriod || '1.º Semestre';
+            const period = (Storage.getAcademicPeriod?.() || '').trim();
 
             const headerUserName = document.getElementById('header-user-name');
             if (headerUserName) {
-                headerUserName.textContent = userName;
-                if (userName) {
-                    headerUserName.classList.remove('hidden');
-                } else {
-                    headerUserName.classList.add('hidden');
-                }
+                headerUserName.textContent = '';
+                headerUserName.classList.add('hidden');
             }
 
             const headerInstName = document.getElementById('header-inst-name');
@@ -464,14 +432,14 @@
                 headerInstName.textContent = userName || 'Mi Organizador';
             }
 
+            const headerPeriodSep = document.getElementById('header-period-sep');
             const headerInstPeriod = document.getElementById('header-inst-period');
             if (headerInstPeriod) {
                 headerInstPeriod.textContent = period;
+                headerInstPeriod.classList.toggle('hidden', !period);
             }
-
-            const headerInstType = document.getElementById('header-inst-type');
-            if (headerInstType) {
-                headerInstType.textContent = inst.systemType || inst.type || 'Semestral';
+            if (headerPeriodSep) {
+                headerPeriodSep.classList.toggle('hidden', !period);
             }
 
             const logoContainer = document.getElementById('header-inst-logo');
@@ -486,26 +454,25 @@
 
         renderDrawer() {
             const Storage = window.StorageModule;
-            const InstitutionsModule = window.InstitutionsModule;
             if (!Storage) return;
 
-            const instId = Storage.getInstitution?.() || 'unam';
-            const inst = InstitutionsModule?.getInstitution?.(instId) || { name: 'Sin institución' };
-            const userName = Storage.getUserName?.() || '';
+            const userName = (Storage.getUserName?.() || '').trim();
             const userPhoto = Storage.getUserPhoto?.() || '';
-            const period = Storage.getAcademicPeriod?.() || inst.defaultPeriod || '1.º Semestre';
+            const period = (Storage.getAcademicPeriod?.() || '').trim();
 
             const drawerName = document.getElementById('drawer-inst-name');
             if (drawerName) drawerName.textContent = userName || 'Mi Organizador';
 
             const drawerPeriod = document.getElementById('drawer-inst-period');
-            if (drawerPeriod) drawerPeriod.textContent = period;
+            if (drawerPeriod) {
+                drawerPeriod.textContent = period;
+                drawerPeriod.classList.toggle('hidden', !period);
+            }
 
             const drawerSlogan = document.getElementById('drawer-inst-slogan');
             if (drawerSlogan) {
-                const sloganDisplay = userName ? userName : (inst.slogan ? `"${inst.slogan}"` : '');
-                drawerSlogan.textContent = sloganDisplay;
-                drawerSlogan.title = userName || inst.slogan || '';
+                drawerSlogan.textContent = '';
+                drawerSlogan.classList.add('hidden');
             }
 
             const drawerLogo = document.getElementById('drawer-inst-logo');
@@ -806,13 +773,13 @@
         isSpecialThemeActive() {
             const Storage = window.StorageModule;
             const current = Storage?.getActiveSpecialTheme ? Storage.getActiveSpecialTheme() : 'default';
-            // Únicamente el tema de felinos/monocromático ('gray') permite modo claro sin bloquearlo
-            return current && current !== 'default' && current !== 'gray' && current !== 'theme_cats' && current !== 'theme-gray';
+            // Únicamente el modo monocromático ('gray' / 'theme-gray') permite modo claro sin bloquearlo
+            return current && current !== 'default' && current !== 'gray' && current !== 'theme-gray';
         }
 
         applyTheme(theme, save = true) {
             const Storage = window.StorageModule;
-            // Si hay un tema especial activo (salvo modo gatos), el modo claro no funciona y se fuerza modo oscuro
+            // Si hay un tema especial activo (salvo modo monocromático), el modo claro no funciona y se fuerza modo oscuro
             const effectiveTheme = this.isSpecialThemeActive() ? 'dark' : theme;
             const isDark = effectiveTheme === 'dark';
 
@@ -948,32 +915,19 @@
 
         applySecretFeaturesUI() {
             const Storage = window.StorageModule;
-            const isUnlocked = Storage.isSecretUnlocked();
             const secretSection = document.getElementById('secret-theme-controls');
             if (secretSection) {
-                // v1.4.4: las funciones secretas viven dentro del inventario de la bóveda.
+                // Las funciones secretas viven dentro del inventario de la bóveda.
                 secretSection.classList.add('hidden');
             }
 
             const updateSecretButtons = () => {
                 const isGrayActive = Storage.getGrayModeEnabled();
-                const isCatsActive = Storage.getSecretCatsEnabled();
-
                 const grayBtn = document.getElementById('settings-gray-mode-btn');
                 if (grayBtn) {
                     grayBtn.textContent = isGrayActive ? 'Desactivar' : 'Activar';
                     grayBtn.className = `tap-effect shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                         isGrayActive
-                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30'
-                            : 'bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50'
-                    }`;
-                }
-
-                const catsBtn = document.getElementById('settings-cats-btn');
-                if (catsBtn) {
-                    catsBtn.textContent = isCatsActive ? 'Desactivar' : 'Activar';
-                    catsBtn.className = `tap-effect shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                        isCatsActive
                             ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30'
                             : 'bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50'
                     }`;
@@ -987,7 +941,7 @@
                     window.HapticsModule?.light();
                     this.applyGrayMode(e.target.checked);
                     updateSecretButtons();
-                    this.showToast(e.target.checked ? 'Modo Gris activado.' : 'Modo Gris desactivado.', 'info');
+                    this.showToast(e.target.checked ? 'Modo Monocromático activado.' : 'Modo Monocromático desactivado.', 'info');
                 };
             }
 
@@ -1000,482 +954,64 @@
                     if (grayToggle) grayToggle.checked = next;
                     updateSecretButtons();
                     this.renderVaultInventory?.();
-                    this.showToast(next ? 'Modo Gris activado.' : 'Modo Gris desactivado.', 'info');
-                };
-            }
-
-            const catsToggle = document.getElementById('settings-cats-toggle');
-            if (catsToggle) {
-                catsToggle.checked = Storage.getSecretCatsEnabled();
-                catsToggle.onchange = (e) => {
-                    window.HapticsModule?.light();
-                    Storage.setSecretCatsEnabled(e.target.checked);
-                    this.updateHiddenKitties();
-                    updateSecretButtons();
-                    this.showToast(e.target.checked ? '🐾 ¡Gatitos activados!' : 'Gatitos desactivados.', 'info');
-                };
-            }
-
-            const catsBtn = document.getElementById('settings-cats-btn');
-            if (catsBtn) {
-                catsBtn.onclick = () => {
-                    window.HapticsModule?.light();
-                    const next = !Storage.getSecretCatsEnabled();
-                    Storage.setSecretCatsEnabled(next);
-                    if (catsToggle) catsToggle.checked = next;
-                    this.updateHiddenKitties();
-                    updateSecretButtons();
-                    this.showToast(next ? '🐾 ¡Gatitos activados!' : 'Gatitos desactivados.', 'info');
+                    this.showToast(next ? 'Modo Monocromático activado.' : 'Modo Monocromático desactivado.', 'info');
                 };
             }
 
             this.applyGrayMode(Storage.getGrayModeEnabled());
-            this.updateHiddenKitties();
             updateSecretButtons();
         }
 
-        updateHiddenKitties() {
+        syncPeriodUI() {
             const Storage = window.StorageModule;
-            const useCats = Storage.isSecretUnlocked() && Storage.getSecretCatsEnabled();
-            const targets = [
-                document.getElementById('add-task-btn'),
-                document.getElementById('add-note-btn'),
-                document.getElementById('add-subject-btn')
-            ];
+            if (!Storage) return;
 
-            targets.forEach(btn => {
-                if (!btn) return;
-                let badge = btn.querySelector('.hidden-kitty-badge');
-                if (useCats) {
-                    if (!badge) {
-                        badge = document.createElement('span');
-                        badge.className = 'hidden-kitty-badge select-none';
-                        badge.textContent = '🐾';
-                        btn.style.position = 'relative';
-                        btn.appendChild(badge);
-                    }
-                } else {
-                    if (badge) badge.remove();
-                }
-            });
-        }
-
-        setInstitution(id) {
-            const InstitutionsModule = window.InstitutionsModule;
-            const Storage = window.StorageModule;
-            const inst = InstitutionsModule.getInstitution(id);
-            this.activeInstitution = inst;
-            Storage.setInstitution(id);
-
-            // Renderizado de logotipos oficiales desde assets/ en marco blanco permanente
-            const logoContainer = document.getElementById('header-inst-logo');
-            const nameEl = document.getElementById('header-inst-name');
-            const typeEl = document.getElementById('header-inst-type');
-            const drawerLogo = document.getElementById('drawer-inst-logo');
-            const drawerName = document.getElementById('drawer-inst-name');
-            const drawerSlogan = document.getElementById('drawer-inst-slogan');
-
-            const userName = Storage.getUserName?.();
-            const sloganDisplay = userName ? userName : (inst.slogan ? `"${inst.slogan}"` : '');
-
-            if (logoContainer) logoContainer.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-10 h-10');
-            if (nameEl) nameEl.textContent = inst.name;
-            if (typeEl) typeEl.textContent = inst.systemType || inst.type;
-            if (drawerLogo) drawerLogo.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-12 h-12');
-            if (drawerName) drawerName.textContent = inst.name;
-            if (drawerSlogan) {
-                drawerSlogan.textContent = sloganDisplay;
-                drawerSlogan.title = userName || inst.slogan || '';
-            }
-
-            // Actualizar vista previa institucional en Configuración
-            const settingsLogo = document.getElementById('settings-inst-logo-container');
-            const settingsName = document.getElementById('settings-inst-name');
-            const settingsFullName = document.getElementById('settings-inst-fullname');
-            const settingsSlogan = document.getElementById('settings-inst-slogan');
-            const settingsTypeBadge = document.getElementById('settings-inst-type-badge');
-            const settingsBadgePill = document.getElementById('settings-inst-badge-pill');
-
-            if (settingsLogo) settingsLogo.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-14 h-14');
-            if (settingsName) settingsName.textContent = inst.name;
-            if (settingsFullName) settingsFullName.textContent = inst.fullName;
-            if (settingsSlogan) settingsSlogan.textContent = sloganDisplay;
-            if (settingsTypeBadge) settingsTypeBadge.textContent = inst.systemType || inst.type;
-            if (settingsBadgePill) settingsBadgePill.textContent = inst.name;
-
-            // Actualizar selector institucional en el header
-            const headerSelect = document.getElementById('header-institution-select');
-            if (headerSelect) headerSelect.value = id;
-
-            // Actualizar selector dinámico de periodos
-            this.updatePeriodSelectors(inst);
-
-            // Re-renderizar resaltado de la galería en Settings
-            this.renderInstitutionGrid();
-
-            document.documentElement.style.setProperty('--inst-primary', inst.colors.primary);
-            this.updateCycleBadges();
-            // v1.4.4: la identidad visible es el usuario (nombre y foto), no la escuela.
-            this.renderHeader?.();
-            this.renderDrawer?.();
-        }
-
-        renderSettingsSchools() {
-            return this.renderInstitutionGrid();
-        }
-
-        renderInstitutionGrid() {
-            const grid = document.getElementById('settings-institution-grid');
-            const pillsContainer = document.getElementById('settings-country-pills');
-            const InstitutionsModule = window.InstitutionsModule;
-            const Storage = window.StorageModule;
-            if (!grid || !InstitutionsModule) return;
-
-            const countries = InstitutionsModule.getCountries();
-            const allInstitutions = InstitutionsModule.getAllInstitutions();
-            const customSchools = Storage?.getCustomSchools?.() || [];
-            const activeId = this.activeInstitution?.id || 'unam';
-            const currentFilter = this.selectedCountryFilter || 'all';
-
-            // 1. Renderizar píldoras horizontales de filtro por país y Mis Escuelas
-            if (pillsContainer) {
-                const filterOptions = [
-                    { id: 'all', label: 'Todas' },
-                    ...countries.map(c => ({ id: c.code, label: c.name })),
-                    { id: 'custom', label: `⭐ Mis Escuelas (${customSchools.length})` }
-                ];
-
-                pillsContainer.innerHTML = filterOptions.map(opt => {
-                    const isSelected = opt.id === currentFilter;
-                    const pillClass = isSelected
-                        ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                        : 'bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold';
-
-                    return `
-                        <button type="button" data-country-filter="${opt.id}"
-                            class="tap-effect shrink-0 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap ${pillClass}">
-                            ${opt.label}
-                        </button>
-                    `;
-                }).join('');
-
-                pillsContainer.querySelectorAll('[data-country-filter]').forEach(btn => {
-                    btn.onclick = () => {
-                        this.selectedCountryFilter = btn.dataset.countryFilter;
-                        window.HapticsModule?.light();
-                        this.renderInstitutionGrid();
-                    };
-                });
-            }
-
-            // 2. Filtrar instituciones según selección activa
-            let filtered = [];
-            if (currentFilter === 'all') {
-                filtered = allInstitutions;
-            } else if (currentFilter === 'custom') {
-                filtered = allInstitutions.filter(inst => inst.isCustom);
-            } else {
-                filtered = allInstitutions.filter(inst => inst.countryCode === currentFilter);
-            }
-
-            // 3. Renderizar tarjetas en la rejilla
-            let cardsHtml = filtered.map(inst => {
-                const isActive = inst.id === activeId;
-                const activeClasses = isActive 
-                    ? 'ring-2 ring-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 shadow-sm'
-                    : 'bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-slate-200/80 dark:border-slate-700/70';
-
-                const countryTag = inst.isCustom 
-                    ? '<span class="text-[8.5px] font-extrabold text-amber-500 leading-none">⭐ Propia</span>'
-                    : (inst.countryCode ? `<span class="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tight leading-none">${inst.countryCode}</span>` : '<span></span>');
-
-                const statusBadge = isActive
-                    ? `<span class="px-1.5 py-0.5 rounded bg-indigo-600 text-[7.5px] font-black text-white uppercase tracking-wider shadow-2xs leading-none ${inst.isCustom ? 'mr-5' : ''}">Actual</span>`
-                    : '';
-
-                const editBtnHtml = inst.isCustom ? `
-                    <button type="button" data-edit-custom-id="${inst.id}"
-                        class="edit-custom-school-btn absolute top-1 right-1 p-1 rounded-md bg-slate-100/90 hover:bg-indigo-100 text-slate-500 hover:text-indigo-600 dark:bg-slate-700/90 dark:hover:bg-slate-600 tap-effect transition-colors z-10"
-                        title="Editar ${inst.name}">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                    </button>
-                ` : '';
-
-                return `
-                    <div class="relative group">
-                        <button type="button" data-inst-id="${inst.id}"
-                            class="inst-grid-card tap-effect w-full flex flex-col items-center text-center py-1 px-1.5 rounded-xl border transition-all ${activeClasses}"
-                            title="Seleccionar ${inst.name}">
-                            <!-- Micro-cabecera con país/tipo y estado Actual -->
-                            <div class="w-full flex items-center justify-between gap-1 px-0.5 leading-none h-3">
-                                ${countryTag}
-                                ${statusBadge}
-                            </div>
-                            <!-- Escudo oficial en contenedor de marco blanco permanente -->
-                            <div class="my-0 flex items-center justify-center">
-                                ${InstitutionsModule.renderIconHtml(inst, 'w-8 h-8 rounded-lg p-0.5', 'w-full h-full object-contain')}
-                            </div>
-                            <span class="text-[11px] font-black text-slate-900 dark:text-white truncate w-full block text-center px-0.5 leading-tight">
-                                ${inst.name}
-                            </span>
-                            <span class="text-[9px] text-slate-500 dark:text-slate-400 truncate w-full block text-center font-medium leading-tight mt-0.5">
-                                ${inst.systemType || inst.type}
-                            </span>
-                        </button>
-                        ${editBtnHtml}
-                    </div>
-                `;
-            }).join('');
-
-            // Agregar tarjeta interactiva "+ Crear Escuela" en formato compacto uniforme
-            const createCardHtml = `
-                <button type="button" id="grid-create-school-card"
-                    class="tap-effect flex flex-col items-center justify-center text-center py-1 px-1.5 rounded-xl border-2 border-dashed border-indigo-300 dark:border-indigo-700/60 hover:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/80 transition-all text-indigo-600 dark:text-indigo-400 min-h-[78px] max-h-[82px] h-[81px]"
-                    title="Crear nueva escuela personalizada">
-                    <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center text-xs mb-0.5 font-bold">
-                        ➕
-                    </div>
-                    <span class="text-[11px] font-black leading-tight">Crear Escuela</span>
-                    <span class="text-[9px] text-indigo-500/80 font-medium leading-tight">Personalizada</span>
-                </button>
-            `;
-            grid.innerHTML = cardsHtml + createCardHtml;
-
-            // Manejadores de eventos a cada tarjeta del selector
-            grid.querySelectorAll('.inst-grid-card').forEach(card => {
-                card.onclick = () => {
-                    const instId = card.dataset.instId;
-                    window.HapticsModule?.light();
-                    this.setInstitution(instId);
-                    this.showToast(`Institución seleccionada: ${this.activeInstitution.name}`, 'success');
-                    setTimeout(() => {
-                        card.closest('.settings-accordion-card')?.classList.remove('open');
-                    }, 400);
-                };
-            });
-
-            // Manejadores para editar escuelas personalizadas
-            grid.querySelectorAll('.edit-custom-school-btn').forEach(btn => {
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    const schoolId = btn.dataset.editCustomId;
-                    this.openCustomSchoolModal(schoolId);
-                };
-            });
-
-            // Manejador botón crear en cuadrícula
-            const gridCreateBtn = document.getElementById('grid-create-school-card');
-            if (gridCreateBtn) {
-                gridCreateBtn.onclick = () => this.openCustomSchoolModal();
-            }
-        }
-
-        updatePeriodSelectors(inst) {
-            const Storage = window.StorageModule;
-            const currentPeriod = Storage.getAcademicPeriod();
-            const headerPeriodSelect = document.getElementById('header-period-select');
-            const settingsPeriodSelect = document.getElementById('settings-period-select');
-            const periodPillsContainer = document.getElementById('settings-period-pills');
-            const customPeriodInput = document.getElementById('custom-period-input');
-            const saveCustomPeriodBtn = document.getElementById('save-custom-period-btn');
+            const period = (Storage.getAcademicPeriod?.() || '').trim();
+            const headerPeriodSep = document.getElementById('header-period-sep');
             const headerPeriodLabel = document.getElementById('header-inst-period');
             const drawerPeriodLabel = document.getElementById('drawer-inst-period');
             const settingsPeriodBadge = document.getElementById('settings-inst-period-badge');
+            const settingsBadgePill = document.getElementById('settings-inst-badge-pill');
+            const customPeriodInput = document.getElementById('custom-period-input');
+            const clearPeriodBtn = document.getElementById('clear-custom-period-btn');
 
-            // Preservar periodo válido del usuario sin sobreescribir con defaultPeriod (evitar arrastrar "Sin periodo")
-            const isStalePlaceholder = !currentPeriod || currentPeriod.trim() === 'Sin periodo';
-            const activePeriod = (!isStalePlaceholder && inst.periods?.includes(currentPeriod.trim()))
-                ? currentPeriod.trim()
-                : (inst?.defaultPeriod || inst?.periods?.[0] || '1.º Semestre');
-            Storage.setAcademicPeriod(activePeriod);
-
-            const optionsHtml = inst.periods.map(p => `
-                <option value="${p}">${p}</option>
-            `).join('');
-
-            if (headerPeriodSelect) {
-                headerPeriodSelect.innerHTML = optionsHtml;
-                if (!inst.periods.includes(activePeriod)) {
-                    const opt = document.createElement('option');
-                    opt.value = activePeriod;
-                    opt.textContent = activePeriod;
-                    headerPeriodSelect.appendChild(opt);
-                }
-                headerPeriodSelect.value = activePeriod;
+            if (headerPeriodLabel) {
+                headerPeriodLabel.textContent = period;
+                headerPeriodLabel.classList.toggle('hidden', !period);
             }
-
-            if (settingsPeriodSelect) {
-                settingsPeriodSelect.innerHTML = optionsHtml;
-                if (!inst.periods.includes(activePeriod)) {
-                    const opt = document.createElement('option');
-                    opt.value = activePeriod;
-                    opt.textContent = activePeriod;
-                    settingsPeriodSelect.appendChild(opt);
-                }
-                settingsPeriodSelect.value = activePeriod;
+            if (headerPeriodSep) {
+                headerPeriodSep.classList.toggle('hidden', !period);
             }
-
-            // Renderizar grupo de botones tipo píldora para selección táctil hermosa
-            if (periodPillsContainer) {
-                let pillsList = [...inst.periods];
-                if (!pillsList.includes(activePeriod)) {
-                    pillsList.push(activePeriod);
-                }
-
-                periodPillsContainer.innerHTML = '';
-                pillsList.forEach(p => {
-                    const isSelected = p === activePeriod;
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.dataset.periodBtn = p;
-                    btn.className = `period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                        isSelected
-                            ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
-                            : 'bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent'
-                    }`;
-                    btn.textContent = p;
-                    btn.onclick = () => this.setAcademicPeriod(p);
-                    periodPillsContainer.appendChild(btn);
-                });
+            if (drawerPeriodLabel) {
+                drawerPeriodLabel.textContent = period;
+                drawerPeriodLabel.classList.toggle('hidden', !period);
             }
-
-            // Sincronizar input de periodo personalizado
+            if (settingsPeriodBadge) {
+                settingsPeriodBadge.textContent = period;
+                settingsPeriodBadge.classList.toggle('hidden', !period);
+            }
+            if (settingsBadgePill) {
+                settingsBadgePill.textContent = period;
+                settingsBadgePill.classList.toggle('hidden', !period);
+            }
             if (customPeriodInput) {
-                customPeriodInput.value = inst.periods.includes(activePeriod) ? '' : activePeriod;
-                customPeriodInput.onkeydown = (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = customPeriodInput.value.trim();
-                        if (val) this.setAcademicPeriod(val);
-                    }
-                };
+                customPeriodInput.value = period;
             }
-            if (saveCustomPeriodBtn) {
-                saveCustomPeriodBtn.onclick = () => {
-                    const val = customPeriodInput?.value?.trim();
-                    if (val) this.setAcademicPeriod(val);
-                };
+            if (clearPeriodBtn) {
+                clearPeriodBtn.classList.toggle('hidden', !period);
             }
-
-            if (headerPeriodLabel) headerPeriodLabel.textContent = activePeriod;
-            if (drawerPeriodLabel) drawerPeriodLabel.textContent = activePeriod;
-            if (settingsPeriodBadge) settingsPeriodBadge.textContent = activePeriod;
         }
 
         setAcademicPeriod(period) {
             const Storage = window.StorageModule;
+            const cleanPeriod = typeof period === 'string' ? period.trim() : '';
             window.HapticsModule?.light();
-            Storage.setAcademicPeriod(period);
-
-            const headerPeriodSelect = document.getElementById('header-period-select');
-            const settingsPeriodSelect = document.getElementById('settings-period-select');
-            const customPeriodInput = document.getElementById('custom-period-input');
-            const headerPeriodLabel = document.getElementById('header-inst-period');
-            const drawerPeriodLabel = document.getElementById('drawer-inst-period');
-            const settingsPeriodBadge = document.getElementById('settings-inst-period-badge');
-
-            if (headerPeriodSelect) {
-                const exists = Array.from(headerPeriodSelect.options).some(o => o.value === period);
-                if (!exists) {
-                    const opt = document.createElement('option');
-                    opt.value = period;
-                    opt.textContent = period;
-                    headerPeriodSelect.appendChild(opt);
-                }
-                headerPeriodSelect.value = period;
-            }
-            if (settingsPeriodSelect) {
-                const exists = Array.from(settingsPeriodSelect.options).some(o => o.value === period);
-                if (!exists) {
-                    const opt = document.createElement('option');
-                    opt.value = period;
-                    opt.textContent = period;
-                    settingsPeriodSelect.appendChild(opt);
-                }
-                settingsPeriodSelect.value = period;
-            }
-            if (headerPeriodLabel) headerPeriodLabel.textContent = period;
-            if (drawerPeriodLabel) drawerPeriodLabel.textContent = period;
-            if (settingsPeriodBadge) settingsPeriodBadge.textContent = period;
-
-            // Re-renderizar píldoras para que la personalizada o seleccionada aparezca y esté activa
-            const inst = this.activeInstitution || window.InstitutionsModule?.getInstitution('unam');
-            if (inst) {
-                const periodPillsContainer = document.getElementById('settings-period-pills');
-                if (periodPillsContainer) {
-                    let pillsList = [...inst.periods];
-                    if (!pillsList.includes(period)) {
-                        pillsList.push(period);
-                    }
-                    periodPillsContainer.innerHTML = '';
-                    pillsList.forEach(p => {
-                        const isSelected = p === period;
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.dataset.periodBtn = p;
-                        btn.className = `period-pill-btn tap-effect px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                            isSelected
-                                ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
-                                : 'bg-slate-100 dark:bg-slate-700/70 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-transparent'
-                        }`;
-                        btn.textContent = p;
-                        btn.onclick = () => this.setAcademicPeriod(p);
-                        periodPillsContainer.appendChild(btn);
-                    });
-                }
-            }
-
-            if (customPeriodInput) {
-                customPeriodInput.value = (inst && inst.periods.includes(period)) ? '' : period;
-            }
-
-            this.showToast(`Periodo actualizado: ${period}`, 'info');
-        }
-
-        setupInstitutionAndPeriodSelectors() {
-            const headerInstSelect = document.getElementById('header-institution-select');
-            const headerPeriodSelect = document.getElementById('header-period-select');
-            const InstitutionsModule = window.InstitutionsModule;
-            const Storage = window.StorageModule;
-
-            if (headerInstSelect && InstitutionsModule) {
-                const countries = InstitutionsModule.getCountries();
-                const builtIns = Object.values(InstitutionsModule.INSTITUTIONS);
-                const customSchools = Storage?.getCustomSchools?.() || [];
-
-                let html = '<option value="unconfigured">🎓 Sin institución</option>';
-                countries.forEach(c => {
-                    const groupSchools = builtIns.filter(inst => inst.countryCode === c.code);
-                    if (groupSchools.length > 0) {
-                        html += `<optgroup label="${c.name}">`;
-                        groupSchools.forEach(inst => {
-                            html += `<option value="${inst.id}">🎓 ${inst.name} - ${inst.systemType || inst.shortBadge}</option>`;
-                        });
-                        html += `</optgroup>`;
-                    }
-                });
-
-                if (customSchools.length > 0) {
-                    html += `<optgroup label="⭐ Mis Escuelas Personalizadas">`;
-                    customSchools.forEach(cs => {
-                        html += `<option value="${cs.id}">⭐ ${cs.name} - ${cs.systemType || 'Personalizada'}</option>`;
-                    });
-                    html += `</optgroup>`;
-                }
-
-                headerInstSelect.innerHTML = html;
-                headerInstSelect.value = this.activeInstitution?.id || (Storage?.isSchoolSkipped?.() ? 'unconfigured' : 'unam');
-                headerInstSelect.onchange = (e) => {
-                    this.setInstitution(e.target.value);
-                    this.showToast(`Institución seleccionada: ${this.activeInstitution.name}`, 'info');
-                };
-            }
-
-            if (headerPeriodSelect) {
-                headerPeriodSelect.onchange = (e) => {
-                    this.setAcademicPeriod(e.target.value);
-                };
-            }
+            Storage.setAcademicPeriod(cleanPeriod);
+            this.syncPeriodUI();
+            this.showToast(
+                cleanPeriod ? `Periodo actualizado: ${cleanPeriod}` : 'Periodo ocultado de la cabecera.',
+                'info'
+            );
         }
 
         setupNavigation() {
@@ -1709,7 +1245,6 @@
                     TasksModule?.closeModal?.();
                     NotesModule?.closeModal?.();
                     CalendarModule?.closeModal?.();
-                    this.closeSchoolIdentityModal?.();
                     this.closeCycleWelcomeModal?.();
                     this.closeExitModal?.();
                     this.closeSidebarDrawer?.();
@@ -1718,507 +1253,114 @@
         }
 
         /* ========================================================
-           MODAL DE IDENTIDAD INSTITUCIONAL (LOGO DINÁMICO ZOOM & GLOW)
+           GESTIÓN DE FOTO DE PERFIL (REUTILIZABLE: INICIO + AJUSTES)
            ======================================================== */
-        setupSchoolIdentityModal() {
-            const modal = document.getElementById('school-identity-modal');
-            const card = document.getElementById('school-identity-card');
-            const backdrop = document.getElementById('school-identity-backdrop');
-            const closeBtn = document.getElementById('close-school-identity-btn');
-            const actionBtn = document.getElementById('school-identity-action-btn');
-            const headerLogo = document.getElementById('header-inst-logo');
-
-            if (!modal || !card) return;
-
-            const openModal = (e) => {
-                const Storage = window.StorageModule;
-                if (!Storage.getLogoExpandEnabled?.()) {
-                    return; // Desactivado por configuración del usuario
-                }
-
-                window.HapticsModule?.medium();
-                const InstitutionsModule = window.InstitutionsModule;
-                const inst = this.activeInstitution || InstitutionsModule.getInstitution('unam');
-                const cycle = Storage.getAcademicCycle?.() || {};
-
-                // Inyectar escudo, nombres y lema oficial
-                const logoContent = document.getElementById('school-identity-logo-content');
-                const nameEl = document.getElementById('school-identity-name');
-                const fullnameEl = document.getElementById('school-identity-fullname');
-                const sloganEl = document.getElementById('school-identity-slogan');
-                const systemBadge = document.getElementById('school-identity-system-badge');
-                const cycleDates = document.getElementById('school-identity-cycle-dates');
-                const cycleBadge = document.getElementById('school-identity-cycle-badge');
-                const glow = document.getElementById('school-identity-glow');
-
-                if (logoContent) {
-                    logoContent.innerHTML = InstitutionsModule.renderIconHtml(inst, 'w-20 h-20 sm:w-24 sm:h-24');
-                }
-                if (nameEl) nameEl.textContent = inst.name;
-                if (fullnameEl) fullnameEl.textContent = inst.fullName;
-                if (sloganEl) sloganEl.textContent = Storage.getUserName?.() || 'Estudiante';
-                if (systemBadge) systemBadge.textContent = inst.systemType || inst.type;
-
-                if (cycleDates) {
-                    cycleDates.textContent = (cycle.startDate && cycle.endDate) 
-                        ? `${cycle.startDate} al ${cycle.endDate}`
-                        : 'Periodo lectivo pendiente de confirmar';
-                }
-
-                if (cycleBadge) {
-                    const isProv = Storage.isCycleProvisional?.();
-                    if (isProv) {
-                        cycleBadge.textContent = 'Provisional';
-                        cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-600 text-white shadow-xs';
-                    } else {
-                        const todayStr = new Date().toISOString().split('T')[0];
-                        if (cycle.endDate && todayStr > cycle.endDate) {
-                            cycleBadge.textContent = 'Terminado';
-                            cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-500 text-white shadow-xs';
-                        } else if (cycle.startDate && todayStr < cycle.startDate) {
-                            cycleBadge.textContent = 'Programado';
-                            cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-600 text-white shadow-xs';
-                        } else {
-                            cycleBadge.textContent = 'Vigente';
-                            cycleBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-xs';
-                        }
-                    }
-                }
-
-                // Resplandor temático con el aura institucional oficial (UAM naranja, CCH dorado, IPN guinda)
-                if (glow) {
-                    let auraColor = inst.colors?.aura;
-                    if (!auraColor) {
-                        const sec = inst.colors?.secondary;
-                        if (sec && sec !== '#1C1C1C' && sec !== '#FFFFFF' && sec !== '#000000') {
-                            auraColor = sec;
-                        } else {
-                            auraColor = inst.colors?.primary || '#6366F1';
-                        }
-                    }
-                    if (inst.id === 'uam') {
-                        auraColor = '#E84D0E'; // Naranja institucional radiante UAM
-                    } else if (inst.id === 'cch') {
-                        auraColor = '#F59E0B'; // Resplandor dorado CCH
-                    } else if (inst.id === 'ipn' || inst.id === 'cecyt') {
-                        auraColor = '#9A2A63'; // Magenta/guinda Politécnico
-                    }
-                    glow.style.backgroundColor = auraColor;
-                    glow.style.boxShadow = `0 0 130px 48px ${auraColor}`;
-                    glow.style.opacity = '0.75';
-                }
-
-                // Calcular origen de animación dinámica desde el logo superior hasta el centro
-                if (headerLogo) {
-                    const rect = headerLogo.getBoundingClientRect();
-                    const originX = (rect.left + rect.width / 2) - (window.innerWidth / 2);
-                    const originY = (rect.top + rect.height / 2) - (window.innerHeight / 2);
-                    card.style.setProperty('--origin-x', `${originX}px`);
-                    card.style.setProperty('--origin-y', `${originY}px`);
-                }
-
-                card.classList.remove('school-identity-exit-right');
-                card.classList.add('school-identity-card-anim');
-
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                document.body.classList.add('overflow-hidden');
-
-                requestAnimationFrame(() => {
-                    modal.classList.add('active');
-                });
-            };
-
-            const closeModal = () => {
-                if (!modal || modal.classList.contains('hidden') || card.classList.contains('school-identity-exit-right')) return;
-                window.HapticsModule?.light();
-
-                // Salida rápida y dinámica de la ventana y el escudo hacia el lado DERECHO
-                card.classList.remove('school-identity-card-anim');
-                card.classList.add('school-identity-exit-right');
-
-                if (backdrop) {
-                    backdrop.style.transition = 'opacity 0.32s ease';
-                    backdrop.style.opacity = '0';
-                }
-
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    modal.classList.remove('active');
-                    card.classList.remove('school-identity-exit-right');
-                    if (backdrop) {
-                        backdrop.style.opacity = '';
-                        backdrop.style.transition = '';
-                    }
-                    document.body.classList.remove('overflow-hidden');
-                }, 310);
-            };
-
-            this.openSchoolIdentityModal = openModal;
-            this.closeSchoolIdentityModal = closeModal;
-
-            if (headerLogo) {
-                headerLogo.onclick = (e) => openModal(e);
-            }
-            if (closeBtn) closeBtn.onclick = closeModal;
-            if (actionBtn) actionBtn.onclick = closeModal;
-            if (backdrop) backdrop.onclick = closeModal;
-        }
-
-        /* ========================================================
-           MODAL CONSTRUCTOR DE ESCUELAS PERSONALIZADAS
-           ======================================================== */
-        setupCustomSchoolModal() {
-            const modal = document.getElementById('custom-school-modal');
-            const backdrop = document.getElementById('custom-school-backdrop');
-            const closeBtn = document.getElementById('custom-school-close-btn');
-            const cancelBtn = document.getElementById('custom-school-cancel-btn');
-            const form = document.getElementById('custom-school-form');
-            const openBtn = document.getElementById('open-create-school-btn');
-            const deleteBtn = document.getElementById('custom-school-delete-btn');
-            const titleEl = document.getElementById('custom-school-modal-title');
-
-            const idInput = document.getElementById('custom-school-id');
-            const nameInput = document.getElementById('custom-school-name');
-            const shortbadgeInput = document.getElementById('custom-school-shortbadge');
-            const fullnameInput = document.getElementById('custom-school-fullname');
-            const sloganInput = document.getElementById('custom-school-slogan');
-            const countrySelect = document.getElementById('custom-school-country');
-            const systemSelect = document.getElementById('custom-school-system');
-            const colorInput = document.getElementById('custom-school-color');
-            const colorPresets = document.getElementById('custom-school-color-presets');
-            const logoInput = document.getElementById('custom-school-logo-input');
-            const logoPreview = document.getElementById('custom-school-logo-preview');
-            const canvas = document.getElementById('custom-school-canvas') || document.createElement('canvas');
-
+        downsampleAndSaveProfilePhoto(file, onSaved) {
             const Storage = window.StorageModule;
-            const InstitutionsModule = window.InstitutionsModule;
-
-            if (!modal) return;
-
-            // Población de países en el selector
-            if (countrySelect && InstitutionsModule) {
-                countrySelect.innerHTML = InstitutionsModule.getCountries().map(c => `
-                    <option value="${c.code}">${c.name}</option>
-                `).join('');
+            if (!file || (!file.type.startsWith('image/') && !file.name.match(/\.(png|jpe?g|webp|gif|bmp)$/i))) {
+                this.showToast('Solo se admiten archivos de imagen válidos.', 'warning');
+                return;
             }
 
-            // Población de presets de colores institucionales
-            if (colorPresets) {
-                const presets = [
-                    '#4F46E5', '#002B7A', '#6C1D45', '#E84D0E', '#006847',
-                    '#0039A6', '#0F6938', '#003A70', '#781D22', '#D32F2F', '#0083CA'
-                ];
-                colorPresets.innerHTML = presets.map(color => `
-                    <button type="button" data-preset-color="${color}"
-                        class="w-6 h-6 rounded-lg transition-transform hover:scale-110 border border-black/10 dark:border-white/10 shadow-2xs"
-                        style="background-color: ${color};" title="${color}"></button>
-                `).join('');
-
-                colorPresets.querySelectorAll('[data-preset-color]').forEach(btn => {
-                    btn.onclick = () => {
-                        if (colorInput) {
-                            colorInput.value = btn.dataset.presetColor;
-                            updatePreviewDefaultLogo();
-                        }
-                    };
-                });
-            }
-
-            const updatePreviewDefaultLogo = () => {
-                if (logoPreview && !logoPreview.dataset.customUploaded) {
-                    const initials = (shortbadgeInput?.value || nameInput?.value || 'ESC').trim().substring(0, 4).toUpperCase();
-                    const color = colorInput?.value || '#4F46E5';
-                    logoPreview.innerHTML = `
-                        <div class="w-full h-full rounded-xl flex items-center justify-center font-black text-sm text-white shadow-2xs"
-                            style="background-color: ${color};">
-                            ${initials || 'ESC'}
-                        </div>
-                    `;
-                }
+            const reader = new FileReader();
+            reader.onerror = () => {
+                this.showToast('Error al leer el archivo seleccionado.', 'error');
             };
-
-            if (nameInput) {
-                nameInput.oninput = () => {
-                    if (!shortbadgeInput.value || shortbadgeInput.dataset.auto) {
-                        shortbadgeInput.value = nameInput.value.substring(0, 6).toUpperCase();
-                        shortbadgeInput.dataset.auto = 'true';
-                    }
-                    updatePreviewDefaultLogo();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = () => {
+                    this.showToast('Archivo de imagen no válido o dañado.', 'error');
                 };
-            }
-            if (shortbadgeInput) {
-                shortbadgeInput.oninput = () => {
-                    delete shortbadgeInput.dataset.auto;
-                    updatePreviewDefaultLogo();
-                };
-            }
-            if (colorInput) {
-                colorInput.oninput = () => updatePreviewDefaultLogo();
-            }
+                img.onload = () => {
+                    const MAX_SIZE = 256;
+                    let targetW = img.width;
+                    let targetH = img.height;
 
-            // Manejo de archivo y downsampling con Canvas (max 256x256 px, <30 KB)
-            const downsampleAndPreviewLogo = (file) => {
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onerror = () => {
-                    window.AppInstance?.showToast?.('Error al leer el archivo seleccionado', 'error');
-                };
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onerror = () => {
-                        if (logoPreview) {
-                            delete logoPreview.dataset.customUploaded;
-                            delete logoPreview.dataset.logoBase64;
-                        }
-                        updatePreviewDefaultLogo();
-                        window.AppInstance?.showToast?.('Archivo de imagen no válido o dañado', 'error');
-                    };
-                    img.onload = () => {
-                        let maxDim = 256;
-                        let w = img.width;
-                        let h = img.height;
-                        if (w > maxDim || h > maxDim) {
-                            if (w > h) {
-                                h = Math.round((h * maxDim) / w);
-                                w = maxDim;
-                            } else {
-                                w = Math.round((w * maxDim) / h);
-                                h = maxDim;
-                            }
-                        }
-                        canvas.width = w;
-                        canvas.height = h;
-                        let ctx = canvas.getContext('2d');
-                        ctx.clearRect(0, 0, w, h);
-                        ctx.drawImage(img, 0, 0, w, h);
-
-                        // Probar compresión progresiva para garantizar < 30KB (~35,000 caracteres DataURI)
-                        let dataUrl = canvas.toDataURL('image/png');
-                        if (dataUrl.length > 35000) {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                        }
-                        if (dataUrl.length > 35000) {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-                        }
-                        if (dataUrl.length > 35000) {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.45);
-                        }
-
-                        // Si aún excede 35,000 caracteres, reducir dimensiones a max 180x180 px
-                        if (dataUrl.length > 35000) {
-                            maxDim = 180;
-                            w = img.width;
-                            h = img.height;
-                            if (w > maxDim || h > maxDim) {
-                                if (w > h) {
-                                    h = Math.round((h * maxDim) / w);
-                                    w = maxDim;
-                                } else {
-                                    w = Math.round((w * maxDim) / h);
-                                    h = maxDim;
-                                }
-                            }
-                            canvas.width = w;
-                            canvas.height = h;
-                            ctx.clearRect(0, 0, w, h);
-                            ctx.drawImage(img, 0, 0, w, h);
-
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-                            if (dataUrl.length > 35000) {
-                                dataUrl = canvas.toDataURL('image/jpeg', 0.45);
-                            }
-                        }
-
-                        if (logoPreview) {
-                            logoPreview.dataset.customUploaded = 'true';
-                            logoPreview.dataset.logoBase64 = dataUrl;
-                            logoPreview.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-contain">`;
-                        }
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            };
-
-            if (logoInput) {
-                logoInput.onchange = (e) => {
-                    const file = e?.target?.files?.[0] || logoInput.files?.[0];
-                    if (file) {
-                        downsampleAndPreviewLogo(file);
-                    }
-                };
-            }
-
-            const openModal = (schoolId = null) => {
-                window.HapticsModule?.light();
-                delete logoPreview.dataset.customUploaded;
-                delete logoPreview.dataset.logoBase64;
-                if (logoInput) logoInput.value = '';
-
-                if (schoolId) {
-                    // Modo Edición
-                    const school = InstitutionsModule.getInstitution(schoolId);
-                    if (titleEl) titleEl.textContent = 'Editar Escuela Personalizada';
-                    if (idInput) idInput.value = school.id;
-                    if (nameInput) nameInput.value = school.name;
-                    if (shortbadgeInput) shortbadgeInput.value = school.shortBadge || school.name;
-                    if (fullnameInput) fullnameInput.value = school.fullName;
-                    if (sloganInput) sloganInput.value = school.slogan || '';
-                    if (countrySelect) countrySelect.value = school.countryCode || 'MX';
-                    if (systemSelect) systemSelect.value = school.systemType || 'Semestral';
-                    if (colorInput) colorInput.value = school.colors?.primary || '#4F46E5';
-                    if (deleteBtn) deleteBtn.classList.remove('hidden');
-
-                    if (logoPreview) {
-                        if (school.icon) {
-                            logoPreview.dataset.customUploaded = 'true';
-                            logoPreview.dataset.logoBase64 = school.icon;
-                            logoPreview.innerHTML = `<img src="${school.icon}" class="w-full h-full object-contain">`;
+                    if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
+                        if (targetW > targetH) {
+                            targetH = Math.round((targetH * MAX_SIZE) / targetW);
+                            targetW = MAX_SIZE;
                         } else {
-                            updatePreviewDefaultLogo();
+                            targetW = Math.round((targetW * MAX_SIZE) / targetH);
+                            targetH = MAX_SIZE;
                         }
                     }
-                } else {
-                    // Modo Creación
-                    if (titleEl) titleEl.textContent = 'Constructor de Escuela Personalizada';
-                    if (idInput) idInput.value = '';
-                    if (nameInput) nameInput.value = '';
-                    if (shortbadgeInput) shortbadgeInput.value = '';
-                    if (fullnameInput) fullnameInput.value = '';
-                    if (sloganInput) sloganInput.value = '';
-                    if (countrySelect) countrySelect.value = 'MX';
-                    if (systemSelect) systemSelect.value = 'Semestral';
-                    if (colorInput) colorInput.value = '#4F46E5';
-                    if (deleteBtn) deleteBtn.classList.add('hidden');
-                    updatePreviewDefaultLogo();
-                }
 
-                modal.style.display = '';
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                document.body.classList.add('overflow-hidden');
-                requestAnimationFrame(() => modal.classList.add('active'));
-            };
+                    const canvas = document.createElement('canvas');
+                    canvas.width = targetW;
+                    canvas.height = targetH;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, targetW, targetH);
 
-            const closeModal = () => {
-                modal.classList.remove('active');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    modal.style.display = 'none';
-                    const onboardingModal = document.getElementById('cycle-setup-modal');
-                    if (!onboardingModal || onboardingModal.classList.contains('hidden')) {
-                        document.body.classList.remove('overflow-hidden');
-                    }
-                }, 200);
-            };
-
-            this.openCustomSchoolModal = openModal;
-            this.closeCustomSchoolModal = closeModal;
-            this.downsampleAndPreviewLogo = downsampleAndPreviewLogo;
-
-            if (openBtn) openBtn.onclick = () => openModal();
-            if (closeBtn) closeBtn.onclick = closeModal;
-            if (cancelBtn) cancelBtn.onclick = closeModal;
-            if (backdrop) backdrop.onclick = closeModal;
-
-            // Eliminar escuela personalizada
-            if (deleteBtn) {
-                deleteBtn.onclick = () => {
-                    const schoolId = idInput?.value;
-                    if (!schoolId) return;
-
-                    const school = InstitutionsModule.getInstitution(schoolId);
-                    const name = school ? school.name : 'esta escuela';
-                    if (confirm(`¿Estás seguro de que deseas eliminar la escuela "${name}"?`)) {
-                        window.HapticsModule?.medium();
-                        Storage.deleteCustomSchool(schoolId);
-                        closeModal();
-                        this.setInstitution(Storage.getInstitution());
-                        this.setupInstitutionAndPeriodSelectors();
-                        this.renderInstitutionGrid();
-                        this.showToast(`Escuela "${name}" eliminada`, 'info');
-                    }
-                };
-            }
-
-            // Guardar escuela personalizada
-            if (form) {
-                form.onsubmit = (e) => {
-                    e.preventDefault();
-                    window.HapticsModule?.double();
-
-                    const name = nameInput.value.trim();
-                    const shortBadge = shortbadgeInput.value.trim() || name.substring(0, 6).toUpperCase();
-                    const fullName = fullnameInput.value.trim() || name;
-                    const slogan = sloganInput.value.trim() || 'Construyendo el futuro';
-                    const countryCode = countrySelect.value;
-                    const countries = InstitutionsModule.getCountries();
-                    const countryObj = countries.find(c => c.code === countryCode) || { name: 'México', code: 'MX', flag: '🇲🇽' };
-                    const systemType = systemSelect.value;
-                    const primaryColor = colorInput.value || '#4F46E5';
-
-                    // Generar lista de periodos según el sistema seleccionado
-                    let periodsList = [];
-                    if (systemType === 'Cuatrimestral') {
-                        periodsList = ['1.º Cuatrimestre', '2.º Cuatrimestre', '3.º Cuatrimestre', '4.º Cuatrimestre', '5.º Cuatrimestre', '6.º Cuatrimestre', '7.º Cuatrimestre', '8.º Cuatrimestre', '9.º Cuatrimestre', '10.º Cuatrimestre'];
-                    } else if (systemType === 'Trimestral') {
-                        periodsList = ['1.º Trimestre', '2.º Trimestre', '3.º Trimestre', '4.º Trimestre', '5.º Trimestre', '6.º Trimestre', '7.º Trimestre', '8.º Trimestre', '9.º Trimestre', '10.º Trimestre', '11.º Trimestre', '12.º Trimestre'];
-                    } else if (systemType === 'Anual') {
-                        periodsList = ['1.º Año', '2.º Año', '3.º Año', '4.º Año', '5.º Año'];
-                    } else if (systemType === 'Modular') {
-                        periodsList = ['Módulo 1', 'Módulo 2', 'Módulo 3', 'Módulo 4', 'Módulo 5', 'Módulo 6', 'Módulo 7', 'Módulo 8'];
+                    let dataUrl;
+                    const isPng = file.type === 'image/png' || (file.name && file.name.toLowerCase().endsWith('.png'));
+                    if (isPng) {
+                        dataUrl = canvas.toDataURL('image/png');
+                        if (dataUrl.length * 0.75 > 30 * 1024) {
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        }
                     } else {
-                        periodsList = ['1.º Semestre', '2.º Semestre', '3.º Semestre', '4.º Semestre', '5.º Semestre', '6.º Semestre', '7.º Semestre', '8.º Semestre', '9.º Semestre', '10.º Semestre'];
+                        dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                        if (dataUrl.length * 0.75 > 30 * 1024) {
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                        }
                     }
-
-                    // Determinar icono (logo subido o SVG autogenerado con siglas)
-                    let iconUrl = logoPreview?.dataset?.logoBase64;
-                    if (!iconUrl) {
-                        const initials = shortBadge.substring(0, 4).toUpperCase();
-                        const safeColor = encodeURIComponent(primaryColor);
-                        iconUrl = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" rx="44" fill="${safeColor}"/><text x="100" y="118" fill="%23FFFFFF" font-family="system-ui, sans-serif" font-size="44" font-weight="900" text-anchor="middle">${encodeURIComponent(initials)}</text></svg>`;
-                    }
-
-                    const schoolData = {
-                        id: idInput.value || undefined,
-                        name: name,
-                        shortBadge: shortBadge,
-                        fullName: fullName,
-                        slogan: slogan,
-                        country: countryObj.name,
-                        countryCode: countryObj.code,
-                        countryFlag: countryObj.flag,
-                        systemType: systemType,
-                        icon: iconUrl,
-                        colors: {
-                            primary: primaryColor,
-                            secondary: '#FFFFFF',
-                            accent: primaryColor,
-                            aura: primaryColor,
-                            badgeBg: `bg-[${primaryColor}]`,
-                            badgeText: 'text-white'
-                        },
-                        periods: periodsList,
-                        defaultPeriod: periodsList[0],
-                        isCustom: true
-                    };
 
                     try {
-                        const saved = Storage.saveCustomSchool(schoolData);
-                        this.setInstitution(saved.id);
-                        closeModal();
-                        this.setupInstitutionAndPeriodSelectors();
-                        this.renderInstitutionGrid();
-                        this.onCustomSchoolCreated?.(saved);
-                        this.showToast(`Escuela "${saved.name}" guardada con éxito`, 'success');
+                        Storage?.setUserPhoto?.(dataUrl);
                     } catch (err) {
-                        this.showToast(err.message || 'Error al guardar la escuela', 'error');
+                        this.showToast(err?.message || 'No se pudo guardar la foto porque el almacenamiento está lleno.', 'error');
+                        return;
+                    }
+
+                    this.renderHeader?.();
+                    this.renderDrawer?.();
+                    this.refreshSettingsProfileUI?.();
+                    this.updateStorageMetrics?.();
+                    window.HapticsModule?.light?.();
+
+                    if (typeof onSaved === 'function') {
+                        onSaved(dataUrl);
                     }
                 };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        refreshSettingsProfileUI() {
+            const Storage = window.StorageModule;
+            if (!Storage) return;
+
+            const userName = (Storage.getUserName?.() || '').trim();
+            const savedPhoto = Storage.getUserPhoto?.() || '';
+
+            const settingsName = document.getElementById('settings-inst-name');
+            if (settingsName) {
+                settingsName.textContent = userName || 'Mi Organizador';
+            }
+
+            const preview = document.getElementById('settings-photo-preview');
+            const placeholder = document.getElementById('settings-photo-placeholder');
+            const uploadBtn = document.getElementById('settings-photo-upload-btn');
+            const clearBtn = document.getElementById('settings-photo-clear-btn');
+
+            if (savedPhoto) {
+                if (preview) {
+                    preview.src = savedPhoto;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+                if (clearBtn) clearBtn.classList.remove('hidden');
+                if (uploadBtn) uploadBtn.textContent = 'Cambiar foto';
+            } else {
+                if (preview) {
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                }
+                if (placeholder) placeholder.classList.remove('hidden');
+                if (clearBtn) clearBtn.classList.add('hidden');
+                if (uploadBtn) uploadBtn.textContent = 'Subir foto';
             }
         }
 
@@ -2233,8 +1375,6 @@
             const endInput = document.getElementById('welcome-cycle-end');
 
             const welcomeUserNameInput = document.getElementById('welcome-user-name');
-            const welcomeTypeInst = document.getElementById('welcome-type-institution');
-            const welcomeTypeAct = document.getElementById('welcome-type-activities');
 
             const welcomePhotoInput = document.getElementById('welcome-photo-input');
             const welcomePhotoPreview = document.getElementById('welcome-photo-preview');
@@ -2245,122 +1385,29 @@
             const progressBar = document.getElementById('onboarding-progress-bar');
             const celebrationMsg = document.getElementById('onboarding-celebration-msg');
 
-            const createSchoolBtn = document.getElementById('welcome-create-school-btn');
-
             const Storage = window.StorageModule;
-            const InstitutionsModule = window.InstitutionsModule;
 
             if (!modal) return;
 
-            let currentAccountType = Storage?.getAccountType?.() || 'institution';
+            let currentAccountType = Storage?.getAccountType?.() || 'organizer';
 
-            // 1. Selector interactivo de modalidad (Institución vs Organizador de actividades)
-            const updateAccountTypeUI = (type) => {
-                currentAccountType = type === 'activities' ? 'organizer' : type;
-                Storage?.setAccountType?.(currentAccountType);
-
-                if (welcomeTypeInst && welcomeTypeAct) {
-                    const isInst = currentAccountType === 'institution';
-                    const instCheck = welcomeTypeInst.querySelector('.welcome-type-check');
-                    const actCheck = welcomeTypeAct.querySelector('.welcome-type-check');
-
-                    if (isInst) {
-                        welcomeTypeInst.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-indigo-500 bg-indigo-500/10 text-white shadow-lg shadow-indigo-950/40';
-                        welcomeTypeAct.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-slate-700 bg-slate-800/60 text-slate-400 hover:border-slate-600';
-                        if (instCheck) instCheck.classList.remove('hidden');
-                        if (actCheck) actCheck.classList.add('hidden');
-                    } else {
-                        welcomeTypeAct.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-indigo-500 bg-indigo-500/10 text-white shadow-lg shadow-indigo-950/40';
-                        welcomeTypeInst.className = 'tap-effect cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-2.5 border-slate-700 bg-slate-800/60 text-slate-400 hover:border-slate-600';
-                        if (actCheck) actCheck.classList.remove('hidden');
-                        if (instCheck) instCheck.classList.add('hidden');
-                    }
-                }
-            };
-
-            if (welcomeTypeInst) {
-                welcomeTypeInst.onclick = () => {
-                    window.HapticsModule?.light?.();
-                    updateAccountTypeUI('institution');
-                };
-            }
-
-            if (welcomeTypeAct) {
-                welcomeTypeAct.onclick = () => {
-                    window.HapticsModule?.light?.();
-                    updateAccountTypeUI('organizer');
-                };
-            }
-
-            // 2. Subida de Foto y Reducción mediante Canvas HTML5 (máx 256x256, <30KB)
-            const downsampleAndSavePhoto = (file) => {
-                if (!file || (!file.type.startsWith('image/') && !file.name.match(/\.(png|jpe?g|webp|gif|bmp)$/i))) {
-                    this.showToast('Solo se admiten archivos de imagen válidos.', 'warning');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const MAX_SIZE = 256;
-                        let targetW = img.width;
-                        let targetH = img.height;
-
-                        if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
-                            if (targetW > targetH) {
-                                targetH = Math.round((targetH * MAX_SIZE) / targetW);
-                                targetW = MAX_SIZE;
-                            } else {
-                                targetW = Math.round((targetW * MAX_SIZE) / targetH);
-                                targetH = MAX_SIZE;
-                            }
-                        }
-
-                        const canvas = document.createElement('canvas');
-                        canvas.width = targetW;
-                        canvas.height = targetH;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, targetW, targetH);
-
-                        let dataUrl;
-                        const isPng = file.type === 'image/png' || (file.name && file.name.toLowerCase().endsWith('.png'));
-                        if (isPng) {
-                            dataUrl = canvas.toDataURL('image/png');
-                            if (dataUrl.length * 0.75 > 30 * 1024) {
-                                dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                            }
-                        } else {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-                            if (dataUrl.length * 0.75 > 30 * 1024) {
-                                dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-                            }
-                        }
-
-                        Storage?.setUserPhoto?.(dataUrl);
-
-                        if (welcomePhotoPreview) {
-                            welcomePhotoPreview.src = dataUrl;
-                            welcomePhotoPreview.classList.remove('hidden');
-                        }
-                        if (welcomePhotoPlaceholder) {
-                            welcomePhotoPlaceholder.classList.add('hidden');
-                        }
-                        if (welcomePhotoClearBtn) {
-                            welcomePhotoClearBtn.classList.remove('hidden');
-                        }
-                        window.HapticsModule?.light?.();
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            };
-
+            // 1. Subida de Foto de Perfil mediante Canvas HTML5 (máx 256x256, <30KB)
             if (welcomePhotoInput) {
                 const handlePhotoChange = (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                        downsampleAndSavePhoto(file);
+                        this.downsampleAndSaveProfilePhoto(file, (dataUrl) => {
+                            if (welcomePhotoPreview) {
+                                welcomePhotoPreview.src = dataUrl;
+                                welcomePhotoPreview.classList.remove('hidden');
+                            }
+                            if (welcomePhotoPlaceholder) {
+                                welcomePhotoPlaceholder.classList.add('hidden');
+                            }
+                            if (welcomePhotoClearBtn) {
+                                welcomePhotoClearBtn.classList.remove('hidden');
+                            }
+                        });
                     }
                 };
                 welcomePhotoInput.addEventListener('change', handlePhotoChange);
@@ -2380,20 +1427,13 @@
                         welcomePhotoPlaceholder.classList.remove('hidden');
                     }
                     welcomePhotoClearBtn.classList.add('hidden');
+                    this.renderHeader?.();
+                    this.renderDrawer?.();
+                    this.refreshSettingsProfileUI?.();
                 };
             }
 
-            // 3. Compatibilidad con Constructor de Escuela Personalizada (T5_ADV_03)
-            if (createSchoolBtn) {
-                createSchoolBtn.onclick = () => {
-                    this.openCustomSchoolModal?.();
-                };
-            }
-
-            this.onCustomSchoolCreated = () => {};
-            this.refreshWelcomeSchoolsGrid = () => {};
-
-            // 4. Apertura y Cierre de Onboarding
+            // 2. Apertura y Cierre de Onboarding
             const openWelcome = () => {
                 modal.style.display = '';
                 modal.classList.remove('hidden');
@@ -2426,7 +1466,7 @@
                     if (welcomePhotoClearBtn) welcomePhotoClearBtn.classList.add('hidden');
                 }
 
-                updateAccountTypeUI(Storage?.getAccountType?.() || 'institution');
+                currentAccountType = Storage?.getAccountType?.() || 'organizer';
 
                 const cycle = Storage?.getAcademicCycle?.() || {};
                 if (startInput) startInput.value = cycle.startDate || '';
@@ -2455,7 +1495,7 @@
             this.openCycleWelcomeModal = openWelcome;
             this.closeCycleWelcomeModal = closeWelcome;
 
-            // 5. Animación de Celebración con Barra de Progreso y Transición a Dashboard
+            // 4. Animación de Celebración con Barra de Progreso y Transición a Dashboard
             const executeCelebration = (onFinish) => {
                 if (form) form.classList.add('hidden');
                 if (celebrationContainer) celebrationContainer.classList.remove('hidden');
@@ -2482,7 +1522,7 @@
                 }, animDuration);
             };
 
-            // 6. Envío del Formulario
+            // 5. Envío del Formulario
             if (form) {
                 form.onsubmit = (e) => {
                     e.preventDefault();
@@ -2530,7 +1570,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.4.4') {
+                        if (lastSeenVersion !== '1.5.0') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2541,7 +1581,7 @@
                 };
             }
 
-            // 7. Configuración con Ciclo Provisional
+            // 6. Configuración con Ciclo Provisional
             if (laterBtn) {
                 laterBtn.onclick = () => {
                     if (this.isOnboardingSubmitting) return;
@@ -2572,7 +1612,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.4.4') {
+                        if (lastSeenVersion !== '1.5.0') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2707,10 +1747,88 @@
                 saveUserNameBtn.onclick = () => {
                     const name = userNameInput ? userNameInput.value.trim() : '';
                     Storage.setUserName(name);
-                    this.setInstitution(Storage.getInstitution());
+                    this.renderHeader();
+                    this.renderDrawer();
+                    this.refreshSettingsProfileUI();
                     window.HapticsModule?.light();
                     this.showToast('Nombre de usuario guardado con éxito.', 'success');
                     autoCloseCard(saveUserNameBtn);
+                };
+            }
+
+            // 1.2 Gestión de Foto de Perfil en Configuraciones (subir, cambiar o quitar)
+            const settingsPhotoInput = document.getElementById('settings-photo-input');
+            const settingsPhotoUploadBtn = document.getElementById('settings-photo-upload-btn');
+            const settingsPhotoClearBtn = document.getElementById('settings-photo-clear-btn');
+
+            this.refreshSettingsProfileUI();
+
+            if (settingsPhotoUploadBtn && settingsPhotoInput) {
+                settingsPhotoUploadBtn.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    settingsPhotoInput.click();
+                };
+            }
+
+            if (settingsPhotoInput) {
+                const handleSettingsPhotoChange = (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    this.downsampleAndSaveProfilePhoto(file, () => {
+                        this.showToast('Foto de perfil actualizada con éxito.', 'success');
+                    });
+                    settingsPhotoInput.value = '';
+                };
+                settingsPhotoInput.onchange = handleSettingsPhotoChange;
+            }
+
+            if (settingsPhotoClearBtn) {
+                settingsPhotoClearBtn.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    Storage.setUserPhoto('');
+                    if (settingsPhotoInput) settingsPhotoInput.value = '';
+                    this.renderHeader();
+                    this.renderDrawer();
+                    this.refreshSettingsProfileUI();
+                    this.updateStorageMetrics();
+                    this.showToast('Foto de perfil eliminada.', 'info');
+                };
+            }
+
+            // 1.3 Campo de Texto Libre para Semestre / Trimestre / Cuatrimestre / Periodo
+            const customPeriodInput = document.getElementById('custom-period-input');
+            const saveCustomPeriodBtn = document.getElementById('save-custom-period-btn');
+            const clearCustomPeriodBtn = document.getElementById('clear-custom-period-btn');
+
+            this.syncPeriodUI();
+
+            const handleSaveCustomPeriod = () => {
+                const val = (customPeriodInput ? customPeriodInput.value : '').trim();
+                this.setAcademicPeriod(val);
+                window.HapticsModule?.light?.();
+                this.showToast(
+                    val ? `Periodo actualizado: ${val}` : 'Periodo borrado y ocultado de la cabecera.',
+                    val ? 'success' : 'info'
+                );
+                autoCloseCard(saveCustomPeriodBtn || customPeriodInput);
+            };
+
+            if (saveCustomPeriodBtn) {
+                saveCustomPeriodBtn.onclick = handleSaveCustomPeriod;
+            }
+            if (customPeriodInput) {
+                customPeriodInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSaveCustomPeriod();
+                    }
+                };
+            }
+            if (clearCustomPeriodBtn) {
+                clearCustomPeriodBtn.onclick = () => {
+                    this.setAcademicPeriod('');
+                    window.HapticsModule?.light?.();
+                    this.showToast('Periodo borrado y ocultado de la cabecera.', 'info');
                 };
             }
 
@@ -2753,22 +1871,7 @@
                 };
             }
 
-            // 3. Inicializar galería de escudos en Settings
-            this.renderInstitutionGrid();
-
-            // 4. Toggle de Animación Dinámica del Logo Escolar
-            const logoExpandToggle = document.getElementById('settings-logo-expand-toggle');
-            if (logoExpandToggle) {
-                logoExpandToggle.checked = Storage.getLogoExpandEnabled?.() !== false;
-                logoExpandToggle.onchange = (e) => {
-                    const enabled = e.target.checked;
-                    Storage.setLogoExpandEnabled(enabled);
-                    window.HapticsModule?.light();
-                    this.showToast(enabled ? 'Efecto dinámico de escudo activado.' : 'Efecto dinámico de escudo desactivado.', 'info');
-                };
-            }
-
-            // 5. Tema y Modo Oscuro en Configuración
+            // 3. Tema y Modo Oscuro en Configuración
             document.getElementById('settings-theme-light')?.addEventListener('click', (e) => {
                 this.setTheme('light');
                 autoCloseCard(e.target);
@@ -2821,7 +1924,7 @@
                         orbitron: 'Orbitron (Cyber HUD)'
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
-                    // v1.4.4: la ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
+                    // La ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
                 };
             });
 
@@ -2951,8 +2054,10 @@
                     reader.onload = (evt) => {
                         try {
                             Storage.importJson(evt.target.result);
-                            this.setInstitution(Storage.getInstitution());
+                            Storage.cleanupLegacyKeys?.();
                             this.initFontFamily();
+                            this.refreshSettingsProfileUI();
+                            this.syncPeriodUI();
                             this.refreshAll();
                             this.showToast('Respaldo restaurado con éxito.', 'success');
                             this.switchView('subjects');
@@ -2976,7 +2081,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.4.4
+            // 11. Novedades de Versión 1.5.0
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -2989,22 +2094,6 @@
             // Cálculo inicial de métricas de almacenamiento y aplicación de tipografía
             this.updateStorageMetrics();
             this.applyFontFamily(Storage.getFontFamily?.() || 'calibri');
-        }
-
-        // Aviso temporal 1.4.4 (borrar después de 1.4.4: ver docs/BORRAR_AVISO_INESTABILIDAD_1.4.4.md)
-        openInstabilityNoticeIfNeeded() {
-            if (localStorage.getItem('org_escolar_dev_notice_144_seen') === 'true') return;
-            const modal = document.getElementById('dev-instability-modal');
-            if (!modal) return;
-            const close = () => {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-                localStorage.setItem('org_escolar_dev_notice_144_seen', 'true');
-            };
-            document.getElementById('dev-instability-close-btn')?.addEventListener('click', close, { once: true });
-            document.getElementById('dev-instability-backdrop')?.addEventListener('click', close, { once: true });
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
         }
 
         openChangelogModal() {
@@ -3021,8 +2110,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.4.4');
-                this.openInstabilityNoticeIfNeeded?.();
+                window.StorageModule.setLastSeenVersion('1.5.0');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
@@ -3048,7 +2136,7 @@
             const unlockedCodes = Storage.getUnlockedCodes ? Storage.getUnlockedCodes() : [];
             const AUTO_UNLOCK_POOL = [
                 'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
-                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'GATITOS_', 'READABLE',
+                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'READABLE',
                 'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON'
             ];
             const unlockedFromPool = AUTO_UNLOCK_POOL.filter(id => unlockedCodes.includes(id)).length;
@@ -3219,6 +2307,8 @@
                     Object.keys(VAULT_CATALOG).forEach(id => {
                         window.StorageModule.unlockCode(id);
                     });
+                    window.StorageModule.unlockSecret?.();
+                    this.applySecretFeaturesUI?.();
                     this.syncSettingsFontButtons?.();
                 } else {
                     window.StorageModule.unlockCode(codeDef.id);
@@ -3316,7 +2406,7 @@
                         closeModal();
                         this.renderVaultInventory();
                         this.syncSettingsFontButtons?.();
-                        this.showToast('✨ ¡Todos los 11 temas y 5 fuentes han sido desbloqueados!', 'success');
+                        this.showToast('✨ ¡Todos los 10 temas, modo monocromático y 5 fuentes han sido desbloqueados!', 'success');
                     };
                 } else {
                     const isFont = (codeDef.type === 'font');
@@ -3360,14 +2450,6 @@
                             window.StorageModule.setApolloRocketsEnabled(false);
                         }
                         this.updateApolloRockets();
-                        if (codeDef.id === 'GATITOS_') {
-                            window.StorageModule.unlockSecret();
-                            window.StorageModule.setGrayModeEnabled(true);
-                            window.StorageModule.setSecretCatsEnabled(true);
-                            document.documentElement.classList.add('theme-gray');
-                            document.body.classList.add('theme-gray');
-                            this.applySecretFeaturesUI?.();
-                        }
                         closeModal();
                         this.renderVaultInventory();
                     };
@@ -3416,7 +2498,6 @@
             const currentFont = window.StorageModule.getFontFamily ? window.StorageModule.getFontFamily() : 'calibri';
 
             const featureDefs = showFeatures ? [
-                { key: 'cats', icon: '🐾', name: 'Efecto Gatitos', category: 'FUNCIÓN', active: !!window.StorageModule.getSecretCatsEnabled() },
                 { key: 'gray', icon: '🔲', name: 'Modo Monocromático', category: 'FUNCIÓN', active: !!window.StorageModule.getGrayModeEnabled() }
             ] : [];
             const featureCardsHtml = featureDefs.map(f => `
@@ -3477,33 +2558,15 @@
                 `;
             }).join('') + featureCardsHtml;
 
-            // Funciones exclusivas de la bóveda (Gatitos / Monocromático)
+            // Función exclusiva de la bóveda (Modo Monocromático)
             grid.querySelectorAll('[data-vault-feature]').forEach(btn => {
                 btn.onclick = (e) => {
                     e.stopPropagation();
                     const Storage = window.StorageModule;
                     const key = btn.getAttribute('data-vault-feature');
                     window.HapticsModule?.light?.();
-                    if (key === 'cats') {
-                        const next = !Storage.getSecretCatsEnabled();
-                        if (next) {
-                            const otherActive = Storage.getGrayModeEnabled()
-                                || (Storage.getActiveSpecialTheme && Storage.getActiveSpecialTheme() !== 'default')
-                                || (VAULT_CATALOG && Object.values(VAULT_CATALOG).some(d => d.type === 'font' && d.fontKey && Storage.getFontFamily() === d.fontKey));
-                            if (otherActive) {
-                                this.showToast('Desactiva primero cualquier otro tema, fuente o modo activo para usar Gatitos.', 'warning');
-                                return;
-                            }
-                        }
-                        Storage.setSecretCatsEnabled(next);
-                        this.updateHiddenKitties();
-                        this.showToast(next ? '🐾 ¡Gatitos activados!' : 'Gatitos desactivados.', 'info');
-                    } else if (key === 'gray') {
+                    if (key === 'gray') {
                         const next = !Storage.getGrayModeEnabled();
-                        if (next && Storage.getSecretCatsEnabled()) {
-                            this.showToast('Desactiva primero Gatitos para usar el modo monocromático.', 'warning');
-                            return;
-                        }
                         this.applyGrayMode(next);
                         this.showToast(next ? 'Modo Monocromático activado.' : 'Modo Monocromático desactivado.', 'info');
                     }
@@ -3577,18 +2640,9 @@
                             window.StorageModule.setApolloRocketsEnabled(false);
                         }
                         this.updateApolloRockets();
-                        if (def.id === 'GATITOS_') {
-                            window.StorageModule.unlockSecret();
-                            window.StorageModule.setGrayModeEnabled(true);
-                            window.StorageModule.setSecretCatsEnabled(true);
-                            document.documentElement.classList.add('theme-gray');
-                            document.body.classList.add('theme-gray');
-                            this.applySecretFeaturesUI?.();
-                        } else {
-                            document.documentElement.classList.add('dark');
-                            window.StorageModule.setTheme('dark');
-                            this.updateThemeUI('dark', false);
-                        }
+                        document.documentElement.classList.add('dark');
+                        window.StorageModule.setTheme('dark');
+                        this.updateThemeUI('dark', false);
                         this.showToast(`✨ ${def.name} activado`, 'success');
                     }
                     this.renderVaultInventory();
@@ -3640,7 +2694,7 @@
                 if (found && found.themeClass) {
                     document.documentElement.classList.add(found.themeClass);
                 }
-                if (current !== 'gray' && current !== 'theme_cats' && current !== 'theme-gray') {
+                if (current !== 'gray' && current !== 'theme-gray') {
                     document.documentElement.classList.add('dark');
                     Storage.setTheme('dark');
                     this.updateThemeUI('dark', false);

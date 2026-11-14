@@ -362,11 +362,7 @@ window.TasksModule = (() => {
     }
 
     function triggerCelebration(sourceEl = null) {
-        const Storage = window.StorageModule;
-        const useCats = Storage?.getSecretCatsEnabled ? Storage.getSecretCatsEnabled() : false;
-        const emojis = useCats
-            ? ['🐱', '😸', '😻', '🐾', '🐈', '😺', '😽', '🧶']
-            : ['🎉', '🥳', '✨', '⭐', '🎊', '👏', '🎈'];
+        const emojis = ['🎉', '🥳', '✨', '⭐', '🎊', '👏', '🎈'];
         let originX = window.innerWidth / 2;
         let originY = window.innerHeight / 2;
 
@@ -376,7 +372,7 @@ window.TasksModule = (() => {
             originY = rect.top + rect.height / 2;
         }
 
-        const count = useCats ? 9 : 7;
+        const count = 7;
         for (let i = 0; i < count; i++) {
             const span = document.createElement('span');
             span.className = 'celebration-emoji-particle';

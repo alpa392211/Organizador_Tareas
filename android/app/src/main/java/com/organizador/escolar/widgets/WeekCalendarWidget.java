@@ -29,13 +29,13 @@ public class WeekCalendarWidget extends AppWidgetProvider {
         JSONObject payload = WidgetDataSync.getParsedPayload(context);
 
         String monthTitle = "Noviembre 2026";
-        String instName = "UNAM";
+        String instName = "Mi Agenda";
         JSONArray weekDays = null;
 
         if (payload != null) {
             JSONObject instObj = payload.optJSONObject("institution");
             if (instObj != null) {
-                instName = instObj.optString("name", "UNAM");
+                instName = instObj.optString("name", "Mi Agenda");
             }
 
             JSONObject calObj = payload.optJSONObject("weekCalendar");

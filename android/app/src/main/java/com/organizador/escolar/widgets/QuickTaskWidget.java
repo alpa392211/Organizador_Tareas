@@ -26,14 +26,14 @@ public class QuickTaskWidget extends AppWidgetProvider {
     public static void updateWidgets(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         JSONObject payload = WidgetDataSync.getParsedPayload(context);
 
-        String instName = "UNAM";
+        String instName = "Mi Agenda";
         int pendingToday = 0;
         String nextTaskTitle = "Todo al corriente para hoy ✨";
 
         if (payload != null) {
             JSONObject instObj = payload.optJSONObject("institution");
             if (instObj != null) {
-                instName = instObj.optString("name", "UNAM");
+                instName = instObj.optString("name", "Mi Agenda");
             }
 
             JSONObject quickTask = payload.optJSONObject("quickTask");

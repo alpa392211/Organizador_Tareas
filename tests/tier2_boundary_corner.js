@@ -1,7 +1,7 @@
 /**
  * tier2_boundary_corner.js - Tier 2: Boundary & Corner Cases
  * Features F01 through F18 (5 distinct boundary/edge tests per feature, 90 total tests)
- * Requirement-driven edge case validation for Organizador_Tareas v1.4.4
+ * Requirement-driven edge case validation for Organizador_Tareas v1.5.0
  */
 
 const fs = require('fs');
@@ -9,7 +9,7 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.4.4 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.5.0 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
@@ -18,7 +18,7 @@ const tests = [
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.4.4', 'package.json version must be 1.4.4');
+            helpers.assertEqual(pkg.version, '1.5.0', 'package.json version must be 1.5.0');
         }
     },
     {
@@ -30,7 +30,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.4.4';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.5.0';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -41,10 +41,10 @@ const tests = [
         name: 'Dismissing changelog modal records target version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                window.StorageModule?.setLastSeenVersion?.('1.4.4');
+                window.StorageModule?.setLastSeenVersion?.('1.5.0');
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.4.4', 'LocalStorage must record version 1.4.4');
+            helpers.assertEqual(saved, '1.5.0', 'LocalStorage must record version 1.5.0');
         }
     },
     {
@@ -178,19 +178,21 @@ const tests = [
     // F03: Secret Vault Standard Button Controls (Boundary & Corner)
     // =========================================================================
     {
-        id: 'T2_F03_01_cats_button_rapid_jitter_clicks',
+        id: 'T2_F03_01_cats_completely_removed_and_gray_ready',
         feature: 'F03',
-        name: 'Clicking cats button 25 times in rapid succession does not crash or corrupt state',
+        name: 'Obsolete cats control is absent while gray-mode button handles 25 rapid clicks',
         run: async (page, helpers) => {
             const success = await page.evaluate(async () => {
-                const btn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
-                if (!btn) return true;
+                const catsBtn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
+                if (catsBtn !== null || typeof window.StorageModule?.getSecretCatsEnabled !== 'undefined') return false;
+                const btn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
+                if (!btn) return false;
                 for (let i = 0; i < 25; i++) {
                     btn.click();
                 }
-                return typeof window.StorageModule?.getSecretCatsEnabled?.() === 'boolean';
+                return typeof window.StorageModule?.getGrayModeEnabled?.() === 'boolean';
             });
-            helpers.assertTrue(success, 'Rapid jitter clicks on cats button must maintain boolean state');
+            helpers.assertTrue(success, 'Cats must be removed and rapid clicks on gray mode button must preserve boolean state');
         }
     },
     {
@@ -200,7 +202,7 @@ const tests = [
         run: async (page, helpers) => {
             const success = await page.evaluate(async () => {
                 const btn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
-                if (!btn) return true;
+                if (!btn) return false;
                 for (let i = 0; i < 25; i++) {
                     btn.click();
                 }
@@ -210,54 +212,55 @@ const tests = [
         }
     },
     {
-        id: 'T2_F03_03_both_buttons_active_simultaneously',
+        id: 'T2_F03_03_gray_mode_coexists_with_dark_and_light',
         feature: 'F03',
-        name: 'Activating both cats and gray mode simultaneously operates safely without interference',
+        name: 'Monochrome mode operates safely alongside dark and light modes',
         run: async (page, helpers) => {
-            await page.evaluate(() => {
-                window.StorageModule?.setSecretCatsEnabled?.(true);
+            const res = await page.evaluate(() => {
+                document.documentElement.classList.add('dark');
                 window.StorageModule?.setGrayModeEnabled?.(true);
-                window.OrganizadorApp?.applySecretFeaturesUI?.();
+                window.OrganizadorApp?.applyGrayMode?.(true);
+                const hasBoth = document.documentElement.classList.contains('dark') &&
+                                document.documentElement.classList.contains('theme-gray');
+                document.documentElement.classList.remove('dark');
+                window.OrganizadorApp?.applyGrayMode?.(true);
+                const hasGrayInLight = !document.documentElement.classList.contains('dark') &&
+                                       document.documentElement.classList.contains('theme-gray');
+                return hasBoth && hasGrayInLight;
             });
-            const bothActive = await page.evaluate(() => {
-                const cats = window.StorageModule?.getSecretCatsEnabled?.() || false;
-                const gray = window.StorageModule?.getGrayModeEnabled?.() || false;
-                return cats && gray;
-            });
-            helpers.assertTrue(bothActive, 'Both secret controls must be active simultaneously');
+            helpers.assertTrue(res, 'theme-gray must coexist cleanly with both dark and light modes');
         }
     },
     {
         id: 'T2_F03_04_reload_persistence_under_active_controls',
         feature: 'F03',
-        name: 'Active state of standard buttons persists across page reload',
+        name: 'Active state of monochrome control persists across page reload',
         run: async (page, helpers) => {
             await page.evaluate(() => {
-                window.StorageModule?.setSecretCatsEnabled?.(true);
                 window.StorageModule?.setGrayModeEnabled?.(true);
             });
             await page.reload({ waitUntil: 'load' });
             const persisted = await page.evaluate(() => {
-                return (window.StorageModule?.getSecretCatsEnabled?.() || false) &&
-                       (window.StorageModule?.getGrayModeEnabled?.() || false);
+                return (window.StorageModule?.getGrayModeEnabled?.() || false) &&
+                       document.documentElement.classList.contains('theme-gray');
             });
-            helpers.assertTrue(persisted, 'Controls state must persist across reload');
+            helpers.assertTrue(persisted, 'Monochrome state and theme-gray class must persist across reload');
         }
     },
     {
         id: 'T2_F03_05_deactivation_cleans_dom_side_effects',
         feature: 'F03',
-        name: 'Deactivating gray mode completely cleans grayscale filter from DOM',
+        name: 'Deactivating gray mode completely cleans theme-gray class from DOM',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setGrayModeEnabled?.(false);
-                window.OrganizadorApp?.applySecretFeaturesUI?.();
-                document.documentElement.classList.remove('grayscale');
+                window.OrganizadorApp?.applyGrayMode?.(false);
             });
-            const hasGrayscale = await page.evaluate(() => {
-                return document.documentElement.classList.contains('grayscale');
+            const hasThemeGray = await page.evaluate(() => {
+                return document.documentElement.classList.contains('theme-gray') ||
+                       document.body.classList.contains('theme-gray');
             });
-            helpers.assertFalse(hasGrayscale, 'Deactivating gray mode must remove grayscale class from document');
+            helpers.assertFalse(hasThemeGray, 'Deactivating gray mode must remove theme-gray class from document and body');
         }
     },
 
@@ -621,21 +624,25 @@ const tests = [
         }
     },
     {
-        id: 'T2_F08_04_rapid_toggling_account_types',
+        id: 'T2_F08_04_obsolete_type_buttons_removed_and_rapid_inputs',
         feature: 'F08',
-        name: 'Rapidly toggling between Institution and Activities 10 times preserves clean form state',
+        name: 'Obsolete account type buttons are removed and rapid cycle/name edits stay clean',
         run: async (page, helpers) => {
-            const success = await page.evaluate(async () => {
+            const success = await page.evaluate(() => {
                 const inst = document.getElementById('welcome-type-institution');
                 const act = document.getElementById('welcome-type-activities');
-                if (!inst || !act) return false;
+                if (inst !== null || act !== null) return false;
+                const nameInp = document.getElementById('welcome-user-name');
+                const startInp = document.getElementById('welcome-cycle-start');
+                const endInp = document.getElementById('welcome-cycle-end');
+                if (!nameInp || !startInp || !endInp) return false;
                 for (let i = 0; i < 10; i++) {
-                    if (i % 2 === 0) inst.click();
-                    else act.click();
+                    nameInp.value = `Usuario ${i}`;
+                    nameInp.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-                return true;
+                return nameInp.value === 'Usuario 9';
             });
-            helpers.assertTrue(success, '#welcome-type-institution and #welcome-type-activities must exist and rapidly toggle');
+            helpers.assertTrue(success, 'Obsolete type cards must be removed and onboarding inputs must handle rapid updates');
         }
     },
     {
@@ -653,7 +660,7 @@ const tests = [
     },
 
     // =========================================================================
-    // F09: Removal of Countries and Schools Catalog + User Name (Boundary & Corner)
+    // F09: Removal of Schools & Countries Catalog + User Name (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F09_01_empty_user_name_validation',
@@ -729,7 +736,7 @@ const tests = [
     },
 
     // =========================================================================
-    // F10: Institution / Personal Photo Upload (Canvas downsampled to 256x256, <30KB) (Boundary & Corner)
+    // F10: Personal Photo Upload (Canvas downsampled to 256x256, <30KB) (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F10_01_giant_image_downsampled_successfully',
@@ -857,10 +864,10 @@ const tests = [
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setOnboardingCompleted?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.4.4');
+                window.StorageModule?.setLastSeenVersion?.('1.5.0');
             });
             const lastSeen = await page.evaluate(() => window.StorageModule?.getLastSeenVersion?.());
-            helpers.assertEqual(lastSeen, '1.4.4', 'Last seen version should be 1.4.4');
+            helpers.assertEqual(lastSeen, '1.5.0', 'Last seen version should be 1.5.0');
         }
     },
     {
@@ -1343,7 +1350,7 @@ const tests = [
     },
 
     // =========================================================================
-    // F17: Materials Photo Gallery on the Left (<30KB Canvas downsampled) (Boundary & Corner)
+    // F17: Materials Photo Gallery on the Left (MAX_DIM=1600, quality>=0.85, Quota Guard) (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F17_01_empty_gallery_state_placeholder',

@@ -1,7 +1,7 @@
 /**
  * tier4_real_world.js - Tier 4: Real-World Student Application Workflows
  * 5 End-to-End comprehensive student scenarios with opaque-box DOM interactions
- * Requirement-driven test suite for Organizador_Tareas v1.4.4
+ * Requirement-driven test suite for Organizador_Tareas v1.5.0
  */
 
 const tests = [
@@ -10,7 +10,7 @@ const tests = [
     // =========================================================================
     {
         id: 'T4_SCENARIO_1_new_student_fresh_onboarding',
-        name: 'Scenario 1: New Student Fresh Onboarding (Activities Mode -> Name -> Photo Upload -> Celebration -> Dashboard Display)',
+        name: 'Scenario 1: New Student Fresh Onboarding (Name -> Photo Upload -> Cycle Dates -> Celebration -> Dashboard Display)',
         run: async (page, helpers) => {
             // Step 1: Clean slate startup
             await page.evaluate(() => {
@@ -35,27 +35,19 @@ const tests = [
             helpers.assertTrue(presentationState.onboardingVisible, 'Onboarding modal must be visible on first launch');
             helpers.assertTrue(presentationState.changelogSuppressed, 'Changelog modal must be suppressed during onboarding');
 
-            // Step 3: Choose "Organizador de actividades"
-            const accountSelected = await page.evaluate(() => {
-                const actBtn = document.getElementById('welcome-type-activities') ||
-                               document.querySelector('[data-type="activities"]');
-                if (!actBtn) return false;
-                actBtn.click();
-                return true;
-            });
-            helpers.assertTrue(accountSelected, 'Activities organizer option must exist and be selectable');
-            const accType = await page.evaluate(() => window.StorageModule?.getAccountType?.());
-            helpers.assertEqual(accType, 'organizer', 'Account type should be organizer in storage');
-
-            // Step 4: Enter user name and profile photo
-            const nameEntered = await page.evaluate(() => {
+            // Step 3: Enter user name and cycle dates (simplified v1.5.0 onboarding)
+            const nameAndDatesEntered = await page.evaluate(() => {
                 const nameInp = document.getElementById('welcome-user-name');
-                if (!nameInp) return false;
+                const startInp = document.getElementById('welcome-cycle-start');
+                const endInp = document.getElementById('welcome-cycle-end');
+                if (!nameInp || !startInp || !endInp) return false;
                 nameInp.value = 'Sofía Ramírez';
                 nameInp.dispatchEvent(new Event('input', { bubbles: true }));
+                if (!startInp.value) startInp.value = '2026-08-01';
+                if (!endInp.value) endInp.value = '2026-12-20';
                 return true;
             });
-            helpers.assertTrue(nameEntered, '#welcome-user-name input must exist');
+            helpers.assertTrue(nameAndDatesEntered, '#welcome-user-name and cycle date inputs must exist');
 
             // Upload profile photo via simulateFileUpload
             await helpers.simulateFileUpload(page, '#welcome-photo-input', {
@@ -72,12 +64,12 @@ const tests = [
             });
             helpers.assert(photoDataUrl.startsWith('data:image/'), 'Profile photo must be downsampled to data:image/ URL');
             const approxBytes = Math.round(photoDataUrl.length * 0.75);
-            helpers.assert(approxBytes < 30 * 1024, `Photo size must be < 30KB, was ${approxBytes} bytes`);
+            helpers.assert(approxBytes < 30 * 1024, `Profile photo size must be < 30KB, was ${approxBytes} bytes`);
 
-            // Step 5: Complete onboarding with celebration progress bar
+            // Step 4: Complete onboarding with celebration progress bar
             const completed = await page.evaluate(async () => {
                 const submitBtn = document.querySelector('#cycle-setup-modal button[type="submit"]') ||
-                                  document.getElementById('welcome-save-btn');
+                                  document.getElementById('welcome-cycle-save-btn');
                 if (!submitBtn) return { submitted: false, hasProgressBar: false, hasCelebration: false };
                 submitBtn.click();
 
@@ -100,7 +92,7 @@ const tests = [
             helpers.assertTrue(completed.hasBar, '#onboarding-progress-bar must exist in onboarding DOM');
             helpers.assertTrue(completed.hasCelebration, 'Celebration message must display "¡Disfruta la app!"');
 
-            // Step 6: Verify dashboard displays user name in header
+            // Step 5: Verify dashboard displays user name in header
             const headerShowsName = await page.evaluate(() => {
                 const header = document.querySelector('header');
                 return header ? header.textContent.includes('Sofía Ramírez') : false;
@@ -113,26 +105,53 @@ const tests = [
     },
 
     // =========================================================================
-    // Scenario 2: Institution Setup & Subject Creation
+    // Scenario 2: Profile Photo, Manual Period & Subject Creation
     // =========================================================================
     {
-        id: 'T4_SCENARIO_2_institution_setup_and_subject_creation',
-        name: 'Scenario 2: Institution Setup & Subject Creation (Institution Mode -> Logo -> Dynamic Popup Long-Press -> Toggle Legacy Buttons)',
+        id: 'T4_SCENARIO_2_profile_period_and_subject_creation',
+        name: 'Scenario 2: Settings Profile Photo + Free-Text Period + Subject Long-Press & Persistent Buttons',
         run: async (page, helpers) => {
-            // Step 1: Configure as Institution
-            await helpers.simulateFileUpload(page, '#welcome-photo-input', {
+            // Step 1: Complete onboarding without a photo, then upload profile photo & set free-text period in Settings
+            await page.evaluate(() => {
+                window.StorageModule?.setUserPhoto?.('');
+                window.StorageModule?.setUserName?.('Elena Vázquez');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.OrganizadorApp?.switchView?.('settings');
+            });
+
+            await helpers.simulateFileUpload(page, '#settings-photo-input', {
                 width: 400,
                 height: 400,
                 color: '#10B981',
-                fileName: 'school_logo.png'
+                fileName: 'elena_avatar.png'
             });
-            await page.evaluate(() => {
-                window.StorageModule?.setAccountType?.('institution');
-                window.StorageModule?.setUserName?.('Colegio San Ignacio');
-                window.StorageModule?.setAcademicPeriod?.('Ciclo 2026-2027');
-                window.StorageModule?.setOnboardingCompleted?.(true);
-                window.StorageModule?.setCycleConfigured?.(true);
+            await new Promise(r => setTimeout(r, 200));
+
+            const settingsPhoto = await page.evaluate(() => window.StorageModule?.getUserPhoto?.() || '');
+            helpers.assert(settingsPhoto.startsWith('data:image/'), 'Profile photo uploaded from Settings must persist');
+
+            const periodState = await page.evaluate(() => {
+                const inp = document.getElementById('custom-period-input');
+                const saveBtn = document.getElementById('save-custom-period-btn');
+                const clearBtn = document.getElementById('clear-custom-period-btn');
+                const headerPeriod = document.getElementById('header-inst-period');
+                if (!inp || !saveBtn || !clearBtn || !headerPeriod) return { found: false };
+                inp.value = 'Cuatrimestre Septiembre 2026';
+                saveBtn.click();
+                const shownText = headerPeriod.textContent.trim();
+                const shownVisible = !headerPeriod.classList.contains('hidden');
+                clearBtn.click();
+                const clearedHidden = headerPeriod.classList.contains('hidden');
+                // Restore period for remaining flow
+                inp.value = 'Semestre 2026-2';
+                saveBtn.click();
+                return { found: true, shownText, shownVisible, clearedHidden };
             });
+            helpers.assertTrue(periodState.found, 'Free-text period controls and header period label must exist');
+            helpers.assertEqual(periodState.shownText, 'Cuatrimestre Septiembre 2026', 'Header must display saved free-text period');
+            helpers.assertTrue(periodState.shownVisible, 'Header period label must be visible when non-empty');
+            helpers.assertTrue(periodState.clearedHidden, 'Header period label must hide when cleared/empty');
 
             // Step 2: Add subjects and switch to subjects view
             const subjects = [
@@ -190,7 +209,7 @@ const tests = [
     // =========================================================================
     {
         id: 'T4_SCENARIO_3_study_materials_and_private_notes_workflow',
-        name: 'Scenario 3: Study Materials & Private Notes (Left Gallery Upload -> Canvas Downsample -> Password Protected Note -> PIN Unlock)',
+        name: 'Scenario 3: Study Materials & Private Notes (High-Res Gallery Upload >=0.85 JPEG -> Quota Guard -> Password Protected Note -> PIN Unlock)',
         run: async (page, helpers) => {
             // Step 1: Navigate to Notes view and verify 2-column layout
             await page.evaluate(() => {
@@ -210,21 +229,36 @@ const tests = [
             helpers.assertTrue(notesLayout.isViewActive, 'Notes view must be active');
             helpers.assertTrue(notesLayout.hasGalleryPanel, '#notes-gallery-panel must exist on left side of notes view');
 
-            // Step 2: Upload study material photo to left gallery
+            // Step 2: Upload high-res study material photo (2000x1200 -> scaled to <= 1600px at quality >= 0.85 JPEG)
             await helpers.simulateFileUpload(page, '#notes-photo-input', {
-                width: 600,
-                height: 600,
+                width: 2000,
+                height: 1200,
                 color: '#3B82F6',
                 fileName: 'pizarron_calculo.png'
             });
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 300));
 
-            const savedPhotos = await page.evaluate(() => window.StorageModule?.getGalleryPhotos?.() || []);
-            helpers.assert(savedPhotos.length > 0, 'Photo must be saved in gallery storage');
-            const photoItem = savedPhotos[0];
-            helpers.assert(photoItem.dataUrl && photoItem.dataUrl.startsWith('data:image/'), 'Gallery photo must contain valid data:image/ URL');
-            const photoBytes = Math.round(photoItem.dataUrl.length * 0.75);
-            helpers.assert(photoBytes < 30 * 1024, `Gallery photo must be < 30KB, was ${photoBytes} bytes`);
+            const photoVerification = await page.evaluate(async () => {
+                const savedPhotos = window.StorageModule?.getGalleryPhotos?.() || [];
+                const item = savedPhotos[0];
+                if (!item || !item.dataUrl) return { count: savedPhotos.length, valid: false };
+                const dims = await new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => resolve({ w: img.width, h: img.height });
+                    img.onerror = () => resolve({ w: 0, h: 0 });
+                    img.src = item.dataUrl;
+                });
+                return {
+                    count: savedPhotos.length,
+                    valid: item.dataUrl.startsWith('data:image/jpeg'),
+                    w: dims.w,
+                    h: dims.h
+                };
+            });
+            helpers.assert(photoVerification.count > 0, 'Photo must be saved in gallery storage');
+            helpers.assertTrue(photoVerification.valid, 'Gallery photo must contain high-quality data:image/jpeg URL');
+            helpers.assert(photoVerification.w <= 1600 && photoVerification.h <= 1600 && photoVerification.w >= 1000,
+                `Gallery photo must preserve high resolution (<=1600px, got ${photoVerification.w}x${photoVerification.h})`);
 
             // Step 3: Create a private note with password protection
             const privateNote = {
@@ -295,7 +329,7 @@ const tests = [
     // =========================================================================
     {
         id: 'T4_SCENARIO_4_secret_vault_easter_egg_discovery',
-        name: 'Scenario 4: Secret Vault Easter Egg Discovery (5 Task Auto Unlock -> Continuous Input -> Standard Push Buttons -> Light Mode Contrast)',
+        name: 'Scenario 4: Secret Vault Easter Egg Discovery (5 Task Auto Unlock -> Continuous Input -> Monochrome Button -> Light Mode Contrast)',
         run: async (page, helpers) => {
             // Step 1: Create 5 real tasks and complete them to trigger automatic vault milestone
             await page.evaluate(() => {
@@ -321,7 +355,7 @@ const tests = [
 
             // Step 2: Open vault terminal and verify notice
             await page.evaluate(() => {
-                window.OrganizadorApp?.switchView?.('vault');
+                window.OrganizadorApp?.switchView?.('secret-codes');
                 window.OrganizadorApp?.renderVaultInventory?.();
             });
             const noticeText = await page.evaluate(() => {
@@ -365,16 +399,16 @@ const tests = [
             helpers.assertFalse(cardFormatting.hasOuterTruncate, 'Inventory card must not have outer truncate');
             helpers.assertTrue(cardFormatting.isWrappingAllowed, 'Title wrapper should permit multi-line text wrapping');
 
-            // Step 5: Verify standard button controls are used instead of iOS switches
+            // Step 5: Verify cats button is removed and gray-mode control is a standard button that toggles theme-gray
             const controlsCheck = await page.evaluate(() => {
                 const catsBtn = document.getElementById('settings-cats-btn') || document.querySelector('[data-cats-btn]');
                 const grayBtn = document.getElementById('settings-gray-mode-btn') || document.querySelector('[data-gray-btn]');
                 return {
-                    catsIsButton: catsBtn ? catsBtn.tagName.toLowerCase() === 'button' : false,
+                    catsRemoved: catsBtn === null,
                     grayIsButton: grayBtn ? grayBtn.tagName.toLowerCase() === 'button' : false
                 };
             });
-            helpers.assertTrue(controlsCheck.catsIsButton, '#settings-cats-btn must be a standard button element');
+            helpers.assertTrue(controlsCheck.catsRemoved, '#settings-cats-btn must be removed in v1.5.0');
             helpers.assertTrue(controlsCheck.grayIsButton, '#settings-gray-mode-btn must be a standard button element');
 
             // Step 6: Switch to light mode and confirm contrast

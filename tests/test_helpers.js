@@ -1,5 +1,5 @@
 /**
- * test_helpers.js - Reusable E2E Test Utilities for Organizador_Tareas v1.3.1
+ * test_helpers.js - Reusable E2E Test Utilities for Organizador_Tareas v1.5.0
  * Runs headless Chrome with zero external network dependencies over file://
  */
 
@@ -414,8 +414,6 @@ async function resetPageState(page) {
             // Switches view back to 'subjects'
             if (window.OrganizadorApp && typeof window.OrganizadorApp.switchView === 'function') {
                 try { window.OrganizadorApp.switchView('subjects'); } catch (_) {}
-            } else if (window.SchoolApp && typeof window.SchoolApp.switchView === 'function') {
-                try { window.SchoolApp.switchView('subjects'); } catch (_) {}
             } else {
                 document.querySelectorAll('.view-section, [id^="view-"]').forEach(v => {
                     if (v.id === 'view-subjects') {
