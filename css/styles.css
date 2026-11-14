@@ -7,50 +7,53 @@
 
 :root {
     --inst-primary: #002B7A;
-    --font-sans: 'Calibri', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-sf-base: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui;
+    --font-sans: var(--font-sf-base), 'Calibri', 'Segoe UI', sans-serif;
 
-    /* Curvas de aceleración dinámica y elástica por hardware (Emil Design Eng / UI Animation) */
+    /* Curvas de aceleración dinámica y elástica por hardware (Apple HIG / Emil Design Eng) */
     --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
     --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-apple-spring: cubic-bezier(0.28, 1.24, 0.44, 1);
     --transition-fast: 0.16s var(--ease-smooth);
     --transition-normal: 0.26s var(--ease-smooth);
 
     /* ========================================================
-       LIQUID GLASS WEB APPROXIMATION TOKENS (Modo Claro)
-       Aproximación CSS web (Open Design Appendix C):
-       Blur real reservado a nav, modales y popovers.
-       Tarjetas/paneles usan fondo semitransparente + borde + sombra.
+       LIQUID GLASS WEB APPROXIMATION TOKENS (v1.5.1 - Modo Claro)
+       Blur real marcado (24–36px) en nav, drawer, paneles contenedores,
+       modales y popovers. Las tarjetas en listas largas (.stagger-card)
+       usan fondo traslúcido + borde refractivo + sombra sin blur propio
+       para preservar 60fps en gama baja.
        ======================================================== */
-    --lg-nav-bg: rgba(255, 255, 255, 0.72);
-    --lg-nav-border: rgba(255, 255, 255, 0.85);
-    --lg-nav-ring: rgba(15, 23, 42, 0.07);
-    --lg-drawer-bg: rgba(248, 250, 252, 0.90);
-    --lg-panel-bg: rgba(255, 255, 255, 0.86);
-    --lg-card-bg: rgba(255, 255, 255, 0.92);
-    --lg-card-border: rgba(203, 213, 225, 0.72);
-    --lg-modal-bg: rgba(255, 255, 255, 0.84);
-    --lg-popover-bg: rgba(255, 255, 255, 0.82);
+    --lg-blur-nav: 28px;
+    --lg-blur-panel: 24px;
+    --lg-blur-modal: 36px;
+    --lg-blur-backdrop: 18px;
+    --lg-nav-bg: rgba(255, 255, 255, 0.66);
+    --lg-nav-border: rgba(255, 255, 255, 0.90);
+    --lg-nav-ring: rgba(15, 23, 42, 0.08);
+    --lg-drawer-bg: rgba(248, 250, 252, 0.80);
+    --lg-panel-bg: rgba(255, 255, 255, 0.72);
+    --lg-card-bg: rgba(255, 255, 255, 0.82);
+    --lg-card-border: rgba(255, 255, 255, 0.85);
+    --lg-card-stroke: rgba(15, 23, 42, 0.07);
+    --lg-modal-bg: rgba(255, 255, 255, 0.78);
+    --lg-popover-bg: rgba(255, 255, 255, 0.76);
     --lg-indicator-bg: rgba(255, 255, 255, 0.96);
-    --lg-indicator-border: rgba(99, 102, 241, 0.16);
-    --lg-specular: inset 0 1px 0 rgba(255, 255, 255, 0.92);
-    --shadow-glass-sm: 0 2px 10px -2px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
-    --shadow-glass-md: 0 10px 28px -8px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.92);
-    --shadow-glass-lg: 0 20px 44px -12px rgba(15, 23, 42, 0.15), 0 6px 16px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-    --shadow-glass-hover: 0 18px 38px -10px rgba(15, 23, 42, 0.13), 0 6px 14px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    --lg-indicator-border: rgba(99, 102, 241, 0.20);
+    --lg-specular: inset 0 1px 0 rgba(255, 255, 255, 0.94);
+    --shadow-glass-sm: 0 2px 10px -2px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-glass-md: 0 12px 32px -10px rgba(15, 23, 42, 0.11), 0 3px 10px -2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 0 0 1px var(--lg-card-stroke);
+    --shadow-glass-lg: 0 24px 54px -14px rgba(15, 23, 42, 0.20), 0 8px 20px -6px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    --shadow-glass-hover: 0 22px 44px -12px rgba(15, 23, 42, 0.16), 0 8px 18px -4px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.98);
 }
 
 /* ========================================================
-   SISTEMA DE TIPOGRAFÍAS SELECCIONABLES (5 ESTILOS)
-   1. Calibri (Moderna / Institucional)
-   2. Times New Roman (Académica / Clásica)
-   3. Montserrat (Geométrica / Estilizada)
-   4. Lora (Serif Literaria / Cálida)
-   5. Poppins (Moderna / Amigable)
+   SISTEMA DE TIPOGRAFÍAS SELECCIONABLES (5 ESTILOS + BASE SF)
    ======================================================== */
 :root[data-font="calibri"], body[data-font="calibri"] {
-    --font-sans: 'Calibri', 'Segoe UI', Candara, -apple-system, sans-serif;
+    --font-sans: var(--font-sf-base), 'Calibri', 'Segoe UI', Candara, sans-serif;
     font-family: var(--font-sans);
 }
 
@@ -60,7 +63,7 @@
 }
 
 :root[data-font="montserrat"], body[data-font="montserrat"] {
-    --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Montserrat', var(--font-sf-base), sans-serif;
     font-family: var(--font-sans);
 }
 
@@ -70,20 +73,15 @@
 }
 
 :root[data-font="poppins"], body[data-font="poppins"] {
-    --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Poppins', var(--font-sf-base), sans-serif;
     font-family: var(--font-sans);
 }
 
 /* ========================================================
    TIPOGRAFÍAS SECRETAS DESBLOQUEABLES (v1.3.2)
-   1. Lexend (Hiperlegible / Accesible) - code: READABLE
-   2. Fira Code (Monospace Hacker) - code: FIRACODE
-   3. Playfair Display (Editorial Serif) - code: PLAYFAIR
-   4. Caveat (Cuaderno / Manuscrito) - code: HANDNOTE
-   5. Orbitron (Cyberpunk HUD / Futurista) - code: ORBITRON
    ======================================================== */
 :root[data-font="readable"], body[data-font="readable"] {
-    --font-sans: 'Lexend', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Lexend', var(--font-sf-base), sans-serif;
     font-family: var(--font-sans);
 }
 
@@ -111,8 +109,8 @@
 body {
     background-color: #eaedf4;
     background-image:
-        radial-gradient(950px 480px at 8% -6%, rgba(99, 102, 241, 0.08), transparent 60%),
-        radial-gradient(820px 440px at 94% 6%, rgba(14, 165, 233, 0.07), transparent 55%);
+        radial-gradient(950px 480px at 8% -6%, rgba(99, 102, 241, 0.09), transparent 60%),
+        radial-gradient(820px 440px at 94% 6%, rgba(14, 165, 233, 0.08), transparent 55%);
     background-attachment: fixed;
     color: #1e293b;
     font-family: var(--font-sans);
@@ -120,10 +118,18 @@ body {
     transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth);
 }
 
-/* Modo Claro: Superficies semitransparentes para tarjetas y paneles (sin blur pesado) */
+/* Contenedores principales sin fondo sólido para dejar respirar el fondo activo */
+main,
+section.view-transition,
+#subjects-grid,
+#tasks-container,
+#notes-grid,
+#archive-items-grid {
+    background-color: transparent;
+}
+
+/* Modo Claro: Superficies traslúcidas calibradas para paneles y tarjetas */
 html:not(.dark):not([class*="theme-"]) .glass-panel,
-html:not(.dark):not([class*="theme-"]) .stagger-card,
-html:not(.dark):not([class*="theme-"]) .card-hover,
 html:not(.dark):not([class*="theme-"]) #view-subjects > div.bg-white,
 html:not(.dark):not([class*="theme-"]) #view-tasks > div.bg-white,
 html:not(.dark):not([class*="theme-"]) #view-notes > div.bg-white,
@@ -131,12 +137,18 @@ html:not(.dark):not([class*="theme-"]) #view-archive > div.bg-white,
 html:not(.dark):not([class*="theme-"]) #archive-empty-state,
 html:not(.dark):not([class*="theme-"]) #view-settings > div.bg-white,
 html:not(.dark):not([class*="theme-"]) .settings-accordion-card {
+    background-color: var(--lg-panel-bg) !important;
+    border: 1px solid var(--lg-card-border) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+}
+html:not(.dark):not([class*="theme-"]) .stagger-card,
+html:not(.dark):not([class*="theme-"]) .card-hover {
     background-color: var(--lg-card-bg) !important;
     border: 1px solid var(--lg-card-border) !important;
     box-shadow: var(--shadow-glass-md) !important;
 }
 
-/* Modo Claro Estándar: Navegación flotante Liquid Glass (blur real solo en nav, drawer, modales y popovers) */
+/* Modo Claro Estándar: Navegación flotante y modales Liquid Glass */
 html:not(.dark):not([class*="theme-"]) header,
 html:not(.dark):not([class*="theme-"]) #bottom-nav {
     background-color: var(--lg-nav-bg) !important;
@@ -146,41 +158,42 @@ html:not(.dark):not([class*="theme-"]) #bottom-nav {
 html:not(.dark):not([class*="theme-"]) #sidebar-drawer,
 html:not(.dark):not([class*="theme-"]) #sidebar-drawer-footer {
     background-color: var(--lg-drawer-bg) !important;
-    border-color: rgba(203, 213, 225, 0.65) !important;
+    border-color: rgba(255, 255, 255, 0.72) !important;
 }
 html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
 html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
     background-color: var(--lg-modal-bg) !important;
-    border-color: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.90) !important;
     box-shadow: var(--shadow-glass-lg) !important;
 }
 
 /* Modo Oscuro Global */
 html.dark {
     color-scheme: dark;
-    --lg-nav-bg: rgba(15, 23, 42, 0.72);
-    --lg-nav-border: rgba(255, 255, 255, 0.13);
-    --lg-nav-ring: rgba(2, 6, 23, 0.45);
-    --lg-drawer-bg: rgba(15, 23, 42, 0.88);
-    --lg-panel-bg: rgba(15, 23, 42, 0.78);
-    --lg-card-bg: rgba(22, 31, 52, 0.82);
-    --lg-card-border: rgba(255, 255, 255, 0.10);
-    --lg-modal-bg: rgba(15, 23, 42, 0.84);
-    --lg-popover-bg: rgba(15, 23, 42, 0.82);
-    --lg-indicator-bg: rgba(255, 255, 255, 0.12);
-    --lg-indicator-border: rgba(255, 255, 255, 0.18);
-    --lg-specular: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    --shadow-glass-sm: 0 2px 10px -2px rgba(2, 6, 23, 0.40), 0 1px 2px rgba(2, 6, 23, 0.25);
-    --shadow-glass-md: 0 12px 30px -8px rgba(2, 6, 23, 0.50), 0 2px 8px -2px rgba(2, 6, 23, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-    --shadow-glass-lg: 0 24px 52px -12px rgba(2, 6, 23, 0.68), 0 8px 20px -4px rgba(2, 6, 23, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    --shadow-glass-hover: 0 20px 42px -10px rgba(2, 6, 23, 0.65), 0 8px 16px -4px rgba(2, 6, 23, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    --lg-nav-bg: rgba(15, 23, 42, 0.64);
+    --lg-nav-border: rgba(255, 255, 255, 0.16);
+    --lg-nav-ring: rgba(2, 6, 23, 0.50);
+    --lg-drawer-bg: rgba(15, 23, 42, 0.78);
+    --lg-panel-bg: rgba(15, 23, 42, 0.68);
+    --lg-card-bg: rgba(22, 31, 52, 0.76);
+    --lg-card-border: rgba(255, 255, 255, 0.13);
+    --lg-card-stroke: rgba(2, 6, 23, 0.35);
+    --lg-modal-bg: rgba(15, 23, 42, 0.76);
+    --lg-popover-bg: rgba(15, 23, 42, 0.76);
+    --lg-indicator-bg: rgba(255, 255, 255, 0.14);
+    --lg-indicator-border: rgba(255, 255, 255, 0.22);
+    --lg-specular: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    --shadow-glass-sm: 0 2px 10px -2px rgba(2, 6, 23, 0.45), 0 1px 2px rgba(2, 6, 23, 0.28);
+    --shadow-glass-md: 0 14px 34px -8px rgba(2, 6, 23, 0.56), 0 3px 10px -2px rgba(2, 6, 23, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    --shadow-glass-lg: 0 26px 56px -12px rgba(2, 6, 23, 0.74), 0 10px 24px -4px rgba(2, 6, 23, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    --shadow-glass-hover: 0 22px 44px -10px rgba(2, 6, 23, 0.68), 0 8px 18px -4px rgba(2, 6, 23, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.20);
 }
 
 html.dark body {
     background-color: #090e1a;
     background-image:
-        radial-gradient(950px 480px at 8% -6%, rgba(99, 102, 241, 0.14), transparent 60%),
-        radial-gradient(820px 440px at 94% 6%, rgba(20, 184, 166, 0.09), transparent 55%);
+        radial-gradient(950px 480px at 8% -6%, rgba(99, 102, 241, 0.15), transparent 60%),
+        radial-gradient(820px 440px at 94% 6%, rgba(20, 184, 166, 0.10), transparent 55%);
     background-attachment: fixed;
     color: #f8fafc;
 }
@@ -540,22 +553,46 @@ section.hidden, .modal-overlay.hidden {
 }
 
 /* ========================================================
-   CAPA LIQUID GLASS REAL (NAV, DRAWER, MODALES Y POPOVERS)
-   Nota: Tarjetas/paneles usan fondo semitransparente + borde
-   + sombra sin backdrop-filter para rendimiento óptimo 60fps.
+   CAPA LIQUID GLASS REAL v1.5.1
+   Blur 24–36px en nav, drawer, modales, popovers y paneles.
+   Las tarjetas de listas largas (.stagger-card) evitan blur propio
+   para conservar rendimiento fluido en teléfonos de gama baja.
    ======================================================== */
 .liquid-glass-nav,
 #bottom-nav.liquid-glass-bottom,
 .liquid-glass-drawer,
-.modal-dialog,
 .liquid-glass-popover,
 .toast-floating-stack > div {
-    backdrop-filter: blur(20px) saturate(175%) contrast(1.03);
-    -webkit-backdrop-filter: blur(20px) saturate(175%) contrast(1.03);
+    backdrop-filter: blur(var(--lg-blur-nav)) saturate(195%) contrast(1.04);
+    -webkit-backdrop-filter: blur(var(--lg-blur-nav)) saturate(195%) contrast(1.04);
+}
+
+.glass-panel,
+.settings-accordion-card {
+    backdrop-filter: blur(var(--lg-blur-panel)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--lg-blur-panel)) saturate(180%);
+}
+
+.stagger-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
+#card-dynamic-popup .modal-dialog {
+    backdrop-filter: blur(var(--lg-blur-modal)) saturate(200%) contrast(1.05);
+    -webkit-backdrop-filter: blur(var(--lg-blur-modal)) saturate(200%) contrast(1.05);
+}
+
+/* Fallback variable usado al animar fondos en Fase B (reduce blur nav/drawer a ~16px) */
+html.animated-bg-running {
+    --lg-blur-nav: 16px;
+    --lg-blur-panel: 14px;
 }
 
 .liquid-glass-nav {
     position: sticky;
+    top: calc(0.625rem + env(safe-area-inset-top, 0px));
     overflow: hidden;
     box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring);
 }
@@ -564,10 +601,18 @@ section.hidden, .modal-overlay.hidden {
 #bottom-nav.liquid-glass-bottom {
     position: fixed;
     bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    left: calc(0.75rem + env(safe-area-inset-left, 0px));
+    right: calc(0.75rem + env(safe-area-inset-right, 0px));
     box-shadow: var(--shadow-glass-lg), 0 0 0 1px var(--lg-nav-ring);
 }
 
-/* Brillo especular superior sutil reservado exclusivamente para barras flotantes */
+#sidebar-drawer.liquid-glass-drawer {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+}
+
+/* Brillo especular superior nítido para barras y popovers */
 .liquid-glass-nav::before,
 #bottom-nav.liquid-glass-bottom::before {
     content: "";
@@ -576,14 +621,14 @@ section.hidden, .modal-overlay.hidden {
     border-radius: inherit;
     pointer-events: none;
     z-index: 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 42%, transparent 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.50) 0%, rgba(255, 255, 255, 0.10) 40%, transparent 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 html.dark .liquid-glass-nav::before,
 html.dark #bottom-nav.liquid-glass-bottom::before {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 45%, transparent 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 44%, transparent 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .liquid-header-inner,
@@ -595,19 +640,25 @@ html.dark #bottom-nav.liquid-glass-bottom::before {
 /* Despeje seguro sobre barra inferior flotante y botón central para banner PWA y toasts */
 .pwa-floating-banner {
     bottom: calc(7.75rem + env(safe-area-inset-bottom, 0px));
+    left: calc(1rem + env(safe-area-inset-left, 0px));
+    right: calc(1rem + env(safe-area-inset-right, 0px));
 }
 
 .toast-floating-stack {
     top: calc(5.5rem + env(safe-area-inset-top, 0px));
+    right: calc(1rem + env(safe-area-inset-right, 0px));
     bottom: auto;
 }
 
 @media (min-width: 768px) {
     .pwa-floating-banner {
-        bottom: 1.5rem;
+        bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        left: auto;
+        right: calc(1.5rem + env(safe-area-inset-right, 0px));
     }
     .toast-floating-stack {
-        top: 6rem;
+        top: calc(6rem + env(safe-area-inset-top, 0px));
+        right: calc(1.5rem + env(safe-area-inset-right, 0px));
         bottom: auto;
     }
 }
@@ -1983,20 +2034,62 @@ html body #vault-reveal-modal .modal-dialog {
     pointer-events: none !important;
 }
 
-/* ===== v1.4.4: Popup dinámico (pulsación larga), galería y notas privadas ===== */
+/* ===== v1.5.1: Popup dinámico (pulsación larga), clon elevado y backdrops desenfocados ===== */
 #card-dynamic-popup .modal-dialog,
 #note-unlock-modal .modal-dialog {
     opacity: 1;
-    transform: none;
 }
+
+.app-modal-backdrop,
+#drawer-backdrop,
+#card-dynamic-popup-backdrop {
+    backdrop-filter: blur(var(--lg-blur-backdrop)) saturate(145%);
+    -webkit-backdrop-filter: blur(var(--lg-blur-backdrop)) saturate(145%);
+    transition: opacity 0.24s var(--ease-smooth), backdrop-filter 0.24s var(--ease-smooth);
+}
+
+#card-dynamic-popup {
+    opacity: 0;
+    transition: opacity 0.2s var(--ease-smooth);
+}
+#card-dynamic-popup.active {
+    opacity: 1;
+}
+
+.longpress-source-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+@keyframes longpressClonePop {
+    0% {
+        transform: scale(1);
+        box-shadow: var(--shadow-glass-md);
+    }
+    100% {
+        transform: scale(1.024);
+        box-shadow: 0 26px 52px -12px rgba(15, 23, 42, 0.34), 0 0 0 1.5px rgba(99, 102, 241, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+}
+
+.longpress-card-clone-elevated {
+    position: fixed !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    z-index: 10 !important;
+    animation: longpressClonePop 0.26s var(--ease-apple-spring) forwards !important;
+    will-change: transform;
+}
+
 @keyframes dynamicCardPopupBounce {
-    0% { opacity: 0; transform: scale(0.6) translateY(16px); }
-    60% { opacity: 1; transform: scale(1.06) translateY(-2px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+    0% { opacity: 0; transform: scale(0.84) translate3d(0, 10px, 0); }
+    70% { opacity: 1; transform: scale(1.02) translate3d(0, -1px, 0); }
+    100% { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
 }
 .dynamic-popup-in {
-    animation: dynamicCardPopupBounce 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: dynamicCardPopupBounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
+
 @keyframes noteShake {
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-8px); }
@@ -2010,14 +2103,227 @@ html body #vault-reveal-modal .modal-dialog {
 .gallery-name { font-size: 10px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; word-break: break-all; }
 
 /* ========================================================
+   NOTAS: DESVANECIDO HORIZONTAL Y CONTRASTE DE CHIPS >= 4.5:1
+   ======================================================== */
+.scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+.notes-filter-scroll-wrap {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 14px, #000 calc(100% - 14px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 14px, #000 calc(100% - 14px), transparent 100%);
+}
+
+.note-filter-chip {
+    min-height: 44px;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+    color: #334155;
+    background-color: rgba(241, 245, 249, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    transition: transform 0.18s var(--ease-apple-spring), box-shadow 0.2s var(--ease-smooth);
+}
+html.dark .note-filter-chip {
+    color: #e2e8f0;
+    background-color: rgba(30, 41, 59, 0.85);
+    border-color: rgba(255, 255, 255, 0.10);
+}
+.note-filter-chip > span {
+    color: inherit;
+}
+
+.note-filter-chip.note-filter-active,
+[data-note-filter].bg-indigo-600 {
+    background-color: #4338ca !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
+    box-shadow: 0 6px 18px -4px rgba(67, 56, 202, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+.note-filter-chip.note-filter-active *,
+[data-note-filter].bg-indigo-600 * {
+    color: #ffffff !important;
+}
+
+/* Contraste garantizado >= 4.5:1 en Monocromático y los 10 temas de Bóveda */
+html.theme-gray .note-filter-chip.note-filter-active,
+html.theme-gray [data-note-filter].bg-indigo-600 {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+}
+html.dark.theme-gray .note-filter-chip.note-filter-active,
+html.dark.theme-gray [data-note-filter].bg-indigo-600 {
+    background-color: #475569 !important;
+    color: #ffffff !important;
+}
+html.theme-matrix .note-filter-chip.note-filter-active,
+html.theme-matrix [data-note-filter].bg-indigo-600 {
+    background-color: #047857 !important;
+    color: #ffffff !important;
+}
+html.theme-sakura .note-filter-chip.note-filter-active,
+html.theme-sakura [data-note-filter].bg-indigo-600 {
+    background-color: #be123c !important;
+    color: #ffffff !important;
+}
+html.theme-arcade .note-filter-chip.note-filter-active,
+html.theme-arcade [data-note-filter].bg-indigo-600 {
+    background-color: #6d28d9 !important;
+    color: #ffffff !important;
+}
+html.theme-synthwave .note-filter-chip.note-filter-active,
+html.theme-synthwave [data-note-filter].bg-indigo-600 {
+    background-color: #a21caf !important;
+    color: #ffffff !important;
+}
+html.theme-eduardo-gold .note-filter-chip.note-filter-active,
+html.theme-eduardo-gold [data-note-filter].bg-indigo-600,
+html.theme-coffee .note-filter-chip.note-filter-active,
+html.theme-coffee [data-note-filter].bg-indigo-600 {
+    background-color: #92400e !important;
+    color: #ffffff !important;
+}
+html.theme-penguin .note-filter-chip.note-filter-active,
+html.theme-penguin [data-note-filter].bg-indigo-600 {
+    background-color: #0e7490 !important;
+    color: #ffffff !important;
+}
+html.theme-hyperfocus .note-filter-chip.note-filter-active,
+html.theme-hyperfocus [data-note-filter].bg-indigo-600,
+html.theme-apollo .note-filter-chip.note-filter-active,
+html.theme-apollo [data-note-filter].bg-indigo-600 {
+    background-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+html.theme-starlight .note-filter-chip.note-filter-active,
+html.theme-starlight [data-note-filter].bg-indigo-600 {
+    background-color: #9d174d !important;
+    color: #ffffff !important;
+}
+
+/* Contraste de chips inactivos en Monocromático y temas oscuros de Bóveda */
+html:not(.dark).theme-gray .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
+    background-color: #dfe4ec !important;
+    color: #1e293b !important;
+    border-color: #cbd2dc !important;
+}
+html.dark.theme-gray .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
+    background-color: #2d313b !important;
+    color: #f1f5f9 !important;
+    border-color: #404552 !important;
+}
+html[class*="theme-"]:not(.theme-gray) .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.20) !important;
+}
+
+/* ========================================================
+   APPLE HIG: JERARQUÍA, OBJETIVOS >= 44px Y CONTENCIÓN MÓVIL
+   ======================================================== */
+section.view-transition h1 {
+    letter-spacing: -0.025em;
+}
+
+.touch-target-44 {
+    min-height: 44px;
+}
+
+input, select, textarea {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Segmented controls (Tareas / Baúl) */
+.segmented-control-track {
+    background-color: rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    padding: 0.25rem;
+    border-radius: 1rem;
+}
+html.dark .segmented-control-track {
+    background-color: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.10);
+}
+
+/* ========================================================
+   HOJAS INFERIORES MÓVILES (<= 639px) CON GRABBER ARRASTRABLE
+   max-height 90dvh + scroll interno + safe-area-inset-bottom
+   ======================================================== */
+.modal-sheet-grabber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 28px;
+    padding-top: 8px;
+    padding-bottom: 4px;
+    cursor: grab;
+    touch-action: none;
+    flex-shrink: 0;
+}
+.modal-sheet-grabber-bar {
+    width: 40px;
+    height: 4.5px;
+    border-radius: 9999px;
+    background-color: rgba(100, 116, 139, 0.38);
+}
+html.dark .modal-sheet-grabber-bar {
+    background-color: rgba(255, 255, 255, 0.30);
+}
+
+@media (max-width: 639px) {
+    .mobile-sheet-overlay {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+    .mobile-sheet-overlay .mobile-bottom-sheet {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 90dvh !important;
+        border-radius: 1.75rem 1.75rem 0 0 !important;
+        border-bottom: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+        transform: translate3d(0, 100%, 0);
+        transition: transform 0.36s var(--ease-drawer), opacity 0.24s var(--ease-smooth);
+    }
+    .mobile-sheet-overlay.active .mobile-bottom-sheet {
+        transform: translate3d(0, 0, 0);
+    }
+    .mobile-sheet-overlay .mobile-sheet-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+}
+
+@media (min-width: 640px) {
+    .modal-sheet-grabber {
+        display: none !important;
+    }
+}
+
+/* ========================================================
    RESPALDO SIN BACKDROP-FILTER, TRANSPARENCIA Y MOVIMIENTO
-   Garantiza legibilidad y accesibilidad en cualquier dispositivo
    ======================================================== */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .liquid-glass-nav,
     #bottom-nav.liquid-glass-bottom,
     .liquid-glass-drawer,
     .liquid-glass-popover,
+    .glass-panel,
+    .settings-accordion-card,
     .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     #card-dynamic-popup .modal-dialog {
         background-color: #ffffff !important;
@@ -2026,6 +2332,8 @@ html body #vault-reveal-modal .modal-dialog {
     html.dark #bottom-nav.liquid-glass-bottom,
     html.dark .liquid-glass-drawer,
     html.dark .liquid-glass-popover,
+    html.dark .glass-panel,
+    html.dark .settings-accordion-card,
     html.dark .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     html.dark #card-dynamic-popup .modal-dialog {
         background-color: #0f172a !important;
@@ -2034,6 +2342,8 @@ html body #vault-reveal-modal .modal-dialog {
     html.theme-gray #bottom-nav.liquid-glass-bottom,
     html.theme-gray .liquid-glass-drawer,
     html.theme-gray .liquid-glass-popover,
+    html.theme-gray .glass-panel,
+    html.theme-gray .settings-accordion-card,
     html.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     html.theme-gray #card-dynamic-popup .modal-dialog {
         background-color: #edf1f6 !important;
@@ -2042,9 +2352,16 @@ html body #vault-reveal-modal .modal-dialog {
     html.dark.theme-gray #bottom-nav.liquid-glass-bottom,
     html.dark.theme-gray .liquid-glass-drawer,
     html.dark.theme-gray .liquid-glass-popover,
+    html.dark.theme-gray .glass-panel,
+    html.dark.theme-gray .settings-accordion-card,
     html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     html.dark.theme-gray #card-dynamic-popup .modal-dialog {
         background-color: #252830 !important;
+    }
+    .app-modal-backdrop,
+    #drawer-backdrop,
+    #card-dynamic-popup-backdrop {
+        background-color: rgba(15, 23, 42, 0.72) !important;
     }
 }
 
@@ -2056,8 +2373,12 @@ html body #vault-reveal-modal .modal-dialog {
     .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     #card-dynamic-popup .modal-dialog,
     .glass-panel,
+    .settings-accordion-card,
     .stagger-card,
-    .toast-floating-stack > div {
+    .toast-floating-stack > div,
+    .app-modal-backdrop,
+    #drawer-backdrop,
+    #card-dynamic-popup-backdrop {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
     }
@@ -2068,6 +2389,7 @@ html body #vault-reveal-modal .modal-dialog {
     html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
     html:not(.dark):not([class*="theme-"]) .glass-panel,
+    html:not(.dark):not([class*="theme-"]) .settings-accordion-card,
     html:not(.dark):not([class*="theme-"]) .stagger-card {
         background-color: #ffffff !important;
     }
@@ -2078,6 +2400,7 @@ html body #vault-reveal-modal .modal-dialog {
     html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     html.dark:not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
     html.dark:not([class*="theme-"]) .glass-panel,
+    html.dark:not([class*="theme-"]) .settings-accordion-card,
     html.dark:not([class*="theme-"]) .stagger-card {
         background-color: #0f172a !important;
     }
@@ -2088,6 +2411,7 @@ html body #vault-reveal-modal .modal-dialog {
     html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     html:not(.dark).theme-gray #card-dynamic-popup .modal-dialog,
     html:not(.dark).theme-gray .glass-panel,
+    html:not(.dark).theme-gray .settings-accordion-card,
     html:not(.dark).theme-gray .stagger-card {
         background-color: #edf1f6 !important;
     }
@@ -2098,6 +2422,7 @@ html body #vault-reveal-modal .modal-dialog {
     html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal) .modal-dialog,
     html.dark.theme-gray #card-dynamic-popup .modal-dialog,
     html.dark.theme-gray .glass-panel,
+    html.dark.theme-gray .settings-accordion-card,
     html.dark.theme-gray .stagger-card {
         background-color: #252830 !important;
     }
@@ -2111,6 +2436,10 @@ html body #vault-reveal-modal .modal-dialog {
     .modal-overlay,
     #sidebar-drawer,
     #drawer-backdrop,
+    .app-modal-backdrop,
+    #card-dynamic-popup,
+    #card-dynamic-popup-backdrop,
+    .longpress-card-clone-elevated,
     .nav-sliding-indicator,
     .fab-glow,
     .tap-effect,

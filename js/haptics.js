@@ -140,6 +140,7 @@ window.HapticsModule = (() => {
 window.CardContextMenu = {
     activeMenuEl: null,
     activeTargetEl: null,
+    activeCloneEl: null,
 
     show({ targetEl, title, onEdit, onDelete, position }) {
         this.close();
@@ -151,8 +152,47 @@ window.CardContextMenu = {
 
         this.activeMenuEl = popup;
         this.activeTargetEl = targetEl;
-        if (targetEl) {
-            targetEl.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2', 'dark:ring-offset-slate-900');
+
+        const stage = popup.querySelector('#card-dynamic-clone-stage');
+        if (stage) stage.innerHTML = '';
+
+        let targetRect = null;
+        if (targetEl && typeof targetEl.cloneNode === 'function') {
+            targetRect = targetEl.getBoundingClientRect ? targetEl.getBoundingClientRect() : null;
+            const clone = targetEl.cloneNode(true);
+            clone.removeAttribute('id');
+            clone.querySelectorAll?.('[id]')?.forEach(el => el.removeAttribute('id'));
+            clone.setAttribute('data-longpress-clone', 'true');
+            clone.setAttribute('aria-hidden', 'true');
+            clone.classList.remove('stagger-card', 'card-hover');
+            clone.classList.add('longpress-card-clone-elevated');
+
+            if (targetRect && targetRect.width > 0 && targetRect.height > 0) {
+                clone.style.left = `${Math.round(targetRect.left)}px`;
+                clone.style.top = `${Math.round(targetRect.top)}px`;
+                clone.style.width = `${Math.round(targetRect.width)}px`;
+                clone.style.height = `${Math.round(targetRect.height)}px`;
+            } else {
+                clone.style.left = '16px';
+                clone.style.top = '16px';
+                clone.style.width = 'calc(100vw - 32px)';
+            }
+
+            const computed = window.getComputedStyle(targetEl);
+            if (computed) {
+                if (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                    clone.style.backgroundColor = computed.backgroundColor;
+                }
+                if (computed.color) {
+                    clone.style.color = computed.color;
+                }
+            }
+
+            if (stage) {
+                stage.appendChild(clone);
+                this.activeCloneEl = clone;
+            }
+            targetEl.classList.add('longpress-source-hidden');
         }
 
         const bindBtn = (action, cb) => {
@@ -169,44 +209,121 @@ window.CardContextMenu = {
         bindBtn('edit', onEdit);
         bindBtn('delete', onDelete);
 
+        const backdrop = popup.querySelector('#card-dynamic-popup-backdrop');
+        if (backdrop) {
+            backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        }
+
         popup.classList.remove('hidden');
         popup.style.display = 'flex';
+
         const dialog = popup.querySelector('.modal-dialog') || popup.firstElementChild;
         if (dialog) {
+            dialog.style.position = '';
+            dialog.style.left = '';
+            dialog.style.top = '';
+            dialog.style.margin = '';
+            dialog.style.maxWidth = '';
+            dialog.style.transformOrigin = 'center center';
+
+            const vw = window.innerWidth || document.documentElement.clientWidth || 390;
+            const vh = window.innerHeight || document.documentElement.clientHeight || 844;
+            const safePad = 8;
+            dialog.style.maxWidth = `${Math.max(200, Math.min(320, vw - safePad * 2))}px`;
+
+            const anchorX = (position && typeof position.clientX === 'number' && !Number.isNaN(position.clientX))
+                ? position.clientX
+                : (targetRect && targetRect.width > 0 ? targetRect.left + targetRect.width / 2 : null);
+            const anchorY = (position && typeof position.clientY === 'number' && !Number.isNaN(position.clientY))
+                ? position.clientY
+                : (targetRect && targetRect.height > 0 ? targetRect.bottom : null);
+
+            if (anchorX !== null && anchorY !== null) {
+                const dlgRect = dialog.getBoundingClientRect();
+                const dlgW = Math.min(Math.max(dialog.offsetWidth || 0, Math.ceil(dlgRect.width || 0), 260), vw - safePad * 2);
+                const dlgH = Math.max(dialog.offsetHeight || 0, Math.ceil(dlgRect.height || 0), 210);
+
+                let left = anchorX - dlgW / 2;
+                left = Math.max(safePad, Math.min(left, vw - dlgW - safePad));
+
+                let top = anchorY + 14;
+                let placedAbove = false;
+                if (top + dlgH > vh - 16) {
+                    const aboveTop = anchorY - dlgH - 14;
+                    if (aboveTop >= 12) {
+                        top = aboveTop;
+                        placedAbove = true;
+                    } else {
+                        top = vh - dlgH - 16;
+                    }
+                }
+                top = Math.max(12, Math.min(top, vh - dlgH - 16));
+
+                const originX = Math.max(16, Math.min(dlgW - 16, anchorX - left));
+                dialog.style.position = 'fixed';
+                dialog.style.margin = '0';
+                dialog.style.left = `${Math.round(left)}px`;
+                dialog.style.top = `${Math.round(top)}px`;
+                dialog.style.transformOrigin = `${Math.round(originX)}px ${placedAbove ? '100%' : '0%'}`;
+            }
+
             dialog.classList.remove('dynamic-popup-in');
             void dialog.offsetWidth;
             dialog.classList.add('dynamic-popup-in');
         }
+
+        requestAnimationFrame(() => {
+            popup.classList.add('active');
+        });
     },
 
     close() {
         if (this.activeTargetEl) {
-            this.activeTargetEl.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2', 'dark:ring-offset-slate-900');
+            this.activeTargetEl.classList.remove('longpress-source-hidden', 'ring-2', 'ring-indigo-500', 'ring-offset-2', 'dark:ring-offset-slate-900');
             this.activeTargetEl = null;
         }
+        if (this.activeCloneEl) {
+            this.activeCloneEl.remove();
+            this.activeCloneEl = null;
+        }
+        const stage = document.getElementById('card-dynamic-clone-stage');
+        if (stage) stage.innerHTML = '';
+
         const popup = document.getElementById('card-dynamic-popup');
         if (popup) {
+            popup.classList.remove('active');
             popup.classList.add('hidden');
-            popup.style.display = '';
+            popup.style.display = 'none';
+            const dialog = popup.querySelector('.modal-dialog');
+            if (dialog) {
+                dialog.classList.remove('dynamic-popup-in');
+                dialog.style.position = '';
+                dialog.style.left = '';
+                dialog.style.top = '';
+                dialog.style.margin = '';
+                dialog.style.maxWidth = '';
+                dialog.style.transformOrigin = '';
+            }
         }
         this.activeMenuEl = null;
     },
 
-        /** Crea (o recrea) el popup dinámico compacto si no existe en el DOM. */
+    /** Crea (o recrea) el popup dinámico compacto si no existe en el DOM. */
     ensurePopup() {
         let popup = document.getElementById('card-dynamic-popup');
         if (popup || !document.body) return popup;
         popup = document.createElement('div');
         popup.id = 'card-dynamic-popup';
-        popup.className = 'fixed inset-0 z-[70] hidden items-center justify-center p-4';
+        popup.className = 'fixed inset-0 z-[70] hidden items-center justify-center p-2 sm:p-4';
         popup.style.display = 'none';
         popup.innerHTML = `
-            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" data-popup-close></div>
-            <div class="modal-dialog dynamic-popup relative w-full max-w-xs bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 p-4 space-y-2">
-                <div data-popup-title class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">Opciones</div>
-                <button type="button" data-context-action="edit" class="tap-effect w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm font-bold bg-indigo-50 dark:bg-slate-700 text-indigo-700 dark:text-indigo-300"><span>✏️</span><span>Editar</span></button>
-                <button type="button" data-context-action="delete" class="tap-effect w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"><span>🗑️</span><span>Eliminar</span></button>
-                <button type="button" data-popup-close class="tap-effect w-full px-3 py-2 rounded-2xl text-xs font-bold text-slate-500 dark:text-slate-400">Cancelar</button>
+            <div id="card-dynamic-popup-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/45" data-popup-close></div>
+            <div id="card-dynamic-clone-stage" class="fixed inset-0 pointer-events-none z-10"></div>
+            <div class="modal-dialog dynamic-popup liquid-glass-popover relative z-20 w-full max-w-xs bg-white/90 dark:bg-slate-800/90 rounded-3xl shadow-2xl border border-white/60 dark:border-white/15 p-4 space-y-2">
+                <div data-popup-title class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate px-1">Opciones</div>
+                <button type="button" data-context-action="edit" class="tap-effect touch-target-44 min-h-[44px] w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-sm font-bold bg-indigo-50/90 dark:bg-slate-700/80 text-indigo-700 dark:text-indigo-300"><span>✏️</span><span>Editar</span></button>
+                <button type="button" data-context-action="delete" class="tap-effect touch-target-44 min-h-[44px] w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-sm font-bold bg-rose-50/90 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400"><span>🗑️</span><span>Eliminar</span></button>
+                <button type="button" data-popup-close class="tap-effect touch-target-44 min-h-[44px] w-full px-3 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-700/50">Cancelar</button>
             </div>`;
         document.body.appendChild(popup);
         return popup;

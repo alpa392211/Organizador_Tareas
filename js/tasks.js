@@ -108,11 +108,11 @@ window.TasksModule = (() => {
         document.querySelectorAll('[data-task-filter]').forEach(btn => {
             btn.onclick = () => {
                 document.querySelectorAll('[data-task-filter]').forEach(b => {
-                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
-                    b.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
+                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'bg-slate-100', 'dark:bg-slate-800');
+                    b.classList.add('text-slate-600', 'dark:text-slate-300');
                 });
                 btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
+                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300', 'dark:text-slate-400');
                 currentFilter = btn.dataset.taskFilter;
                 render();
             };
@@ -269,6 +269,18 @@ window.TasksModule = (() => {
         window.HapticsModule?.light();
         const modal = document.getElementById('task-modal');
         if (modal) {
+            modal.style.display = '';
+            const backdrop = document.getElementById('task-modal-backdrop');
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
+            const sheet = modal.querySelector('.mobile-bottom-sheet');
+            if (sheet) {
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+                sheet.style.maxHeight = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');

@@ -131,6 +131,17 @@ window.SubjectsModule = (() => {
         const modal = document.getElementById('subject-modal');
         if (modal) {
             modal.style.display = '';
+            const backdrop = document.getElementById('subject-modal-backdrop');
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
+            const sheet = modal.querySelector('.mobile-bottom-sheet');
+            if (sheet) {
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+                sheet.style.maxHeight = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');

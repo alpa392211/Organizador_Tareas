@@ -46,10 +46,25 @@ window.NotesModule = (() => {
         const el = document.getElementById(id);
         if (!el) return;
         if (show) {
+            const backdrop = el.querySelector('[id$="-backdrop"]');
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
+            const sheet = el.querySelector('.mobile-bottom-sheet');
+            if (sheet) {
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+                sheet.style.maxHeight = '';
+            }
             el.classList.remove('hidden');
+            el.classList.add('flex');
             el.style.display = 'flex';
+            requestAnimationFrame(() => el.classList.add('active'));
         } else {
+            el.classList.remove('active');
             el.classList.add('hidden');
+            el.classList.remove('flex');
             el.style.display = '';
         }
     }
@@ -246,11 +261,13 @@ window.NotesModule = (() => {
             btn.onclick = () => {
                 window.HapticsModule?.light();
                 document.querySelectorAll('[data-note-filter]').forEach(b => {
-                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
-                    b.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
+                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'note-filter-active', 'text-slate-600', 'dark:text-slate-400');
+                    b.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200');
+                    b.setAttribute('aria-pressed', 'false');
                 });
-                btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
+                btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'note-filter-active');
+                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400', 'text-slate-700', 'dark:text-slate-200');
+                btn.setAttribute('aria-pressed', 'true');
                 currentFilter = btn.dataset.noteFilter;
                 render();
             };
@@ -384,6 +401,18 @@ window.NotesModule = (() => {
     function openModal() {
         const modal = document.getElementById('note-modal');
         if (modal) {
+            modal.style.display = '';
+            const backdrop = document.getElementById('note-modal-backdrop');
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
+            const sheet = modal.querySelector('.mobile-bottom-sheet');
+            if (sheet) {
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+                sheet.style.maxHeight = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
@@ -588,10 +617,11 @@ window.NotesModule = (() => {
                 </div>`;
             }
             const typeInfo = NOTE_TYPES[note.type] || NOTE_TYPES.apunte;
-            const dateFormatted = new Date(note.createdAt).toLocaleDateString('es-MX', {
-                day: 'numeric',
-                month: 'short'
-            });
+            const rawDate = note.createdAt || note.updatedAt;
+            const parsedDate = rawDate ? new Date(rawDate) : null;
+            const dateFormatted = (parsedDate && !isNaN(parsedDate.getTime()))
+                ? parsedDate.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
+                : '';
 
             // Formatear recordatorio si existe
             let reminderBadge = '';

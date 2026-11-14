@@ -1514,6 +1514,277 @@ const tests = [
             });
             helpers.assertFalse(leaks, 'Protected note content must not appear in HTML attributes of locked card');
         }
+    },
+
+    // =========================================================================
+    // F19: Phase A Visual Fixes, Notes Chip Contrast, Long-Press Clone & Sheets
+    // =========================================================================
+    {
+        id: 'T2_F19_01_mobile_overflow_320_360_430',
+        feature: 'F19',
+        name: 'No horizontal overflow at 320, 360, and 430px across all views and Settings profile/period controls',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                localStorage.setItem('org_escolar_onboarding_completed', 'true');
+                localStorage.setItem('org_escolar_cycle_configured', 'true');
+                window.StorageModule?.setUserName?.('Sofía Ramírez');
+                window.StorageModule?.setAcademicPeriod?.('Semestre 2026-2 Ingeniería');
+                window.OrganizadorApp?.closeCycleWelcomeModal?.();
+                window.OrganizadorApp?.refreshAll?.();
+            });
+
+            const widths = [320, 360, 430];
+            const views = ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'];
+            const failures = [];
+
+            for (const w of widths) {
+                await page.setViewport({ width: w, height: 800, deviceScaleFactor: 2 });
+                for (const v of views) {
+                    const check = await page.evaluate((viewName) => {
+                        window.OrganizadorApp?.switchView?.(viewName);
+                        if (viewName === 'settings') {
+                            const acc = document.getElementById('settings-acc-profile-period');
+                            if (acc) acc.classList.add('open');
+                            window.OrganizadorApp?.syncPeriodUI?.();
+                        }
+                        const sw = document.documentElement.scrollWidth;
+                        const iw = window.innerWidth;
+                        let clearBtnOverflow = false;
+                        if (viewName === 'settings') {
+                            const clearBtn = document.getElementById('clear-custom-period-btn');
+                            if (clearBtn) {
+                                const r = clearBtn.getBoundingClientRect();
+                                if (r.width === 0 || r.right > iw + 0.5 || r.left < -0.5) {
+                                    clearBtnOverflow = true;
+                                }
+                            }
+                        }
+                        return { sw, iw, clearBtnOverflow };
+                    }, v);
+
+                    if (check.sw > check.iw) {
+                        failures.push(`w=${w} view=${v}: scrollWidth=${check.sw} > innerWidth=${check.iw}`);
+                    }
+                    if (check.clearBtnOverflow) {
+                        failures.push(`w=${w} view=${v}: #clear-custom-period-btn fuera de pantalla`);
+                    }
+                }
+            }
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+            helpers.assertEqual(failures.length, 0, `Overflow detectado: ${failures.join('; ')}`);
+        }
+    },
+    {
+        id: 'T2_F19_02_notes_chip_wcag_contrast_all_themes',
+        feature: 'F19',
+        name: 'Selected Notes category chip (Idea) and inactive monochrome chips have WCAG contrast >= 4.5:1 across all themes',
+        run: async (page, helpers) => {
+            const report = await page.evaluate(() => {
+                const parseRgb = (str) => {
+                    const m = String(str || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+                    if (!m) return { r: 0, g: 0, b: 0, a: 1 };
+                    return {
+                        r: parseInt(m[1], 10),
+                        g: parseInt(m[2], 10),
+                        b: parseInt(m[3], 10),
+                        a: m[4] !== undefined ? parseFloat(m[4]) : 1
+                    };
+                };
+                const blendOver = (fg, bg) => ({
+                    r: Math.round(fg.r * fg.a + bg.r * (1 - fg.a)),
+                    g: Math.round(fg.g * fg.a + bg.g * (1 - fg.a)),
+                    b: Math.round(fg.b * fg.a + bg.b * (1 - fg.a)),
+                    a: 1
+                });
+                const lum = ({ r, g, b }) => {
+                    const lin = (c) => {
+                        const v = c / 255;
+                        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+                    };
+                    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+                };
+                const contrast = (c1, c2) => {
+                    const l1 = lum(c1);
+                    const l2 = lum(c2);
+                    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+                };
+
+                window.OrganizadorApp?.switchView?.('notes');
+                const ideaBtn = document.querySelector('[data-note-filter="idea"]');
+                const pendingBtn = document.querySelector('[data-note-filter="pendiente"]');
+                if (!ideaBtn || !pendingBtn) return { missing: true, failures: ['Missing filter chips'] };
+                ideaBtn.click();
+
+                const html = document.documentElement;
+                const allThemeClasses = [
+                    'theme-gray', 'theme-apollo', 'theme-starlight', 'theme-eduardo-gold',
+                    'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura',
+                    'theme-coffee', 'theme-arcade', 'theme-hyperfocus'
+                ];
+                const cases = [
+                    { name: 'claro', dark: false, theme: null },
+                    { name: 'oscuro', dark: true, theme: null },
+                    { name: 'monocromatico-claro', dark: false, theme: 'theme-gray' },
+                    { name: 'monocromatico-oscuro', dark: true, theme: 'theme-gray' },
+                    { name: 'apollo', dark: true, theme: 'theme-apollo' },
+                    { name: 'starlight', dark: true, theme: 'theme-starlight' },
+                    { name: 'eduardo-gold', dark: true, theme: 'theme-eduardo-gold' },
+                    { name: 'penguin', dark: true, theme: 'theme-penguin' },
+                    { name: 'synthwave', dark: true, theme: 'theme-synthwave' },
+                    { name: 'matrix', dark: true, theme: 'theme-matrix' },
+                    { name: 'sakura', dark: true, theme: 'theme-sakura' },
+                    { name: 'coffee', dark: true, theme: 'theme-coffee' },
+                    { name: 'arcade', dark: true, theme: 'theme-arcade' },
+                    { name: 'hyperfocus', dark: true, theme: 'theme-hyperfocus' }
+                ];
+
+                const failures = [];
+                for (const c of cases) {
+                    html.classList.remove('dark', ...allThemeClasses);
+                    if (c.dark) html.classList.add('dark');
+                    if (c.theme) html.classList.add(c.theme);
+
+                    const baseBg = c.dark ? { r: 15, g: 23, b: 42, a: 1 } : { r: 248, g: 250, b: 252, a: 1 };
+                    const csBtn = getComputedStyle(ideaBtn);
+                    const labelSpan = ideaBtn.querySelector('span:last-child') || ideaBtn;
+                    const csLabel = getComputedStyle(labelSpan);
+
+                    const bg = blendOver(parseRgb(csBtn.backgroundColor), baseBg);
+                    const fg = parseRgb(csLabel.color);
+                    const ratio = contrast(fg, bg);
+                    const rRect = labelSpan.getBoundingClientRect();
+
+                    if (!ideaBtn.textContent.includes('Idea') || parseFloat(csLabel.opacity) === 0 || rRect.width <= 0) {
+                        failures.push(`${c.name}: etiqueta invisible en chip Idea`);
+                    }
+                    if (ratio < 4.5) {
+                        failures.push(`${c.name}: contraste chip activo=${ratio.toFixed(2)} (<4.5) fg=${csLabel.color} bg=${csBtn.backgroundColor}`);
+                    }
+
+                    if (['claro', 'oscuro', 'monocromatico-claro', 'monocromatico-oscuro', 'matrix'].includes(c.name)) {
+                        const csInact = getComputedStyle(pendingBtn);
+                        const inactLabel = pendingBtn.querySelector('span:last-child') || pendingBtn;
+                        const csInactLabel = getComputedStyle(inactLabel);
+                        const inactBg = blendOver(parseRgb(csInact.backgroundColor), baseBg);
+                        const inactFg = parseRgb(csInactLabel.color);
+                        const inactRatio = contrast(inactFg, inactBg);
+                        if (inactRatio < 4.5) {
+                            failures.push(`${c.name}: contraste chip inactivo=${inactRatio.toFixed(2)} (<4.5)`);
+                        }
+                    }
+                }
+
+                html.classList.remove('dark', ...allThemeClasses);
+                document.querySelector('[data-note-filter="all"]')?.click();
+                return { failures };
+            });
+
+            helpers.assertEqual(report.failures.length, 0, `Fallo contraste/visibilidad en chips de Notas: ${report.failures.join('; ')}`);
+        }
+    },
+    {
+        id: 'T2_F19_03_longpress_clonenode_elevation_and_cleanup',
+        feature: 'F19',
+        name: 'Long-press context menu elevates target card via cloneNode into overlay stage and cleans up on close',
+        run: async (page, helpers) => {
+            const res = await page.evaluate(() => {
+                window.StorageModule?.saveNote?.({
+                    id: 'note_lp_clone_test',
+                    title: 'Nota para clonar',
+                    content: 'Contenido visible en overlay',
+                    type: 'idea'
+                });
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.render?.();
+
+                const card = document.querySelector('[data-note-id="note_lp_clone_test"]');
+                if (!card) return { ok: false, reason: 'Card not rendered' };
+
+                const rect = card.getBoundingClientRect();
+                window.CardContextMenu?.show({
+                    targetEl: card,
+                    title: 'Nota para clonar',
+                    position: { clientX: Math.round(rect.left + 80), clientY: Math.round(rect.top + 40) }
+                });
+
+                const popup = document.getElementById('card-dynamic-popup');
+                const backdrop = document.getElementById('card-dynamic-popup-backdrop');
+                const stage = document.getElementById('card-dynamic-clone-stage');
+                const clone = stage?.querySelector('[data-longpress-clone="true"]');
+                const backdropFilter = backdrop ? (getComputedStyle(backdrop).backdropFilter || getComputedStyle(backdrop).webkitBackdropFilter || '') : '';
+                const cloneRect = clone ? clone.getBoundingClientRect() : null;
+
+                const openChecks = {
+                    popupVisible: Boolean(popup && !popup.classList.contains('hidden') && popup.style.display === 'flex'),
+                    hasBlurBackdrop: Boolean(backdrop && backdropFilter.includes('blur')),
+                    hasClone: Boolean(clone && clone.classList.contains('longpress-card-clone-elevated')),
+                    cloneHasNoId: Boolean(clone && !clone.hasAttribute('id')),
+                    clonePosMatches: Boolean(cloneRect && Math.abs(parseFloat(clone.style.left) - Math.round(rect.left)) <= 2 && Math.abs(parseFloat(clone.style.top) - Math.round(rect.top)) <= 2),
+                    sourceHidden: card.classList.contains('longpress-source-hidden')
+                };
+
+                window.CardContextMenu?.close();
+
+                const closeChecks = {
+                    cloneRemoved: (stage?.children.length || 0) === 0,
+                    sourceRestored: !card.classList.contains('longpress-source-hidden'),
+                    popupHidden: Boolean(popup && popup.classList.contains('hidden') && popup.style.display === 'none')
+                };
+
+                return { ok: true, openChecks, closeChecks };
+            });
+
+            helpers.assertTrue(res.ok, res.reason || 'Test setup failed');
+            helpers.assertTrue(res.openChecks.popupVisible, 'Context menu popup must be visible');
+            helpers.assertTrue(res.openChecks.hasBlurBackdrop, 'Context menu backdrop must apply blur');
+            helpers.assertTrue(res.openChecks.hasClone, 'Target card must be cloned into overlay stage');
+            helpers.assertTrue(res.openChecks.cloneHasNoId, 'Cloned card must not duplicate DOM IDs');
+            helpers.assertTrue(res.openChecks.clonePosMatches, 'Cloned card position must match source bounding rect');
+            helpers.assertTrue(res.openChecks.sourceHidden, 'Source card must carry .longpress-source-hidden while elevated');
+            helpers.assertTrue(res.closeChecks.cloneRemoved, 'Cloned card must be removed synchronously on close');
+            helpers.assertTrue(res.closeChecks.sourceRestored, 'Source card must be restored synchronously on close');
+            helpers.assertTrue(res.closeChecks.popupHidden, 'Popup must hide synchronously on close');
+        }
+    },
+    {
+        id: 'T2_F19_04_mobile_bottom_sheets_grabber_policy_and_90dvh',
+        feature: 'F19',
+        name: 'Mobile bottom sheets enforce 90dvh max-height and grabber only on dismissible sheets',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
+            const res = await page.evaluate(() => {
+                const grabberIds = ['subject-modal', 'task-modal', 'note-modal', 'calendar-modal', 'exit-modal', 'archive-confirm-modal', 'changelog-modal', 'note-unlock-modal'];
+                const noGrabberIds = ['cycle-setup-modal', 'vault-reveal-modal', 'photo-preview-modal'];
+                const failures = [];
+
+                grabberIds.forEach(id => {
+                    const modal = document.getElementById(id);
+                    const grabber = modal?.querySelector('.modal-sheet-grabber');
+                    const sheet = modal?.querySelector('.mobile-bottom-sheet');
+                    if (!grabber) failures.push(`${id}: falta .modal-sheet-grabber`);
+                    if (!sheet) {
+                        failures.push(`${id}: falta .mobile-bottom-sheet`);
+                    } else {
+                        const mh = parseFloat(getComputedStyle(sheet).maxHeight);
+                        if (!mh || mh > Math.ceil(window.innerHeight * 0.90) + 1) {
+                            failures.push(`${id}: maxHeight=${mh} excede 90dvh`);
+                        }
+                    }
+                });
+
+                noGrabberIds.forEach(id => {
+                    const modal = document.getElementById(id);
+                    if (modal?.querySelector('.modal-sheet-grabber')) {
+                        failures.push(`${id}: no debe tener .modal-sheet-grabber`);
+                    }
+                });
+
+                return failures;
+            });
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+            helpers.assertEqual(res.length, 0, `Fallo política de hojas inferiores: ${res.join('; ')}`);
+        }
     }
 ];
 

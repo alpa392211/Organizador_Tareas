@@ -323,6 +323,7 @@
             this.setupSidebarDrawer();
             this.setupBottomActionButton();
             this.setupModalsAndShortcuts();
+            this.setupMobileBottomSheets();
             this.setupCycleWelcomeModal();
             this.setupExitModal();
             this.setupSettingsView();
@@ -1161,7 +1162,7 @@
                 if (!drawer || !backdrop) return;
                 window.HapticsModule?.light();
                 drawer.classList.remove('-translate-x-full');
-                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 backdrop.classList.add('opacity-100');
                 document.body.classList.add('overflow-hidden');
             };
@@ -1311,6 +1312,144 @@
                     this.closeSidebarDrawer?.();
                 }
             });
+        }
+
+        setupMobileBottomSheets() {
+            let drag = null;
+
+            const dismissSheet = (overlay, sheet, backdrop) => {
+                const id = overlay?.id;
+                window.HapticsModule?.light?.();
+                if (sheet) {
+                    sheet.style.transition = 'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+                    sheet.style.transform = 'translate3d(0, 100%, 0)';
+                }
+                if (backdrop) {
+                    backdrop.style.transition = 'opacity 0.2s ease';
+                    backdrop.style.opacity = '0';
+                }
+
+                if (id === 'subject-modal') window.SubjectsModule?.closeModal?.();
+                else if (id === 'task-modal') window.TasksModule?.closeModal?.();
+                else if (id === 'note-modal') window.NotesModule?.closeModal?.();
+                else if (id === 'calendar-modal') window.CalendarModule?.closeModal?.();
+                else if (id === 'exit-modal') this.closeExitModal?.();
+                else if (id === 'archive-confirm-modal') document.getElementById('archive-cancel-btn')?.click();
+                else if (id === 'changelog-modal') document.getElementById('changelog-confirm-btn')?.click();
+                else if (id === 'note-unlock-modal') document.getElementById('note-unlock-cancel')?.click();
+                else if (overlay) {
+                    overlay.classList.remove('active');
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        overlay.classList.remove('flex');
+                        document.body.classList.remove('overflow-hidden');
+                    }, 200);
+                }
+
+                setTimeout(() => {
+                    if (sheet) {
+                        sheet.style.transform = '';
+                        sheet.style.transition = '';
+                    }
+                    if (backdrop) {
+                        backdrop.style.opacity = '';
+                        backdrop.style.transition = '';
+                    }
+                }, 240);
+            };
+
+            document.addEventListener('touchstart', (e) => {
+                if ((window.innerWidth || 0) > 639) return;
+                const grabber = e.target.closest?.('.modal-sheet-grabber');
+                if (!grabber) return;
+                const overlay = grabber.closest('.mobile-sheet-overlay');
+                const sheet = overlay?.querySelector('.mobile-bottom-sheet');
+                if (!overlay || !sheet || overlay.classList.contains('hidden')) return;
+                const touch = e.touches && e.touches[0];
+                if (!touch) return;
+                const backdrop = overlay.querySelector('.app-modal-backdrop');
+                sheet.style.transition = 'none';
+                if (backdrop) backdrop.style.transition = 'none';
+                const now = Date.now();
+                drag = {
+                    overlay,
+                    sheet,
+                    backdrop,
+                    startY: touch.clientY,
+                    prevY: touch.clientY,
+                    prevTime: now,
+                    lastY: touch.clientY,
+                    lastTime: now,
+                    dy: 0
+                };
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!drag) return;
+                const touch = e.touches && e.touches[0];
+                if (!touch) return;
+                const dy = Math.max(0, touch.clientY - drag.startY);
+                drag.prevY = drag.lastY;
+                drag.prevTime = drag.lastTime;
+                drag.lastY = touch.clientY;
+                drag.lastTime = Date.now();
+                drag.dy = dy;
+                drag.sheet.style.transform = `translate3d(0, ${Math.round(dy)}px, 0)`;
+                if (drag.backdrop) {
+                    drag.backdrop.style.opacity = String(Math.max(0.1, 1 - dy / 320));
+                }
+                if (e.cancelable) e.preventDefault();
+            }, { passive: false });
+
+            const endDrag = () => {
+                if (!drag) return;
+                const { overlay, sheet, backdrop, dy, prevY, prevTime, lastY, lastTime } = drag;
+                drag = null;
+                const dt = Math.max(16, lastTime - prevTime);
+                const velocity = (lastY - prevY) / dt;
+                sheet.style.transition = '';
+                if (backdrop) backdrop.style.transition = '';
+                if (dy > 80 || velocity > 0.45) {
+                    dismissSheet(overlay, sheet, backdrop);
+                } else {
+                    sheet.style.transform = 'translate3d(0, 0, 0)';
+                    if (backdrop) backdrop.style.opacity = '';
+                    setTimeout(() => {
+                        if (!overlay.classList.contains('hidden') && overlay.classList.contains('active')) {
+                            sheet.style.transform = '';
+                        }
+                    }, 360);
+                }
+            };
+
+            document.addEventListener('touchend', endDrag, { passive: true });
+            document.addEventListener('touchcancel', endDrag, { passive: true });
+
+            const adjustSheetForViewport = (focusedEl) => {
+                if ((window.innerWidth || 0) > 639) return;
+                const vvHeight = window.visualViewport?.height || window.innerHeight;
+                const openSheets = document.querySelectorAll('.mobile-sheet-overlay:not(.hidden) .mobile-bottom-sheet');
+                openSheets.forEach(sheet => {
+                    sheet.style.maxHeight = `${Math.max(260, Math.floor(vvHeight * 0.90))}px`;
+                });
+                if (focusedEl && focusedEl.closest?.('.mobile-bottom-sheet')) {
+                    setTimeout(() => {
+                        focusedEl.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+                    }, 180);
+                }
+            };
+
+            document.addEventListener('focusin', (e) => {
+                if (!e.target?.matches?.('input, select, textarea')) return;
+                if (!e.target.closest?.('.mobile-bottom-sheet')) return;
+                adjustSheetForViewport(e.target);
+            });
+
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    adjustSheetForViewport(document.activeElement);
+                });
+            }
         }
 
         /* ========================================================
@@ -1497,6 +1636,11 @@
             // 2. Apertura y Cierre de Onboarding
             const openWelcome = () => {
                 modal.style.display = '';
+                const backdrop = document.getElementById('cycle-setup-backdrop');
+                if (backdrop) {
+                    backdrop.classList.remove('hidden', 'opacity-0');
+                    backdrop.style.opacity = '';
+                }
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 document.body.classList.add('overflow-hidden');
@@ -1696,6 +1840,17 @@
                 if (!exitModal) return;
                 window.HapticsModule?.medium();
                 this.closeSidebarDrawer?.();
+                exitModal.style.display = '';
+                if (backdrop) {
+                    backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                    backdrop.style.opacity = '';
+                }
+                const sheet = exitModal.querySelector('.mobile-bottom-sheet');
+                if (sheet) {
+                    sheet.style.transform = '';
+                    sheet.style.transition = '';
+                    sheet.style.maxHeight = '';
+                }
                 exitModal.classList.remove('hidden');
                 exitModal.classList.add('flex');
                 document.body.classList.add('overflow-hidden');
@@ -2177,6 +2332,17 @@
             if (confirmBtn) confirmBtn.onclick = closeModal;
             if (backdrop) backdrop.onclick = closeModal;
 
+            modal.style.display = '';
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
+            const sheet = modal.querySelector('.mobile-bottom-sheet');
+            if (sheet) {
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+                sheet.style.maxHeight = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
@@ -2529,6 +2695,11 @@
             };
             window.addEventListener('keydown', handleEsc);
 
+            modal.style.display = '';
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             requestAnimationFrame(() => {
