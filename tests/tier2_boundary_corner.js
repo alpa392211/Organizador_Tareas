@@ -3505,6 +3505,402 @@ const tests = [
                 await window.BackgroundsModule?.clearCustomPhoto?.();
             });
         }
+    },
+
+    // =========================================================================
+    // F25: Notes Gallery Segmented Tabs, Fullscreen Zoom Viewer, Exact Download & IDB v2 (v1.5.2 Etapa 3)
+    // =========================================================================
+    {
+        id: 'T2_F25_01_notes_gallery_segmented_tabs_and_empty_state',
+        feature: 'F25',
+        name: 'Notas | Galería segmented tabs toggle cleanly, render square thumbnails, empty state, count badge, and delete',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.switchNotesTab?.('notes');
+                window.NotesModule?.renderGallery?.();
+            });
+
+            const initialState = await page.evaluate(() => {
+                const tabNotes = document.getElementById('notes-tab-notes');
+                const tabGallery = document.getElementById('notes-tab-gallery');
+                const count = document.getElementById('notes-gallery-count')?.textContent?.trim();
+                const galleryHidden = document.getElementById('notes-gallery-panel')?.classList.contains('hidden');
+                return {
+                    hasTabs: Boolean(tabNotes && tabGallery),
+                    notesSelected: tabNotes?.getAttribute('aria-selected') === 'true',
+                    gallerySelected: tabGallery?.getAttribute('aria-selected') === 'false',
+                    count,
+                    galleryHidden
+                };
+            });
+            helpers.assertTrue(initialState.hasTabs, 'Segmented tabs #notes-tab-notes and #notes-tab-gallery must exist');
+            helpers.assertTrue(initialState.notesSelected, 'Notas tab must be selected initially');
+            helpers.assertEqual(initialState.count, '0', 'Initial gallery badge count must be 0');
+            helpers.assertTrue(initialState.galleryHidden, 'Gallery panel must be hidden on Notas tab');
+
+            await page.setViewport({ width: 360, height: 640 });
+            await page.click('#notes-tab-gallery');
+            await new Promise(r => setTimeout(r, 120));
+
+            const emptyGallery = await page.evaluate(() => {
+                const grid = document.getElementById('notes-gallery-grid');
+                const galleryPanel = document.getElementById('notes-gallery-panel');
+                const cardsPanel = document.getElementById('notes-cards-panel');
+                return {
+                    emptyMsg: (grid?.textContent || '').includes('Aún no tienes fotos en tus notas'),
+                    galleryVisible: !galleryPanel?.classList.contains('hidden'),
+                    cardsHidden: cardsPanel?.classList.contains('hidden'),
+                    noOverflow: document.documentElement.scrollWidth <= window.innerWidth + 2
+                };
+            });
+            helpers.assertTrue(emptyGallery.emptyMsg, 'Empty gallery must display "Aún no tienes fotos en tus notas"');
+            helpers.assertTrue(emptyGallery.galleryVisible, 'Gallery panel must be visible on Galería tab');
+            helpers.assertTrue(emptyGallery.cardsHidden, 'Notes cards panel must be hidden on Galería tab');
+            helpers.assertTrue(emptyGallery.noOverflow, 'Gallery view must not overflow horizontally at 360px');
+
+            await helpers.simulateFileUpload(page, '#notes-photo-input', {
+                width: 900,
+                height: 600,
+                color: '#4F46E5',
+                fileName: 'diagrama_fisica.png'
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            const afterUpload = await page.evaluate(() => {
+                const thumb = document.querySelector('#notes-gallery-grid .gallery-thumb');
+                const rect = thumb ? thumb.getBoundingClientRect() : null;
+                const count = document.getElementById('notes-gallery-count')?.textContent?.trim();
+                const img = thumb?.querySelector('img');
+                return {
+                    count,
+                    hasImg: Boolean(img && img.getAttribute('src') && img.getAttribute('loading') === 'lazy'),
+                    squareRatio: rect ? Math.abs(rect.width - rect.height) <= 2 : false
+                };
+            });
+            helpers.assertEqual(afterUpload.count, '1', 'Gallery badge count must update to 1 after upload');
+            helpers.assertTrue(afterUpload.hasImg, 'Gallery card must render lazy img');
+            helpers.assertTrue(afterUpload.squareRatio, 'Gallery thumbnail must have 1:1 square aspect ratio');
+
+            await page.click('#notes-gallery-grid [data-photo-del]');
+            await new Promise(r => setTimeout(r, 150));
+            const afterDeleteCount = await page.evaluate(() => document.getElementById('notes-gallery-count')?.textContent?.trim());
+            helpers.assertEqual(afterDeleteCount, '0', 'Deleting photo must reset gallery counter to 0');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.NotesModule?.switchNotesTab?.('notes');
+            });
+            await page.setViewport({ width: 1280, height: 800 });
+        }
+    },
+    {
+        id: 'T2_F25_02_fullscreen_photo_viewer_zoom_pan_nav_and_goto_note',
+        feature: 'F25',
+        name: 'Fullscreen crystal viewer supports zoom (1x-6x), pan clamping, prev/next, Ir a la nota, and Escape focus restore',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.StorageModule?.saveNotes?.([
+                    { id: 'note_gal_1', title: 'Resumen Álgebra', content: 'Matrices y determinantes', type: 'apunte', createdAt: Date.now() },
+                    { id: 'note_gal_2', title: 'Pendiente Lab', content: 'Traer bata', type: 'pendiente', createdAt: Date.now() }
+                ]);
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.render?.();
+                window.NotesModule?.switchNotesTab?.('gallery');
+                const sel = document.getElementById('notes-photo-note-select');
+                if (sel) sel.value = 'note_gal_1';
+            });
+
+            await helpers.simulateFileUpload(page, '#notes-photo-input', {
+                width: 1400,
+                height: 1000,
+                color: '#10B981',
+                fileName: 'matrices.jpg',
+                mimeType: 'image/jpeg'
+            });
+            await new Promise(r => setTimeout(r, 250));
+
+            await page.evaluate(() => {
+                const sel = document.getElementById('notes-photo-note-select');
+                if (sel) sel.value = '';
+            });
+            await helpers.simulateFileUpload(page, '#notes-photo-input', {
+                width: 1000,
+                height: 1200,
+                color: '#F59E0B',
+                fileName: 'bata_lista.png'
+            });
+            await new Promise(r => setTimeout(r, 300));
+
+            // Click first thumbnail button (bata_lista.png)
+            await page.click('#notes-gallery-grid [data-photo-open]');
+            await page.waitForSelector('#photo-preview-modal:not(.hidden)', { timeout: 3000 });
+            await new Promise(r => setTimeout(r, 150));
+
+            const viewerOpenCheck = await page.evaluate(() => {
+                const ids = ['photo-preview-close', 'photo-preview-prev', 'photo-preview-next', 'photo-preview-zoom-in', 'photo-preview-zoom-out', 'photo-preview-zoom-reset', 'photo-preview-download'];
+                const minTouchOk = ids.every(id => {
+                    const r = document.getElementById(id)?.getBoundingClientRect();
+                    return r && r.width >= 44 && r.height >= 44;
+                });
+                const st = window.NotesModule?.getViewerState?.();
+                return { minTouchOk, total: st?.total || 0, index: st?.index ?? -1, scale: st?.scale || 0 };
+            });
+            helpers.assertTrue(viewerOpenCheck.minTouchOk, 'All viewer action buttons must meet 44x44 touch target minimum');
+            helpers.assertEqual(viewerOpenCheck.total, 2, 'Viewer must track both uploaded photos');
+            helpers.assertEqual(viewerOpenCheck.scale, 1, 'Viewer must start at 1x zoom');
+
+            // Zoom in + clamped zoom test up to 6x max
+            await page.click('#photo-preview-zoom-in');
+            await page.click('#photo-preview-zoom-in');
+            const zoomedState = await page.evaluate(() => {
+                const st = window.NotesModule?.getViewerState?.();
+                window.NotesModule?.setViewerZoom?.(9); // debe acotar a 6x
+                const clampedMax = window.NotesModule?.getViewerState?.();
+                return { stepZoom: st?.scale, maxZoom: clampedMax?.scale, resetLabel: document.getElementById('photo-preview-zoom-reset')?.textContent?.trim() };
+            });
+            helpers.assertEqual(zoomedState.stepZoom, 2, 'Two zoom-in clicks from 1x must yield 2x');
+            helpers.assertEqual(zoomedState.maxZoom, 6, 'Zoom above 6x must clamp to 6x');
+            helpers.assertEqual(zoomedState.resetLabel, '600%', 'Zoom badge must display 600%');
+
+            // Reset zoom & navigate to linked note photo
+            await page.click('#photo-preview-zoom-reset');
+            await page.click('#photo-preview-next');
+            await new Promise(r => setTimeout(r, 120));
+
+            const linkedViewerState = await page.evaluate(() => {
+                const gotoBtn = document.getElementById('photo-preview-goto-note');
+                const metaText = document.getElementById('photo-preview-meta')?.textContent || '';
+                return {
+                    gotoVisible: Boolean(gotoBtn && !gotoBtn.classList.contains('hidden')),
+                    metaHasNote: metaText.includes('Resumen Álgebra'),
+                    scaleAfterNav: window.NotesModule?.getViewerState?.()?.scale
+                };
+            });
+            helpers.assertTrue(linkedViewerState.gotoVisible, 'Ir a la nota button must be visible on note-linked photo');
+            helpers.assertTrue(linkedViewerState.metaHasNote, 'Viewer metadata must show linked note title');
+            helpers.assertEqual(linkedViewerState.scaleAfterNav, 1, 'Navigating photos must reset zoom to 1x');
+
+            // Escape closes viewer & restores focus to originating thumbnail button
+            await page.keyboard.press('Escape');
+            await new Promise(r => setTimeout(r, 120));
+            const focusRestored = await page.evaluate(() => {
+                const modalHidden = document.getElementById('photo-preview-modal')?.classList.contains('hidden');
+                const activeHasAttr = document.activeElement?.hasAttribute('data-photo-open');
+                return { modalHidden, activeHasAttr };
+            });
+            helpers.assertTrue(focusRestored.modalHidden, 'Escape key must close fullscreen viewer');
+            helpers.assertTrue(focusRestored.activeHasAttr, 'Closing viewer must restore focus to originating gallery thumbnail button');
+
+            // Reopen linked photo via note card badge and jump via "Ir a la nota"
+            await page.evaluate(() => {
+                window.NotesModule?.switchNotesTab?.('notes');
+            });
+            await new Promise(r => setTimeout(r, 100));
+            await page.click('[data-note-open-photos="note_gal_1"]');
+            await page.waitForSelector('#photo-preview-modal:not(.hidden)', { timeout: 3000 });
+            await page.click('#photo-preview-goto-note');
+            await new Promise(r => setTimeout(r, 150));
+
+            const afterGoto = await page.evaluate(() => ({
+                viewerClosed: document.getElementById('photo-preview-modal')?.classList.contains('hidden'),
+                cardsVisible: !document.getElementById('notes-cards-panel')?.classList.contains('hidden'),
+                cardHighlighted: document.querySelector('[data-note-id="note_gal_1"]')?.classList.contains('note-card-highlight')
+            }));
+            helpers.assertTrue(afterGoto.viewerClosed, 'Ir a la nota must close viewer');
+            helpers.assertTrue(afterGoto.cardsVisible, 'Ir a la nota must switch back to Notas tab');
+            helpers.assertTrue(afterGoto.cardHighlighted, 'Ir a la nota must highlight target note card');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+        }
+    },
+    {
+        id: 'T2_F25_03_gallery_exact_byte_download_and_filename',
+        feature: 'F25',
+        name: 'Downloading a photo from gallery returns exact uploaded original bytes and formatted nota-{slug}-{YYYYMMDD}-{HHmm}.{ext} filename',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.StorageModule?.saveNotes?.([
+                    { id: 'note_dl_1', title: 'Fórmulas de Cálculo I', content: 'Derivadas', type: 'apunte', createdAt: Date.now() }
+                ]);
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.render?.();
+                window.NotesModule?.switchNotesTab?.('gallery');
+                const sel = document.getElementById('notes-photo-note-select');
+                if (sel) sel.value = 'note_dl_1';
+            });
+
+            // Upload an exact custom PNG File preserving custom bytes & verify exact equality on download
+            const uploadMeta = await page.evaluate(async () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 180;
+                canvas.height = 120;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#312e81';
+                ctx.fillRect(0, 0, 180, 120);
+                const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                const origBytes = new Uint8Array(await pngBlob.arrayBuffer());
+                // Append recognizable trailing signature bytes to guarantee exact original Blob (not re-encoded canvas!)
+                const marker = new Uint8Array([0x50, 0x4b, 0x31, 0x35, 0x32, 0x45, 0x58, 0x41, 0x43, 0x54]);
+                const combined = new Uint8Array(origBytes.length + marker.length);
+                combined.set(origBytes, 0);
+                combined.set(marker, origBytes.length);
+
+                const file = new File([combined], 'pizarron_exacto.png', { type: 'image/png' });
+                const input = document.getElementById('notes-photo-input');
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                window.__uploadedExactBytes = Array.from(combined);
+                return { size: combined.length };
+            });
+
+            await new Promise(r => setTimeout(r, 350));
+
+            await page.click('#notes-gallery-grid [data-photo-open]');
+            await page.waitForSelector('#photo-preview-modal:not(.hidden)', { timeout: 3000 });
+
+            const downloadCheck = await page.evaluate(async () => {
+                window.__capturedDownload = null;
+                const origClick = HTMLAnchorElement.prototype.click;
+                HTMLAnchorElement.prototype.click = function () {
+                    window.__capturedDownload = {
+                        download: this.getAttribute('download'),
+                        href: this.getAttribute('href')
+                    };
+                };
+                try {
+                    const photoId = document.getElementById('photo-preview-stage')?.dataset?.photoId;
+                    const res = await window.NotesModule?.downloadPhotoById?.(photoId);
+                    const cap = window.__capturedDownload;
+                    if (!cap || !cap.href) return { ok: false, reason: 'No anchor click captured' };
+                    const resp = await fetch(cap.href);
+                    const buf = await resp.arrayBuffer();
+                    const dlBytes = Array.from(new Uint8Array(buf));
+                    const expected = window.__uploadedExactBytes || [];
+                    const exactMatch = dlBytes.length === expected.length &&
+                        dlBytes.every((b, i) => b === expected[i]);
+                    return {
+                        ok: true,
+                        filename: cap.download || res?.filename || '',
+                        exactMatch,
+                        expectedLen: expected.length,
+                        dlLen: dlBytes.length
+                    };
+                } finally {
+                    HTMLAnchorElement.prototype.click = origClick;
+                }
+            });
+
+            helpers.assertTrue(downloadCheck.ok, 'Download button must generate blob download anchor');
+            helpers.assertTrue(downloadCheck.exactMatch, `Downloaded bytes (${downloadCheck.dlLen}) must match uploaded original bytes (${downloadCheck.expectedLen}) bit-for-bit (expected ${uploadMeta.size})`);
+            helpers.assertMatch(downloadCheck.filename, /^nota-formulas-de-calculo-i-\d{8}-\d{4}\.png$/,
+                `Filename "${downloadCheck.filename}" must match nota-{slug}-{AAAAMMDD}-{HHmm}.{ext}`);
+
+            await page.evaluate(async () => {
+                window.NotesModule?.closePhotoPreview?.();
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+        }
+    },
+    {
+        id: 'T2_F25_04_idb_non_destructive_migration_and_json_backup',
+        feature: 'F25',
+        name: 'Legacy gallery migrates non-destructively to IndexedDB with read-back check, keeps LS on IDB error, and survives JSON backup round-trip',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+
+            const sampleDataUrl = await page.evaluate(() => {
+                const c = document.createElement('canvas');
+                c.width = 64;
+                c.height = 64;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#6366F1';
+                ctx.fillRect(0, 0, 64, 64);
+                return c.toDataURL('image/png');
+            });
+
+            // Case 1: Mock IDB failure -> legacy localStorage MUST NOT be deleted
+            const failMigration = await page.evaluate(async (url) => {
+                const legacyPayload = JSON.stringify([
+                    { id: 'legacy_photo_1', name: 'Apunte Viejo.png', dataUrl: url, createdAt: 1700000000000 }
+                ]);
+                localStorage.setItem('org_escolar_gallery_photos', legacyPayload);
+
+                const origOpen = indexedDB.open.bind(indexedDB);
+                indexedDB.open = function () {
+                    const req = {};
+                    setTimeout(() => {
+                        if (typeof req.onerror === 'function') req.onerror(new Event('error'));
+                    }, 5);
+                    return req;
+                };
+                try {
+                    const res = await window.StorageModule.hydrateAndMigrateGalleryIdb();
+                    return {
+                        migrated: res.migrated,
+                        keptLegacy: res.keptLegacy,
+                        lsIntact: localStorage.getItem('org_escolar_gallery_photos') === legacyPayload
+                    };
+                } finally {
+                    indexedDB.open = origOpen;
+                }
+            }, sampleDataUrl);
+
+            helpers.assertFalse(failMigration.migrated, 'Failed IDB migration must report migrated=false');
+            helpers.assertTrue(failMigration.keptLegacy, 'Failed IDB migration must keep legacy marker true');
+            helpers.assertTrue(failMigration.lsIntact, 'Failed IDB migration must NOT delete legacy localStorage gallery');
+
+            // Case 2: Successful migration -> verified readback in IDB removes legacy LS key
+            const okMigration = await page.evaluate(async () => {
+                const res = await window.StorageModule.hydrateAndMigrateGalleryIdb();
+                const blobInfo = await window.StorageModule.getGalleryPhotoBlobFromIdb('legacy_photo_1');
+                return {
+                    ok: res.ok,
+                    migrated: res.migrated,
+                    lsRemoved: localStorage.getItem('org_escolar_gallery_photos') === null,
+                    hasIdbBlob: Boolean(blobInfo && blobInfo.blob instanceof Blob && blobInfo.blob.size > 0)
+                };
+            });
+            helpers.assertTrue(okMigration.ok && okMigration.migrated, 'Valid IDB migration must succeed');
+            helpers.assertTrue(okMigration.lsRemoved, 'Legacy localStorage gallery key must be removed ONLY after IDB verification');
+            helpers.assertTrue(okMigration.hasIdbBlob, 'Migrated photo blob must be readable from IndexedDB notes_photos');
+
+            // Case 3: JSON Backup export/import + full page reload persistence
+            const backupJson = await page.evaluate(() => window.StorageModule.exportJson());
+            const parsedBackup = JSON.parse(backupJson);
+            helpers.assertTrue(Array.isArray(parsedBackup.galleryPhotos) && parsedBackup.galleryPhotos.length === 1,
+                'exportJson() must include migrated Notes gallery photos');
+
+            await page.evaluate(async () => {
+                await window.StorageModule.clearAll();
+            });
+            await page.evaluate((json) => {
+                window.StorageModule.importJson(json);
+            }, backupJson);
+            await new Promise(r => setTimeout(r, 300));
+
+            await page.reload({ waitUntil: 'load' });
+            await new Promise(r => setTimeout(r, 350));
+
+            const afterReloadCount = await page.evaluate(async () => {
+                await window.StorageModule?.hydrateAndMigrateGalleryIdb?.();
+                return (window.StorageModule?.getGalleryPhotos?.() || []).length;
+            });
+            helpers.assertEqual(afterReloadCount, 1, 'Notes gallery photos restored via JSON backup must persist across page reload');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+        }
     }
 ];
 

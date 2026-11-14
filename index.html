@@ -510,7 +510,7 @@
         <!-- ========================================================= -->
         <section id="view-notes" class="view-transition hidden space-y-6">
             
-            <!-- Barra Superior de Notas: Título, Filtros de Categoría y Botón CTA -->
+            <!-- Barra Superior de Notas: Título, Selector Notas/Galería, Filtros y Botón CTA -->
             <div class="glass-panel bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="min-w-0">
@@ -523,7 +523,7 @@
                             </span>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                            Guarda ideas, pendientes, apuntes de clase y recordatorios en cualquier momento.
+                            Guarda ideas, pendientes, apuntes de clase y fotos de tus materiales.
                         </p>
                     </div>
 
@@ -545,8 +545,26 @@
                     </div>
                 </div>
 
+                <!-- Control segmentado Notas | Galería (estilo Apple HIG) -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <div id="notes-view-tabs" role="tablist" aria-label="Secciones de notas"
+                        class="notes-segmented-control inline-flex items-center p-1 rounded-2xl bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 w-full sm:w-auto">
+                        <button type="button" id="notes-tab-notes" role="tab" aria-selected="true" data-notes-tab="notes"
+                            class="notes-seg-btn notes-seg-active touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            <span>📝</span>
+                            <span>Notas</span>
+                        </button>
+                        <button type="button" id="notes-tab-gallery" role="tab" aria-selected="false" data-notes-tab="gallery"
+                            class="notes-seg-btn touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            <span>🖼️</span>
+                            <span>Galería</span>
+                            <span id="notes-gallery-count" class="px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">0</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Barra de Búsqueda y Filtros de Categoría -->
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 items-center">
+                <div id="notes-search-filter-bar" class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 items-center">
                     <!-- Buscador en Vivo -->
                     <div class="sm:col-span-5 relative min-w-0">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -590,16 +608,34 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)] gap-6 items-start">
-            <!-- Galería de materiales (izquierda) -->
-            <aside id="notes-gallery-panel" class="glass-panel bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-3 min-w-0">
-                <div class="flex items-center justify-between gap-2">
-                    <h2 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">🖼️ Galería de materiales</h2>
-                    <label for="notes-photo-input" class="touch-target-44 min-h-[44px] inline-flex items-center tap-effect cursor-pointer shrink-0 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold">+ Foto</label>
-                    <input type="file" id="notes-photo-input" accept="image/*" class="hidden">
+            <!-- Panel Galería de fotos de notas (vista dedicada en pestaña Galería) -->
+            <section id="notes-gallery-panel" class="hidden glass-panel bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-4 min-w-0" aria-labelledby="notes-gallery-heading">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <h2 id="notes-gallery-heading" class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>🖼️</span>
+                            <span>Galería de materiales</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            Se conservan con su calidad original sin saturar la memoria rápida. Toca una foto para ampliar o descargar.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+                        <select id="notes-photo-note-select" aria-label="Vincular foto a una nota"
+                            class="min-h-[44px] max-w-[200px] px-3 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                            <option value="">Sin vincular a nota</option>
+                        </select>
+                        <label for="notes-photo-input"
+                            class="touch-target-44 min-h-[44px] inline-flex items-center justify-center gap-1.5 tap-effect cursor-pointer shrink-0 px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm">
+                            <span>+ Foto</span>
+                        </label>
+                        <input type="file" id="notes-photo-input" accept="image/*" class="hidden">
+                    </div>
                 </div>
-                <div id="notes-gallery-grid" class="grid grid-cols-2 gap-2 min-w-0"></div>
-            </aside>
+                <div id="notes-gallery-grid" class="grid grid-cols-2 min-[360px]:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 min-w-0"></div>
+            </section>
+
+            <!-- Panel Tarjetas de Notas -->
             <div id="notes-cards-panel" class="space-y-6 min-w-0">
             <!-- Empty State de Notas -->
             <div id="notes-empty-state" class="glass-panel hidden text-center py-12 px-6 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
@@ -622,7 +658,6 @@
             <!-- Grid de Tarjetas de Notas -->
             <div id="notes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Inyectado por notes.js -->
-            </div>
             </div>
             </div>
         </section>
@@ -2020,6 +2055,19 @@
                     </div>
                 </div>
 
+                <!-- Fotos adjuntas a la nota -->
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">🖼️ Fotos adjuntas</span>
+                        <label for="note-modal-photo-input"
+                            class="touch-target-44 min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold cursor-pointer tap-effect border border-indigo-200/70 dark:border-indigo-700/50">
+                            <span>+ Adjuntar foto</span>
+                        </label>
+                        <input type="file" id="note-modal-photo-input" accept="image/*" class="hidden">
+                    </div>
+                    <div id="note-modal-photos-list" class="flex flex-wrap gap-2"></div>
+                </div>
+
                 <div class="pt-4 flex flex-wrap items-center justify-end gap-2.5 border-t border-slate-100 dark:border-slate-700">
                     <button type="button" id="cancel-note-btn"
                         class="touch-target-44 min-h-[44px] px-5 py-2.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs tap-effect transition-colors">
@@ -2482,15 +2530,66 @@
     <script src="js/backgrounds.js?v=1.5.1"></script>
     <script src="js/app.js?v=1.5.1"></script>
 
-    <!-- Visor de fotos de la galería -->
-    <div id="photo-preview-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
-        <div id="photo-preview-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/75 backdrop-blur-sm"></div>
-        <div class="modal-dialog relative max-w-md w-full space-y-2 z-10 rounded-3xl p-3">
-            <img id="photo-preview-img" alt="Foto de la galería" class="w-full max-h-[75vh] object-contain rounded-2xl bg-slate-900">
-            <div class="flex items-center justify-between gap-2">
-                <span id="photo-preview-name" class="text-xs font-bold text-white truncate min-w-0"></span>
-                <button type="button" id="photo-preview-close" class="tap-effect touch-target-44 min-h-[44px] shrink-0 px-4 py-2 rounded-xl bg-white text-slate-800 text-xs font-bold">Cerrar</button>
+    <!-- Visor de fotos de la galería a pantalla completa -->
+    <div id="photo-preview-modal" class="modal-overlay photo-viewer-overlay fixed inset-0 z-[70] hidden flex-col" role="dialog" aria-modal="true" aria-labelledby="photo-preview-name" aria-hidden="true">
+        <div id="photo-preview-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/92 backdrop-blur-md"></div>
+
+        <div class="modal-dialog photo-viewer-shell relative z-10 flex flex-col w-full h-full">
+            <!-- Barra superior translúcida con safe-area -->
+            <header id="photo-preview-topbar" class="photo-viewer-bar flex items-center justify-between gap-3 px-3 sm:px-5 pb-2.5 shrink-0">
+                <div class="min-w-0 flex-1">
+                    <h3 id="photo-preview-name" class="text-sm font-bold text-white truncate"></h3>
+                    <p id="photo-preview-meta" class="text-[11px] text-slate-300 truncate"></p>
+                </div>
+                <button type="button" id="photo-preview-close" aria-label="Cerrar visor"
+                    class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] shrink-0 px-3 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold inline-flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span class="hidden sm:inline">Cerrar</span>
+                </button>
+            </header>
+
+            <!-- Escenario interactivo (zoom/pan por gestos y botones) -->
+            <div id="photo-preview-stage" class="photo-viewer-stage relative flex-1 min-h-0 flex items-center justify-center overflow-hidden select-none p-2 sm:p-4" data-zoom="1" data-pan-x="0" data-pan-y="0">
+                <img id="photo-preview-img" alt="Foto de la galería" draggable="false" class="photo-viewer-img max-w-full max-h-full object-contain select-none">
+                <span id="photo-preview-zoom-badge" class="hidden pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-slate-900/75 text-white text-[11px] font-mono font-bold tabular-nums border border-white/15">100%</span>
             </div>
+
+            <!-- Barra inferior translúcida con controles de zoom, navegación y descarga -->
+            <footer id="photo-preview-toolbar" class="photo-viewer-bar photo-viewer-bottom-bar flex flex-wrap items-center justify-between gap-2 px-3 sm:px-5 pt-2.5 shrink-0">
+                <div class="flex items-center gap-1.5">
+                    <button type="button" id="photo-preview-prev" aria-label="Foto anterior"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">‹</button>
+                    <button type="button" id="photo-preview-zoom-out" aria-label="Alejar"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">−</button>
+                    <button type="button" id="photo-preview-zoom-reset" aria-label="Restablecer zoom a 100%"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] px-3 rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-xs font-mono font-bold tabular-nums inline-flex items-center justify-center">100%</button>
+                    <button type="button" id="photo-preview-zoom-in" aria-label="Acercar"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">+</button>
+                    <button type="button" id="photo-preview-next" aria-label="Foto siguiente"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-white/12 hover:bg-white/22 text-white border border-white/20 text-base font-bold inline-flex items-center justify-center">›</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <button type="button" id="photo-preview-goto-note"
+                        class="hidden tap-effect touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-sm">
+                        <span>📝</span>
+                        <span>Ir a la nota</span>
+                    </button>
+                    <button type="button" id="photo-preview-download"
+                        class="tap-effect touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-sm">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        <span>Descargar</span>
+                    </button>
+                    <button type="button" id="photo-preview-share"
+                        class="hidden tap-effect touch-target-44 min-h-[44px] px-3.5 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold inline-flex items-center justify-center gap-1.5">
+                        <span>Compartir</span>
+                    </button>
+                    <button type="button" id="photo-preview-delete" aria-label="Eliminar foto"
+                        class="tap-effect touch-target-44 min-w-[44px] min-h-[44px] rounded-full bg-rose-600/85 hover:bg-rose-600 text-white border border-rose-300/30 text-xs font-bold inline-flex items-center justify-center">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+            </footer>
         </div>
     </div>
 
