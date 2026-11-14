@@ -3296,6 +3296,215 @@ const tests = [
             }
             await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
         }
+    },
+    // --- F24: Mi foto reencuadre con original reducido y estado guardado (v1.5.2 Etapa 2) ---
+    {
+        id: 'T2_F24_01_mi_foto_crop_and_original_preservation',
+        feature: 'F24',
+        name: 'Mi foto stores viewport-cropped JPEG (<= 1600px), reduced original (<= 2400px), and cropState in IndexedDB with zero bytes in localStorage/JSON',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                const header = document.querySelector('#settings-acc-background .settings-accordion-header');
+                if (header && !document.getElementById('settings-acc-background')?.classList.contains('open')) {
+                    header.click();
+                }
+            });
+            await page.waitForSelector('#settings-bg-photo-input', { timeout: 5000 });
+
+            try {
+                await helpers.simulateFileUpload(page, '#settings-bg-photo-input', {
+                    width: 2600,
+                    height: 1600,
+                    color: '#4F46E5',
+                    fileName: 'bg_reframe_src.png',
+                    mimeType: 'image/png'
+                });
+                await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 6000 });
+                await new Promise(r => setTimeout(r, 350));
+
+                // Apply zoom 1.8 and save
+                await page.evaluate(() => {
+                    const slider = document.getElementById('photo-editor-zoom');
+                    if (slider) {
+                        slider.value = '1.8';
+                        slider.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    window.PhotoEditorModule?.panBy?.(36, -24);
+                });
+                await page.click('#photo-editor-save-btn');
+                await new Promise(r => setTimeout(r, 450));
+
+                const result = await page.evaluate(async () => {
+                    const rec = await window.BackgroundsModule?.loadCustomPhotoRecord?.(true);
+                    const measure = (src) => new Promise((res) => {
+                        if (!src) return res({ w: 0, h: 0 });
+                        const im = new Image();
+                        im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight });
+                        im.onerror = () => res({ w: 0, h: 0 });
+                        im.src = src;
+                    });
+                    const croppedDims = await measure(rec?.croppedDataUrl);
+                    const origDims = await measure(rec?.originalDataUrl);
+
+                    let lsHasPhoto = false;
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const val = localStorage.getItem(localStorage.key(i)) || '';
+                        if (val.includes('data:image')) lsHasPhoto = true;
+                    }
+                    const jsonExport = window.StorageModule?.exportJson?.() || '';
+                    const bgUrl = document.getElementById('app-bg-photo')?.style.backgroundImage || '';
+                    return {
+                        hasCropped: Boolean(rec?.croppedDataUrl?.startsWith('data:image/jpeg')),
+                        hasOrig: Boolean(rec?.originalDataUrl?.startsWith('data:image/jpeg')),
+                        croppedDims,
+                        origDims,
+                        cropState: rec?.cropState || null,
+                        lsHasPhoto,
+                        jsonHasPhoto: jsonExport.includes('data:image'),
+                        bgShowsCropped: Boolean(rec?.croppedDataUrl && bgUrl.includes(rec.croppedDataUrl.slice(0, 64)))
+                    };
+                });
+
+                helpers.assertTrue(result.hasCropped, 'Mi foto record must include croppedDataUrl JPEG');
+                helpers.assertTrue(result.hasOrig, 'Mi foto record must include originalDataUrl JPEG');
+                helpers.assertEqual(result.croppedDims.w, 1600, 'Cropped Mi foto longest side must be <= 1600px (1600w for landscape)');
+                helpers.assertEqual(result.croppedDims.h, 1000, 'Cropped Mi foto height must match 1280x800 viewport aspect (1000h)');
+                helpers.assertEqual(result.origDims.w, 2400, 'Reduced originalDataUrl must cap longest side at 2400px');
+                helpers.assertTrue(result.origDims.h <= 2400 && result.origDims.h > 1400, `Reduced original height (${result.origDims.h}) must keep proportional dimensions`);
+                helpers.assertTrue(result.cropState && Math.abs(result.cropState.zoom - 1.8) < 0.05, `cropState.zoom must persist ~1.8 (got ${result.cropState?.zoom})`);
+                helpers.assertFalse(result.lsHasPhoto, 'Mi foto bytes must never be saved to localStorage');
+                helpers.assertFalse(result.jsonHasPhoto, 'Mi foto bytes must never appear in JSON exports');
+                helpers.assertTrue(result.bgShowsCropped, '#app-bg-photo must render croppedDataUrl');
+            } finally {
+                // no temp file needed
+            }
+        }
+    },
+    {
+        id: 'T2_F24_02_mi_foto_reencuadrar_and_legacy_fallback',
+        feature: 'F24',
+        name: 'Reencuadrar restores originalDataUrl and cropState with zero empty gaps, and handles legacy v1.5.1 records without errors',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                const header = document.querySelector('#settings-acc-background .settings-accordion-header');
+                if (header && !document.getElementById('settings-acc-background')?.classList.contains('open')) {
+                    header.click();
+                }
+            });
+            await page.waitForSelector('#settings-bg-photo-input', { timeout: 5000 });
+
+            // Upload 2200x1400 image with zoom 1.8
+            await helpers.simulateFileUpload(page, '#settings-bg-photo-input', {
+                width: 2200,
+                height: 1400,
+                color: '#0F172A',
+                fileName: 'reframe_step.png',
+                mimeType: 'image/png'
+            });
+            await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 6000 });
+            await new Promise(r => setTimeout(r, 300));
+            await page.evaluate(() => {
+                window.PhotoEditorModule?.setZoom?.(1.8);
+                window.PhotoEditorModule?.panBy?.(30, -20);
+            });
+            await page.click('#photo-editor-save-btn');
+            await new Promise(r => setTimeout(r, 450));
+
+            await page.evaluate(() => {
+                const header = document.querySelector('#settings-acc-background .settings-accordion-header');
+                if (header && !document.getElementById('settings-acc-background')?.classList.contains('open')) {
+                    header.click();
+                }
+                document.getElementById('settings-bg-photo-adjust-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+            await page.waitForSelector('#settings-bg-photo-adjust-btn:not(.hidden)', { timeout: 5000 });
+            await page.click('#settings-bg-photo-adjust-btn');
+            await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 5000 });
+            await new Promise(r => setTimeout(r, 250));
+
+            const restored = await page.evaluate(() => {
+                const st = window.PhotoEditorModule?.getState?.();
+                const zoomVal = document.getElementById('photo-editor-zoom')?.value || '';
+                const imgSrc = window.PhotoEditorModule?.img?.src || '';
+                const recOrig = window.BackgroundsModule?._customPhotoRecord?.originalDataUrl || '';
+                // Rotate 90° and zoom to 2.4 with pan
+                window.PhotoEditorModule?.rotate90?.();
+                window.PhotoEditorModule?.setZoom?.(2.4);
+                window.PhotoEditorModule?.panBy?.(500, 500);
+                const after = window.PhotoEditorModule?.getState?.();
+                return {
+                    restoredZoom: st?.zoom || 0,
+                    sliderVal: zoomVal,
+                    loadedOriginal: Boolean(recOrig && imgSrc === recOrig),
+                    noEmptyGapsAfterRotateAndPan: Boolean(
+                        after &&
+                        after.drawnW >= after.cropW - 0.5 &&
+                        after.drawnH >= after.cropH - 0.5 &&
+                        Math.abs(after.offsetX) <= after.maxOffsetX + 0.5 &&
+                        Math.abs(after.offsetY) <= after.maxOffsetY + 0.5
+                    ),
+                    origBeforeSave: recOrig
+                };
+            });
+
+            helpers.assertTrue(Math.abs(restored.restoredZoom - 1.8) < 0.05, `Reencuadrar must restore saved zoom 1.8 (got ${restored.restoredZoom})`);
+            helpers.assertTrue(restored.loadedOriginal, 'Reencuadrar must load reduced originalDataUrl instead of cropped copy');
+            helpers.assertTrue(restored.noEmptyGapsAfterRotateAndPan, 'Editor must enforce zero empty gaps across 90° rotation, zoom, and max pan');
+
+            await page.click('#photo-editor-save-btn');
+            await new Promise(r => setTimeout(r, 450));
+
+            const afterReframe = await page.evaluate(async (prevOrig) => {
+                const rec = await window.BackgroundsModule?.loadCustomPhotoRecord?.(true);
+                return {
+                    rotation: rec?.cropState?.rotation,
+                    zoom: rec?.cropState?.zoom,
+                    origPreserved: rec?.originalDataUrl === prevOrig,
+                    hasCropped: Boolean(rec?.croppedDataUrl?.startsWith('data:image/jpeg'))
+                };
+            }, restored.origBeforeSave);
+
+            helpers.assertEqual(afterReframe.rotation, 90, 'Reframed cropState must persist 90° rotation');
+            helpers.assertTrue(Math.abs((afterReframe.zoom || 0) - 2.4) < 0.05, `Reframed cropState must persist zoom 2.4 (got ${afterReframe.zoom})`);
+            helpers.assertTrue(afterReframe.origPreserved, 'Reframing must preserve existing originalDataUrl without re-encoding');
+            helpers.assertTrue(afterReframe.hasCropped, 'Reframing must produce updated croppedDataUrl');
+
+            // Legacy v1.5.1 record without originalDataUrl
+            const legacyCheck = await page.evaluate(async () => {
+                const rec = await window.BackgroundsModule.loadCustomPhotoRecord(true);
+                await window.BackgroundsModule.saveCustomPhotoRecord({
+                    dataUrl: rec.dataUrl,
+                    width: rec.width,
+                    height: rec.height,
+                    avgLuminance: rec.avgLuminance
+                });
+                const loadedLegacy = await window.BackgroundsModule.loadCustomPhotoRecord(true);
+                return { hasOrig: Boolean(loadedLegacy?.originalDataUrl) };
+            });
+            helpers.assertFalse(legacyCheck.hasOrig, 'Legacy record setup must lack originalDataUrl');
+
+            await page.evaluate(() => {
+                document.getElementById('settings-bg-photo-adjust-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+            await page.click('#settings-bg-photo-adjust-btn');
+            await page.waitForSelector('#photo-editor-modal:not(.hidden)', { timeout: 5000 });
+            await new Promise(r => setTimeout(r, 200));
+
+            const legacyToastText = await page.evaluate(() => document.getElementById('toast-container')?.textContent || '');
+            helpers.assertIncludes(legacyToastText, 'heredada', 'Reencuadrar on legacy v1.5.1 photo must show non-blocking info notice');
+
+            await page.click('#photo-editor-save-btn');
+            await new Promise(r => setTimeout(r, 400));
+            await page.evaluate(async () => {
+                await window.BackgroundsModule?.clearCustomPhoto?.();
+            });
+        }
     }
 ];
 
