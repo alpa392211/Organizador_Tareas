@@ -50,12 +50,12 @@ const tests = [
     {
         id: 'T1_F01_04_sw_cache_name_and_assets',
         feature: 'F01',
-        name: 'sw.js specifies v1.5.0 cache identifier',
+        name: 'sw.js specifies v1.5.1-e1 cache identifier',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const swCode = fs.readFileSync(swPath, 'utf8');
-            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.5.0');
-            helpers.assertTrue(hasTargetCache, 'sw.js must specify v1.5.0 cache name');
+            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.5.1-e1');
+            helpers.assertTrue(hasTargetCache, 'sw.js must specify v1.5.1-e1 cache name');
         }
     },
     {

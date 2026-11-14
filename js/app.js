@@ -304,8 +304,9 @@
             this.applySpecialThemeFromStorage();
             this.updateApolloRockets();
 
-            // 4. Inicializar y aplicar tipografía seleccionada
+            // 4. Inicializar y aplicar tipografía e intensidad Liquid Glass
             this.initFontFamily();
+            this.initGlassIntensity();
 
             // Bloqueo de orientación horizontal en teléfonos móviles (Portrait Lock)
             this.initOrientationLock();
@@ -576,6 +577,33 @@
             const font = Storage.getFontFamily?.() || 'calibri';
             this.syncSettingsFontButtons();
             this.applyFontFamily(font);
+        }
+
+        initGlassIntensity() {
+            const Storage = window.StorageModule;
+            const level = Storage?.getGlassIntensity?.() || 'normal';
+            this.applyGlassIntensity(level);
+        }
+
+        applyGlassIntensity(level) {
+            const normalized = (level === 'suave' || level === 'normal' || level === 'intenso') ? level : 'normal';
+            const root = document.documentElement;
+            root.setAttribute('data-glass-intensity', normalized);
+
+            const labels = {
+                suave: 'Suave',
+                normal: 'Normal',
+                intenso: 'Intenso'
+            };
+            const pill = document.getElementById('settings-glass-pill');
+            if (pill) {
+                pill.textContent = labels[normalized] || 'Normal';
+            }
+
+            document.querySelectorAll('#settings-glass-intensity-group [data-glass-intensity]').forEach(btn => {
+                const isSelected = btn.dataset.glassIntensity === normalized;
+                btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            });
         }
 
         syncSettingsFontButtons() {
@@ -2119,6 +2147,19 @@
                 };
             }
 
+            // 5.5 Intensidad del cristal (Suave / Normal / Intenso)
+            this.initGlassIntensity();
+            document.querySelectorAll('#settings-glass-intensity-group [data-glass-intensity]').forEach(btn => {
+                btn.onclick = () => {
+                    const level = btn.dataset.glassIntensity;
+                    Storage.setGlassIntensity(level);
+                    this.applyGlassIntensity(level);
+                    window.HapticsModule?.light?.();
+                    const labels = { suave: 'Suave', normal: 'Normal', intenso: 'Intenso' };
+                    this.showToast(`Intensidad del cristal: ${labels[level] || level}`, 'success');
+                };
+            });
+
             // 6. Tipografía Mediante Botones Interactivos (5 Opciones Estándar + Desbloqueables Bóveda)
             this.syncSettingsFontButtons();
             document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]').forEach(btn => {
@@ -2272,6 +2313,7 @@
                             Storage.importJson(evt.target.result);
                             Storage.cleanupLegacyKeys?.();
                             this.initFontFamily();
+                            this.initGlassIntensity();
                             this.refreshSettingsProfileUI();
                             this.syncPeriodUI();
                             this.refreshAll();

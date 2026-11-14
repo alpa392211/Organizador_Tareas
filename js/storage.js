@@ -32,7 +32,8 @@ window.StorageModule = (() => {
         USER_PHOTO: 'org_escolar_user_photo',
         ACCOUNT_TYPE: 'org_escolar_account_type',
         LONG_PRESS: 'org_escolar_long_press_enabled_v1',
-        GALLERY_PHOTOS: 'org_escolar_gallery_photos'
+        GALLERY_PHOTOS: 'org_escolar_gallery_photos',
+        GLASS_INTENSITY: 'org_escolar_glass_intensity_v1'
     };
 
     const LEGACY_KEYS = [
@@ -653,6 +654,33 @@ window.StorageModule = (() => {
             return chosen;
         },
 
+        // --- Intensidad del Cristal Liquid Glass (suave | normal | intenso) ---
+        getDefaultGlassIntensity() {
+            try {
+                const cores = typeof navigator !== 'undefined' ? Number(navigator.hardwareConcurrency) : 0;
+                const mem = typeof navigator !== 'undefined' ? Number(navigator.deviceMemory) : 0;
+                if ((cores > 0 && cores <= 4) || (mem > 0 && mem <= 4)) {
+                    return 'normal';
+                }
+            } catch (_) {}
+            return 'intenso';
+        },
+        getGlassIntensity() {
+            const val = (localStorage.getItem(KEYS.GLASS_INTENSITY) || '').trim().toLowerCase();
+            if (val === 'suave' || val === 'normal' || val === 'intenso') {
+                return val;
+            }
+            return this.getDefaultGlassIntensity();
+        },
+        setGlassIntensity(level) {
+            const normalized = typeof level === 'string' ? level.trim().toLowerCase() : '';
+            const chosen = (normalized === 'suave' || normalized === 'normal' || normalized === 'intenso')
+                ? normalized
+                : this.getDefaultGlassIntensity();
+            localStorage.setItem(KEYS.GLASS_INTENSITY, chosen);
+            return chosen;
+        },
+
         // --- Elementos Archivados (Baúl de Tareas y Notas) ---
         getArchivedTasks() {
             try {
@@ -980,6 +1008,7 @@ window.StorageModule = (() => {
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),
+                glassIntensity: this.getGlassIntensity(),
                 academicPeriod: this.getAcademicPeriod(),
                 academicCycle: this.getAcademicCycle(),
                 isCycleConfigured: this.isCycleConfigured(),
@@ -1017,6 +1046,7 @@ window.StorageModule = (() => {
                 }
                 if (data.theme) this.setTheme(data.theme);
                 if (data.fontFamily) this.setFontFamily(data.fontFamily);
+                if (typeof data.glassIntensity === 'string') this.setGlassIntensity(data.glassIntensity);
                 if (typeof data.academicPeriod === 'string') this.setAcademicPeriod(data.academicPeriod);
                 if (data.academicCycle && data.academicCycle.startDate && data.academicCycle.endDate) {
                     this.setAcademicCycle(data.academicCycle.startDate, data.academicCycle.endDate);

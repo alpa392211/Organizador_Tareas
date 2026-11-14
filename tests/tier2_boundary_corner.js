@@ -1785,6 +1785,273 @@ const tests = [
             await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
             helpers.assertEqual(res.length, 0, `Fallo política de hojas inferiores: ${res.join('; ')}`);
         }
+    },
+
+    // =========================================================================
+    // F20: Etapa 1 - Liquid Glass Apple, Tipografía Inter SF e Intensidad
+    // =========================================================================
+    {
+        id: 'T2_F20_01_inter_sf_font_stack_and_precache',
+        feature: 'F20',
+        name: 'Inter Variable local SF stack, font files, #app-background and SW precache are configured',
+        run: async (page, helpers) => {
+            const fontLatin = path.join(helpers.PROJECT_ROOT, 'assets', 'fonts', 'inter-latin-opsz-normal.woff2');
+            const fontLatinExt = path.join(helpers.PROJECT_ROOT, 'assets', 'fonts', 'inter-latin-ext-opsz-normal.woff2');
+            helpers.assertTrue(fs.existsSync(fontLatin), 'Missing assets/fonts/inter-latin-opsz-normal.woff2');
+            helpers.assertTrue(fs.existsSync(fontLatinExt), 'Missing assets/fonts/inter-latin-ext-opsz-normal.woff2');
+
+            const swCode = fs.readFileSync(path.join(helpers.PROJECT_ROOT, 'sw.js'), 'utf8');
+            helpers.assertIncludes(swCode, 'assets/fonts/inter-latin-opsz-normal.woff2', 'sw.js must precache latin Inter font');
+            helpers.assertIncludes(swCode, 'assets/fonts/inter-latin-ext-opsz-normal.woff2', 'sw.js must precache latin-ext Inter font');
+
+            const domCheck = await page.evaluate(() => {
+                const bodyFont = getComputedStyle(document.body).fontFamily || '';
+                const bg = document.getElementById('app-background');
+                const bgPos = bg ? getComputedStyle(bg).position : '';
+                const mainBg = getComputedStyle(document.querySelector('main')).backgroundColor;
+                return { bodyFont, hasBg: Boolean(bg), bgPos, mainBg };
+            });
+
+            helpers.assertTrue(
+                domCheck.bodyFont.includes('Inter Variable') || domCheck.bodyFont.includes('Inter'),
+                `Expected Inter SF font stack in body fontFamily, got: ${domCheck.bodyFont}`
+            );
+            helpers.assertTrue(domCheck.hasBg && domCheck.bgPos === 'fixed', 'Expected fixed #app-background layer');
+        }
+    },
+    {
+        id: 'T2_F20_02_glass_intensity_heuristic_and_persistence',
+        feature: 'F20',
+        name: 'Glass intensity hardware heuristic, UI toggle, reload persistence, and legacy backup restore',
+        run: async (page, helpers) => {
+            const heuristic = await page.evaluate(() => {
+                localStorage.removeItem('org_escolar_glass_intensity_v1');
+                const origCoresDesc = Object.getOwnPropertyDescriptor(Navigator.prototype, 'hardwareConcurrency');
+                const origMemDesc = Object.getOwnPropertyDescriptor(Navigator.prototype, 'deviceMemory');
+                const setSpecs = (cores, mem) => {
+                    Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => cores });
+                    Object.defineProperty(navigator, 'deviceMemory', { configurable: true, get: () => mem });
+                };
+                try {
+                    setSpecs(4, 8);
+                    const lowCores = window.StorageModule.getDefaultGlassIntensity();
+                    setSpecs(8, 4);
+                    const lowMem = window.StorageModule.getDefaultGlassIntensity();
+                    setSpecs(8, 8);
+                    const highSpecs = window.StorageModule.getDefaultGlassIntensity();
+                    return { lowCores, lowMem, highSpecs };
+                } finally {
+                    delete navigator.hardwareConcurrency;
+                    delete navigator.deviceMemory;
+                    if (origCoresDesc) Object.defineProperty(Navigator.prototype, 'hardwareConcurrency', origCoresDesc);
+                    if (origMemDesc) Object.defineProperty(Navigator.prototype, 'deviceMemory', origMemDesc);
+                }
+            });
+
+            helpers.assertEqual(heuristic.lowCores, 'normal', '<= 4 cores must default to normal');
+            helpers.assertEqual(heuristic.lowMem, 'normal', '<= 4 GB RAM must default to normal');
+            helpers.assertEqual(heuristic.highSpecs, 'intenso', '> 4 cores & > 4 GB RAM must default to intenso');
+
+            const uiRes = await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                const levels = ['suave', 'normal', 'intenso'];
+                const snapshots = {};
+                levels.forEach(lvl => {
+                    const btn = document.querySelector(`#settings-glass-intensity-group [data-glass-intensity="${lvl}"]`);
+                    btn?.click();
+                    snapshots[lvl] = {
+                        attr: document.documentElement.getAttribute('data-glass-intensity'),
+                        stored: window.StorageModule.getGlassIntensity(),
+                        pill: document.getElementById('settings-glass-pill')?.textContent?.trim(),
+                        pressed: btn?.getAttribute('aria-pressed')
+                    };
+                });
+                const suaveBtn = document.querySelector('#settings-glass-intensity-group [data-glass-intensity="suave"]');
+                suaveBtn?.click();
+                return snapshots;
+            });
+
+            helpers.assertEqual(uiRes.suave.attr, 'suave');
+            helpers.assertEqual(uiRes.suave.stored, 'suave');
+            helpers.assertEqual(uiRes.suave.pill, 'Suave');
+            helpers.assertEqual(uiRes.suave.pressed, 'true');
+            helpers.assertEqual(uiRes.intenso.attr, 'intenso');
+            helpers.assertEqual(uiRes.intenso.pill, 'Intenso');
+
+            await page.reload({ waitUntil: 'load' });
+            const persisted = await page.evaluate(() => ({
+                attr: document.documentElement.getAttribute('data-glass-intensity'),
+                stored: window.StorageModule.getGlassIntensity()
+            }));
+            helpers.assertEqual(persisted.attr, 'suave', 'Selected glass intensity must persist after reload');
+            helpers.assertEqual(persisted.stored, 'suave', 'Stored glass intensity must persist after reload');
+
+            const legacyOk = await page.evaluate(() => {
+                const legacyPayload = JSON.stringify({
+                    version: '1.5.0',
+                    subjects: [{ id: 'sub_leg_1', name: 'Física', color: '#4f46e5', days: ['lun'], startTime: '08:00', endTime: '09:00' }],
+                    tasks: [],
+                    notes: [],
+                    archivedTasks: [],
+                    archivedNotes: []
+                });
+                return window.StorageModule.importJson(legacyPayload);
+            });
+            helpers.assertTrue(legacyOk, 'Legacy backup without glassIntensity must import cleanly');
+        }
+    },
+    {
+        id: 'T2_F20_03_glass_worst_case_contrast_white_and_black',
+        feature: 'F20',
+        name: 'Liquid Glass panels, cards, nav, chips and modals meet WCAG >= 4.5:1 over worst-case #ffffff and #000000',
+        run: async (page, helpers) => {
+            const failures = await page.evaluate(() => {
+                // Seed visible content for cards, chips and modal checks
+                window.StorageModule.addSubject({
+                    id: 'sub_contrast_1',
+                    name: 'Álgebra Lineal',
+                    color: '#4f46e5',
+                    days: ['lun', 'mie'],
+                    startTime: '08:00',
+                    endTime: '10:00',
+                    classroom: 'A-12',
+                    professor: 'Dr. Gauss'
+                });
+                window.StorageModule.saveNote({
+                    id: 'note_contrast_1',
+                    title: 'Teorema Espectral',
+                    content: 'Matrices simétricas diagonales en bases ortonormales.',
+                    type: 'idea'
+                });
+
+                const parseRgba = (str) => {
+                    if (!str || str === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
+                    const m = str.match(/rgba?\(\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/i);
+                    if (!m) return null;
+                    return {
+                        r: Number(m[1]),
+                        g: Number(m[2]),
+                        b: Number(m[3]),
+                        a: m[4] !== undefined ? Number(m[4]) : 1
+                    };
+                };
+
+                const extractScrimColors = (bgImage) => {
+                    if (!bgImage || bgImage === 'none') return [];
+                    const matches = bgImage.match(/rgba?\([^)]+\)/gi) || [];
+                    return matches.map(parseRgba).filter(Boolean);
+                };
+
+                const compositeOver = (fg, bg) => {
+                    const a = Math.max(0, Math.min(1, fg.a));
+                    return {
+                        r: fg.r * a + bg.r * (1 - a),
+                        g: fg.g * a + bg.g * (1 - a),
+                        b: fg.b * a + bg.b * (1 - a),
+                        a: 1
+                    };
+                };
+
+                const relLum = ({ r, g, b }) => {
+                    const lin = (c) => {
+                        const s = c / 255;
+                        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+                    };
+                    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+                };
+
+                const contrast = (c1, c2) => {
+                    const l1 = relLum(c1);
+                    const l2 = relLum(c2);
+                    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+                };
+
+                const computeSurfaceOver = (el, baseColor) => {
+                    const cs = getComputedStyle(el);
+                    let surface = baseColor;
+                    const bgColor = parseRgba(cs.backgroundColor);
+                    if (bgColor && bgColor.a > 0) {
+                        surface = compositeOver(bgColor, surface);
+                    }
+                    const scrimStops = extractScrimColors(cs.backgroundImage);
+                    if (scrimStops.length > 0) {
+                        // Use primary protective interior stop (index 0 in radial/linear center scrim)
+                        surface = compositeOver(scrimStops[0], surface);
+                    }
+                    return surface;
+                };
+
+                const themes = [
+                    { name: 'claro', setup: () => { document.documentElement.className = ''; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'oscuro', setup: () => { document.documentElement.className = 'dark'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'mono-claro', setup: () => { document.documentElement.className = 'theme-gray'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'mono-oscuro', setup: () => { document.documentElement.className = 'dark theme-gray'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'matrix', setup: () => { document.documentElement.className = 'dark theme-matrix'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'sakura', setup: () => { document.documentElement.className = 'dark theme-sakura'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'arcade', setup: () => { document.documentElement.className = 'dark theme-arcade'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } }
+                ];
+
+                const bases = [
+                    { label: '#ffffff', rgb: { r: 255, g: 255, b: 255, a: 1 } },
+                    { label: '#000000', rgb: { r: 0, g: 0, b: 0, a: 1 } }
+                ];
+
+                const problems = [];
+
+                themes.forEach(theme => {
+                    theme.setup();
+
+                    // Inspect Notes view (header, .glass-panel, .stagger-card, active & inactive .note-filter-chip)
+                    window.OrganizadorApp?.switchView?.('notes');
+                    window.NotesModule?.render?.();
+                    const ideaChip = document.querySelector('[data-note-filter="idea"]');
+                    ideaChip?.click();
+
+                    const targets = [
+                        { label: 'header-title', container: document.querySelector('header'), textEl: document.getElementById('header-inst-name') },
+                        { label: 'glass-panel-heading', container: document.querySelector('#view-notes .glass-panel'), textEl: document.querySelector('#view-notes .glass-panel h1') },
+                        { label: 'glass-panel-muted', container: document.querySelector('#view-notes .glass-panel'), textEl: document.querySelector('#view-notes .glass-panel p') },
+                        { label: 'note-card-title', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card h3') },
+                        { label: 'note-card-body', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card p') },
+                        { label: 'chip-active', container: document.querySelector('[data-note-filter="idea"]'), textEl: document.querySelector('[data-note-filter="idea"] span:last-child') },
+                        { label: 'chip-inactive', container: document.querySelector('[data-note-filter="apunte"]'), textEl: document.querySelector('[data-note-filter="apunte"] span:last-child') }
+                    ];
+
+                    // Open subject modal for modal contrast evaluation
+                    document.getElementById('add-subject-btn')?.click();
+                    const modalDialog = document.querySelector('#subject-modal .modal-dialog');
+                    const modalTitle = document.getElementById('subject-modal-title');
+                    const modalLabel = document.querySelector('#subject-form label');
+                    targets.push(
+                        { label: 'modal-title', container: modalDialog, textEl: modalTitle },
+                        { label: 'modal-label', container: modalDialog, textEl: modalLabel }
+                    );
+
+                    targets.forEach(t => {
+                        if (!t.container || !t.textEl) return;
+                        const fg = parseRgba(getComputedStyle(t.textEl).color);
+                        if (!fg) return;
+                        bases.forEach(b => {
+                            const bg = computeSurfaceOver(t.container, b.rgb);
+                            const fgFinal = fg.a < 1 ? compositeOver(fg, bg) : fg;
+                            const ratio = contrast(fgFinal, bg);
+                            if (ratio < 4.5) {
+                                problems.push(`${theme.name}/${t.label} over ${b.label}: ${ratio.toFixed(2)}:1 (fg=${JSON.stringify(fg)}, bg=${Math.round(bg.r)},${Math.round(bg.g)},${Math.round(bg.b)})`);
+                            }
+                        });
+                    });
+
+                    document.getElementById('close-subject-modal')?.click();
+                });
+
+                document.querySelector('[data-note-filter="all"]')?.click();
+                document.documentElement.className = '';
+                document.documentElement.setAttribute('data-glass-intensity', window.StorageModule?.getGlassIntensity?.() || 'normal');
+                return problems;
+            });
+
+            helpers.assertEqual(failures.length, 0, `Worst-case WCAG contrast < 4.5:1 detected:\n${failures.join('\n')}`);
+        }
     }
 ];
 

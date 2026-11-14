@@ -56,23 +56,25 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.0-ui">
-    <link rel="stylesheet" href="css/styles.css?v=1.5.0-ui">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.0-ui-e1">
+    <link rel="stylesheet" href="css/styles.css?v=1.5.0-ui-e1">
 </head>
 <body class="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+    <!-- Capa de fondo ambiental fija para transparencia Liquid Glass -->
+    <div id="app-background" aria-hidden="true"></div>
 
     <!-- ========================================== -->
     <!-- ENCABEZADO Y BARRA SUPERIOR FLOTANTE       -->
     <!-- ========================================== -->
-    <header class="liquid-glass-nav shrink-0 sticky top-2.5 sm:top-3 z-30 mx-2.5 sm:mx-5 lg:mx-auto lg:w-[calc(100%-2.5rem)] max-w-7xl rounded-[1.5rem] bg-white/75 dark:bg-slate-900/75 border border-white/70 dark:border-white/10 transition-colors">
-        <div class="liquid-header-inner px-3 sm:px-5 lg:px-6">
+    <header class="liquid-glass-nav shrink-0 sticky top-2.5 sm:top-3 z-30 mx-2.5 sm:mx-5 lg:mx-auto lg:w-[calc(100%-2.5rem)] max-w-7xl rounded-full bg-white/75 dark:bg-slate-900/75 border border-white/70 dark:border-white/10 transition-colors">
+        <div class="liquid-header-inner px-4 sm:px-6 lg:px-7">
             <div class="flex items-center justify-between min-h-16 py-1.5 gap-2 sm:gap-3">
                 
                 <!-- Lado Izquierdo: Botón Hamburguesa + Perfil y Periodo -->
                 <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <!-- Botón Hamburguesa (Abre Sidebar Drawer) -->
                     <button type="button" id="drawer-toggle-btn"
-                        class="touch-target-44 min-w-[44px] min-h-[44px] flex items-center justify-center p-2 -ml-1 rounded-2xl text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/10 tap-effect transition-colors shrink-0"
+                        class="touch-target-44 min-w-[44px] min-h-[44px] flex items-center justify-center p-2 ml-0 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/10 tap-effect transition-colors shrink-0"
                         title="Abrir menú de navegación" aria-label="Abrir menú">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -107,7 +109,7 @@
 
                     <!-- Interruptor Rápido de Modo Oscuro / Claro (Header) -->
                     <button type="button" id="theme-toggle-btn"
-                        class="touch-target-44 min-w-[44px] min-h-[44px] p-2 sm:px-3.5 sm:py-2 rounded-2xl bg-slate-900/5 dark:bg-white/10 hover:bg-amber-500/10 dark:hover:bg-white/15 text-slate-700 dark:text-amber-400 hover:text-amber-600 tap-effect transition-colors flex items-center justify-center gap-1.5 border border-slate-900/5 dark:border-white/10"
+                        class="touch-target-44 min-w-[44px] min-h-[44px] p-2 sm:px-3.5 sm:py-2 rounded-full bg-slate-900/5 dark:bg-white/10 hover:bg-amber-500/10 dark:hover:bg-white/15 text-slate-700 dark:text-amber-400 hover:text-amber-600 tap-effect transition-colors flex items-center justify-center gap-1.5 border border-slate-900/5 dark:border-white/10"
                         title="Cambiar tema claro / oscuro" aria-label="Cambiar tema">
                         <!-- Icono Sol (se muestra en modo oscuro para cambiar a claro) -->
                         <svg id="theme-icon-sun" class="w-5 h-5 text-amber-400 transition-transform hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,29 +123,29 @@
                     </button>
 
                     <!-- Navegación Desktop y Tablet Flotante con Indicador Animado -->
-                    <nav id="desktop-nav-pill" class="hidden md:flex relative items-center gap-1 bg-slate-900/5 dark:bg-white/5 p-1 rounded-2xl border border-slate-900/5 dark:border-white/10">
+                    <nav id="desktop-nav-pill" class="hidden md:flex relative items-center gap-1 bg-slate-900/5 dark:bg-white/5 p-1 rounded-full border border-slate-900/5 dark:border-white/10">
                         <span id="desktop-nav-indicator" aria-hidden="true" class="nav-sliding-indicator"></span>
                         <button type="button" data-view-target="subjects"
-                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
+                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
                             <span>📚 Materias</span>
                             <span id="nav-sub-count" class="text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-100 dark:bg-indigo-900/60 font-bold">0</span>
                         </button>
                         <button type="button" data-view-target="tasks"
-                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
                             <span>✅ Tareas</span>
                             <span id="nav-task-count" class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200/80 dark:bg-slate-700 font-bold">0</span>
                         </button>
                         <button type="button" data-view-target="notes"
-                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
                             <span>📝 Notas</span>
                             <span id="nav-note-count" class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">0</span>
                         </button>
                         <button type="button" data-view-target="calendar"
-                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
                             <span>🗓️ Calendario</span>
                         </button>
                         <button type="button" data-view-target="archive"
-                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+                            class="nav-link-btn relative z-10 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
                             <span>🗄️ Baúl</span>
                             <span id="nav-archive-count" class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">0</span>
                         </button>
@@ -365,7 +367,7 @@
 
                 <!-- Botón CTA con Degradado Enriquecido y Efecto Hover/Touch -->
                 <button type="button" id="add-subject-btn"
-                    class="btn-gradient-subject touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm shrink-0">
+                    class="btn-gradient-subject touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-white font-bold text-sm shrink-0">
                     <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -385,7 +387,7 @@
                     Pulsa el botón para añadir la primera materia o actividad y organizar tu horario escolar.
                 </p>
                 <button type="button" id="empty-add-subject-btn"
-                    class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md">
+                    class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <span>Añadir mi primera materia</span>
                 </button>
@@ -422,13 +424,13 @@
                     <!-- Acciones de Tareas (Baúl y Nueva Tarea) -->
                     <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
                         <button type="button" data-view-target="archive"
-                            class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all border border-slate-200/60 dark:border-slate-600/60"
+                            class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all border border-slate-200/60 dark:border-slate-600/60"
                             title="Ir al Baúl de Archivados">
                             <span>🗄️</span>
                             <span class="hidden sm:inline">Baúl</span>
                         </button>
                         <button type="button" id="add-task-btn"
-                            class="btn-gradient-task touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-white font-bold text-sm transition-all flex-1 sm:flex-initial">
+                            class="btn-gradient-task touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white font-bold text-sm transition-all flex-1 sm:flex-initial">
                             <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -451,17 +453,17 @@
                     </div>
 
                     <!-- Filtro por Estado (Control segmentado estilo Apple: Todas, Pendientes, Completadas) -->
-                    <div class="sm:col-span-4 segmented-control-track flex items-center gap-1 min-w-0">
+                    <div class="sm:col-span-4 segmented-control-track rounded-full flex items-center gap-1 min-w-0">
                         <button type="button" data-task-filter="all"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-bold rounded-xl transition-all bg-indigo-600 text-white shadow-md truncate">
+                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-bold rounded-full transition-all bg-indigo-600 text-white shadow-md truncate">
                             Todas
                         </button>
                         <button type="button" data-task-filter="pending"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 transition-all truncate">
+                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-all truncate">
                             Pendientes
                         </button>
                         <button type="button" data-task-filter="completed"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 transition-all truncate">
+                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-all truncate">
                             Listas
                         </button>
                     </div>
@@ -491,7 +493,7 @@
                     No hay tareas que coincidan con los filtros seleccionados o tu lista está despejada.
                 </p>
                 <button type="button" id="empty-add-task-btn"
-                    class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md">
+                    class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <span>Crear una tarea</span>
                 </button>
@@ -528,13 +530,13 @@
                     <!-- Acciones de Notas (Baúl y Nueva Nota) -->
                     <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
                         <button type="button" data-view-target="archive"
-                            class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all border border-slate-200/60 dark:border-slate-600/60"
+                            class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all border border-slate-200/60 dark:border-slate-600/60"
                             title="Ir al Baúl de Archivados">
                             <span>🗄️</span>
                             <span class="hidden sm:inline">Baúl</span>
                         </button>
                         <button type="button" id="add-note-btn"
-                            class="btn-gradient-note touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-white font-bold text-sm transition-all flex-1 sm:flex-initial">
+                            class="btn-gradient-note touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white font-bold text-sm transition-all flex-1 sm:flex-initial">
                             <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -560,27 +562,27 @@
                     <div class="sm:col-span-7 notes-filter-scroll-wrap min-w-0">
                         <div class="notes-filter-scroll flex items-center gap-1.5 overflow-x-auto px-2 py-1 scrollbar-none">
                             <button type="button" data-note-filter="all"
-                                class="note-filter-chip note-filter-active tap-effect shrink-0 px-3.5 py-2 text-xs font-bold rounded-xl transition-transform bg-indigo-600 text-white shadow-md whitespace-nowrap">
+                                class="note-filter-chip note-filter-active tap-effect shrink-0 px-3.5 py-2 text-xs font-bold rounded-full transition-transform bg-indigo-600 text-white shadow-md whitespace-nowrap">
                                 Todas
                             </button>
                             <button type="button" data-note-filter="idea"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>💡</span> <span>Ideas</span>
                             </button>
                             <button type="button" data-note-filter="apunte"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>📝</span> <span>Apuntes</span>
                             </button>
                             <button type="button" data-note-filter="pendiente"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>📌</span> <span>Pendientes</span>
                             </button>
                             <button type="button" data-note-filter="importante"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>⚠️</span> <span>Importante</span>
                             </button>
                             <button type="button" data-note-filter="personal"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>🔒</span> <span>Personal</span>
                             </button>
                         </div>
@@ -593,7 +595,7 @@
             <aside id="notes-gallery-panel" class="glass-panel bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs space-y-3 min-w-0">
                 <div class="flex items-center justify-between gap-2">
                     <h2 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">🖼️ Galería de materiales</h2>
-                    <label for="notes-photo-input" class="touch-target-44 min-h-[44px] inline-flex items-center tap-effect cursor-pointer shrink-0 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">+ Foto</label>
+                    <label for="notes-photo-input" class="touch-target-44 min-h-[44px] inline-flex items-center tap-effect cursor-pointer shrink-0 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold">+ Foto</label>
                     <input type="file" id="notes-photo-input" accept="image/*" class="hidden">
                 </div>
                 <div id="notes-gallery-grid" class="grid grid-cols-2 gap-2 min-w-0"></div>
@@ -611,7 +613,7 @@
                     Anota rápidamente recordatorios, fórmulas, libros por leer o pendientes del semestre.
                 </p>
                 <button type="button" id="empty-add-note-btn"
-                    class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md">
+                    class="touch-target-44 min-h-[44px] tap-effect inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <span>Crear mi primera nota</span>
                 </button>
@@ -748,14 +750,14 @@
                     </div>
 
                     <!-- Pestañas de Filtrado (Control segmentado) -->
-                    <div class="segmented-control-track flex items-center gap-1 self-stretch sm:self-auto min-w-0">
-                        <button type="button" data-archive-filter="all" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-xs">
+                    <div class="segmented-control-track rounded-full flex items-center gap-1 self-stretch sm:self-auto min-w-0">
+                        <button type="button" data-archive-filter="all" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-indigo-600 text-white shadow-xs">
                             Todos
                         </button>
-                        <button type="button" data-archive-filter="tasks" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
+                        <button type="button" data-archive-filter="tasks" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
                             Tareas
                         </button>
-                        <button type="button" data-archive-filter="notes" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
+                        <button type="button" data-archive-filter="notes" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
                             Notas
                         </button>
                     </div>
@@ -969,6 +971,34 @@
                                     </div>
                                 </label>
                             </div>
+                        </div>
+
+                        <!-- Intensidad del Cristal (Liquid Glass Apple / iOS 26) -->
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0">
+                            <div class="flex items-center justify-between gap-2 flex-wrap min-w-0">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                    Intensidad del cristal
+                                </label>
+                                <span id="settings-glass-pill" class="shrink-0 text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">Intenso</span>
+                            </div>
+                            <div id="settings-glass-intensity-group" role="group" aria-label="Intensidad del cristal"
+                                class="segmented-control-track rounded-full flex items-center gap-1 min-w-0">
+                                <button type="button" data-glass-intensity="suave" aria-pressed="false"
+                                    class="glass-intensity-btn touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">
+                                    Suave
+                                </button>
+                                <button type="button" data-glass-intensity="normal" aria-pressed="false"
+                                    class="glass-intensity-btn touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">
+                                    Normal
+                                </button>
+                                <button type="button" data-glass-intensity="intenso" aria-pressed="false"
+                                    class="glass-intensity-btn touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">
+                                    Intenso
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                Ajusta la transparencia, desenfoque y reflejos especulares según el rendimiento de tu dispositivo.
+                            </p>
                         </div>
 
                         <!-- SECCIÓN DE TIPOGRAFÍAS Y FUENTES (INTEGRADA AQUÍ) -->
@@ -1483,13 +1513,13 @@
     <!-- ========================================================= -->
     <!-- BARRA INFERIOR FLOTANTE PARA MÓVILES (BOTTOM NAV)        -->
     <!-- ========================================================= -->
-    <nav id="bottom-nav" class="liquid-glass-bottom fixed inset-x-3 z-30 md:hidden rounded-[1.75rem] bg-white/80 dark:bg-slate-900/80 border border-white/70 dark:border-white/10 px-5 py-2">
+    <nav id="bottom-nav" class="liquid-glass-bottom fixed inset-x-3 z-30 md:hidden rounded-full bg-white/80 dark:bg-slate-900/80 border border-white/70 dark:border-white/10 px-6 py-2">
         <div class="bottom-nav-inner relative flex items-center justify-between max-w-sm mx-auto">
             <span id="bottom-nav-indicator" aria-hidden="true" class="nav-sliding-indicator bottom-nav-indicator"></span>
 
             <!-- 1. Lateral Izquierdo: Materias -->
             <button type="button" data-view-target="subjects"
-                class="nav-link-btn relative z-10 flex flex-col items-center justify-center py-1.5 px-4 text-xs font-bold text-slate-600 dark:text-slate-400 tap-effect rounded-2xl transition-colors">
+                class="nav-link-btn relative z-10 flex flex-col items-center justify-center py-1.5 px-4 text-xs font-bold text-slate-600 dark:text-slate-400 tap-effect rounded-full transition-colors">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
@@ -1514,7 +1544,7 @@
 
             <!-- 3. Lateral Derecho: Tareas -->
             <button type="button" data-view-target="tasks"
-                class="nav-link-btn relative z-10 flex flex-col items-center justify-center py-1.5 px-4 text-xs font-bold text-slate-600 dark:text-slate-400 tap-effect rounded-2xl transition-colors">
+                class="nav-link-btn relative z-10 flex flex-col items-center justify-center py-1.5 px-4 text-xs font-bold text-slate-600 dark:text-slate-400 tap-effect rounded-full transition-colors">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                 </svg>
@@ -2296,16 +2326,16 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/storage.js?v=1.5.0-ui"></script>
-    <script src="js/haptics.js?v=1.5.0-ui"></script>
-    <script src="js/notifications.js?v=1.5.0-ui"></script>
-    <script src="js/widgets.js?v=1.5.0-ui"></script>
-    <script src="js/subjects.js?v=1.5.0-ui"></script>
-    <script src="js/tasks.js?v=1.5.0-ui"></script>
-    <script src="js/notes.js?v=1.5.0-ui"></script>
-    <script src="js/calendar.js?v=1.5.0-ui"></script>
-    <script src="js/archive.js?v=1.5.0-ui"></script>
-    <script src="js/app.js?v=1.5.0-ui"></script>
+    <script src="js/storage.js?v=1.5.0-ui-e1"></script>
+    <script src="js/haptics.js?v=1.5.0-ui-e1"></script>
+    <script src="js/notifications.js?v=1.5.0-ui-e1"></script>
+    <script src="js/widgets.js?v=1.5.0-ui-e1"></script>
+    <script src="js/subjects.js?v=1.5.0-ui-e1"></script>
+    <script src="js/tasks.js?v=1.5.0-ui-e1"></script>
+    <script src="js/notes.js?v=1.5.0-ui-e1"></script>
+    <script src="js/calendar.js?v=1.5.0-ui-e1"></script>
+    <script src="js/archive.js?v=1.5.0-ui-e1"></script>
+    <script src="js/app.js?v=1.5.0-ui-e1"></script>
 
     <!-- Visor de fotos de la galería -->
     <div id="photo-preview-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
