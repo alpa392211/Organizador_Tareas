@@ -33,7 +33,12 @@ window.StorageModule = (() => {
         ACCOUNT_TYPE: 'org_escolar_account_type',
         LONG_PRESS: 'org_escolar_long_press_enabled_v1',
         GALLERY_PHOTOS: 'org_escolar_gallery_photos',
-        GLASS_INTENSITY: 'org_escolar_glass_intensity_v1'
+        GLASS_INTENSITY: 'org_escolar_glass_intensity_v1',
+        BACKGROUND_PRESET: 'org_escolar_background_v1',
+        BACKGROUND_ANIMATED: 'org_escolar_background_animated_v1',
+        BACKGROUND_BLUR: 'org_escolar_background_blur_v1',
+        BACKGROUND_SCRIM: 'org_escolar_background_scrim_v1',
+        BACKGROUND_FOCAL: 'org_escolar_background_focal_v1'
     };
 
     const LEGACY_KEYS = [
@@ -681,6 +686,76 @@ window.StorageModule = (() => {
             return chosen;
         },
 
+        // --- Fondos y Preferencias Visuales (sin guardar bytes de imagen en localStorage) ---
+        getBackgroundPreset() {
+            const val = (localStorage.getItem(KEYS.BACKGROUND_PRESET) || '').trim();
+            return val || 'default';
+        },
+        setBackgroundPreset(presetId) {
+            const chosen = (typeof presetId === 'string' && presetId.trim()) ? presetId.trim() : 'default';
+            localStorage.setItem(KEYS.BACKGROUND_PRESET, chosen);
+            return chosen;
+        },
+        getBackgroundAnimated() {
+            return localStorage.getItem(KEYS.BACKGROUND_ANIMATED) === 'true';
+        },
+        setBackgroundAnimated(enabled) {
+            const val = enabled === true;
+            localStorage.setItem(KEYS.BACKGROUND_ANIMATED, val ? 'true' : 'false');
+            return val;
+        },
+        getBackgroundBlur() {
+            const raw = localStorage.getItem(KEYS.BACKGROUND_BLUR);
+            const num = raw !== null ? Number(raw) : 0;
+            if (!Number.isFinite(num)) return 0;
+            return Math.min(20, Math.max(0, Math.round(num)));
+        },
+        setBackgroundBlur(px) {
+            const num = Number(px);
+            const clamped = Number.isFinite(num) ? Math.min(20, Math.max(0, Math.round(num))) : 0;
+            localStorage.setItem(KEYS.BACKGROUND_BLUR, String(clamped));
+            return clamped;
+        },
+        getBackgroundScrim() {
+            const raw = localStorage.getItem(KEYS.BACKGROUND_SCRIM);
+            const num = raw !== null ? Number(raw) : 35;
+            if (!Number.isFinite(num)) return 35;
+            return Math.min(85, Math.max(-60, Math.round(num)));
+        },
+        setBackgroundScrim(val) {
+            const num = Number(val);
+            const clamped = Number.isFinite(num) ? Math.min(85, Math.max(-60, Math.round(num))) : 35;
+            localStorage.setItem(KEYS.BACKGROUND_SCRIM, String(clamped));
+            return clamped;
+        },
+        getBackgroundFocalPoint() {
+            try {
+                const raw = localStorage.getItem(KEYS.BACKGROUND_FOCAL);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    const x = Number(parsed?.x);
+                    const y = Number(parsed?.y);
+                    return {
+                        x: Number.isFinite(x) ? Math.min(100, Math.max(0, Math.round(x * 10) / 10)) : 50,
+                        y: Number.isFinite(y) ? Math.min(100, Math.max(0, Math.round(y * 10) / 10)) : 50
+                    };
+                }
+            } catch (_) {}
+            return { x: 50, y: 50 };
+        },
+        setBackgroundFocalPoint(pt) {
+            const rawX = Number(pt?.x);
+            const rawY = Number(pt?.y);
+            const normX = Number.isFinite(rawX) ? (rawX <= 1 && rawX >= 0 && pt?._normalized ? rawX * 100 : rawX) : 50;
+            const normY = Number.isFinite(rawY) ? (rawY <= 1 && rawY >= 0 && pt?._normalized ? rawY * 100 : rawY) : 50;
+            const safe = {
+                x: Math.min(100, Math.max(0, Math.round(normX * 10) / 10)),
+                y: Math.min(100, Math.max(0, Math.round(normY * 10) / 10))
+            };
+            localStorage.setItem(KEYS.BACKGROUND_FOCAL, JSON.stringify(safe));
+            return safe;
+        },
+
         // --- Elementos Archivados (Baúl de Tareas y Notas) ---
         getArchivedTasks() {
             try {
@@ -1009,6 +1084,11 @@ window.StorageModule = (() => {
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),
                 glassIntensity: this.getGlassIntensity(),
+                backgroundPreset: this.getBackgroundPreset(),
+                backgroundAnimated: this.getBackgroundAnimated(),
+                backgroundBlur: this.getBackgroundBlur(),
+                backgroundScrim: this.getBackgroundScrim(),
+                backgroundFocal: this.getBackgroundFocalPoint(),
                 academicPeriod: this.getAcademicPeriod(),
                 academicCycle: this.getAcademicCycle(),
                 isCycleConfigured: this.isCycleConfigured(),
@@ -1047,6 +1127,11 @@ window.StorageModule = (() => {
                 if (data.theme) this.setTheme(data.theme);
                 if (data.fontFamily) this.setFontFamily(data.fontFamily);
                 if (typeof data.glassIntensity === 'string') this.setGlassIntensity(data.glassIntensity);
+                if (typeof data.backgroundPreset === 'string') this.setBackgroundPreset(data.backgroundPreset);
+                if (typeof data.backgroundAnimated === 'boolean') this.setBackgroundAnimated(data.backgroundAnimated);
+                if (typeof data.backgroundBlur === 'number') this.setBackgroundBlur(data.backgroundBlur);
+                if (typeof data.backgroundScrim === 'number') this.setBackgroundScrim(data.backgroundScrim);
+                if (data.backgroundFocal && typeof data.backgroundFocal === 'object') this.setBackgroundFocalPoint(data.backgroundFocal);
                 if (typeof data.academicPeriod === 'string') this.setAcademicPeriod(data.academicPeriod);
                 if (data.academicCycle && data.academicCycle.startDate && data.academicCycle.endDate) {
                     this.setAcademicCycle(data.academicCycle.startDate, data.academicCycle.endDate);

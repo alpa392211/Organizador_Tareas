@@ -307,6 +307,7 @@
             // 4. Inicializar y aplicar tipografía e intensidad Liquid Glass
             this.initFontFamily();
             this.initGlassIntensity();
+            window.BackgroundsModule?.init?.();
 
             // Bloqueo de orientación horizontal en teléfonos móviles (Portrait Lock)
             this.initOrientationLock();
@@ -825,6 +826,7 @@
             if (window.CalendarModule?.render) {
                 window.CalendarModule.render();
             }
+            window.BackgroundsModule?.applyBackground?.();
         }
 
         setTheme(themeMode) {
@@ -941,6 +943,7 @@
             if (window.CalendarModule?.render) {
                 window.CalendarModule.render();
             }
+            window.BackgroundsModule?.onGrayModeChanged?.(isGray);
         }
 
         applySecretFeaturesUI() {
@@ -2218,6 +2221,9 @@
                 };
             });
 
+            // 5.6 Fondo de Pantalla, Temáticos Experimentales y Mi foto (Etapa 3)
+            window.BackgroundsModule?.bindSettingsUI?.();
+
             // 6. Tipografía Mediante Botones Interactivos (5 Opciones Estándar + Desbloqueables Bóveda)
             this.syncSettingsFontButtons();
             document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]').forEach(btn => {
@@ -2372,6 +2378,8 @@
                             Storage.cleanupLegacyKeys?.();
                             this.initFontFamily();
                             this.initGlassIntensity();
+                            window.BackgroundsModule?.applyBackground?.();
+                            window.BackgroundsModule?.renderSettingsUI?.();
                             this.refreshSettingsProfileUI();
                             this.syncPeriodUI();
                             this.refreshAll();
@@ -2391,6 +2399,7 @@
                 if (confirm('¿Estás seguro de eliminar todas las materias, tareas, notas y archivados? Esta acción no se puede deshacer.')) {
                     window.TasksModule?.cancelAllNotifications?.();
                     Storage.clearAll();
+                    window.BackgroundsModule?.clearCustomPhoto?.();
                     this.refreshAll();
                     this.showToast('Todos los datos han sido eliminados.', 'info');
                     this.switchView('subjects');
@@ -2640,6 +2649,7 @@
                 } else {
                     window.StorageModule.unlockCode(codeDef.id);
                 }
+                window.BackgroundsModule?.renderSettingsUI?.();
                 window.HapticsModule?.double?.();
 
                 const lockDiv = cardContainer?.querySelector('.text-3xl');
@@ -2770,6 +2780,7 @@
                                 }
                                 this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
                             }
+                            window.BackgroundsModule?.onSpecialThemeChanged?.(isCurrentlyActive ? 'default' : codeDef.themeId);
                         }
                         if (codeDef.supportsRockets) {
                             window.StorageModule.setApolloRocketsEnabled(!isCurrentlyActive);
@@ -2977,6 +2988,7 @@
                         this.updateThemeUI('dark', false);
                         this.showToast(`✨ ${def.name} activado`, 'success');
                     }
+                    window.BackgroundsModule?.onSpecialThemeChanged?.(isCurrentlyActive ? 'default' : def.themeId);
                     this.renderVaultInventory();
                 };
             });

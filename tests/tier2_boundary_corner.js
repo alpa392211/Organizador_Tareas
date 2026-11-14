@@ -2427,6 +2427,646 @@ const tests = [
             helpers.assertTrue(ok.adjustVisible, 'Ajustar foto actual must be visible for legacy imported photo');
             helpers.assertTrue(ok.opened, 'PhotoEditorModule must open legacy 256px photo cleanly');
         }
+    },
+
+    // =========================================================================
+    // F22: Etapa 3 - Fondos Sencillos, Temáticos Experimentales y "Mi foto"
+    // =========================================================================
+    {
+        id: 'T2_F22_01_basic_mono_presets_persistence_and_json_exclusion',
+        feature: 'F22',
+        name: 'Basic and monochrome presets persist across reload and JSON backup exports lightweight preferences without photo binary',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                localStorage.setItem('org_escolar_onboarding_completed', 'true');
+                localStorage.setItem('org_escolar_cycle_configured', 'true');
+                window.OrganizadorApp?.switchView?.('settings');
+                const card = document.getElementById('settings-acc-background');
+                if (card && !card.classList.contains('open')) {
+                    card.querySelector('.settings-accordion-toggle')?.click();
+                }
+                window.BackgroundsModule?.renderSettingsUI?.();
+            });
+
+            const uiCheck = await page.evaluate(() => {
+                const notice = document.getElementById('settings-bg-privacy-notice');
+                const noticeText = notice ? notice.textContent.trim() : '';
+                document.querySelector('#settings-bg-mono-grid [data-bg-preset="mono_silver"]')?.click();
+                const monoBg = document.getElementById('app-bg-gradient')?.style.backgroundImage || '';
+                const monoPreset = window.StorageModule?.getBackgroundPreset?.();
+
+                document.querySelector('#settings-bg-basic-grid [data-bg-preset="breeze_indigo"]')?.click();
+                const indigoBg = document.getElementById('app-bg-gradient')?.style.backgroundImage || '';
+                const indigoPreset = window.StorageModule?.getBackgroundPreset?.();
+                const activeAttr = document.documentElement.getAttribute('data-bg-active');
+                const pill = document.getElementById('settings-bg-pill')?.textContent?.trim();
+
+                return { noticeText, monoBg, monoPreset, indigoBg, indigoPreset, activeAttr, pill };
+            });
+
+            helpers.assertTrue(
+                uiCheck.noticeText.includes('IndexedDB') && uiCheck.noticeText.includes('respaldos JSON'),
+                'Privacy notice must warn that photo stays in IndexedDB and is excluded from localStorage/JSON'
+            );
+            helpers.assertEqual(uiCheck.monoPreset, 'mono_silver', 'Selecting mono_silver must save preset');
+            helpers.assertTrue(uiCheck.monoBg.length > 0, 'Selecting mono_silver must populate #app-bg-gradient');
+            helpers.assertEqual(uiCheck.indigoPreset, 'breeze_indigo', 'Selecting breeze_indigo must save preset');
+            helpers.assertTrue(uiCheck.indigoBg.length > 0, 'Selecting breeze_indigo must populate #app-bg-gradient');
+            helpers.assertEqual(uiCheck.activeAttr, 'true', 'Active styled background must set data-bg-active="true"');
+            helpers.assertEqual(uiCheck.pill, 'Brisa Índigo', 'Settings accordion pill must display active preset');
+
+            await page.reload({ waitUntil: 'load' });
+            const persisted = await page.evaluate(() => ({
+                preset: window.StorageModule?.getBackgroundPreset?.(),
+                activeAttr: document.documentElement.getAttribute('data-bg-active'),
+                gradient: document.getElementById('app-bg-gradient')?.style.backgroundImage || '',
+                exported: window.StorageModule?.exportJson?.() || ''
+            }));
+
+            helpers.assertEqual(persisted.preset, 'breeze_indigo', 'Basic preset must persist after reload');
+            helpers.assertEqual(persisted.activeAttr, 'true', 'data-bg-active must persist after reload');
+            helpers.assertTrue(persisted.gradient.length > 0, '#app-bg-gradient must restore after reload');
+
+            const parsedExport = JSON.parse(persisted.exported);
+            helpers.assertEqual(parsedExport.backgroundPreset, 'breeze_indigo', 'JSON export must preserve backgroundPreset preference');
+            helpers.assertFalse(persisted.exported.includes('data:image'), 'JSON export must never embed custom background photo data');
+
+            // Legacy JSON backup without background keys must import cleanly
+            const legacyOk = await page.evaluate(() => {
+                return window.StorageModule?.importJson?.(JSON.stringify({
+                    version: '1.5.0',
+                    subjects: [],
+                    tasks: [],
+                    notes: [],
+                    events: []
+                }));
+            });
+            helpers.assertTrue(legacyOk, 'Legacy JSON without background keys must import cleanly');
+        }
+    },
+    {
+        id: 'T2_F22_02_custom_photo_indexeddb_luminance_focal_blur_scrim_and_fallback',
+        feature: 'F22',
+        name: 'Mi foto uploads proportionally via PhotoEditorModule into IndexedDB (persist), tunes luminance scrim/blur/focal point, and falls back on missing IDB',
+        run: async (page, helpers) => {
+            const os = require('os');
+            const tmpFile = path.join(os.tmpdir(), `ot_bg_photo_${Date.now()}.png`);
+            try {
+                // 2000x1000 bright landscape canvas to verify proportional maxDim=1600, quality>=0.85, and luminance scrim
+                const brightPng = await page.evaluate(() => {
+                    const c = document.createElement('canvas');
+                    c.width = 2000;
+                    c.height = 1000;
+                    const ctx = c.getContext('2d');
+                    const g = ctx.createLinearGradient(0, 0, 2000, 1000);
+                    g.addColorStop(0, '#f8fafc');
+                    g.addColorStop(1, '#e0f2fe');
+                    ctx.fillStyle = g;
+                    ctx.fillRect(0, 0, 2000, 1000);
+                    return c.toDataURL('image/png').split(',')[1];
+                });
+                fs.writeFileSync(tmpFile, Buffer.from(brightPng, 'base64'));
+
+                await page.evaluate(() => {
+                    localStorage.setItem('org_escolar_initialized_v3', 'true');
+                    window.OrganizadorApp?.switchView?.('settings');
+                    const card = document.getElementById('settings-acc-background');
+                    if (card && !card.classList.contains('open')) {
+                        card.querySelector('.settings-accordion-toggle')?.click();
+                    }
+                    window.BackgroundsModule?.renderSettingsUI?.();
+
+                    window.__persistSpyCalled = false;
+                    if (navigator.storage && typeof navigator.storage.persist === 'function') {
+                        const origPersist = navigator.storage.persist.bind(navigator.storage);
+                        navigator.storage.persist = async () => {
+                            window.__persistSpyCalled = true;
+                            try { return await origPersist(); } catch (_) { return true; }
+                        };
+                    } else if (navigator.storage) {
+                        navigator.storage.persist = async () => {
+                            window.__persistSpyCalled = true;
+                            return true;
+                        };
+                    }
+                });
+
+                const inputHandle = await page.$('#settings-bg-photo-input');
+                await inputHandle.uploadFile(tmpFile);
+
+                await page.waitForFunction(() => {
+                    const m = document.getElementById('photo-editor-modal');
+                    return m && !m.classList.contains('hidden') && m.classList.contains('active') && parseFloat(getComputedStyle(m).opacity) > 0.8 && window.PhotoEditorModule?.isOpen;
+                }, { timeout: 3000 });
+
+                await new Promise(r => setTimeout(r, 120));
+                await page.click('#photo-editor-save-btn');
+                await page.waitForFunction(() => !window.PhotoEditorModule?.isOpen && window.StorageModule?.getBackgroundPreset?.() === 'custom_photo', { timeout: 4000 });
+
+                const afterUpload = await page.evaluate(async () => {
+                    const rec = await window.BackgroundsModule?.loadCustomPhotoRecord?.(true);
+                    const dims = await new Promise(res => {
+                        if (!rec?.dataUrl) return res({ w: 0, h: 0 });
+                        const im = new Image();
+                        im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight });
+                        im.onerror = () => res({ w: 0, h: 0 });
+                        im.src = rec.dataUrl;
+                    });
+
+                    // Verify dark canvas gives noticeably lower initial scrim than bright photo
+                    const darkCanvas = document.createElement('canvas');
+                    darkCanvas.width = 64;
+                    darkCanvas.height = 64;
+                    const dCtx = darkCanvas.getContext('2d');
+                    dCtx.fillStyle = '#050814';
+                    dCtx.fillRect(0, 0, 64, 64);
+                    const darkLum = await window.BackgroundsModule.computeAverageLuminance(darkCanvas.toDataURL('image/png'));
+                    const darkScrim = window.BackgroundsModule.getRecommendedScrim(darkLum);
+
+                    // Check localStorage & exportJson do not contain any data:image payload
+                    let lsHasPhoto = false;
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const val = localStorage.getItem(localStorage.key(i)) || '';
+                        if (val.includes('data:image')) lsHasPhoto = true;
+                    }
+                    const exported = window.StorageModule?.exportJson?.() || '';
+
+                    // Test blur, scrim & focal point UI sliders
+                    const setSlider = (id, val) => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.value = String(val);
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                    };
+                    const initialBrightScrim = window.StorageModule?.getBackgroundScrim?.();
+                    setSlider('settings-bg-focal-x', 25);
+                    setSlider('settings-bg-focal-y', 75);
+                    setSlider('settings-bg-blur-range', 12);
+                    setSlider('settings-bg-scrim-range', -30);
+
+                    const photoEl = document.getElementById('app-bg-photo');
+                    const scrimEl = document.getElementById('app-bg-scrim');
+                    return {
+                        persistCalled: Boolean(window.__persistSpyCalled),
+                        hasRec: Boolean(rec && rec.dataUrl && rec.dataUrl.startsWith('data:image/jpeg')),
+                        dims,
+                        avgLum: rec?.avgLuminance ?? 0,
+                        initialBrightScrim,
+                        darkScrim,
+                        lsHasPhoto,
+                        exportHasPhoto: exported.includes('data:image'),
+                        photoSize: photoEl?.style.backgroundSize || '',
+                        photoPos: photoEl?.style.backgroundPosition || '',
+                        photoFilter: photoEl?.style.filter || '',
+                        scrimColor: scrimEl?.style.backgroundColor || ''
+                    };
+                });
+
+                helpers.assertTrue(afterUpload.persistCalled, 'navigator.storage.persist() must be invoked on Mi foto save');
+                helpers.assertTrue(afterUpload.hasRec, 'Mi foto must be stored as JPEG in IndexedDB');
+                helpers.assertEqual(afterUpload.dims.w, 1600, 'Mi foto width must cap at maxDim=1600');
+                helpers.assertEqual(afterUpload.dims.h, 800, 'Mi foto must keep uncropped proportional height (800px)');
+                helpers.assertTrue(afterUpload.initialBrightScrim > afterUpload.darkScrim, `Bright scrim (${afterUpload.initialBrightScrim}) must exceed dark scrim (${afterUpload.darkScrim})`);
+                helpers.assertFalse(afterUpload.lsHasPhoto, 'Mi foto must NEVER be saved in localStorage');
+                helpers.assertFalse(afterUpload.exportHasPhoto, 'Mi foto must NEVER be exported in JSON backups');
+                helpers.assertEqual(afterUpload.photoSize, 'cover', 'Background photo must render with background-size: cover');
+                helpers.assertEqual(afterUpload.photoPos, '25% 75%', 'Focal point controls must update backgroundPosition');
+                helpers.assertIncludes(afterUpload.photoFilter, 'blur(12px)', 'Blur slider must update backdrop filter on photo');
+                helpers.assertIncludes(afterUpload.scrimColor, '255, 255, 255', 'Negative scrim must lighten using white overlay');
+
+                // Test missing IndexedDB record & IDB error fallback without uncaught errors
+                const fallbackRes = await page.evaluate(async () => {
+                    window.BackgroundsModule._forceFailIdbForTest = true;
+                    window.BackgroundsModule._customPhotoRecord = null;
+                    window.BackgroundsModule._customPhotoLoaded = false;
+                    let threw = false;
+                    try {
+                        await window.BackgroundsModule.applyBackground();
+                    } catch (_) {
+                        threw = true;
+                    } finally {
+                        window.BackgroundsModule._forceFailIdbForTest = false;
+                    }
+                    await window.BackgroundsModule.deleteCustomPhotoRecord();
+                    return {
+                        threw,
+                        preset: window.StorageModule?.getBackgroundPreset?.(),
+                        photoHidden: document.getElementById('app-bg-photo')?.classList.contains('hidden')
+                    };
+                });
+
+                helpers.assertFalse(fallbackRes.threw, 'Missing/failing IndexedDB must never throw unhandled exceptions');
+                helpers.assertEqual(fallbackRes.preset, 'default', 'Missing IndexedDB photo must cleanly revert preset to default');
+                helpers.assertTrue(fallbackRes.photoHidden, '#app-bg-photo must be hidden after fallback to default');
+            } finally {
+                if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+            }
+        }
+    },
+    {
+        id: 'T2_F22_03_experimental_vault_auto_manual_deactivate_and_monochrome',
+        feature: 'F22',
+        name: 'Experimental backgrounds default to Automático (según tema), allow manual selection, revert on theme deactivation, and Monochrome restricts to grayscale presets',
+        run: async (page, helpers) => {
+            const res = await page.evaluate(() => {
+                const Storage = window.StorageModule;
+                const Bg = window.BackgroundsModule;
+                Storage.unlockCode('MATRIX99');
+                Storage.unlockCode('ZENPEACE');
+                Storage.setActiveSpecialTheme('default');
+                Storage.setBackgroundPreset('vault_auto');
+                Bg.renderSettingsUI();
+
+                const expSection = document.getElementById('settings-bg-experimental-section');
+                const expVisible = Boolean(expSection && !expSection.classList.contains('hidden'));
+                const hasExpBadge = Boolean(expSection && expSection.textContent.includes('Experimental'));
+                const autoBtn = document.querySelector('#settings-bg-experimental-grid [data-bg-preset="vault_auto"]');
+                const autoPressedInitially = autoBtn?.getAttribute('aria-pressed') === 'true';
+
+                // Activate Matrix Vault theme -> vault_auto must resolve to theme_matrix
+                Storage.setActiveSpecialTheme('matrix');
+                document.documentElement.classList.add('dark', 'theme-matrix');
+                Bg.onSpecialThemeChanged('matrix');
+                const resolvedMatrix = Bg.resolveEffectiveBackgroundId();
+                const domPresetMatrix = document.documentElement.getAttribute('data-bg-preset');
+
+                // Switch manually to theme_sakura
+                document.querySelector('#settings-bg-experimental-grid [data-bg-preset="theme_sakura"]')?.click();
+                const manualPreset = Storage.getBackgroundPreset();
+                const manualEffective = Bg.resolveEffectiveBackgroundId();
+
+                // Deactivate Vault theme -> must revert thematic preset back to simple default
+                Storage.setActiveSpecialTheme('default');
+                document.documentElement.classList.remove('theme-matrix', 'dark');
+                Bg.onSpecialThemeChanged('default');
+                const revertedAfterDeactivate = Storage.getBackgroundPreset();
+
+                // Select colorful preset then activate Monochrome -> must force default & disable non-gray
+                Storage.setBackgroundPreset('breeze_indigo');
+                Bg.applyBackground();
+                window.OrganizadorApp.applyGrayMode(true);
+                const monoForcedPreset = Storage.getBackgroundPreset();
+                const bgFilter = getComputedStyle(document.getElementById('app-background')).filter || '';
+                const indigoDisabled = document.querySelector('#settings-bg-basic-grid [data-bg-preset="breeze_indigo"]')?.disabled === true;
+                const uploadDisabled = document.getElementById('settings-bg-photo-upload-btn')?.disabled === true;
+
+                // Selecting mono_titanium inside Monochrome must remain allowed
+                const monoBtn = document.querySelector('#settings-bg-mono-grid [data-bg-preset="mono_titanium"]');
+                const monoDisabled = monoBtn?.disabled === true;
+                monoBtn?.click();
+                const chosenMonoPreset = Storage.getBackgroundPreset();
+
+                // Cleanup
+                window.OrganizadorApp.applyGrayMode(false);
+                Storage.setBackgroundPreset('default');
+                Bg.applyBackground();
+
+                return {
+                    expVisible,
+                    hasExpBadge,
+                    autoPressedInitially,
+                    resolvedMatrix,
+                    domPresetMatrix,
+                    manualPreset,
+                    manualEffective,
+                    revertedAfterDeactivate,
+                    monoForcedPreset,
+                    bgFilter,
+                    indigoDisabled,
+                    uploadDisabled,
+                    monoDisabled,
+                    chosenMonoPreset
+                };
+            });
+
+            helpers.assertTrue(res.expVisible, 'Experimental background section must appear when Vault themes are unlocked');
+            helpers.assertTrue(res.hasExpBadge, 'Experimental section must display Experimental badge');
+            helpers.assertTrue(res.autoPressedInitially, 'Automático (según tema) must be selected as Experimental default');
+            helpers.assertEqual(res.resolvedMatrix, 'theme_matrix', 'vault_auto must follow active Matrix Vault theme');
+            helpers.assertEqual(res.domPresetMatrix, 'theme_matrix', 'DOM data-bg-preset must reflect theme_matrix');
+            helpers.assertEqual(res.manualPreset, 'theme_sakura', 'Manual thematic background selection must update stored preset');
+            helpers.assertEqual(res.manualEffective, 'theme_sakura', 'Manual thematic background selection must render');
+            helpers.assertEqual(res.revertedAfterDeactivate, 'default', 'Deactivating Vault theme must revert thematic background to simple default');
+            helpers.assertEqual(res.monoForcedPreset, 'default', 'Enabling Monochrome must replace colorful preset with default');
+            helpers.assertIncludes(res.bgFilter, 'grayscale(1)', '#app-background must apply grayscale(1) filter in Monochrome mode');
+            helpers.assertTrue(res.indigoDisabled, 'Colorful presets must be disabled in Monochrome mode');
+            helpers.assertTrue(res.uploadDisabled, 'Mi foto upload must be disabled in Monochrome mode');
+            helpers.assertFalse(res.monoDisabled, 'Grayscale presets must remain enabled in Monochrome mode');
+            helpers.assertEqual(res.chosenMonoPreset, 'mono_titanium', 'Grayscale preset mono_titanium must be selectable in Monochrome mode');
+        }
+    },
+    {
+        id: 'T2_F22_04_animation_static_default_fps_visibility_reduced_motion_and_degrade',
+        feature: 'F22',
+        name: 'Animated backgrounds are static by default, lower nav blur (~16px), pause on visibilitychange, and degrade cleanly on reduced-motion & slow hardware',
+        run: async (page, helpers) => {
+            // Ensure neutral hardware & reduced-motion state first
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+            const initRes = await page.evaluate(() => {
+                const origCoresDesc = Object.getOwnPropertyDescriptor(Navigator.prototype, 'hardwareConcurrency');
+                Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => 8 });
+                try {
+                    const defaultAnimated = window.StorageModule.getBackgroundAnimated();
+                    const initialRunning = document.documentElement.classList.contains('animated-bg-running');
+                    const toggle = document.getElementById('settings-bg-animate-toggle');
+                    const initialChecked = Boolean(toggle?.checked);
+
+                    window.StorageModule.setBackgroundPreset('breeze_indigo');
+                    window.BackgroundsModule.isDegraded = false;
+                    if (toggle) {
+                        toggle.checked = true;
+                        toggle.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+
+                    const runningWhenEnabled = document.documentElement.classList.contains('animated-bg-running');
+                    const rafActive = window.BackgroundsModule._rafId !== null;
+                    const navBlurVar = getComputedStyle(document.documentElement).getPropertyValue('--lg-blur-nav').trim();
+                    const navFilter = getComputedStyle(document.getElementById('bottom-nav')).backdropFilter || getComputedStyle(document.getElementById('bottom-nav')).webkitBackdropFilter || '';
+
+                    // Simulate visibilitychange hidden -> must pause rAF
+                    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+                    document.dispatchEvent(new Event('visibilitychange'));
+                    const rafWhileHidden = window.BackgroundsModule._rafId;
+                    const runningWhileHidden = document.documentElement.classList.contains('animated-bg-running');
+
+                    // Restore visible -> must resume
+                    delete document.hidden;
+                    document.dispatchEvent(new Event('visibilitychange'));
+                    const rafAfterVisible = window.BackgroundsModule._rafId !== null;
+
+                    return {
+                        defaultAnimated,
+                        initialRunning,
+                        initialChecked,
+                        runningWhenEnabled,
+                        rafActive,
+                        navBlurVar,
+                        navFilter,
+                        rafWhileHidden,
+                        runningWhileHidden,
+                        rafAfterVisible
+                    };
+                } finally {
+                    delete document.hidden;
+                    delete navigator.hardwareConcurrency;
+                    if (origCoresDesc) Object.defineProperty(Navigator.prototype, 'hardwareConcurrency', origCoresDesc);
+                }
+            });
+
+            helpers.assertFalse(initRes.defaultAnimated, 'Background animation must be OFF (static) by default');
+            helpers.assertFalse(initRes.initialRunning, 'animated-bg-running must be absent by default');
+            helpers.assertFalse(initRes.initialChecked, 'Animar fondo switch must be unchecked by default');
+            helpers.assertTrue(initRes.runningWhenEnabled, 'Enabling Animar fondo must activate animated-bg-running');
+            helpers.assertTrue(initRes.rafActive, 'Enabling Animar fondo must start rAF loop');
+            helpers.assertEqual(initRes.navBlurVar, '16px', '--lg-blur-nav must reduce to 16px while animated background runs');
+            helpers.assertIncludes(initRes.navFilter, 'blur(16px)', 'Nav backdrop-filter must drop to blur(16px) during animated background');
+            helpers.assertEqual(initRes.rafWhileHidden, null, 'visibilitychange (hidden) must cancel rAF loop');
+            helpers.assertFalse(initRes.runningWhileHidden, 'visibilitychange (hidden) must clear animated-bg-running');
+            helpers.assertTrue(initRes.rafAfterVisible, 'visibilitychange (visible) must resume rAF loop');
+
+            const fpsCount = await page.evaluate(async () => {
+                const origDraw = window.BackgroundsModule._drawFrame.bind(window.BackgroundsModule);
+                let count = 0;
+                window.BackgroundsModule._drawFrame = (...args) => {
+                    count++;
+                    return origDraw(...args);
+                };
+                await new Promise(r => setTimeout(r, 250));
+                window.BackgroundsModule._drawFrame = origDraw;
+                return count;
+            });
+            helpers.assertTrue(fpsCount <= 10, `Animated background must cap <= 30 FPS (~7-8 frames in 250ms, got ${fpsCount})`);
+
+            // Test prefers-reduced-motion pause
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+            const reducedRes = await page.evaluate(() => {
+                window.BackgroundsModule.applyBackground();
+                const notice = document.getElementById('settings-bg-perf-notice');
+                return {
+                    running: document.documentElement.classList.contains('animated-bg-running'),
+                    rafId: window.BackgroundsModule._rafId,
+                    noticeVisible: Boolean(notice && !notice.classList.contains('hidden'))
+                };
+            });
+            helpers.assertFalse(reducedRes.running, 'prefers-reduced-motion must pause animated background');
+            helpers.assertEqual(reducedRes.rafId, null, 'prefers-reduced-motion must keep rAF stopped');
+            helpers.assertTrue(reducedRes.noticeVisible, 'prefers-reduced-motion must display performance/accessibility notice');
+
+            // Test slow hardware degradation (<= 2 cores) and reset cleanly
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+            const slowRes = await page.evaluate(() => {
+                const origCoresDesc = Object.getOwnPropertyDescriptor(Navigator.prototype, 'hardwareConcurrency');
+                Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => 2 });
+                try {
+                    window.BackgroundsModule.isDegraded = false;
+                    window.BackgroundsModule.applyBackground();
+                    const notice = document.getElementById('settings-bg-perf-notice');
+                    const out = {
+                        isDegraded: window.BackgroundsModule.isDegraded,
+                        running: document.documentElement.classList.contains('animated-bg-running'),
+                        noticeVisible: Boolean(notice && !notice.classList.contains('hidden'))
+                    };
+                    // Restore static default
+                    window.StorageModule.setBackgroundAnimated(false);
+                    window.StorageModule.setBackgroundPreset('default');
+                    window.BackgroundsModule.isDegraded = false;
+                    window.BackgroundsModule.applyBackground();
+                    return out;
+                } finally {
+                    delete navigator.hardwareConcurrency;
+                    if (origCoresDesc) Object.defineProperty(Navigator.prototype, 'hardwareConcurrency', origCoresDesc);
+                }
+            });
+
+            helpers.assertTrue(slowRes.isDegraded, 'hardwareConcurrency <= 2 must degrade animated background to static');
+            helpers.assertFalse(slowRes.running, 'Degraded low-core device must not run animated background');
+            helpers.assertTrue(slowRes.noticeVisible, 'Degradation notice must be visible');
+        }
+    },
+    {
+        id: 'T2_F22_05_etapa3_contrast_worst_case_and_mobile_overflow',
+        feature: 'F22',
+        name: 'Thematic backgrounds and Mi foto meet WCAG >= 4.5:1 worst-case contrast over #ffffff/#000000 and 0px overflow at 320/360/430px',
+        run: async (page, helpers) => {
+            const contrastFailures = await page.evaluate(async () => {
+                // Seed a bright test photo in IndexedDB for Mi foto Claro/Oscuro checks
+                const c = document.createElement('canvas');
+                c.width = 160;
+                c.height = 90;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, 160, 90);
+                await window.BackgroundsModule.saveCustomPhotoFromDataUrl(c.toDataURL('image/jpeg', 0.9), { x: 50, y: 50 });
+
+                window.StorageModule.addSubject({
+                    id: 'sub_bg_contrast_1',
+                    name: 'Cálculo Vectorial',
+                    color: '#4f46e5',
+                    days: ['lun', 'jue'],
+                    startTime: '09:00',
+                    endTime: '11:00'
+                });
+                window.StorageModule.saveNote({
+                    id: 'note_bg_contrast_1',
+                    title: 'Gradientes',
+                    content: 'Divergencia y rotacional en R3.',
+                    type: 'idea'
+                });
+
+                const _colorCanvas = document.createElement('canvas');
+                _colorCanvas.width = 1;
+                _colorCanvas.height = 1;
+                const _colorCtx = _colorCanvas.getContext('2d', { willReadFrequently: true });
+                const parseRgba = (str) => {
+                    if (!str || str === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
+                    const m = str.match(/rgba?\(\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/i);
+                    if (m) {
+                        return { r: Number(m[1]), g: Number(m[2]), b: Number(m[3]), a: m[4] !== undefined ? Number(m[4]) : 1 };
+                    }
+                    try {
+                        _colorCtx.clearRect(0, 0, 1, 1);
+                        _colorCtx.fillStyle = str;
+                        _colorCtx.fillRect(0, 0, 1, 1);
+                        const d = _colorCtx.getImageData(0, 0, 1, 1).data;
+                        return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
+                    } catch (_) {
+                        return null;
+                    }
+                };
+                const extractScrimColors = (bgImage) => {
+                    if (!bgImage || bgImage === 'none') return [];
+                    return (bgImage.match(/rgba?\([^)]+\)/gi) || []).map(parseRgba).filter(Boolean);
+                };
+                const compositeOver = (fg, bg) => {
+                    const a = Math.max(0, Math.min(1, fg.a));
+                    return { r: fg.r * a + bg.r * (1 - a), g: fg.g * a + bg.g * (1 - a), b: fg.b * a + bg.b * (1 - a), a: 1 };
+                };
+                const relLum = ({ r, g, b }) => {
+                    const lin = (v) => {
+                        const s = v / 255;
+                        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+                    };
+                    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+                };
+                const contrast = (c1, c2) => {
+                    const l1 = relLum(c1);
+                    const l2 = relLum(c2);
+                    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+                };
+                const computeSurfaceOver = (el, baseColor) => {
+                    const cs = getComputedStyle(el);
+                    let surface = baseColor;
+                    const bgColor = parseRgba(cs.backgroundColor);
+                    if (bgColor && bgColor.a > 0) surface = compositeOver(bgColor, surface);
+                    const stops = extractScrimColors(cs.backgroundImage);
+                    if (stops.length > 0) surface = compositeOver(stops[0], surface);
+                    return surface;
+                };
+
+                const scenarios = [
+                    { name: 'mifoto-claro', cls: '', bgPreset: 'custom_photo' },
+                    { name: 'mifoto-oscuro', cls: 'dark', bgPreset: 'custom_photo' },
+                    { name: 'matrix', cls: 'dark theme-matrix', bgPreset: 'theme_matrix' },
+                    { name: 'sakura', cls: 'dark theme-sakura', bgPreset: 'theme_sakura' },
+                    { name: 'synthwave', cls: 'dark theme-synthwave', bgPreset: 'theme_synthwave' },
+                    { name: 'coffee', cls: 'dark theme-coffee', bgPreset: 'theme_coffee' }
+                ];
+                const bases = [
+                    { label: '#ffffff', rgb: { r: 255, g: 255, b: 255, a: 1 } },
+                    { label: '#000000', rgb: { r: 0, g: 0, b: 0, a: 1 } }
+                ];
+                const problems = [];
+
+                for (const sc of scenarios) {
+                    document.documentElement.className = sc.cls;
+                    document.documentElement.setAttribute('data-glass-intensity', 'intenso');
+                    window.StorageModule.setBackgroundPreset(sc.bgPreset);
+                    await window.BackgroundsModule.applyBackground();
+
+                    window.OrganizadorApp?.switchView?.('notes');
+                    window.NotesModule?.render?.();
+                    document.querySelector('[data-note-filter="idea"]')?.click();
+
+                    const targets = [
+                        { label: 'header-title', container: document.querySelector('header'), textEl: document.getElementById('header-inst-name') },
+                        { label: 'glass-panel-heading', container: document.querySelector('#view-notes .glass-panel'), textEl: document.querySelector('#view-notes .glass-panel h1') },
+                        { label: 'note-card-title', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card h3') },
+                        { label: 'note-card-body', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card p') },
+                        { label: 'chip-active', container: document.querySelector('[data-note-filter="idea"]'), textEl: document.querySelector('[data-note-filter="idea"] span:last-child') },
+                        { label: 'chip-inactive', container: document.querySelector('[data-note-filter="apunte"]'), textEl: document.querySelector('[data-note-filter="apunte"] span:last-child') }
+                    ];
+
+                    targets.forEach(t => {
+                        if (!t.container || !t.textEl) return;
+                        const fg = parseRgba(getComputedStyle(t.textEl).color);
+                        if (!fg) return;
+                        bases.forEach(b => {
+                            const bg = computeSurfaceOver(t.container, b.rgb);
+                            const fgFinal = fg.a < 1 ? compositeOver(fg, bg) : fg;
+                            const ratio = contrast(fgFinal, bg);
+                            if (ratio < 4.5) {
+                                problems.push(`${sc.name}/${t.label} over ${b.label}: ${ratio.toFixed(2)}:1`);
+                            }
+                        });
+                    });
+
+                    // Check settings preset card text over active background
+                    window.OrganizadorApp?.switchView?.('settings');
+                    const cardAcc = document.getElementById('settings-acc-background');
+                    if (cardAcc) cardAcc.classList.add('open');
+                    window.BackgroundsModule.renderSettingsUI();
+                    const presetBtn = document.querySelector('#settings-bg-basic-grid .bg-preset-card');
+                    const presetText = presetBtn?.querySelector('span:last-child');
+                    if (presetBtn && presetText) {
+                        const fg = parseRgba(getComputedStyle(presetText).color);
+                        bases.forEach(b => {
+                            const bg = computeSurfaceOver(presetBtn, b.rgb);
+                            const ratio = contrast(fg.a < 1 ? compositeOver(fg, bg) : fg, bg);
+                            if (ratio < 4.5) {
+                                problems.push(`${sc.name}/bg-preset-card over ${b.label}: ${ratio.toFixed(2)}:1`);
+                            }
+                        });
+                    }
+                }
+
+                // Restore clean state after checking mobile overflow with custom_photo open
+                return problems;
+            });
+
+            helpers.assertEqual(contrastFailures.length, 0, `WCAG contrast < 4.5:1 over worst-case #ffffff/#000000:\n${contrastFailures.join('\n')}`);
+
+            // Check 0px horizontal overflow at 320, 360 and 430px with Settings > Fondo open + Mi foto controls visible
+            const overflowFailures = [];
+            for (const w of [320, 360, 430]) {
+                await page.setViewport({ width: w, height: 800, deviceScaleFactor: 2 });
+                for (const viewName of ['settings', 'subjects', 'tasks', 'notes', 'calendar']) {
+                    const ov = await page.evaluate((v) => {
+                        window.OrganizadorApp?.switchView?.(v);
+                        if (v === 'settings') {
+                            const acc = document.getElementById('settings-acc-background');
+                            if (acc) acc.classList.add('open');
+                            window.BackgroundsModule?.renderSettingsUI?.();
+                        }
+                        return { sw: document.documentElement.scrollWidth, iw: window.innerWidth };
+                    }, viewName);
+                    if (ov.sw > ov.iw) {
+                        overflowFailures.push(`w=${w} view=${viewName}: scrollWidth=${ov.sw} > innerWidth=${ov.iw}`);
+                    }
+                }
+            }
+
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+            await page.evaluate(async () => {
+                document.querySelector('[data-note-filter="all"]')?.click();
+                document.documentElement.className = '';
+                document.documentElement.setAttribute('data-glass-intensity', window.StorageModule?.getGlassIntensity?.() || 'normal');
+                window.StorageModule?.setBackgroundPreset?.('default');
+                await window.BackgroundsModule?.clearCustomPhoto?.();
+            });
+
+            helpers.assertEqual(overflowFailures.length, 0, `Mobile horizontal overflow detected: ${overflowFailures.join('; ')}`);
+        }
     }
 ];
 

@@ -3,7 +3,7 @@
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.5.1-e2';
+const CACHE_NAME = 'organizador-tareas-cache-v1.5.1-e3';
 
 const PRECACHE_ASSETS = [
     './',
@@ -15,20 +15,21 @@ const PRECACHE_ASSETS = [
     './assets/fonts/inter-latin-opsz-normal.woff2',
     './assets/fonts/inter-latin-ext-opsz-normal.woff2',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.5.0-ui-e2',
-    './css/styles.css?v=1.5.0-ui-e2',
+    './css/tailwind.min.css?v=1.5.0-ui-e3',
+    './css/styles.css?v=1.5.0-ui-e3',
     // JavaScript application modules
-    './js/storage.js?v=1.5.0-ui-e2',
-    './js/haptics.js?v=1.5.0-ui-e2',
-    './js/notifications.js?v=1.5.0-ui-e2',
-    './js/widgets.js?v=1.5.0-ui-e2',
-    './js/subjects.js?v=1.5.0-ui-e2',
-    './js/tasks.js?v=1.5.0-ui-e2',
-    './js/notes.js?v=1.5.0-ui-e2',
-    './js/calendar.js?v=1.5.0-ui-e2',
-    './js/archive.js?v=1.5.0-ui-e2',
-    './js/photo-editor.js?v=1.5.0-ui-e2',
-    './js/app.js?v=1.5.0-ui-e2',
+    './js/storage.js?v=1.5.0-ui-e3',
+    './js/haptics.js?v=1.5.0-ui-e3',
+    './js/notifications.js?v=1.5.0-ui-e3',
+    './js/widgets.js?v=1.5.0-ui-e3',
+    './js/subjects.js?v=1.5.0-ui-e3',
+    './js/tasks.js?v=1.5.0-ui-e3',
+    './js/notes.js?v=1.5.0-ui-e3',
+    './js/calendar.js?v=1.5.0-ui-e3',
+    './js/archive.js?v=1.5.0-ui-e3',
+    './js/photo-editor.js?v=1.5.0-ui-e3',
+    './js/backgrounds.js?v=1.5.0-ui-e3',
+    './js/app.js?v=1.5.0-ui-e3',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',

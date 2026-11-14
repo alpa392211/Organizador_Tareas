@@ -50,17 +50,18 @@ const tests = [
     {
         id: 'T1_F01_04_sw_cache_name_and_assets',
         feature: 'F01',
-        name: 'sw.js specifies v1.5.1-e2 cache identifier',
+        name: 'sw.js specifies v1.5.1-e3 cache identifier and precaches backgrounds.js',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const swCode = fs.readFileSync(swPath, 'utf8');
             const htmlCode = fs.readFileSync(htmlPath, 'utf8');
-            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.5.1-e2');
-            helpers.assertTrue(hasTargetCache, 'sw.js must specify v1.5.1-e2 cache name');
-            helpers.assertTrue(swCode.includes('?v=1.5.0-ui-e2'), 'sw.js precache assets must use -e2 query parameter');
-            helpers.assertTrue(htmlCode.includes('?v=1.5.0-ui-e2'), 'index.html assets must use -e2 query parameter');
+            const hasTargetCache = swCode.includes('organizador-tareas-cache-v1.5.1-e3');
+            helpers.assertTrue(hasTargetCache, 'sw.js must specify v1.5.1-e3 cache name');
+            helpers.assertTrue(swCode.includes('?v=1.5.0-ui-e3'), 'sw.js precache assets must use -e3 query parameter');
+            helpers.assertTrue(htmlCode.includes('?v=1.5.0-ui-e3'), 'index.html assets must use -e3 query parameter');
             helpers.assertTrue(swCode.includes('js/photo-editor.js'), 'sw.js must precache js/photo-editor.js');
+            helpers.assertTrue(swCode.includes('js/backgrounds.js'), 'sw.js must precache js/backgrounds.js');
         }
     },
     {

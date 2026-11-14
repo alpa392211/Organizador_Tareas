@@ -435,8 +435,12 @@
 
         getState() {
             const metrics = this._computeMetrics();
-            const focalX = metrics.drawnW > 0 ? Math.min(1, Math.max(0, 0.5 - this.state.offsetX / metrics.drawnW)) : 0.5;
-            const focalY = metrics.drawnH > 0 ? Math.min(1, Math.max(0, 0.5 - this.state.offsetY / metrics.drawnH)) : 0.5;
+            const focalX = metrics.maxOffsetX > 0.5
+                ? Math.min(1, Math.max(0, 0.5 - this.state.offsetX / (2 * metrics.maxOffsetX)))
+                : 0.5;
+            const focalY = metrics.maxOffsetY > 0.5
+                ? Math.min(1, Math.max(0, 0.5 - this.state.offsetY / (2 * metrics.maxOffsetY)))
+                : 0.5;
             return {
                 zoom: this.state.zoom,
                 rotation: this.state.rotation,
@@ -680,6 +684,19 @@
             document.body.classList.add('overflow-hidden');
 
             this._measureViewport();
+            if (this.options.initialFocalPoint && typeof this.options.initialFocalPoint === 'object') {
+                const rawFx = Number(this.options.initialFocalPoint.x);
+                const rawFy = Number(this.options.initialFocalPoint.y);
+                const fx = Number.isFinite(rawFx) ? (rawFx > 1 ? rawFx / 100 : rawFx) : 0.5;
+                const fy = Number.isFinite(rawFy) ? (rawFy > 1 ? rawFy / 100 : rawFy) : 0.5;
+                const metrics = this._computeMetrics();
+                if (metrics.maxOffsetX > 0.5) {
+                    this.state.offsetX = (0.5 - Math.min(1, Math.max(0, fx))) * 2 * metrics.maxOffsetX;
+                }
+                if (metrics.maxOffsetY > 0.5) {
+                    this.state.offsetY = (0.5 - Math.min(1, Math.max(0, fy))) * 2 * metrics.maxOffsetY;
+                }
+            }
             this._clampState();
             this._render();
 

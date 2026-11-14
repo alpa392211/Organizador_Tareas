@@ -204,11 +204,11 @@ body {
     transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth);
 }
 
-/* Capa ambiental fija detrás del contenido (#app-background) con manchas difusas suaves */
+/* Capa ambiental fija detrás del contenido (#app-background, z-index 0 sobre body y bajo main) */
 #app-background {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
     overflow: hidden;
     background-color: transparent;
@@ -217,6 +217,30 @@ body {
         radial-gradient(44vw 34vh at 86% 18%, rgba(245, 158, 11, 0.16) 0%, rgba(245, 158, 11, 0.04) 52%, transparent 78%),
         radial-gradient(52vw 40vh at 48% 92%, rgba(129, 140, 248, 0.18) 0%, rgba(14, 165, 233, 0.05) 54%, transparent 80%);
     transition: background-image 0.35s var(--ease-smooth), opacity 0.3s var(--ease-smooth);
+}
+.app-bg-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+#app-bg-gradient {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+#app-bg-photo {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    transition: background-position 0.12s var(--ease-smooth), filter 0.15s linear;
+}
+#app-bg-scrim {
+    transition: background-color 0.15s linear;
+}
+html.theme-gray #app-background {
+    filter: grayscale(1);
 }
 
 html.dark #app-background {
@@ -303,6 +327,10 @@ html.theme-starlight #app-background {
 }
 
 /* Contenedores principales sin fondo sólido para dejar respirar el fondo activo */
+main {
+    position: relative;
+    z-index: 10;
+}
 main,
 section.view-transition,
 #subjects-grid,
@@ -835,7 +863,9 @@ section.hidden, .modal-overlay.hidden {
 }
 
 /* Reducción dinámica de blur cuando haya fondo animado */
-html.animated-bg-running {
+html.animated-bg-running,
+html.animated-bg-running[data-glass-intensity="intenso"],
+html.animated-bg-running[data-glass-intensity="normal"] {
     --lg-blur-nav: 16px;
     --lg-blur-panel: 14px;
 }
@@ -2501,9 +2531,9 @@ html body #vault-reveal-modal .modal-dialog {
     transition: transform 0.18s var(--ease-apple-spring), box-shadow 0.2s var(--ease-smooth);
 }
 html.dark .note-filter-chip {
-    color: #e2e8f0;
-    background-color: rgba(30, 41, 59, 0.85);
-    border-color: rgba(255, 255, 255, 0.10);
+    color: #f8fafc;
+    background-color: rgba(15, 23, 42, 0.88);
+    border-color: rgba(255, 255, 255, 0.14);
 }
 .note-filter-chip > span {
     color: inherit;
@@ -2851,4 +2881,81 @@ html.dark .modal-sheet-grabber-bar {
 #photo-editor-zoom {
     accent-color: var(--primary, #4F46E5);
 }
+
+/* ========================================================
+   ETAPA 3: FONDOS, PUNTO FOCAL Y PROTECCIÓN DE CONTRASTE
+   ======================================================== */
+.bg-preset-card {
+    box-shadow: var(--shadow-glass-sm);
+}
+.bg-preset-card.bg-preset-active {
+    box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.35);
+}
+html.dark .bg-preset-card,
+html[class*="theme-"]:not(.theme-gray) .bg-preset-card {
+    background-color: rgba(15, 23, 42, 0.86) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    color: #f8fafc !important;
+}
+html.dark .bg-preset-card.bg-preset-active,
+html[class*="theme-"]:not(.theme-gray) .bg-preset-card.bg-preset-active {
+    border-color: rgba(129, 140, 248, 0.85) !important;
+    background-color: rgba(30, 41, 59, 0.94) !important;
+}
+html:not(.dark)[data-bg-active="true"] .bg-preset-card {
+    background-color: rgba(255, 255, 255, 0.90) !important;
+    color: #0f172a !important;
+}
+
+#settings-bg-focal-preview {
+    background-color: #0f172a;
+    background-repeat: no-repeat;
+    touch-action: manipulation;
+}
+#settings-bg-focal-dot {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    border: 2.5px solid #ffffff;
+    background: rgba(79, 70, 229, 0.88);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(15, 23, 42, 0.45);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: left 0.1s linear, top 0.1s linear;
+}
+#settings-bg-blur-range,
+#settings-bg-scrim-range,
+#settings-bg-focal-x,
+#settings-bg-focal-y {
+    accent-color: var(--primary, #4F46E5);
+}
+
+/* Protección WCAG >= 4.5:1 sobre fondos activos ("Mi foto", gradientes y temáticos) */
+html:not(.dark):not([class*="theme-"])[data-bg-active="true"] {
+    --lg-nav-scrim: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.58) 76%, rgba(255, 255, 255, 0.36) 100%);
+    --lg-panel-scrim: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.60) 76%, rgba(255, 255, 255, 0.40) 100%);
+    --lg-card-scrim: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.48) 100%);
+    --lg-modal-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.78) 100%);
+}
+html:not(.dark)[data-bg-active="true"] .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
+    background-color: rgba(248, 250, 252, 0.94) !important;
+    color: #0f172a !important;
+}
+html.dark[data-bg-active="true"] {
+    --lg-nav-scrim: radial-gradient(ellipse at 50% 50%, rgba(11, 17, 32, 0.86) 0%, rgba(15, 23, 42, 0.62) 76%, rgba(15, 23, 42, 0.42) 100%);
+    --lg-panel-scrim: radial-gradient(ellipse at 50% 50%, rgba(11, 17, 32, 0.84) 0%, rgba(15, 23, 42, 0.60) 76%, rgba(15, 23, 42, 0.40) 100%);
+    --lg-card-scrim: radial-gradient(ellipse at 50% 55%, rgba(11, 17, 32, 0.84) 0%, rgba(18, 27, 48, 0.60) 76%, rgba(18, 27, 48, 0.40) 100%);
+    --lg-modal-scrim: linear-gradient(180deg, rgba(11, 17, 32, 0.88) 0%, rgba(15, 23, 42, 0.78) 100%);
+}
+html.dark[data-bg-active="true"] .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
+    background-color: rgba(15, 23, 42, 0.90) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+html.dark[data-bg-active="true"] .text-slate-500,
+html.dark[data-bg-active="true"] .text-slate-400 {
+    color: #cbd5e1;
+}
+
 
