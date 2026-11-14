@@ -1365,6 +1365,7 @@
                 else if (id === 'archive-confirm-modal') document.getElementById('archive-cancel-btn')?.click();
                 else if (id === 'changelog-modal') document.getElementById('changelog-confirm-btn')?.click();
                 else if (id === 'note-unlock-modal') document.getElementById('note-unlock-cancel')?.click();
+                else if (id === 'photo-editor-modal') window.PhotoEditorModule?.cancel?.();
                 else if (overlay) {
                     overlay.classList.remove('active');
                     setTimeout(() => {
@@ -1483,8 +1484,53 @@
         /* ========================================================
            GESTIÓN DE FOTO DE PERFIL (REUTILIZABLE: INICIO + AJUSTES)
            ======================================================== */
-        downsampleAndSaveProfilePhoto(file, onSaved) {
+        applySavedProfilePhoto(dataUrl, originalSrc, onSaved) {
             const Storage = window.StorageModule;
+            try {
+                Storage?.setUserPhoto?.(dataUrl);
+            } catch (err) {
+                this.showToast(err?.message || 'No se pudo guardar la foto porque el almacenamiento está lleno.', 'error');
+                return false;
+            }
+            if (originalSrc) {
+                this._rawProfilePhotoSrc = originalSrc;
+            }
+            this.renderHeader?.();
+            this.renderDrawer?.();
+            this.refreshSettingsProfileUI?.();
+            this.updateStorageMetrics?.();
+            window.HapticsModule?.light?.();
+
+            if (typeof onSaved === 'function') {
+                onSaved(dataUrl);
+            }
+            return true;
+        }
+
+        async openProfilePhotoEditor({ file, src, title } = {}, onSaved) {
+            if (!window.PhotoEditorModule) {
+                if (file) this.downsampleAndSaveProfilePhoto(file, onSaved);
+                return null;
+            }
+            const res = await window.PhotoEditorModule.open({
+                file,
+                src,
+                aspectRatio: 1,
+                shape: 'circle',
+                outputWidth: 512,
+                outputHeight: 512,
+                mimeType: 'image/jpeg',
+                quality: 0.88,
+                title: title || 'Ajustar foto de perfil'
+            });
+            if (res && res.dataUrl) {
+                const ok = this.applySavedProfilePhoto(res.dataUrl, res.originalSrc || src, onSaved);
+                return ok ? res : null;
+            }
+            return null;
+        }
+
+        downsampleAndSaveProfilePhoto(file, onSaved) {
             if (!file || (!file.type.startsWith('image/') && !file.name.match(/\.(png|jpe?g|webp|gif|bmp)$/i))) {
                 this.showToast('Solo se admiten archivos de imagen válidos.', 'warning');
                 return;
@@ -1495,63 +1541,46 @@
                 this.showToast('Error al leer el archivo seleccionado.', 'error');
             };
             reader.onload = (e) => {
+                const rawSrc = e.target?.result;
                 const img = new Image();
                 img.onerror = () => {
                     this.showToast('Archivo de imagen no válido o dañado.', 'error');
                 };
                 img.onload = () => {
-                    const MAX_SIZE = 256;
+                    const TARGET_SIZE = 512;
                     let targetW = img.width;
                     let targetH = img.height;
 
-                    if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
+                    if (targetW > TARGET_SIZE || targetH > TARGET_SIZE) {
                         if (targetW > targetH) {
-                            targetH = Math.round((targetH * MAX_SIZE) / targetW);
-                            targetW = MAX_SIZE;
+                            targetH = Math.round((targetH * TARGET_SIZE) / targetW);
+                            targetW = TARGET_SIZE;
                         } else {
-                            targetW = Math.round((targetW * MAX_SIZE) / targetH);
-                            targetH = MAX_SIZE;
+                            targetW = Math.round((targetW * TARGET_SIZE) / targetH);
+                            targetH = TARGET_SIZE;
                         }
                     }
 
                     const canvas = document.createElement('canvas');
-                    canvas.width = targetW;
-                    canvas.height = targetH;
+                    canvas.width = Math.max(1, targetW);
+                    canvas.height = Math.max(1, targetH);
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, targetW, targetH);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                     let dataUrl;
                     const isPng = file.type === 'image/png' || (file.name && file.name.toLowerCase().endsWith('.png'));
                     if (isPng) {
                         dataUrl = canvas.toDataURL('image/png');
                         if (dataUrl.length * 0.75 > 30 * 1024) {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.88);
                         }
                     } else {
-                        dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-                        if (dataUrl.length * 0.75 > 30 * 1024) {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-                        }
+                        dataUrl = canvas.toDataURL('image/jpeg', 0.88);
                     }
 
-                    try {
-                        Storage?.setUserPhoto?.(dataUrl);
-                    } catch (err) {
-                        this.showToast(err?.message || 'No se pudo guardar la foto porque el almacenamiento está lleno.', 'error');
-                        return;
-                    }
-
-                    this.renderHeader?.();
-                    this.renderDrawer?.();
-                    this.refreshSettingsProfileUI?.();
-                    this.updateStorageMetrics?.();
-                    window.HapticsModule?.light?.();
-
-                    if (typeof onSaved === 'function') {
-                        onSaved(dataUrl);
-                    }
+                    this.applySavedProfilePhoto(dataUrl, rawSrc, onSaved);
                 };
-                img.src = e.target.result;
+                img.src = rawSrc;
             };
             reader.readAsDataURL(file);
         }
@@ -1571,6 +1600,7 @@
             const preview = document.getElementById('settings-photo-preview');
             const placeholder = document.getElementById('settings-photo-placeholder');
             const uploadBtn = document.getElementById('settings-photo-upload-btn');
+            const adjustBtn = document.getElementById('settings-photo-adjust-btn');
             const clearBtn = document.getElementById('settings-photo-clear-btn');
 
             if (savedPhoto) {
@@ -1579,6 +1609,7 @@
                     preview.classList.remove('hidden');
                 }
                 if (placeholder) placeholder.classList.add('hidden');
+                if (adjustBtn) adjustBtn.classList.remove('hidden');
                 if (clearBtn) clearBtn.classList.remove('hidden');
                 if (uploadBtn) uploadBtn.textContent = 'Cambiar foto';
             } else {
@@ -1587,6 +1618,7 @@
                     preview.classList.add('hidden');
                 }
                 if (placeholder) placeholder.classList.remove('hidden');
+                if (adjustBtn) adjustBtn.classList.add('hidden');
                 if (clearBtn) clearBtn.classList.add('hidden');
                 if (uploadBtn) uploadBtn.textContent = 'Subir foto';
             }
@@ -1619,32 +1651,36 @@
 
             let currentAccountType = Storage?.getAccountType?.() || 'organizer';
 
-            // 1. Subida de Foto de Perfil mediante Canvas HTML5 (máx 256x256, <30KB)
+            // 1. Subida de Foto de Perfil mediante Editor con recorte/zoom (512x512 JPEG 0.88)
             if (welcomePhotoInput) {
+                const updateWelcomePreview = (dataUrl) => {
+                    if (welcomePhotoPreview) {
+                        welcomePhotoPreview.src = dataUrl;
+                        welcomePhotoPreview.classList.remove('hidden');
+                    }
+                    if (welcomePhotoPlaceholder) {
+                        welcomePhotoPlaceholder.classList.add('hidden');
+                    }
+                    if (welcomePhotoClearBtn) {
+                        welcomePhotoClearBtn.classList.remove('hidden');
+                    }
+                };
                 const handlePhotoChange = (e) => {
                     const file = e.target.files?.[0];
-                    if (file) {
-                        this.downsampleAndSaveProfilePhoto(file, (dataUrl) => {
-                            if (welcomePhotoPreview) {
-                                welcomePhotoPreview.src = dataUrl;
-                                welcomePhotoPreview.classList.remove('hidden');
-                            }
-                            if (welcomePhotoPlaceholder) {
-                                welcomePhotoPlaceholder.classList.add('hidden');
-                            }
-                            if (welcomePhotoClearBtn) {
-                                welcomePhotoClearBtn.classList.remove('hidden');
-                            }
-                        });
+                    if (!file) return;
+                    if (e.isTrusted && window.PhotoEditorModule) {
+                        this.openProfilePhotoEditor({ file, title: 'Encuadrar foto de perfil' }, updateWelcomePreview);
+                    } else {
+                        this.downsampleAndSaveProfilePhoto(file, updateWelcomePreview);
                     }
                 };
                 welcomePhotoInput.addEventListener('change', handlePhotoChange);
-                welcomePhotoInput.addEventListener('input', handlePhotoChange);
             }
 
             if (welcomePhotoClearBtn) {
                 welcomePhotoClearBtn.onclick = () => {
                     window.HapticsModule?.light?.();
+                    this._rawProfilePhotoSrc = '';
                     Storage?.setUserPhoto?.('');
                     if (welcomePhotoInput) welcomePhotoInput.value = '';
                     if (welcomePhotoPreview) {
@@ -2000,9 +2036,10 @@
                 };
             }
 
-            // 1.2 Gestión de Foto de Perfil en Configuraciones (subir, cambiar o quitar)
+            // 1.2 Gestión de Foto de Perfil en Configuraciones (subir, cambiar, ajustar o quitar)
             const settingsPhotoInput = document.getElementById('settings-photo-input');
             const settingsPhotoUploadBtn = document.getElementById('settings-photo-upload-btn');
+            const settingsPhotoAdjustBtn = document.getElementById('settings-photo-adjust-btn');
             const settingsPhotoClearBtn = document.getElementById('settings-photo-clear-btn');
 
             this.refreshSettingsProfileUI();
@@ -2018,17 +2055,38 @@
                 const handleSettingsPhotoChange = (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    this.downsampleAndSaveProfilePhoto(file, () => {
-                        this.showToast('Foto de perfil actualizada con éxito.', 'success');
-                    });
+                    if (e.isTrusted && window.PhotoEditorModule) {
+                        this.openProfilePhotoEditor({ file, title: 'Ajustar foto de perfil' }, () => {
+                            this.showToast('Foto de perfil actualizada con éxito.', 'success');
+                        });
+                    } else {
+                        this.downsampleAndSaveProfilePhoto(file, () => {
+                            this.showToast('Foto de perfil actualizada con éxito.', 'success');
+                        });
+                    }
                     settingsPhotoInput.value = '';
                 };
                 settingsPhotoInput.onchange = handleSettingsPhotoChange;
             }
 
+            if (settingsPhotoAdjustBtn) {
+                settingsPhotoAdjustBtn.onclick = () => {
+                    const src = this._rawProfilePhotoSrc || Storage.getUserPhoto?.() || '';
+                    if (!src) {
+                        this.showToast('Primero sube una foto para poder ajustarla.', 'info');
+                        return;
+                    }
+                    window.HapticsModule?.light?.();
+                    this.openProfilePhotoEditor({ src, title: 'Ajustar foto actual' }, () => {
+                        this.showToast('Encuadre de foto actualizado con éxito.', 'success');
+                    });
+                };
+            }
+
             if (settingsPhotoClearBtn) {
                 settingsPhotoClearBtn.onclick = () => {
                     window.HapticsModule?.light?.();
+                    this._rawProfilePhotoSrc = '';
                     Storage.setUserPhoto('');
                     if (settingsPhotoInput) settingsPhotoInput.value = '';
                     this.renderHeader();

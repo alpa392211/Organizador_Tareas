@@ -133,11 +133,14 @@ window.SubjectsModule = (() => {
             modal.style.display = '';
             const backdrop = document.getElementById('subject-modal-backdrop');
             if (backdrop) {
+                backdrop.style.display = '';
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 backdrop.style.opacity = '';
             }
             const sheet = modal.querySelector('.mobile-bottom-sheet');
             if (sheet) {
+                sheet.style.display = '';
+                sheet.classList.remove('hidden');
                 sheet.style.transform = '';
                 sheet.style.transition = '';
                 sheet.style.maxHeight = '';
@@ -145,9 +148,8 @@ window.SubjectsModule = (() => {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
-            requestAnimationFrame(() => {
-                modal.classList.add('active');
-            });
+            void modal.offsetWidth;
+            modal.classList.add('active');
             setTimeout(() => {
                 document.getElementById('subject-name')?.focus();
             }, 100);

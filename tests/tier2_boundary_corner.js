@@ -2052,6 +2052,381 @@ const tests = [
 
             helpers.assertEqual(failures.length, 0, `Worst-case WCAG contrast < 4.5:1 detected:\n${failures.join('\n')}`);
         }
+    },
+
+    // =========================================================================
+    // F21: Etapa 2 - Editor de Foto de Perfil (PhotoEditorModule)
+    // =========================================================================
+    {
+        id: 'T2_F21_01_settings_editor_512_jpeg_adjust_and_clear',
+        feature: 'F21',
+        name: 'Settings photo upload opens PhotoEditorModule, saves 512x512 JPEG (0.88), supports Ajustar foto actual and Quitar foto',
+        run: async (page, helpers) => {
+            const os = require('os');
+            const tmpFile = path.join(os.tmpdir(), `ot_test_wide_${Date.now()}.png`);
+            try {
+                const base64Png = await page.evaluate(() => {
+                    const c = document.createElement('canvas');
+                    c.width = 1000;
+                    c.height = 600;
+                    const ctx = c.getContext('2d');
+                    const grad = ctx.createLinearGradient(0, 0, 1000, 600);
+                    grad.addColorStop(0, '#4f46e5');
+                    grad.addColorStop(1, '#f59e0b');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, 1000, 600);
+                    return c.toDataURL('image/png').split(',')[1];
+                });
+                fs.writeFileSync(tmpFile, Buffer.from(base64Png, 'base64'));
+
+                await page.evaluate(() => {
+                    window.StorageModule?.setOnboardingCompleted?.(true);
+                    window.StorageModule?.setCycleConfigured?.(true);
+                    window.StorageModule?.setUserPhoto?.('');
+                    window.OrganizadorApp?.switchView?.('settings');
+                    window.OrganizadorApp?.refreshSettingsProfileUI?.();
+                    const firstCard = document.querySelector('#view-settings .settings-accordion-card');
+                    if (firstCard && !firstCard.classList.contains('open')) {
+                        firstCard.querySelector('.settings-accordion-toggle')?.click();
+                    }
+                });
+
+                const hiddenInitially = await page.evaluate(() =>
+                    document.getElementById('settings-photo-adjust-btn')?.classList.contains('hidden')
+                );
+                helpers.assertTrue(hiddenInitially, '#settings-photo-adjust-btn must be hidden when no photo exists');
+
+                const inputHandle = await page.$('#settings-photo-input');
+                await inputHandle.uploadFile(tmpFile);
+
+                await page.waitForFunction(() => {
+                    const m = document.getElementById('photo-editor-modal');
+                    return m && !m.classList.contains('hidden') && m.classList.contains('active') && parseFloat(getComputedStyle(m).opacity) > 0.8 && window.PhotoEditorModule?.isOpen;
+                }, { timeout: 3000 });
+
+                // Interact: zoom in and click save
+                await page.evaluate(() => {
+                    window.PhotoEditorModule.setZoom(1.5);
+                    window.PhotoEditorModule.panBy(20, -15);
+                });
+                await new Promise(r => setTimeout(r, 150));
+                await page.click('#photo-editor-save-btn');
+                await page.waitForFunction(() => !window.PhotoEditorModule?.isOpen, { timeout: 3000 });
+
+                const afterSave = await page.evaluate(async () => {
+                    const dataUrl = window.StorageModule?.getUserPhoto?.() || '';
+                    const dims = await new Promise(res => {
+                        const img = new Image();
+                        img.onload = () => res({ w: img.naturalWidth, h: img.naturalHeight });
+                        img.onerror = () => res({ w: 0, h: 0 });
+                        img.src = dataUrl;
+                    });
+                    return {
+                        dataUrl,
+                        dims,
+                        adjustVisible: !document.getElementById('settings-photo-adjust-btn')?.classList.contains('hidden'),
+                        clearVisible: !document.getElementById('settings-photo-clear-btn')?.classList.contains('hidden'),
+                        previewVisible: !document.getElementById('settings-photo-preview')?.classList.contains('hidden'),
+                        headerImgSrc: document.querySelector('#header-inst-logo img')?.src || '',
+                        drawerImgSrc: document.querySelector('#drawer-inst-logo img')?.src || ''
+                    };
+                });
+
+                helpers.assertTrue(afterSave.dataUrl.startsWith('data:image/jpeg'), 'Saved profile photo must be JPEG');
+                helpers.assertEqual(afterSave.dims.w, 512, 'Saved profile photo width must be 512px');
+                helpers.assertEqual(afterSave.dims.h, 512, 'Saved profile photo height must be 512px');
+                helpers.assertTrue(afterSave.adjustVisible, '#settings-photo-adjust-btn must appear after saving photo');
+                helpers.assertTrue(afterSave.clearVisible, '#settings-photo-clear-btn must appear after saving photo');
+                helpers.assertTrue(afterSave.previewVisible, '#settings-photo-preview must be visible');
+                helpers.assertTrue(afterSave.headerImgSrc.startsWith('data:image/jpeg'), 'Header avatar must sync');
+                helpers.assertTrue(afterSave.drawerImgSrc.startsWith('data:image/jpeg'), 'Drawer avatar must sync');
+
+                // Test "Ajustar foto actual"
+                await page.click('#settings-photo-adjust-btn');
+                await page.waitForFunction(() => {
+                    const m = document.getElementById('photo-editor-modal');
+                    return m && m.classList.contains('active') && parseFloat(getComputedStyle(m).opacity) > 0.8 && window.PhotoEditorModule?.isOpen;
+                }, { timeout: 3000 });
+                await new Promise(r => setTimeout(r, 120));
+                await page.click('#photo-editor-rotate-btn');
+                await page.click('#photo-editor-save-btn');
+                await page.waitForFunction(() => !window.PhotoEditorModule?.isOpen, { timeout: 3000 });
+
+                const afterAdjust = await page.evaluate(() => window.StorageModule?.getUserPhoto?.() || '');
+                helpers.assertTrue(afterAdjust.startsWith('data:image/jpeg'), 'Adjusted photo must save as JPEG');
+
+                // Clear photo
+                await page.click('#settings-photo-clear-btn');
+                const afterClear = await page.evaluate(() => ({
+                    stored: window.StorageModule?.getUserPhoto?.() || '',
+                    adjustHidden: document.getElementById('settings-photo-adjust-btn')?.classList.contains('hidden'),
+                    clearHidden: document.getElementById('settings-photo-clear-btn')?.classList.contains('hidden')
+                }));
+                helpers.assertEqual(afterClear.stored, '', 'Quitar foto must clear storage');
+                helpers.assertTrue(afterClear.adjustHidden, 'Adjust button must hide after clearing');
+                helpers.assertTrue(afterClear.clearHidden, 'Clear button must hide after clearing');
+            } finally {
+                if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+            }
+        }
+    },
+    {
+        id: 'T2_F21_02_zero_empty_gaps_cover_clamping_with_rotation',
+        feature: 'F21',
+        name: 'Extreme panning and 90-degree rotations keep cover geometry with zero empty gaps',
+        run: async (page, helpers) => {
+            const check = await page.evaluate(async () => {
+                // Non-square 900x300 gradient image
+                const srcCanvas = document.createElement('canvas');
+                srcCanvas.width = 900;
+                srcCanvas.height = 300;
+                const sCtx = srcCanvas.getContext('2d');
+                sCtx.fillStyle = '#059669';
+                sCtx.fillRect(0, 0, 900, 300);
+                const src = srcCanvas.toDataURL('image/png');
+
+                const promise = window.PhotoEditorModule.open({
+                    src,
+                    aspectRatio: 1,
+                    shape: 'circle',
+                    outputWidth: 512,
+                    outputHeight: 512,
+                    quality: 0.88
+                });
+
+                await new Promise(r => setTimeout(r, 80));
+                const violations = [];
+                const rotations = [0, 90, 180, 270];
+                for (const rot of rotations) {
+                    if (rot > 0) window.PhotoEditorModule.rotate90();
+                    window.PhotoEditorModule.setZoom(1);
+                    window.PhotoEditorModule.panBy(50000, -50000);
+                    let st = window.PhotoEditorModule.getState();
+                    if (st.drawnW + 0.01 < st.cropW || st.drawnH + 0.01 < st.cropH) {
+                        violations.push(`rot=${rot} z=1 cover failed: drawn=${st.drawnW}x${st.drawnH} < crop=${st.cropW}x${st.cropH}`);
+                    }
+                    if (Math.abs(st.offsetX) > st.maxOffsetX + 0.01 || Math.abs(st.offsetY) > st.maxOffsetY + 0.01) {
+                        violations.push(`rot=${rot} z=1 pan out of bounds`);
+                    }
+
+                    window.PhotoEditorModule.setZoom(2.2);
+                    window.PhotoEditorModule.panBy(-50000, 50000);
+                    st = window.PhotoEditorModule.getState();
+                    if (Math.abs(st.offsetX) > st.maxOffsetX + 0.01 || Math.abs(st.offsetY) > st.maxOffsetY + 0.01) {
+                        violations.push(`rot=${rot} z=2.2 pan out of bounds`);
+                    }
+                }
+
+                // Sample corners of exported 512x512 image to guarantee green coverage (not blank white)
+                const exportedUrl = window.PhotoEditorModule.exportDataUrl();
+                const cornerCheck = await new Promise(res => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const c = document.createElement('canvas');
+                        c.width = img.naturalWidth;
+                        c.height = img.naturalHeight;
+                        const ctx = c.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const tl = ctx.getImageData(2, 2, 1, 1).data;
+                        const br = ctx.getImageData(c.width - 3, c.height - 3, 1, 1).data;
+                        res({ tl: Array.from(tl), br: Array.from(br) });
+                    };
+                    img.src = exportedUrl;
+                });
+
+                window.PhotoEditorModule.cancel();
+                await promise;
+                return { violations, cornerCheck };
+            });
+
+            helpers.assertEqual(check.violations.length, 0, `Cover/clamping violations: ${check.violations.join('; ')}`);
+            helpers.assertTrue(check.cornerCheck.tl[1] > 100 && check.cornerCheck.tl[0] < 60, `Top-left corner should stay green, got ${JSON.stringify(check.cornerCheck.tl)}`);
+            helpers.assertTrue(check.cornerCheck.br[1] > 100 && check.cornerCheck.br[0] < 60, `Bottom-right corner should stay green, got ${JSON.stringify(check.cornerCheck.br)}`);
+        }
+    },
+    {
+        id: 'T2_F21_03_onboarding_editor_stacking_and_save',
+        feature: 'F21',
+        name: 'Onboarding #welcome-photo-input opens PhotoEditorModule above #cycle-setup-modal and updates preview',
+        run: async (page, helpers) => {
+            const os = require('os');
+            const tmpFile = path.join(os.tmpdir(), `ot_test_onb_${Date.now()}.png`);
+            try {
+                const base64Png = await page.evaluate(() => {
+                    const c = document.createElement('canvas');
+                    c.width = 400;
+                    c.height = 400;
+                    const ctx = c.getContext('2d');
+                    ctx.fillStyle = '#ec4899';
+                    ctx.fillRect(0, 0, 400, 400);
+                    return c.toDataURL('image/png').split(',')[1];
+                });
+                fs.writeFileSync(tmpFile, Buffer.from(base64Png, 'base64'));
+
+                await page.evaluate(() => {
+                    window.StorageModule?.setUserPhoto?.('');
+                    window.OrganizadorApp?.openCycleWelcomeModal?.();
+                });
+                await new Promise(r => setTimeout(r, 80));
+
+                const inputHandle = await page.$('#welcome-photo-input');
+                await inputHandle.uploadFile(tmpFile);
+                await page.waitForFunction(() => {
+                    const m = document.getElementById('photo-editor-modal');
+                    return m && m.classList.contains('active') && parseFloat(getComputedStyle(m).opacity) > 0.8 && window.PhotoEditorModule?.isOpen;
+                }, { timeout: 3000 });
+
+                const zCheck = await page.evaluate(() => {
+                    const edZ = parseInt(getComputedStyle(document.getElementById('photo-editor-modal')).zIndex, 10) || 0;
+                    const onbZ = parseInt(getComputedStyle(document.getElementById('cycle-setup-modal')).zIndex, 10) || 0;
+                    return { edZ, onbZ };
+                });
+                helpers.assertTrue(zCheck.edZ > zCheck.onbZ, `Editor z-index (${zCheck.edZ}) must stack above onboarding (${zCheck.onbZ})`);
+
+                await new Promise(r => setTimeout(r, 120));
+                await page.click('#photo-editor-save-btn');
+                await page.waitForFunction(() => !window.PhotoEditorModule?.isOpen, { timeout: 3000 });
+
+                const afterOnbSave = await page.evaluate(() => ({
+                    saved: window.StorageModule?.getUserPhoto?.() || '',
+                    previewHidden: document.getElementById('welcome-photo-preview')?.classList.contains('hidden'),
+                    bodyLocked: document.body.classList.contains('overflow-hidden')
+                }));
+
+                helpers.assertTrue(afterOnbSave.saved.startsWith('data:image/jpeg'), 'Onboarding editor must save JPEG photo');
+                helpers.assertFalse(afterOnbSave.previewHidden, 'Welcome photo preview must become visible');
+                helpers.assertTrue(afterOnbSave.bodyLocked, 'Body scroll lock must remain while onboarding is still open');
+
+                await page.evaluate(() => {
+                    const cm = document.getElementById('cycle-setup-modal');
+                    if (cm) cm.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                });
+            } finally {
+                if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+            }
+        }
+    },
+    {
+        id: 'T2_F21_04_parametrizable_reuse_keyboard_aria_and_mobile_sheet',
+        feature: 'F21',
+        name: 'PhotoEditorModule supports parametrizable rect/maxDim mode, keyboard/Escape controls, >=44px touch targets and 90dvh mobile sheet',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
+            const res = await page.evaluate(async () => {
+                window.StorageModule?.setUserPhoto?.('existing-sentinel');
+                const c = document.createElement('canvas');
+                c.width = 2000;
+                c.height = 1000;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(0, 0, 2000, 1000);
+
+                const p = window.PhotoEditorModule.open({
+                    src: c.toDataURL('image/png'),
+                    aspectRatio: 16 / 9,
+                    shape: 'rect',
+                    maxDim: 1600,
+                    quality: 0.85,
+                    title: 'Encuadrar fondo'
+                });
+                await new Promise(r => setTimeout(r, 80));
+
+                // Keyboard zoom & pan
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: '+' }));
+                const zoomAfterPlus = window.PhotoEditorModule.getState().zoom;
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+                const offsetAfterArrow = window.PhotoEditorModule.getState().offsetX;
+
+                // Measure touch targets & sheet overflow
+                const btns = ['photo-editor-rotate-btn', 'photo-editor-reset-btn', 'photo-editor-cancel-btn', 'photo-editor-save-btn'];
+                const minSizes = btns.map(id => {
+                    const el = document.getElementById(id);
+                    const r = el.getBoundingClientRect();
+                    return { id, h: Math.round(r.height), aria: el.getAttribute('aria-label') || '' };
+                });
+                const canvasTouchAction = getComputedStyle(document.getElementById('photo-editor-canvas')).touchAction;
+                const sheetH = document.querySelector('#photo-editor-modal .mobile-bottom-sheet').getBoundingClientRect().height;
+                const exportedProportional = window.PhotoEditorModule.exportDataUrl();
+                const outDims = await new Promise(r => {
+                    const im = new Image();
+                    im.onload = () => r({ w: im.naturalWidth, h: im.naturalHeight });
+                    im.src = exportedProportional;
+                });
+
+                // Escape cancels cleanly without mutating user photo
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                const resolved = await p;
+                const afterEsc = window.StorageModule?.getUserPhoto?.();
+
+                return {
+                    zoomAfterPlus,
+                    offsetAfterArrow,
+                    minSizes,
+                    canvasTouchAction,
+                    sheetH,
+                    outDims,
+                    resolved,
+                    afterEsc
+                };
+            });
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+
+            helpers.assertTrue(res.zoomAfterPlus > 1, 'Keyboard + must increase zoom');
+            helpers.assertTrue(res.offsetAfterArrow > 0, 'Keyboard ArrowRight must pan image');
+            helpers.assertEqual(res.canvasTouchAction, 'none', 'Editor canvas must enforce touch-action: none');
+            helpers.assertTrue(res.sheetH <= Math.ceil(844 * 0.90) + 2, `Mobile bottom sheet height (${res.sheetH}) must stay <= 90dvh`);
+            helpers.assertEqual(res.outDims.w, 1600, 'Proportional maxDim=1600 export must downscale longest edge to 1600px');
+            helpers.assertEqual(res.outDims.h, 800, 'Proportional maxDim=1600 export must keep aspect ratio (800px)');
+            helpers.assertEqual(res.resolved, null, 'Escape key must cancel and resolve null');
+            helpers.assertEqual(res.afterEsc, 'existing-sentinel', 'Cancel must not overwrite existing userPhoto');
+            res.minSizes.forEach(b => {
+                helpers.assertTrue(b.h >= 44, `${b.id} height (${b.h}px) must be >= 44px`);
+                helpers.assertTrue(b.aria.length > 0, `${b.id} must define aria-label`);
+            });
+        }
+    },
+    {
+        id: 'T2_F21_05_legacy_256px_backup_import_compatibility',
+        feature: 'F21',
+        name: 'Legacy JSON backup with 256x256 userPhoto imports cleanly and opens in Ajustar foto actual',
+        run: async (page, helpers) => {
+            const ok = await page.evaluate(async () => {
+                const c = document.createElement('canvas');
+                c.width = 256;
+                c.height = 256;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#0ea5e9';
+                ctx.fillRect(0, 0, 256, 256);
+                const legacyPhoto = c.toDataURL('image/png');
+
+                const payload = JSON.stringify({
+                    version: '1.5.0',
+                    userName: 'Usuario Respaldo',
+                    userPhoto: legacyPhoto,
+                    subjects: [],
+                    tasks: [],
+                    notes: [],
+                    events: []
+                });
+
+                const imported = window.StorageModule?.importJson?.(payload);
+                window.OrganizadorApp?.refreshSettingsProfileUI?.();
+                const stored = window.StorageModule?.getUserPhoto?.() || '';
+                const adjustVisible = !document.getElementById('settings-photo-adjust-btn')?.classList.contains('hidden');
+                const p = window.PhotoEditorModule?.open?.({ src: stored, title: 'Ajustar foto actual' });
+                await new Promise(r => setTimeout(r, 60));
+                const opened = Boolean(window.PhotoEditorModule?.isOpen);
+                window.PhotoEditorModule?.cancel?.();
+                await p;
+                return { imported, storedMatch: stored === legacyPhoto, adjustVisible, opened };
+            });
+
+            helpers.assertTrue(ok.imported, 'Legacy JSON import must succeed');
+            helpers.assertTrue(ok.storedMatch, 'Legacy 256px userPhoto must be preserved on import');
+            helpers.assertTrue(ok.adjustVisible, 'Ajustar foto actual must be visible for legacy imported photo');
+            helpers.assertTrue(ok.opened, 'PhotoEditorModule must open legacy 256px photo cleanly');
+        }
     }
 ];
 

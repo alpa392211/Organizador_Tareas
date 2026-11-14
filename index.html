@@ -56,8 +56,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.0-ui-e1">
-    <link rel="stylesheet" href="css/styles.css?v=1.5.0-ui-e1">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.0-ui-e2">
+    <link rel="stylesheet" href="css/styles.css?v=1.5.0-ui-e2">
 </head>
 <body class="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
     <!-- Capa de fondo ambiental fija para transparencia Liquid Glass -->
@@ -827,13 +827,17 @@
                                     <span id="settings-inst-period-badge" class="hidden text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 max-w-full truncate"></span>
                                 </div>
                                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                    Sube o cambia tu foto de perfil en cualquier momento (máx. 256×256 px).
+                                    Sube, recorta o ajusta tu foto de perfil en cualquier momento (512×512 px).
                                 </p>
                                 <div class="flex items-center gap-2 mt-2.5 flex-wrap">
                                     <input type="file" id="settings-photo-input" accept="image/*" class="hidden">
                                     <button type="button" id="settings-photo-upload-btn"
                                         class="touch-target-44 min-h-[44px] tap-effect px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-colors">
                                         Subir foto
+                                    </button>
+                                    <button type="button" id="settings-photo-adjust-btn"
+                                        class="hidden touch-target-44 min-h-[44px] tap-effect px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-700/50 font-bold text-xs transition-colors">
+                                        Ajustar foto actual
                                     </button>
                                     <button type="button" id="settings-photo-clear-btn"
                                         class="hidden touch-target-44 min-h-[44px] tap-effect px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 font-bold text-xs transition-colors">
@@ -2080,7 +2084,7 @@
                             <input type="file" id="welcome-photo-input" accept="image/*"
                                 class="block w-full min-h-[44px] text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer cursor-pointer">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-[10px] text-slate-400">Compresión automática a máx 256×256 px (&lt; 30 KB). También puedes subirla o cambiarla en Configuraciones.</span>
+                                <span class="text-[10px] text-slate-400">Editor con zoom y recorte (512×512 px). También puedes subirla o ajustarla luego en Configuraciones.</span>
                                 <button type="button" id="welcome-photo-clear-btn" class="hidden min-h-[44px] px-2 text-[11px] font-bold text-rose-400 hover:text-rose-300 transition-colors">
                                     ✕ Quitar
                                 </button>
@@ -2326,16 +2330,17 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/storage.js?v=1.5.0-ui-e1"></script>
-    <script src="js/haptics.js?v=1.5.0-ui-e1"></script>
-    <script src="js/notifications.js?v=1.5.0-ui-e1"></script>
-    <script src="js/widgets.js?v=1.5.0-ui-e1"></script>
-    <script src="js/subjects.js?v=1.5.0-ui-e1"></script>
-    <script src="js/tasks.js?v=1.5.0-ui-e1"></script>
-    <script src="js/notes.js?v=1.5.0-ui-e1"></script>
-    <script src="js/calendar.js?v=1.5.0-ui-e1"></script>
-    <script src="js/archive.js?v=1.5.0-ui-e1"></script>
-    <script src="js/app.js?v=1.5.0-ui-e1"></script>
+    <script src="js/storage.js?v=1.5.0-ui-e2"></script>
+    <script src="js/haptics.js?v=1.5.0-ui-e2"></script>
+    <script src="js/notifications.js?v=1.5.0-ui-e2"></script>
+    <script src="js/widgets.js?v=1.5.0-ui-e2"></script>
+    <script src="js/subjects.js?v=1.5.0-ui-e2"></script>
+    <script src="js/tasks.js?v=1.5.0-ui-e2"></script>
+    <script src="js/notes.js?v=1.5.0-ui-e2"></script>
+    <script src="js/calendar.js?v=1.5.0-ui-e2"></script>
+    <script src="js/archive.js?v=1.5.0-ui-e2"></script>
+    <script src="js/photo-editor.js?v=1.5.0-ui-e2"></script>
+    <script src="js/app.js?v=1.5.0-ui-e2"></script>
 
     <!-- Visor de fotos de la galería -->
     <div id="photo-preview-modal" class="modal-overlay fixed inset-0 z-[70] hidden items-center justify-center p-4">
@@ -2363,6 +2368,69 @@
                 <div class="flex flex-wrap justify-end gap-2 pt-1">
                     <button type="button" id="note-unlock-cancel" class="tap-effect touch-target-44 min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300">Cancelar</button>
                     <button type="button" id="note-unlock-confirm" class="tap-effect touch-target-44 min-h-[44px] px-4 py-2 rounded-2xl bg-amber-500 text-white text-xs font-bold">Desbloquear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor reutilizable de foto de perfil / encuadre (Etapa 2) -->
+    <div id="photo-editor-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-[80] hidden items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="photo-editor-title" aria-hidden="true">
+        <div id="photo-editor-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/65 backdrop-blur-sm"></div>
+        <div class="modal-dialog mobile-bottom-sheet relative w-full max-w-md bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200/70 dark:border-slate-700/70 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
+            <div class="mobile-sheet-body px-4 pb-5 pt-2 sm:p-6 space-y-3.5 overflow-y-auto">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <h3 id="photo-editor-title" class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Ajustar foto de perfil</h3>
+                        <p id="photo-editor-subtitle" class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Arrastra para mover y pellizca o usa el deslizador para hacer zoom.</p>
+                    </div>
+                </div>
+
+                <!-- Lienzo interactivo con marco circular y touch-action: none -->
+                <div id="photo-editor-canvas-wrap" class="w-fit max-w-full mx-auto rounded-2xl overflow-hidden bg-slate-950/90 border border-white/15 shadow-inner flex items-center justify-center">
+                    <canvas id="photo-editor-canvas" tabindex="0" role="img"
+                        aria-label="Lienzo de recorte de foto. Arrastra o usa las flechas para mover, y el deslizador o las teclas más y menos para ajustar el zoom."
+                        class="block rounded-2xl"></canvas>
+                </div>
+
+                <!-- Control de Zoom -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between gap-2 text-xs">
+                        <label for="photo-editor-zoom" class="font-bold text-slate-700 dark:text-slate-300">Zoom</label>
+                        <span id="photo-editor-zoom-value" class="font-mono font-bold tabular-nums text-indigo-600 dark:text-indigo-400">100%</span>
+                    </div>
+                    <input type="range" id="photo-editor-zoom" min="1" max="4" step="0.01" value="1"
+                        aria-label="Nivel de zoom de la foto"
+                        class="w-full min-h-[44px] cursor-pointer">
+                </div>
+
+                <!-- Herramientas rápidas de giro y reinicio -->
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button type="button" id="photo-editor-rotate-btn" aria-label="Girar foto 90 grados a la derecha"
+                            class="touch-target-44 min-h-[44px] tap-effect px-3.5 py-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold border border-slate-200/80 dark:border-slate-700 transition-colors flex items-center gap-1.5">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <span>Girar 90°</span>
+                        </button>
+                        <button type="button" id="photo-editor-reset-btn" aria-label="Restablecer encuadre y zoom"
+                            class="touch-target-44 min-h-[44px] tap-effect px-3.5 py-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold border border-slate-200/80 dark:border-slate-700 transition-colors">
+                            Restablecer
+                        </button>
+                    </div>
+                    <span id="photo-editor-meta-hint" class="text-[10px] font-semibold tabular-nums text-slate-500 dark:text-slate-400">Salida: 512×512 px · JPEG 88%</span>
+                </div>
+
+                <!-- Cancelar / Guardar -->
+                <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200/70 dark:border-slate-700/70 flex-wrap">
+                    <button type="button" id="photo-editor-cancel-btn" aria-label="Cancelar edición de foto"
+                        class="touch-target-44 min-h-[44px] tap-effect px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="button" id="photo-editor-save-btn" aria-label="Guardar foto recortada"
+                        class="touch-target-44 min-h-[44px] tap-effect px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-lg shadow-indigo-500/25 transition-colors flex items-center gap-1.5">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span data-save-label>Guardar foto</span>
+                    </button>
                 </div>
             </div>
         </div>
