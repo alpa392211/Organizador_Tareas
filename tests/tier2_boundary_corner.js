@@ -9,16 +9,16 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.2 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.5.3 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver 1.5.2',
+        name: 'package.json version matches strict semver 1.5.3',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.2', 'package.json version must be 1.5.2');
+            helpers.assertEqual(pkg.version, '1.5.3', 'package.json version must be 1.5.3');
         }
     },
     {
@@ -30,7 +30,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.5.2';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.5.3';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -38,14 +38,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target 1.5.2 version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.5.3 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.OrganizadorApp?.openChangelogModal?.();
                 document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.5.2', 'LocalStorage must record version 1.5.2');
+            helpers.assertEqual(saved, '1.5.3', 'LocalStorage must record version 1.5.3');
         }
     },
     {
@@ -865,10 +865,10 @@ const tests = [
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setOnboardingCompleted?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.5.2');
+                window.StorageModule?.setLastSeenVersion?.('1.5.3');
             });
             const lastSeen = await page.evaluate(() => window.StorageModule?.getLastSeenVersion?.());
-            helpers.assertEqual(lastSeen, '1.5.2', 'Last seen version should be 1.5.2');
+            helpers.assertEqual(lastSeen, '1.5.3', 'Last seen version should be 1.5.3');
         }
     },
     {
