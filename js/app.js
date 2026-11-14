@@ -816,10 +816,24 @@
             return current && current !== 'default' && current !== 'gray' && current !== 'theme-gray';
         }
 
+        isDarkOnlyBackgroundActive() {
+            const Bg = window.BackgroundsModule;
+            if (!Bg) return false;
+            if (typeof Bg.isDarkOnlyBackgroundActive === 'function') {
+                return Boolean(Bg.isDarkOnlyBackgroundActive());
+            }
+            const preset = window.StorageModule?.getBackgroundPreset?.() || 'default';
+            return Boolean(Bg.isDarkOnlyPreset?.(preset));
+        }
+
+        isDarkModeForced() {
+            return Boolean(this.isSpecialThemeActive() || this.isDarkOnlyBackgroundActive());
+        }
+
         applyTheme(theme, save = true) {
             const Storage = window.StorageModule;
-            // Si hay un tema especial activo (salvo modo monocromático), el modo claro no funciona y se fuerza modo oscuro
-            const effectiveTheme = this.isSpecialThemeActive() ? 'dark' : theme;
+            // Si hay un tema especial activo (salvo modo monocromático) o un fondo temático oscuro, se fuerza modo oscuro
+            const effectiveTheme = this.isDarkModeForced() ? 'dark' : theme;
             const isDark = effectiveTheme === 'dark';
 
             // Alternar clase dark en la etiqueta raíz <html> para Tailwind
@@ -841,10 +855,18 @@
             const Storage = window.StorageModule;
             window.HapticsModule?.light();
 
-            if (this.isSpecialThemeActive()) {
+            const isSpecialLocked = this.isSpecialThemeActive();
+            const isBgLocked = !isSpecialLocked && this.isDarkOnlyBackgroundActive();
+
+            if (isSpecialLocked || isBgLocked) {
                 if (themeMode === 'light') {
                     window.HapticsModule?.warning?.();
-                    this.showToast('⚠️ El Modo Claro no está disponible con este tema especial activo. Desactívalo en Bóveda para volver al modo claro.', 'warning');
+                    this.showToast(
+                        isSpecialLocked
+                            ? '⚠️ El Modo Claro no está disponible con este tema especial activo. Desactívalo en Bóveda para volver al modo claro.'
+                            : '⚠️ El Modo Claro no está disponible con este fondo temático activo. Elige otro fondo para volver al modo claro.',
+                        'warning'
+                    );
                     return;
                 }
             }
@@ -852,9 +874,14 @@
             if (themeMode === 'auto') {
                 Storage.setTheme(null);
                 const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const effectiveMode = this.isSpecialThemeActive() ? 'dark' : (systemPrefersDark ? 'dark' : 'light');
+                const effectiveMode = this.isDarkModeForced() ? 'dark' : (systemPrefersDark ? 'dark' : 'light');
                 this.applyTheme(effectiveMode, false);
-                this.showToast('Tema ajustado automáticamente según tu sistema.', 'info');
+                this.showToast(
+                    this.isDarkModeForced()
+                        ? '🌙 Modo Oscuro mantenido porque los fondos temáticos solo funcionan en modo oscuro.'
+                        : 'Tema ajustado automáticamente según tu sistema.',
+                    'info'
+                );
             } else {
                 this.applyTheme(themeMode, true);
                 this.showToast(`Modo ${themeMode === 'dark' ? 'Oscuro' : 'Claro'} activado.`, 'success');
@@ -862,9 +889,16 @@
         }
 
         toggleTheme() {
-            if (this.isSpecialThemeActive()) {
+            const isSpecialLocked = this.isSpecialThemeActive();
+            const isBgLocked = !isSpecialLocked && this.isDarkOnlyBackgroundActive();
+            if (isSpecialLocked || isBgLocked) {
                 window.HapticsModule?.warning?.();
-                this.showToast('⚠️ El Modo Claro está bloqueado mientras este tema especial esté activo.', 'warning');
+                this.showToast(
+                    isSpecialLocked
+                        ? '⚠️ El Modo Claro está bloqueado mientras este tema especial esté activo.'
+                        : '⚠️ El Modo Claro no está disponible con este fondo temático activo. Elige otro fondo para volver al modo claro.',
+                    'warning'
+                );
                 return;
             }
             const isCurrentlyDark = document.documentElement.classList.contains('dark');
@@ -874,7 +908,9 @@
 
         updateThemeUI(activeTheme, isAuto = false) {
             const isDark = activeTheme === 'dark';
-            const isLockedToDark = this.isSpecialThemeActive();
+            const isSpecialLocked = this.isSpecialThemeActive();
+            const isBgLocked = !isSpecialLocked && this.isDarkOnlyBackgroundActive();
+            const isLockedToDark = isSpecialLocked || isBgLocked;
 
             // Sincronizar iconos de Sol y Luna en Header explícitamente
             const sunIcon = document.getElementById('theme-icon-sun');
@@ -884,8 +920,10 @@
 
             const pill = document.getElementById('settings-theme-pill');
             if (pill) {
-                if (isLockedToDark) {
+                if (isSpecialLocked) {
                     pill.textContent = '🌙 Modo Oscuro (Bloqueado por Tema Especial)';
+                } else if (isBgLocked) {
+                    pill.textContent = '🌙 Modo Oscuro (Requerido por Fondo Temático)';
                 } else if (isAuto) {
                     pill.textContent = `💻 Sistema (${isDark ? 'Oscuro' : 'Claro'})`;
                 } else {
@@ -901,7 +939,9 @@
                 if (isLockedToDark) {
                     lightBtn.disabled = true;
                     lightBtn.classList.add('opacity-40', 'cursor-not-allowed');
-                    lightBtn.title = 'Modo Claro bloqueado: los temas clasificados de la bóveda requieren Modo Oscuro.';
+                    lightBtn.title = isSpecialLocked
+                        ? 'Modo Claro bloqueado: los temas clasificados de la bóveda requieren Modo Oscuro.'
+                        : 'Modo Claro bloqueado: los fondos temáticos solo funcionan en Modo Oscuro.';
                 } else {
                     lightBtn.disabled = false;
                     lightBtn.classList.remove('opacity-40', 'cursor-not-allowed');

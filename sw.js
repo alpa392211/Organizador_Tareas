@@ -48,9 +48,17 @@ self.addEventListener('install', event => {
         caches.open(CACHE_NAME).then(async cache => {
             const results = await Promise.allSettled(
                 PRECACHE_ASSETS.map(url =>
-                    cache.add(url).catch(err => {
-                        console.warn(`[SW] Precache item skipped: ${url} (${err.message})`);
-                    })
+                    fetch(new Request(url, { cache: 'reload' }))
+                        .then(networkRes => {
+                            if (networkRes && networkRes.ok) {
+                                return cache.put(url, networkRes);
+                            }
+                            return cache.add(url);
+                        })
+                        .catch(() => cache.add(url))
+                        .catch(err => {
+                            console.warn(`[SW] Precache item skipped: ${url} (${err.message})`);
+                        })
                 )
             );
             console.log(`[SW v1.5.3] Precaching complete. Processed ${results.length} assets.`);

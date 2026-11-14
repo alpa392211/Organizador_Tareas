@@ -3110,6 +3110,111 @@ const tests = [
             helpers.assertEqual(overflowFailures.length, 0, `Mobile horizontal overflow detected: ${overflowFailures.join('; ')}`);
         }
     },
+    {
+        id: 'T2_F22_06_thematic_backgrounds_force_dark_mode_and_block_light_mode',
+        feature: 'F22',
+        name: 'Selecting any thematic background automatically activates Dark Mode, blocks Light Mode while active, and unlocks Light Mode upon returning to basic backgrounds',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.reload({ waitUntil: 'load' });
+
+            const res = await page.evaluate(async () => {
+                const Storage = window.StorageModule;
+                const Bg = window.BackgroundsModule;
+                const App = window.OrganizadorApp;
+
+                // Start explicitly in Light Mode with all 10 thematic backgrounds unlocked
+                Storage.setActiveSpecialTheme('default');
+                App.setTheme('light');
+                const initiallyDark = document.documentElement.classList.contains('dark');
+
+                ['MATRIX99', 'ZENPEACE', 'RETRO80S', '06062009', 'ARCADE90', 'COFFEE42', 'APOLLO11', 'EDUARDO', 'PINGUINO', 'STUDYMAX']
+                    .forEach(c => Storage.unlockCode(c));
+
+                App.switchView('settings');
+                document.getElementById('settings-acc-background')?.classList.add('open');
+                document.getElementById('settings-acc-appearance')?.classList.add('open');
+                Bg.renderSettingsUI();
+
+                // Click Jardín Sakura while in Light Mode -> must auto-enable Dark Mode & lock Light Mode button
+                const sakuraBtn = document.querySelector('#settings-bg-experimental-grid [data-bg-preset="theme_sakura"]');
+                sakuraBtn?.click();
+
+                const afterSakuraDark = document.documentElement.classList.contains('dark');
+                const afterSakuraStoredTheme = Storage.getTheme();
+                const afterSakuraLightDisabled = document.getElementById('settings-theme-light')?.disabled === true;
+                const afterSakuraPill = document.getElementById('settings-theme-pill')?.textContent || '';
+
+                // Attempt to toggle back to Light Mode via header button, settings light button, and auto mode
+                document.getElementById('theme-toggle-btn')?.click();
+                const stillDarkAfterToggle = document.documentElement.classList.contains('dark');
+                App.setTheme('light');
+                const stillDarkAfterSetLight = document.documentElement.classList.contains('dark');
+                App.setTheme('auto');
+                const stillDarkAfterAuto = document.documentElement.classList.contains('dark');
+
+                // Verify ALL 10 thematic backgrounds auto-activate Dark Mode when clicked from Light Mode
+                const failedAutoDark = [];
+                const thematicIds = (Bg.getAllThematicPresets?.() || []).map(p => p.id);
+                for (const id of thematicIds) {
+                    // Temporarily force clean Light Mode before clicking each card
+                    Storage.setBackgroundPreset('default');
+                    App.applyTheme('light', true);
+                    if (document.documentElement.classList.contains('dark')) {
+                        failedAutoDark.push(`${id}:precondition-dark`);
+                        continue;
+                    }
+                    document.querySelector(`#settings-bg-experimental-grid [data-bg-preset="${id}"]`)?.click();
+                    if (!document.documentElement.classList.contains('dark') || Storage.getTheme() !== 'dark') {
+                        failedAutoDark.push(id);
+                    }
+                }
+
+                // Switch back to Predeterminado -> Light Mode button unlocks & switching to light works again
+                document.querySelector('#settings-bg-basic-grid [data-bg-preset="default"]')?.click();
+                const lightUnlockedAfterDefault = document.getElementById('settings-theme-light')?.disabled === false;
+                document.getElementById('settings-theme-light')?.click();
+                const lightWorksAfterDefault = !document.documentElement.classList.contains('dark');
+
+                // Even if programmatic applyBackground runs with theme_matrix while not dark, dark mode activates
+                Storage.setBackgroundPreset('theme_matrix');
+                await Bg.applyBackground();
+                const darkForcedOnApply = document.documentElement.classList.contains('dark');
+
+                return {
+                    initiallyDark,
+                    afterSakuraDark,
+                    afterSakuraStoredTheme,
+                    afterSakuraLightDisabled,
+                    afterSakuraPill,
+                    stillDarkAfterToggle,
+                    stillDarkAfterSetLight,
+                    stillDarkAfterAuto,
+                    thematicCount: thematicIds.length,
+                    failedAutoDark,
+                    lightUnlockedAfterDefault,
+                    lightWorksAfterDefault,
+                    darkForcedOnApply
+                };
+            });
+
+            await helpers.resetPageState(page);
+
+            helpers.assertFalse(res.initiallyDark, 'Test precondition must start in Light Mode');
+            helpers.assertTrue(res.afterSakuraDark, 'Selecting theme_sakura from Light Mode must activate Dark Mode automatically');
+            helpers.assertEqual(res.afterSakuraStoredTheme, 'dark', 'Selecting thematic background must persist theme=dark');
+            helpers.assertTrue(res.afterSakuraLightDisabled, '#settings-theme-light must be disabled while thematic background is active');
+            helpers.assertIncludes(res.afterSakuraPill, 'Modo Oscuro', '#settings-theme-pill must show Modo Oscuro requirement');
+            helpers.assertTrue(res.stillDarkAfterToggle, 'Header theme toggle must keep Dark Mode while thematic background is active');
+            helpers.assertTrue(res.stillDarkAfterSetLight, 'setTheme("light") must keep Dark Mode while thematic background is active');
+            helpers.assertTrue(res.stillDarkAfterAuto, 'setTheme("auto") must keep Dark Mode while thematic background is active');
+            helpers.assertEqual(res.thematicCount, 10, 'All 10 thematic backgrounds must be verified');
+            helpers.assertEqual(res.failedAutoDark.length, 0, `Every thematic background must auto-activate Dark Mode (${res.failedAutoDark.join(', ')})`);
+            helpers.assertTrue(res.lightUnlockedAfterDefault, 'Returning to Predeterminado must unlock Light Mode button');
+            helpers.assertTrue(res.lightWorksAfterDefault, 'Light Mode must work normally once thematic background is deselected');
+            helpers.assertTrue(res.darkForcedOnApply, 'Programmatic applyBackground() with thematic preset must also enforce Dark Mode');
+        }
+    },
 
     // =========================================================================
     // F23: v1.5.2 Temáticos Ocultos, Sin 'Liquid Glass', Cristal en Drawer/Hojas/Toasts

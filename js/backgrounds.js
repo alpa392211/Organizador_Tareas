@@ -596,6 +596,74 @@
             return id === 'vault_auto' || THEMATIC_PRESETS.some(p => p.id === id);
         }
 
+        isDarkOnlyPreset(id) {
+            return THEMATIC_PRESETS.some(p => p.id === id);
+        }
+
+        isDarkOnlyBackgroundActive() {
+            const Storage = window.StorageModule;
+            if (!Storage || this.isMonochromeActive()) return false;
+            return this.isDarkOnlyPreset(this.resolveEffectiveBackgroundId());
+        }
+
+        _syncAppThemeUI() {
+            const Storage = window.StorageModule;
+            if (window.OrganizadorApp?.updateThemeUI && Storage) {
+                const savedTheme = Storage.getTheme?.();
+                const isDarkNow = document.documentElement.classList.contains('dark');
+                window.OrganizadorApp.updateThemeUI(isDarkNow ? 'dark' : 'light', !savedTheme);
+            }
+        }
+
+        _ensureDarkModeForThematic({ showToast = false } = {}) {
+            if (this._forcingDarkTheme) return false;
+            const Storage = window.StorageModule;
+            const wasDark = document.documentElement.classList.contains('dark');
+            if (wasDark) {
+                if (Storage && Storage.getTheme?.() !== 'dark') {
+                    Storage.setTheme('dark');
+                    this._syncAppThemeUI();
+                }
+                return false;
+            }
+            this._forcingDarkTheme = true;
+            try {
+                if (window.OrganizadorApp?.applyTheme) {
+                    window.OrganizadorApp.applyTheme('dark', true);
+                } else {
+                    document.documentElement.classList.add('dark');
+                    Storage?.setTheme?.('dark');
+                }
+                if (showToast) {
+                    window.OrganizadorApp?.showToast?.('🌙 Modo oscuro activado automáticamente para usar este fondo.', 'info');
+                }
+            } finally {
+                this._forcingDarkTheme = false;
+            }
+            return true;
+        }
+
+        selectPreset(presetId, { silentThemeToast = false } = {}) {
+            const Storage = window.StorageModule;
+            if (!Storage || !presetId) return;
+            window.HapticsModule?.light?.();
+
+            const wasDark = document.documentElement.classList.contains('dark');
+            Storage.setBackgroundPreset(presetId);
+
+            const effectiveId = this.resolveEffectiveBackgroundId();
+            const isDarkOnly = !this.isMonochromeActive() && this.isDarkOnlyPreset(effectiveId);
+
+            if (isDarkOnly && !wasDark) {
+                this._ensureDarkModeForThematic({ showToast: !silentThemeToast });
+            } else {
+                this.applyBackground();
+                this._syncAppThemeUI();
+            }
+
+            this.renderSettingsUI();
+        }
+
         onSpecialThemeChanged(nextThemeId) {
             const Storage = window.StorageModule;
             if (!Storage) return;
@@ -615,6 +683,7 @@
             }
             this.applyBackground();
             this.renderSettingsUI();
+            this._syncAppThemeUI();
         }
 
         onGrayModeChanged(enabled) {
@@ -627,6 +696,7 @@
             }
             this.applyBackground();
             this.renderSettingsUI();
+            this._syncAppThemeUI();
         }
 
         resolveEffectiveBackgroundId() {
@@ -1058,6 +1128,9 @@
             const isThemedOrStyled = Boolean((basicMatch && basicMatch.id !== 'default') || monoMatch || thematicMatch);
 
             if (thematicMatch) {
+                if (!isDark && this._ensureDarkModeForThematic({ showToast: false })) {
+                    return;
+                }
                 this.gradientEl.style.backgroundImage = thematicMatch.gradient;
                 this._resizeCanvas();
                 this.canvas.classList.remove('hidden');
@@ -1139,10 +1212,7 @@
                 basicGrid.querySelectorAll('[data-bg-preset]').forEach(btn => {
                     btn.onclick = () => {
                         if (btn.disabled) return;
-                        window.HapticsModule?.light?.();
-                        Storage.setBackgroundPreset(btn.getAttribute('data-bg-preset'));
-                        this.applyBackground();
-                        this.renderSettingsUI();
+                        this.selectPreset(btn.getAttribute('data-bg-preset'));
                     };
                 });
             }
@@ -1162,10 +1232,7 @@
                 }).join('');
                 monoGrid.querySelectorAll('[data-bg-preset]').forEach(btn => {
                     btn.onclick = () => {
-                        window.HapticsModule?.light?.();
-                        Storage.setBackgroundPreset(btn.getAttribute('data-bg-preset'));
-                        this.applyBackground();
-                        this.renderSettingsUI();
+                        this.selectPreset(btn.getAttribute('data-bg-preset'));
                     };
                 });
             }
@@ -1202,19 +1269,17 @@
                     }).join('');
 
                     expSection.innerHTML = `
-                        <div class="flex items-center justify-between gap-2 mb-2">
+                        <div class="flex items-center justify-between gap-2 mb-1">
                             <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Fondos temáticos de Bóveda</p>
                             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">Experimental</span>
                         </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2">Solo funcionan en modo oscuro; se activa automáticamente al seleccionarlos.</p>
                         <div id="settings-bg-experimental-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">${autoBtn}${manualCards}</div>`;
 
                     expSection.querySelectorAll('[data-bg-preset]').forEach(btn => {
                         btn.onclick = () => {
                             if (btn.disabled) return;
-                            window.HapticsModule?.light?.();
-                            Storage.setBackgroundPreset(btn.getAttribute('data-bg-preset'));
-                            this.applyBackground();
-                            this.renderSettingsUI();
+                            this.selectPreset(btn.getAttribute('data-bg-preset'));
                         };
                     });
                 }
@@ -1331,9 +1396,7 @@
             if (usePhotoBtn) {
                 usePhotoBtn.onclick = () => {
                     if (this.isMonochromeActive()) return;
-                    Storage.setBackgroundPreset('custom_photo');
-                    this.applyBackground();
-                    this.renderSettingsUI();
+                    this.selectPreset('custom_photo');
                 };
             }
 
