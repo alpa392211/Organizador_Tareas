@@ -304,8 +304,10 @@
             this.applySpecialThemeFromStorage();
             this.updateApolloRockets();
 
-            // 4. Inicializar y aplicar tipografía seleccionada
+            // 4. Inicializar y aplicar tipografía e intensidad Liquid Glass
             this.initFontFamily();
+            this.initGlassIntensity();
+            window.BackgroundsModule?.init?.();
 
             // Bloqueo de orientación horizontal en teléfonos móviles (Portrait Lock)
             this.initOrientationLock();
@@ -323,6 +325,7 @@
             this.setupSidebarDrawer();
             this.setupBottomActionButton();
             this.setupModalsAndShortcuts();
+            this.setupMobileBottomSheets();
             this.setupCycleWelcomeModal();
             this.setupExitModal();
             this.setupSettingsView();
@@ -389,9 +392,9 @@
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.5.0
+                // Comprobar changelog de versión 1.5.1
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.5.0') {
+                if (lastSeenVersion !== '1.5.1') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
@@ -575,6 +578,33 @@
             const font = Storage.getFontFamily?.() || 'calibri';
             this.syncSettingsFontButtons();
             this.applyFontFamily(font);
+        }
+
+        initGlassIntensity() {
+            const Storage = window.StorageModule;
+            const level = Storage?.getGlassIntensity?.() || 'normal';
+            this.applyGlassIntensity(level);
+        }
+
+        applyGlassIntensity(level) {
+            const normalized = (level === 'suave' || level === 'normal' || level === 'intenso') ? level : 'normal';
+            const root = document.documentElement;
+            root.setAttribute('data-glass-intensity', normalized);
+
+            const labels = {
+                suave: 'Suave',
+                normal: 'Normal',
+                intenso: 'Intenso'
+            };
+            const pill = document.getElementById('settings-glass-pill');
+            if (pill) {
+                pill.textContent = labels[normalized] || 'Normal';
+            }
+
+            document.querySelectorAll('#settings-glass-intensity-group [data-glass-intensity]').forEach(btn => {
+                const isSelected = btn.dataset.glassIntensity === normalized;
+                btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            });
         }
 
         syncSettingsFontButtons() {
@@ -796,6 +826,7 @@
             if (window.CalendarModule?.render) {
                 window.CalendarModule.render();
             }
+            window.BackgroundsModule?.applyBackground?.();
         }
 
         setTheme(themeMode) {
@@ -912,6 +943,7 @@
             if (window.CalendarModule?.render) {
                 window.CalendarModule.render();
             }
+            window.BackgroundsModule?.onGrayModeChanged?.(isGray);
         }
 
         applySecretFeaturesUI() {
@@ -1161,7 +1193,7 @@
                 if (!drawer || !backdrop) return;
                 window.HapticsModule?.light();
                 drawer.classList.remove('-translate-x-full');
-                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 backdrop.classList.add('opacity-100');
                 document.body.classList.add('overflow-hidden');
             };
@@ -1313,11 +1345,195 @@
             });
         }
 
+        setupMobileBottomSheets() {
+            let drag = null;
+
+            const dismissSheet = (overlay, sheet, backdrop) => {
+                const id = overlay?.id;
+                window.HapticsModule?.light?.();
+                if (sheet) {
+                    sheet.style.transition = 'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+                    sheet.style.transform = 'translate3d(0, 100%, 0)';
+                }
+                if (backdrop) {
+                    backdrop.style.transition = 'opacity 0.2s ease';
+                    backdrop.style.opacity = '0';
+                }
+
+                if (id === 'subject-modal') window.SubjectsModule?.closeModal?.();
+                else if (id === 'task-modal') window.TasksModule?.closeModal?.();
+                else if (id === 'note-modal') window.NotesModule?.closeModal?.();
+                else if (id === 'calendar-modal') window.CalendarModule?.closeModal?.();
+                else if (id === 'exit-modal') this.closeExitModal?.();
+                else if (id === 'archive-confirm-modal') document.getElementById('archive-cancel-btn')?.click();
+                else if (id === 'changelog-modal') document.getElementById('changelog-confirm-btn')?.click();
+                else if (id === 'note-unlock-modal') document.getElementById('note-unlock-cancel')?.click();
+                else if (id === 'photo-editor-modal') window.PhotoEditorModule?.cancel?.();
+                else if (overlay) {
+                    overlay.classList.remove('active');
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        overlay.classList.remove('flex');
+                        document.body.classList.remove('overflow-hidden');
+                    }, 200);
+                }
+
+                setTimeout(() => {
+                    if (sheet) {
+                        sheet.style.transform = '';
+                        sheet.style.transition = '';
+                    }
+                    if (backdrop) {
+                        backdrop.style.opacity = '';
+                        backdrop.style.transition = '';
+                    }
+                }, 240);
+            };
+
+            document.addEventListener('touchstart', (e) => {
+                if ((window.innerWidth || 0) > 639) return;
+                const grabber = e.target.closest?.('.modal-sheet-grabber');
+                if (!grabber) return;
+                const overlay = grabber.closest('.mobile-sheet-overlay');
+                const sheet = overlay?.querySelector('.mobile-bottom-sheet');
+                if (!overlay || !sheet || overlay.classList.contains('hidden')) return;
+                const touch = e.touches && e.touches[0];
+                if (!touch) return;
+                const backdrop = overlay.querySelector('.app-modal-backdrop');
+                sheet.style.transition = 'none';
+                if (backdrop) backdrop.style.transition = 'none';
+                const now = Date.now();
+                drag = {
+                    overlay,
+                    sheet,
+                    backdrop,
+                    startY: touch.clientY,
+                    prevY: touch.clientY,
+                    prevTime: now,
+                    lastY: touch.clientY,
+                    lastTime: now,
+                    dy: 0
+                };
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!drag) return;
+                const touch = e.touches && e.touches[0];
+                if (!touch) return;
+                const dy = Math.max(0, touch.clientY - drag.startY);
+                drag.prevY = drag.lastY;
+                drag.prevTime = drag.lastTime;
+                drag.lastY = touch.clientY;
+                drag.lastTime = Date.now();
+                drag.dy = dy;
+                drag.sheet.style.transform = `translate3d(0, ${Math.round(dy)}px, 0)`;
+                if (drag.backdrop) {
+                    drag.backdrop.style.opacity = String(Math.max(0.1, 1 - dy / 320));
+                }
+                if (e.cancelable) e.preventDefault();
+            }, { passive: false });
+
+            const endDrag = () => {
+                if (!drag) return;
+                const { overlay, sheet, backdrop, dy, prevY, prevTime, lastY, lastTime } = drag;
+                drag = null;
+                const dt = Math.max(16, lastTime - prevTime);
+                const velocity = (lastY - prevY) / dt;
+                sheet.style.transition = '';
+                if (backdrop) backdrop.style.transition = '';
+                if (dy > 80 || velocity > 0.45) {
+                    dismissSheet(overlay, sheet, backdrop);
+                } else {
+                    sheet.style.transform = 'translate3d(0, 0, 0)';
+                    if (backdrop) backdrop.style.opacity = '';
+                    setTimeout(() => {
+                        if (!overlay.classList.contains('hidden') && overlay.classList.contains('active')) {
+                            sheet.style.transform = '';
+                        }
+                    }, 360);
+                }
+            };
+
+            document.addEventListener('touchend', endDrag, { passive: true });
+            document.addEventListener('touchcancel', endDrag, { passive: true });
+
+            const adjustSheetForViewport = (focusedEl) => {
+                if ((window.innerWidth || 0) > 639) return;
+                const vvHeight = window.visualViewport?.height || window.innerHeight;
+                const openSheets = document.querySelectorAll('.mobile-sheet-overlay:not(.hidden) .mobile-bottom-sheet');
+                openSheets.forEach(sheet => {
+                    sheet.style.maxHeight = `${Math.max(260, Math.floor(vvHeight * 0.90))}px`;
+                });
+                if (focusedEl && focusedEl.closest?.('.mobile-bottom-sheet')) {
+                    setTimeout(() => {
+                        focusedEl.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+                    }, 180);
+                }
+            };
+
+            document.addEventListener('focusin', (e) => {
+                if (!e.target?.matches?.('input, select, textarea')) return;
+                if (!e.target.closest?.('.mobile-bottom-sheet')) return;
+                adjustSheetForViewport(e.target);
+            });
+
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    adjustSheetForViewport(document.activeElement);
+                });
+            }
+        }
+
         /* ========================================================
            GESTIÓN DE FOTO DE PERFIL (REUTILIZABLE: INICIO + AJUSTES)
            ======================================================== */
-        downsampleAndSaveProfilePhoto(file, onSaved) {
+        applySavedProfilePhoto(dataUrl, originalSrc, onSaved) {
             const Storage = window.StorageModule;
+            try {
+                Storage?.setUserPhoto?.(dataUrl);
+            } catch (err) {
+                this.showToast(err?.message || 'No se pudo guardar la foto porque el almacenamiento está lleno.', 'error');
+                return false;
+            }
+            if (originalSrc) {
+                this._rawProfilePhotoSrc = originalSrc;
+            }
+            this.renderHeader?.();
+            this.renderDrawer?.();
+            this.refreshSettingsProfileUI?.();
+            this.updateStorageMetrics?.();
+            window.HapticsModule?.light?.();
+
+            if (typeof onSaved === 'function') {
+                onSaved(dataUrl);
+            }
+            return true;
+        }
+
+        async openProfilePhotoEditor({ file, src, title } = {}, onSaved) {
+            if (!window.PhotoEditorModule) {
+                if (file) this.downsampleAndSaveProfilePhoto(file, onSaved);
+                return null;
+            }
+            const res = await window.PhotoEditorModule.open({
+                file,
+                src,
+                aspectRatio: 1,
+                shape: 'circle',
+                outputWidth: 512,
+                outputHeight: 512,
+                mimeType: 'image/jpeg',
+                quality: 0.88,
+                title: title || 'Ajustar foto de perfil'
+            });
+            if (res && res.dataUrl) {
+                const ok = this.applySavedProfilePhoto(res.dataUrl, res.originalSrc || src, onSaved);
+                return ok ? res : null;
+            }
+            return null;
+        }
+
+        downsampleAndSaveProfilePhoto(file, onSaved) {
             if (!file || (!file.type.startsWith('image/') && !file.name.match(/\.(png|jpe?g|webp|gif|bmp)$/i))) {
                 this.showToast('Solo se admiten archivos de imagen válidos.', 'warning');
                 return;
@@ -1328,63 +1544,46 @@
                 this.showToast('Error al leer el archivo seleccionado.', 'error');
             };
             reader.onload = (e) => {
+                const rawSrc = e.target?.result;
                 const img = new Image();
                 img.onerror = () => {
                     this.showToast('Archivo de imagen no válido o dañado.', 'error');
                 };
                 img.onload = () => {
-                    const MAX_SIZE = 256;
+                    const TARGET_SIZE = 512;
                     let targetW = img.width;
                     let targetH = img.height;
 
-                    if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
+                    if (targetW > TARGET_SIZE || targetH > TARGET_SIZE) {
                         if (targetW > targetH) {
-                            targetH = Math.round((targetH * MAX_SIZE) / targetW);
-                            targetW = MAX_SIZE;
+                            targetH = Math.round((targetH * TARGET_SIZE) / targetW);
+                            targetW = TARGET_SIZE;
                         } else {
-                            targetW = Math.round((targetW * MAX_SIZE) / targetH);
-                            targetH = MAX_SIZE;
+                            targetW = Math.round((targetW * TARGET_SIZE) / targetH);
+                            targetH = TARGET_SIZE;
                         }
                     }
 
                     const canvas = document.createElement('canvas');
-                    canvas.width = targetW;
-                    canvas.height = targetH;
+                    canvas.width = Math.max(1, targetW);
+                    canvas.height = Math.max(1, targetH);
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, targetW, targetH);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                     let dataUrl;
                     const isPng = file.type === 'image/png' || (file.name && file.name.toLowerCase().endsWith('.png'));
                     if (isPng) {
                         dataUrl = canvas.toDataURL('image/png');
                         if (dataUrl.length * 0.75 > 30 * 1024) {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.88);
                         }
                     } else {
-                        dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-                        if (dataUrl.length * 0.75 > 30 * 1024) {
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-                        }
+                        dataUrl = canvas.toDataURL('image/jpeg', 0.88);
                     }
 
-                    try {
-                        Storage?.setUserPhoto?.(dataUrl);
-                    } catch (err) {
-                        this.showToast(err?.message || 'No se pudo guardar la foto porque el almacenamiento está lleno.', 'error');
-                        return;
-                    }
-
-                    this.renderHeader?.();
-                    this.renderDrawer?.();
-                    this.refreshSettingsProfileUI?.();
-                    this.updateStorageMetrics?.();
-                    window.HapticsModule?.light?.();
-
-                    if (typeof onSaved === 'function') {
-                        onSaved(dataUrl);
-                    }
+                    this.applySavedProfilePhoto(dataUrl, rawSrc, onSaved);
                 };
-                img.src = e.target.result;
+                img.src = rawSrc;
             };
             reader.readAsDataURL(file);
         }
@@ -1404,6 +1603,7 @@
             const preview = document.getElementById('settings-photo-preview');
             const placeholder = document.getElementById('settings-photo-placeholder');
             const uploadBtn = document.getElementById('settings-photo-upload-btn');
+            const adjustBtn = document.getElementById('settings-photo-adjust-btn');
             const clearBtn = document.getElementById('settings-photo-clear-btn');
 
             if (savedPhoto) {
@@ -1412,6 +1612,7 @@
                     preview.classList.remove('hidden');
                 }
                 if (placeholder) placeholder.classList.add('hidden');
+                if (adjustBtn) adjustBtn.classList.remove('hidden');
                 if (clearBtn) clearBtn.classList.remove('hidden');
                 if (uploadBtn) uploadBtn.textContent = 'Cambiar foto';
             } else {
@@ -1420,6 +1621,7 @@
                     preview.classList.add('hidden');
                 }
                 if (placeholder) placeholder.classList.remove('hidden');
+                if (adjustBtn) adjustBtn.classList.add('hidden');
                 if (clearBtn) clearBtn.classList.add('hidden');
                 if (uploadBtn) uploadBtn.textContent = 'Subir foto';
             }
@@ -1452,32 +1654,36 @@
 
             let currentAccountType = Storage?.getAccountType?.() || 'organizer';
 
-            // 1. Subida de Foto de Perfil mediante Canvas HTML5 (máx 256x256, <30KB)
+            // 1. Subida de Foto de Perfil mediante Editor con recorte/zoom (512x512 JPEG 0.88)
             if (welcomePhotoInput) {
+                const updateWelcomePreview = (dataUrl) => {
+                    if (welcomePhotoPreview) {
+                        welcomePhotoPreview.src = dataUrl;
+                        welcomePhotoPreview.classList.remove('hidden');
+                    }
+                    if (welcomePhotoPlaceholder) {
+                        welcomePhotoPlaceholder.classList.add('hidden');
+                    }
+                    if (welcomePhotoClearBtn) {
+                        welcomePhotoClearBtn.classList.remove('hidden');
+                    }
+                };
                 const handlePhotoChange = (e) => {
                     const file = e.target.files?.[0];
-                    if (file) {
-                        this.downsampleAndSaveProfilePhoto(file, (dataUrl) => {
-                            if (welcomePhotoPreview) {
-                                welcomePhotoPreview.src = dataUrl;
-                                welcomePhotoPreview.classList.remove('hidden');
-                            }
-                            if (welcomePhotoPlaceholder) {
-                                welcomePhotoPlaceholder.classList.add('hidden');
-                            }
-                            if (welcomePhotoClearBtn) {
-                                welcomePhotoClearBtn.classList.remove('hidden');
-                            }
-                        });
+                    if (!file) return;
+                    if (e.isTrusted && window.PhotoEditorModule) {
+                        this.openProfilePhotoEditor({ file, title: 'Encuadrar foto de perfil' }, updateWelcomePreview);
+                    } else {
+                        this.downsampleAndSaveProfilePhoto(file, updateWelcomePreview);
                     }
                 };
                 welcomePhotoInput.addEventListener('change', handlePhotoChange);
-                welcomePhotoInput.addEventListener('input', handlePhotoChange);
             }
 
             if (welcomePhotoClearBtn) {
                 welcomePhotoClearBtn.onclick = () => {
                     window.HapticsModule?.light?.();
+                    this._rawProfilePhotoSrc = '';
                     Storage?.setUserPhoto?.('');
                     if (welcomePhotoInput) welcomePhotoInput.value = '';
                     if (welcomePhotoPreview) {
@@ -1497,6 +1703,11 @@
             // 2. Apertura y Cierre de Onboarding
             const openWelcome = () => {
                 modal.style.display = '';
+                const backdrop = document.getElementById('cycle-setup-backdrop');
+                if (backdrop) {
+                    backdrop.classList.remove('hidden', 'opacity-0');
+                    backdrop.style.opacity = '';
+                }
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 document.body.classList.add('overflow-hidden');
@@ -1631,7 +1842,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.0') {
+                        if (lastSeenVersion !== '1.5.1') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -1673,7 +1884,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.0') {
+                        if (lastSeenVersion !== '1.5.1') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -1696,6 +1907,17 @@
                 if (!exitModal) return;
                 window.HapticsModule?.medium();
                 this.closeSidebarDrawer?.();
+                exitModal.style.display = '';
+                if (backdrop) {
+                    backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                    backdrop.style.opacity = '';
+                }
+                const sheet = exitModal.querySelector('.mobile-bottom-sheet');
+                if (sheet) {
+                    sheet.style.transform = '';
+                    sheet.style.transition = '';
+                    sheet.style.maxHeight = '';
+                }
                 exitModal.classList.remove('hidden');
                 exitModal.classList.add('flex');
                 document.body.classList.add('overflow-hidden');
@@ -1817,9 +2039,10 @@
                 };
             }
 
-            // 1.2 Gestión de Foto de Perfil en Configuraciones (subir, cambiar o quitar)
+            // 1.2 Gestión de Foto de Perfil en Configuraciones (subir, cambiar, ajustar o quitar)
             const settingsPhotoInput = document.getElementById('settings-photo-input');
             const settingsPhotoUploadBtn = document.getElementById('settings-photo-upload-btn');
+            const settingsPhotoAdjustBtn = document.getElementById('settings-photo-adjust-btn');
             const settingsPhotoClearBtn = document.getElementById('settings-photo-clear-btn');
 
             this.refreshSettingsProfileUI();
@@ -1835,17 +2058,38 @@
                 const handleSettingsPhotoChange = (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    this.downsampleAndSaveProfilePhoto(file, () => {
-                        this.showToast('Foto de perfil actualizada con éxito.', 'success');
-                    });
+                    if (e.isTrusted && window.PhotoEditorModule) {
+                        this.openProfilePhotoEditor({ file, title: 'Ajustar foto de perfil' }, () => {
+                            this.showToast('Foto de perfil actualizada con éxito.', 'success');
+                        });
+                    } else {
+                        this.downsampleAndSaveProfilePhoto(file, () => {
+                            this.showToast('Foto de perfil actualizada con éxito.', 'success');
+                        });
+                    }
                     settingsPhotoInput.value = '';
                 };
                 settingsPhotoInput.onchange = handleSettingsPhotoChange;
             }
 
+            if (settingsPhotoAdjustBtn) {
+                settingsPhotoAdjustBtn.onclick = () => {
+                    const src = this._rawProfilePhotoSrc || Storage.getUserPhoto?.() || '';
+                    if (!src) {
+                        this.showToast('Primero sube una foto para poder ajustarla.', 'info');
+                        return;
+                    }
+                    window.HapticsModule?.light?.();
+                    this.openProfilePhotoEditor({ src, title: 'Ajustar foto actual' }, () => {
+                        this.showToast('Encuadre de foto actualizado con éxito.', 'success');
+                    });
+                };
+            }
+
             if (settingsPhotoClearBtn) {
                 settingsPhotoClearBtn.onclick = () => {
                     window.HapticsModule?.light?.();
+                    this._rawProfilePhotoSrc = '';
                     Storage.setUserPhoto('');
                     if (settingsPhotoInput) settingsPhotoInput.value = '';
                     this.renderHeader();
@@ -1963,6 +2207,22 @@
                     this.showToast(enabled ? 'Acceso rápido de tema visible en cabecera.' : 'Acceso rápido de tema oculto en cabecera.', 'info');
                 };
             }
+
+            // 5.5 Intensidad del cristal (Suave / Normal / Intenso)
+            this.initGlassIntensity();
+            document.querySelectorAll('#settings-glass-intensity-group [data-glass-intensity]').forEach(btn => {
+                btn.onclick = () => {
+                    const level = btn.dataset.glassIntensity;
+                    Storage.setGlassIntensity(level);
+                    this.applyGlassIntensity(level);
+                    window.HapticsModule?.light?.();
+                    const labels = { suave: 'Suave', normal: 'Normal', intenso: 'Intenso' };
+                    this.showToast(`Intensidad del cristal: ${labels[level] || level}`, 'success');
+                };
+            });
+
+            // 5.6 Fondo de Pantalla, Temáticos Experimentales y Mi foto (Etapa 3)
+            window.BackgroundsModule?.bindSettingsUI?.();
 
             // 6. Tipografía Mediante Botones Interactivos (5 Opciones Estándar + Desbloqueables Bóveda)
             this.syncSettingsFontButtons();
@@ -2117,6 +2377,9 @@
                             Storage.importJson(evt.target.result);
                             Storage.cleanupLegacyKeys?.();
                             this.initFontFamily();
+                            this.initGlassIntensity();
+                            window.BackgroundsModule?.applyBackground?.();
+                            window.BackgroundsModule?.renderSettingsUI?.();
                             this.refreshSettingsProfileUI();
                             this.syncPeriodUI();
                             this.refreshAll();
@@ -2136,13 +2399,14 @@
                 if (confirm('¿Estás seguro de eliminar todas las materias, tareas, notas y archivados? Esta acción no se puede deshacer.')) {
                     window.TasksModule?.cancelAllNotifications?.();
                     Storage.clearAll();
+                    window.BackgroundsModule?.clearCustomPhoto?.();
                     this.refreshAll();
                     this.showToast('Todos los datos han sido eliminados.', 'info');
                     this.switchView('subjects');
                 }
             });
 
-            // 11. Novedades de Versión 1.5.0
+            // 11. Novedades de Versión 1.5.1
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -2171,12 +2435,23 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.5.0');
+                window.StorageModule.setLastSeenVersion('1.5.1');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
             if (backdrop) backdrop.onclick = closeModal;
 
+            modal.style.display = '';
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
+            const sheet = modal.querySelector('.mobile-bottom-sheet');
+            if (sheet) {
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+                sheet.style.maxHeight = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
@@ -2374,6 +2649,7 @@
                 } else {
                     window.StorageModule.unlockCode(codeDef.id);
                 }
+                window.BackgroundsModule?.renderSettingsUI?.();
                 window.HapticsModule?.double?.();
 
                 const lockDiv = cardContainer?.querySelector('.text-3xl');
@@ -2504,6 +2780,7 @@
                                 }
                                 this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
                             }
+                            window.BackgroundsModule?.onSpecialThemeChanged?.(isCurrentlyActive ? 'default' : codeDef.themeId);
                         }
                         if (codeDef.supportsRockets) {
                             window.StorageModule.setApolloRocketsEnabled(!isCurrentlyActive);
@@ -2529,6 +2806,11 @@
             };
             window.addEventListener('keydown', handleEsc);
 
+            modal.style.display = '';
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             requestAnimationFrame(() => {
@@ -2706,6 +2988,7 @@
                         this.updateThemeUI('dark', false);
                         this.showToast(`✨ ${def.name} activado`, 'success');
                     }
+                    window.BackgroundsModule?.onSpecialThemeChanged?.(isCurrentlyActive ? 'default' : def.themeId);
                     this.renderVaultInventory();
                 };
             });

@@ -64,6 +64,18 @@ window.CalendarModule = (() => {
         window.HapticsModule?.light();
         const modal = document.getElementById('calendar-modal');
         if (modal) {
+            modal.style.display = '';
+            const backdrop = document.getElementById('calendar-modal-backdrop');
+            if (backdrop) {
+                backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.opacity = '';
+            }
+            const sheet = modal.querySelector('.mobile-bottom-sheet');
+            if (sheet) {
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+                sheet.style.maxHeight = '';
+            }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
@@ -112,10 +124,10 @@ window.CalendarModule = (() => {
         // Banner informativo del ciclo escolar en el calendario
         if (cycleBanner && cycle) {
             cycleBanner.innerHTML = `
-                <div class="flex items-center justify-between text-xs px-3 py-1.5 rounded-xl bg-indigo-50/80 dark:bg-slate-700/60 border border-indigo-100 dark:border-slate-600 text-indigo-950 dark:text-indigo-200">
-                    <span class="flex items-center gap-1.5 font-bold">
+                <div class="flex flex-wrap items-center justify-between gap-1.5 min-w-0 text-xs px-3 py-1.5 rounded-xl bg-indigo-50/80 dark:bg-slate-700/60 border border-indigo-100 dark:border-slate-600 text-indigo-950 dark:text-indigo-200">
+                    <span class="flex flex-wrap items-center gap-1.5 font-bold min-w-0">
                         <span>🗓️</span> Ciclo Escolar Activo:
-                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-extrabold">${cycle.startDate} al ${cycle.endDate}</span>
+                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-extrabold break-all">${cycle.startDate} al ${cycle.endDate}</span>
                     </span>
                     <span class="text-[11px] text-slate-600 dark:text-slate-300 hidden sm:inline">Clases vigentes solo en periodo activo</span>
                 </div>
@@ -126,7 +138,7 @@ window.CalendarModule = (() => {
 
         DAY_LABELS.forEach(label => {
             const h = document.createElement('div');
-            h.className = 'text-center text-xs font-bold text-slate-600 dark:text-slate-400 py-1.5 uppercase tracking-wider';
+            h.className = 'text-center text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-400 py-1.5 uppercase tracking-wider truncate min-w-0';
             h.textContent = label;
             gridEl.appendChild(h);
         });
@@ -141,7 +153,7 @@ window.CalendarModule = (() => {
         const prevMonthLastDay = new Date(year, month, 0).getDate();
         for (let i = startCol - 1; i >= 0; i--) {
             const cell = document.createElement('div');
-            cell.className = 'min-h-[50px] sm:min-h-[64px] p-1 rounded-xl bg-slate-50/50 dark:bg-slate-800/20 text-slate-500 opacity-60 flex flex-col items-center justify-start text-xs border border-transparent select-none';
+            cell.className = 'min-w-0 min-h-[44px] sm:min-h-[64px] p-0.5 sm:p-1 rounded-xl bg-slate-50/50 dark:bg-slate-800/20 text-slate-500 opacity-60 flex flex-col items-center justify-start text-xs border border-transparent select-none';
             cell.innerHTML = `<span>${prevMonthLastDay - i}</span>`;
             gridEl.appendChild(cell);
         }
@@ -183,7 +195,7 @@ window.CalendarModule = (() => {
             cell.type = 'button';
 
             // Estilos delimitadores según vigencia del ciclo escolar
-            let baseStyles = 'min-h-[50px] sm:min-h-[64px] p-1 rounded-xl transition-all duration-150 flex flex-col items-center justify-between text-xs border relative group ';
+            let baseStyles = 'min-w-0 min-h-[44px] sm:min-h-[64px] p-0.5 sm:p-1 rounded-xl transition-all duration-150 flex flex-col items-center justify-between text-xs border relative group ';
             
             if (!isInCycle) {
                 baseStyles += 'bg-slate-100/60 dark:bg-slate-800/40 border-dashed border-slate-300 dark:border-slate-700/70 hover:opacity-90 ';
@@ -209,7 +221,7 @@ window.CalendarModule = (() => {
             numSpan.textContent = dayNum;
 
             const dotsContainer = document.createElement('div');
-            dotsContainer.className = 'w-full flex items-center justify-center gap-1 flex-wrap mt-0.5 px-0.5';
+            dotsContainer.className = 'w-full flex items-center justify-center gap-0.5 sm:gap-1 flex-wrap mt-0.5 px-0.5 overflow-hidden';
 
             if (!isInCycle) {
                 const offSpan = document.createElement('span');

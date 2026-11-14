@@ -73,6 +73,17 @@ window.ArchiveModule = (() => {
             };
         }
 
+        if (backdrop) {
+            backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+            backdrop.style.opacity = '';
+        }
+        const sheet = modal.querySelector('.mobile-bottom-sheet');
+        if (sheet) {
+            sheet.style.transform = '';
+            sheet.style.transition = '';
+            sheet.style.maxHeight = '';
+        }
+        modal.style.display = '';
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         document.body.classList.add('overflow-hidden');
@@ -89,8 +100,8 @@ window.ArchiveModule = (() => {
                 e.stopPropagation();
                 window.HapticsModule?.light();
                 filterBtns.forEach(b => {
-                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs', 'active-archive-filter');
-                    b.classList.add('bg-slate-100', 'dark:bg-slate-700/60', 'text-slate-600', 'dark:text-slate-300');
+                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs', 'active-archive-filter', 'bg-slate-100', 'dark:bg-slate-700/60');
+                    b.classList.add('text-slate-600', 'dark:text-slate-300');
                 });
                 btn.classList.add('bg-indigo-600', 'text-white', 'shadow-xs', 'active-archive-filter');
                 btn.classList.remove('bg-slate-100', 'dark:bg-slate-700/60', 'text-slate-600', 'dark:text-slate-300');
