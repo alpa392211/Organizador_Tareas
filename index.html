@@ -56,8 +56,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.2">
-    <link rel="stylesheet" href="css/styles.css?v=1.5.2">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.3">
+    <link rel="stylesheet" href="css/styles.css?v=1.5.3">
 </head>
 <body class="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
     <!-- Capa de fondo ambiental fija para efectos de transparencia avanzados -->
@@ -453,17 +453,17 @@
                     </div>
 
                     <!-- Filtro por Estado (Control segmentado estilo Apple: Todas, Pendientes, Completadas) -->
-                    <div class="sm:col-span-4 segmented-control-track rounded-full flex items-center gap-1 min-w-0">
-                        <button type="button" data-task-filter="all"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-bold rounded-full transition-all bg-indigo-600 text-white shadow-md truncate">
+                    <div id="tasks-filter-track" role="tablist" aria-label="Filtrar tareas por estado" class="sm:col-span-4 segmented-control-track rounded-full flex items-center gap-1 min-w-0">
+                        <button type="button" data-task-filter="all" aria-selected="true"
+                            class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2 py-2 text-xs font-bold rounded-full transition-colors bg-indigo-600 text-white shadow-md truncate">
                             Todas
                         </button>
-                        <button type="button" data-task-filter="pending"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-all truncate">
+                        <button type="button" data-task-filter="pending" aria-selected="false"
+                            class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2 py-2 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-colors truncate">
                             Pendientes
                         </button>
-                        <button type="button" data-task-filter="completed"
-                            class="flex-1 min-w-0 min-h-[38px] px-2 py-1.5 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-all truncate">
+                        <button type="button" data-task-filter="completed" aria-selected="false"
+                            class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2 py-2 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-400 transition-colors truncate">
                             Listas
                         </button>
                     </div>
@@ -548,14 +548,14 @@
                 <!-- Control segmentado Notas | Galería (estilo Apple HIG) -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
                     <div id="notes-view-tabs" role="tablist" aria-label="Secciones de notas"
-                        class="notes-segmented-control inline-flex items-center p-1 rounded-2xl bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 w-full sm:w-auto">
+                        class="notes-segmented-control segmented-control-track inline-flex items-center p-1 rounded-full bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/60 w-full sm:w-auto">
                         <button type="button" id="notes-tab-notes" role="tab" aria-selected="true" data-notes-tab="notes"
-                            class="notes-seg-btn notes-seg-active touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            class="notes-seg-btn notes-seg-active touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-full text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
                             <span>📝</span>
                             <span>Notas</span>
                         </button>
                         <button type="button" id="notes-tab-gallery" role="tab" aria-selected="false" data-notes-tab="gallery"
-                            class="notes-seg-btn touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
+                            class="notes-seg-btn touch-target-44 min-h-[44px] flex-1 sm:flex-initial px-4 py-2 rounded-full text-xs font-extrabold inline-flex items-center justify-center gap-1.5 tap-effect">
                             <span>🖼️</span>
                             <span>Galería</span>
                             <span id="notes-gallery-count" class="px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">0</span>
@@ -785,14 +785,14 @@
                     </div>
 
                     <!-- Pestañas de Filtrado (Control segmentado) -->
-                    <div class="segmented-control-track rounded-full flex items-center gap-1 self-stretch sm:self-auto min-w-0">
-                        <button type="button" data-archive-filter="all" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-indigo-600 text-white shadow-xs">
+                    <div id="archive-filter-track" role="tablist" aria-label="Filtrar elementos del baúl" class="segmented-control-track rounded-full flex items-center gap-1 self-stretch sm:self-auto min-w-0">
+                        <button type="button" data-archive-filter="all" aria-selected="true" class="touch-target-44 tap-effect flex-1 sm:flex-initial min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-colors bg-indigo-600 text-white shadow-xs">
                             Todos
                         </button>
-                        <button type="button" data-archive-filter="tasks" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
+                        <button type="button" data-archive-filter="tasks" aria-selected="false" class="touch-target-44 tap-effect flex-1 sm:flex-initial min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-colors text-slate-600 dark:text-slate-300">
                             Tareas
                         </button>
-                        <button type="button" data-archive-filter="notes" class="tap-effect flex-1 sm:flex-initial min-h-[38px] px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300">
+                        <button type="button" data-archive-filter="notes" aria-selected="false" class="touch-target-44 tap-effect flex-1 sm:flex-initial min-h-[44px] px-3 py-2 rounded-full text-xs font-bold transition-colors text-slate-600 dark:text-slate-300">
                             Notas
                         </button>
                     </div>
@@ -1538,17 +1538,17 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.5.2 -->
+                <!-- VERSIÓN HASTA ABAJO v1.5.3 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.5.2</span>
+                        <span>Versión 1.5.3</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="touch-target-44 min-h-[44px] px-3 tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.5.2</span>
+                        <span>✨ Ver novedades de la versión 1.5.3</span>
                     </button>
                 </div>
             </div>
@@ -2449,14 +2449,14 @@
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                                Novedades de la Versión 1.5.2
+                                Novedades de la Versión 1.5.3
                             </h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                                v1.5.2
+                                v1.5.3
                             </span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            ¡Descubre los efectos de transparencia avanzados en toda la app, reencuadre de fondos y galería fotográfica en Notas!
+                            ¡Controles segmentados con animación de cristal líquido, menú contextual con reacomodo automático sin superposición y bloqueo total de scroll!
                         </p>
                     </div>
                 </div>
@@ -2466,29 +2466,29 @@
                     <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">🫧</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Efectos de transparencia avanzados</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Controles segmentados con animación de cristal líquido</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Menú lateral, hojas inferiores, popovers y notificaciones flotantes con cristal real traslúcido, intensidad ajustable (Suave, Normal o Intenso) y tipografía Inter variable.
+                                Indicador deslizante con efectos de transparencia avanzados, reflejo especular y física de resorte suave en los selectores de Tareas, Notas, Baúl y Configuraciones.
                             </p>
                         </div>
                     </div>
 
                     <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">🖼️</span>
+                        <span class="text-xl shrink-0 select-none">📐</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Reencuadre de foto de fondo y perfil</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Menú de mantener presionado sin superposición</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Arrastra, haz zoom y gira tus imágenes libremente con conservación del original en el dispositivo para volver a reencuadrar cuando quieras.
+                                Al mantener presionada cualquier tarjeta, el sistema calcula el espacio disponible y reacomoda suavemente la tarjeta clonada y el menú dentro del área segura para que nunca se tapen entre sí.
                             </p>
                         </div>
                     </div>
 
                     <div class="p-3 rounded-2xl bg-violet-50/60 dark:bg-violet-950/30 border border-violet-100 dark:border-violet-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">📸</span>
+                        <span class="text-xl shrink-0 select-none">🔒</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Galería fotográfica en Notas con zoom y descarga</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Bloqueo total de scroll durante el menú contextual</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Explora tus fotos en cuadrícula o desliza a pantalla completa con zoom táctil y controles precisos, descarga el archivo original o abre su nota en un toque.
+                                El desplazamiento de fondo en móvil y escritorio queda congelado mientras el menú contextual está abierto y se restaura exactamente en el mismo punto al cerrarlo.
                             </p>
                         </div>
                     </div>
@@ -2496,9 +2496,9 @@
                     <div class="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">✨</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Privacidad visual y contraste impecable</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Fluidez, accesibilidad por teclado y contraste garantizado</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Personalización ordenada sin funciones ocultas visibles antes de descubrirlas y legibilidad asegurada sobre cualquier fondo en claro u oscuro.
+                                Navegación completa con flechas de teclado en controles segmentados, respeto a movimiento reducido y legibilidad verificada en modo claro, oscuro y monocromático.
                             </p>
                         </div>
                     </div>
@@ -2517,18 +2517,19 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/storage.js?v=1.5.2"></script>
-    <script src="js/haptics.js?v=1.5.2"></script>
-    <script src="js/notifications.js?v=1.5.2"></script>
-    <script src="js/widgets.js?v=1.5.2"></script>
-    <script src="js/subjects.js?v=1.5.2"></script>
-    <script src="js/tasks.js?v=1.5.2"></script>
-    <script src="js/notes.js?v=1.5.2"></script>
-    <script src="js/calendar.js?v=1.5.2"></script>
-    <script src="js/archive.js?v=1.5.2"></script>
-    <script src="js/photo-editor.js?v=1.5.2"></script>
-    <script src="js/backgrounds.js?v=1.5.2"></script>
-    <script src="js/app.js?v=1.5.2"></script>
+    <script src="js/storage.js?v=1.5.3"></script>
+    <script src="js/haptics.js?v=1.5.3"></script>
+    <script src="js/segmented.js?v=1.5.3"></script>
+    <script src="js/notifications.js?v=1.5.3"></script>
+    <script src="js/widgets.js?v=1.5.3"></script>
+    <script src="js/subjects.js?v=1.5.3"></script>
+    <script src="js/tasks.js?v=1.5.3"></script>
+    <script src="js/notes.js?v=1.5.3"></script>
+    <script src="js/calendar.js?v=1.5.3"></script>
+    <script src="js/archive.js?v=1.5.3"></script>
+    <script src="js/photo-editor.js?v=1.5.3"></script>
+    <script src="js/backgrounds.js?v=1.5.3"></script>
+    <script src="js/app.js?v=1.5.3"></script>
 
     <!-- Visor de fotos de la galería a pantalla completa -->
     <div id="photo-preview-modal" class="modal-overlay photo-viewer-overlay fixed inset-0 z-[70] hidden flex-col" role="dialog" aria-modal="true" aria-labelledby="photo-preview-name" aria-hidden="true">

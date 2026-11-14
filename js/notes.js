@@ -238,6 +238,11 @@ window.NotesModule = (() => {
         if (searchBar) searchBar.classList.toggle('hidden', target !== 'notes');
         if (galleryPanel) galleryPanel.classList.toggle('hidden', target !== 'gallery');
 
+        const tabsTrack = document.getElementById('notes-view-tabs');
+        if (tabsTrack) {
+            window.SegmentedControl?.sync?.(tabsTrack);
+        }
+
         if (target === 'gallery') {
             refreshPhotoNoteSelect();
             renderGallery();

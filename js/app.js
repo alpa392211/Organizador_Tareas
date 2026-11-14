@@ -392,9 +392,9 @@
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.5.2
+                // Comprobar changelog de versión 1.5.3
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.5.2') {
+                if (lastSeenVersion !== '1.5.3') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
@@ -605,10 +605,14 @@
                 pill.textContent = labels[normalized] || 'Normal';
             }
 
+            const group = document.getElementById('settings-glass-intensity-group');
             document.querySelectorAll('#settings-glass-intensity-group [data-glass-intensity]').forEach(btn => {
                 const isSelected = btn.dataset.glassIntensity === normalized;
                 btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
             });
+            if (group) {
+                window.SegmentedControl?.sync?.(group);
+            }
         }
 
         syncSettingsFontButtons() {
@@ -1129,6 +1133,7 @@
         switchView(viewName) {
             this.currentView = viewName;
             window.HapticsModule?.light();
+            window.CardContextMenu?.close?.();
             // v1.4.4: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
             this.closeAllSettingsSubmenus();
 
@@ -1181,7 +1186,11 @@
             }
             if (viewName === 'secret-codes') this.renderVaultInventory();
 
-            requestAnimationFrame(() => this.updateNavIndicators(viewName));
+            window.SegmentedControl?.syncAll?.({ instant: true });
+            requestAnimationFrame(() => {
+                this.updateNavIndicators(viewName);
+                window.SegmentedControl?.syncAll?.({ instant: true });
+            });
 
             // Scroll suave hacia la parte superior
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1868,7 +1877,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.2') {
+                        if (lastSeenVersion !== '1.5.3') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -1910,7 +1919,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.2') {
+                        if (lastSeenVersion !== '1.5.3') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2041,6 +2050,8 @@
                             card.classList.remove('open');
                         } else {
                             card.classList.add('open');
+                            window.SegmentedControl?.syncAll?.({ instant: true });
+                            requestAnimationFrame(() => window.SegmentedControl?.syncAll?.({ instant: true }));
                         }
                     }
                 };
@@ -2432,7 +2443,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.5.2
+            // 11. Novedades de Versión 1.5.3
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -2461,7 +2472,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.5.2');
+                window.StorageModule.setLastSeenVersion('1.5.3');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
