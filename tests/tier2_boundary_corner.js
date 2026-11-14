@@ -4167,6 +4167,322 @@ const tests = [
                 helpers.assertEqual(overflowIssues.length, 0, `Zero horizontal overflow at ${vw}px (${overflowIssues.join(', ')})`);
             }
         }
+    },
+
+    // =========================================================================
+    // F27: v1.5.3 Etapa 2 — Menú Contextual (Cero Superposición, Área Segura y Bloqueo Total de Scroll)
+    // =========================================================================
+    {
+        id: 'T2_F27_01_context_menu_non_overlap_safe_area_and_return',
+        feature: 'F27',
+        name: 'CardContextMenu positions cloned card and menu with zero overlap inside safe area across viewports/positions/heights and returns clone on close',
+        run: async (page, helpers) => {
+            const viewports = [
+                { width: 320, height: 568 },
+                { width: 360, height: 640 },
+                { width: 390, height: 844 },
+                { width: 1280, height: 800 }
+            ];
+
+            for (const vp of viewports) {
+                await page.setViewport({ width: vp.width, height: vp.height, deviceScaleFactor: 2 });
+                const vpResult = await page.evaluate(async ({ vw, vh }) => {
+                    window.OrganizadorApp?.switchView?.('tasks');
+                    window.CardContextMenu?.close?.();
+
+                    const intersectionArea = (a, b) => {
+                        const xOverlap = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+                        const yOverlap = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+                        return xOverlap * yOverlap;
+                    };
+
+                    // Create a fixed test fixture container so we can place synthetic cards at exact top/mid/bottom coordinates and heights
+                    let fixture = document.getElementById('f27-test-fixture');
+                    if (fixture) fixture.remove();
+                    fixture = document.createElement('div');
+                    fixture.id = 'f27-test-fixture';
+                    fixture.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:10;';
+                    document.body.appendChild(fixture);
+
+                    const scenarios = [
+                        { label: 'top-small', top: 76, height: 92 },
+                        { label: 'mid-medium', top: Math.round(vh * 0.42), height: 220 },
+                        { label: 'bottom-near-nav', top: Math.max(100, vh - 190), height: 118 },
+                        { label: 'ultra-tall', top: 68, height: 650 }
+                    ];
+
+                    const failures = [];
+
+                    for (const sc of scenarios) {
+                        fixture.innerHTML = '';
+                        const card = document.createElement('article');
+                        card.className = 'glass-panel rounded-2xl p-4 shadow-md';
+                        card.style.cssText = `position:fixed;left:16px;width:${Math.min(360, vw - 32)}px;top:${sc.top}px;height:${sc.height}px;box-sizing:border-box;`;
+                        card.innerHTML = `<h4 class="font-bold text-sm">Tarjeta ${sc.label}</h4><p class="text-xs">Contenido de prueba para validar layout conjunto sin superposición.</p>`;
+                        fixture.appendChild(card);
+
+                        window.CardContextMenu.show({
+                            targetEl: card,
+                            title: `Prueba ${sc.label}`,
+                            onEdit: () => {},
+                            onDelete: () => {},
+                            position: { clientX: Math.round(vw / 2), clientY: sc.top + 24 }
+                        });
+
+                        const popup = document.getElementById('card-dynamic-popup');
+                        const clone = document.querySelector('#card-dynamic-clone-stage [data-longpress-clone="true"]');
+                        const dialog = popup?.querySelector('.modal-dialog');
+                        const safe = window.CardContextMenu.computeSafeViewport();
+
+                        if (!clone || !dialog) {
+                            failures.push(`${vw}x${vh}/${sc.label}: missing clone or dialog`);
+                            window.CardContextMenu.close();
+                            continue;
+                        }
+
+                        const cloneRect = clone.getBoundingClientRect();
+                        const dlgRect = dialog.getBoundingClientRect();
+                        const overlap = intersectionArea(cloneRect, dlgRect);
+
+                        if (overlap > 0.5) {
+                            failures.push(`${vw}x${vh}/${sc.label}: clone & menu overlap area=${overlap.toFixed(1)} (clone=[${Math.round(cloneRect.top)}..${Math.round(cloneRect.bottom)}], menu=[${Math.round(dlgRect.top)}..${Math.round(dlgRect.bottom)}])`);
+                        }
+
+                        // Safe viewport bounds check (with 2px rounding tolerance)
+                        const tol = 2;
+                        if (
+                            cloneRect.left < safe.safeLeft - tol ||
+                            cloneRect.right > safe.safeRight + tol ||
+                            cloneRect.top < safe.safeTop - tol ||
+                            cloneRect.bottom > safe.safeBottom + tol
+                        ) {
+                            failures.push(`${vw}x${vh}/${sc.label}: clone outside safe area [${Math.round(cloneRect.left)},${Math.round(cloneRect.top)},${Math.round(cloneRect.right)},${Math.round(cloneRect.bottom)}] vs safe [${safe.safeLeft},${safe.safeTop},${safe.safeRight},${safe.safeBottom}]`);
+                        }
+
+                        if (
+                            dlgRect.left < safe.safeLeft - tol ||
+                            dlgRect.right > safe.safeRight + tol ||
+                            dlgRect.top < safe.safeTop - tol ||
+                            dlgRect.bottom > safe.safeBottom + tol
+                        ) {
+                            failures.push(`${vw}x${vh}/${sc.label}: menu outside safe area [${Math.round(dlgRect.left)},${Math.round(dlgRect.top)},${Math.round(dlgRect.right)},${Math.round(dlgRect.bottom)}] vs safe [${safe.safeLeft},${safe.safeTop},${safe.safeRight},${safe.safeBottom}]`);
+                        }
+
+                        // Check return to original card coordinates on close
+                        window.CardContextMenu.close();
+                        const closeState = window.CardContextMenu.lastCloseState;
+                        const stageChildren = document.getElementById('card-dynamic-clone-stage')?.children?.length ?? -1;
+                        const sourceStillHidden = card.classList.contains('longpress-source-hidden');
+
+                        if (!closeState || closeState.deltaX > 1.5 || closeState.deltaY > 1.5) {
+                            failures.push(`${vw}x${vh}/${sc.label}: clone did not return to original coords (deltaX=${closeState?.deltaX}, deltaY=${closeState?.deltaY})`);
+                        }
+                        if (stageChildren !== 0) {
+                            failures.push(`${vw}x${vh}/${sc.label}: stage not empty after close (${stageChildren})`);
+                        }
+                        if (sourceStillHidden) {
+                            failures.push(`${vw}x${vh}/${sc.label}: original card still has longpress-source-hidden after close`);
+                        }
+                    }
+
+                    fixture.remove();
+                    return failures;
+                }, { vw: vp.width, vh: vp.height });
+
+                helpers.assertEqual(
+                    vpResult.length,
+                    0,
+                    `CardContextMenu layout/safe-area/return failed at ${vp.width}x${vp.height}: ${vpResult.join(' | ')}`
+                );
+            }
+
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+        }
+    },
+    {
+        id: 'T2_F27_02_context_menu_scroll_lock_stress_and_ghost_click',
+        feature: 'F27',
+        name: 'ScrollLockManager freezes window/container scroll during context menu, unlocks across all close paths and 20x stress loop, and suppresses ghost click',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
+
+            const lockResult = await page.evaluate(async () => {
+                window.OrganizadorApp?.switchView?.('tasks');
+                window.CardContextMenu?.close?.();
+                window.ScrollLockManager?.forceUnlockAll?.();
+
+                // Ensure the document is tall enough to scroll to Y=200
+                let spacer = document.getElementById('f27-scroll-spacer');
+                if (spacer) spacer.remove();
+                spacer = document.createElement('div');
+                spacer.id = 'f27-scroll-spacer';
+                spacer.style.cssText = 'height: 2200px; width: 100%; pointer-events: none;';
+                document.body.appendChild(spacer);
+
+                const card = document.createElement('article');
+                card.id = 'f27-target-card';
+                card.className = 'glass-panel rounded-2xl p-4';
+                card.style.cssText = 'position:fixed;top:180px;left:20px;width:320px;height:110px;z-index:15;';
+                card.innerHTML = '<h4>Tarea Scroll Lock</h4>';
+                document.body.appendChild(card);
+
+                window.scrollTo(0, 200);
+                const initialScrollY = Math.round(window.scrollY);
+
+                // Open context menu
+                let editCalled = 0;
+                let deleteCalled = 0;
+                window.CardContextMenu.show({
+                    targetEl: card,
+                    title: 'Bloqueo de Scroll',
+                    onEdit: () => { editCalled++; },
+                    onDelete: () => { deleteCalled++; },
+                    position: { clientX: 160, clientY: 220 }
+                });
+
+                const lockedOnOpen = window.ScrollLockManager.isLocked();
+                const htmlHasLockClass = document.documentElement.classList.contains('context-menu-scroll-locked');
+
+                // Attempt wheel, touchmove, and keyboard scroll outside dialog
+                const wheelEvt = new WheelEvent('wheel', { deltaY: 160, bubbles: true, cancelable: true });
+                document.body.dispatchEvent(wheelEvt);
+
+                const touchMoveEvt = new Event('touchmove', { bubbles: true, cancelable: true });
+                document.body.dispatchEvent(touchMoveEvt);
+
+                const keyDownEvt = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
+                document.body.dispatchEvent(keyDownEvt);
+
+                const pageDownEvt = new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true, cancelable: true });
+                document.body.dispatchEvent(pageDownEvt);
+
+                const scrollYDuringLock = Math.round(window.scrollY);
+
+                // Verify all close paths unlock scroll and preserve scrollY === 200
+                const closePaths = [
+                    {
+                        name: 'cancel-btn',
+                        trigger: () => document.querySelector('#card-dynamic-popup [data-popup-close]:not(#card-dynamic-popup-backdrop)')?.click()
+                    },
+                    {
+                        name: 'escape-key',
+                        trigger: () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+                    },
+                    {
+                        name: 'backdrop-click',
+                        trigger: () => document.getElementById('card-dynamic-popup-backdrop')?.click()
+                    },
+                    {
+                        name: 'edit-action',
+                        trigger: () => document.querySelector('#card-dynamic-popup [data-context-action="edit"]')?.click()
+                    },
+                    {
+                        name: 'delete-action',
+                        trigger: () => document.querySelector('#card-dynamic-popup [data-context-action="delete"]')?.click()
+                    },
+                    {
+                        name: 'switch-view',
+                        trigger: () => window.OrganizadorApp?.switchView?.('notes')
+                    }
+                ];
+
+                const pathFailures = [];
+                for (const cp of closePaths) {
+                    window.OrganizadorApp?.switchView?.('tasks');
+                    window.scrollTo(0, 200);
+                    window.CardContextMenu.show({
+                        targetEl: card,
+                        title: `Ruta ${cp.name}`,
+                        onEdit: () => { editCalled++; },
+                        onDelete: () => { deleteCalled++; },
+                        position: { clientX: 160, clientY: 220 }
+                    });
+                    if (!window.ScrollLockManager.isLocked()) {
+                        pathFailures.push(`${cp.name}: not locked on show`);
+                    }
+                    cp.trigger();
+                    if (window.ScrollLockManager.isLocked() || window.ScrollLockManager.getLockCount() !== 0) {
+                        pathFailures.push(`${cp.name}: remained locked after close (count=${window.ScrollLockManager.getLockCount()})`);
+                    }
+                    if (document.documentElement.classList.contains('context-menu-scroll-locked')) {
+                        pathFailures.push(`${cp.name}: html still has context-menu-scroll-locked`);
+                    }
+                    if (cp.name !== 'switch-view' && Math.abs(window.scrollY - 200) > 2) {
+                        pathFailures.push(`${cp.name}: scrollY jumped to ${window.scrollY} instead of 200`);
+                    }
+                }
+
+                // Stress test: 20 rapid open/close cycles
+                window.OrganizadorApp?.switchView?.('tasks');
+                window.scrollTo(0, 200);
+                for (let i = 0; i < 20; i++) {
+                    window.CardContextMenu.show({
+                        targetEl: card,
+                        title: `Stress #${i}`,
+                        onEdit: () => {},
+                        onDelete: () => {},
+                        position: { clientX: 150, clientY: 210 }
+                    });
+                    if (i % 2 === 0) {
+                        window.CardContextMenu.close();
+                    }
+                }
+                window.CardContextMenu.close();
+
+                const lockCountAfterStress = window.ScrollLockManager.getLockCount();
+                const listenerCountAfterStress = window.ScrollLockManager.getActiveListenerCount();
+
+                // Verify normal scrolling works after unlock
+                window.scrollTo(0, 120);
+                const scrollYAfterUnlock = Math.round(window.scrollY);
+
+                // Verify ghost click suppression after long-press release
+                let ghostClickReachedCard = false;
+                card.addEventListener('click', () => { ghostClickReachedCard = true; });
+                window.CardContextMenu._suppressGhostClickUntil = Date.now() + 400;
+                card.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+                card.remove();
+                spacer.remove();
+                window.scrollTo(0, 0);
+
+                return {
+                    initialScrollY,
+                    lockedOnOpen,
+                    htmlHasLockClass,
+                    wheelPrevented: wheelEvt.defaultPrevented,
+                    touchMovePrevented: touchMoveEvt.defaultPrevented,
+                    keyDownPrevented: keyDownEvt.defaultPrevented,
+                    pageDownPrevented: pageDownEvt.defaultPrevented,
+                    scrollYDuringLock,
+                    pathFailures,
+                    editCalled,
+                    deleteCalled,
+                    lockCountAfterStress,
+                    listenerCountAfterStress,
+                    scrollYAfterUnlock,
+                    ghostClickReachedCard
+                };
+            });
+
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+
+            helpers.assertEqual(lockResult.initialScrollY, 200, 'Initial scrollY must be 200px before lock');
+            helpers.assertTrue(lockResult.lockedOnOpen, 'ScrollLockManager must report locked when context menu opens');
+            helpers.assertTrue(lockResult.htmlHasLockClass, 'html must have context-menu-scroll-locked while open');
+            helpers.assertTrue(lockResult.wheelPrevented, 'Wheel event outside dialog must be defaultPrevented');
+            helpers.assertTrue(lockResult.touchMovePrevented, 'Touchmove event outside dialog must be defaultPrevented');
+            helpers.assertTrue(lockResult.keyDownPrevented, 'ArrowDown key event must be defaultPrevented while locked');
+            helpers.assertTrue(lockResult.pageDownPrevented, 'PageDown key event must be defaultPrevented while locked');
+            helpers.assertEqual(lockResult.scrollYDuringLock, 200, 'window.scrollY must remain frozen at 200px during lock');
+            helpers.assertEqual(lockResult.pathFailures.length, 0, `All close paths must unlock and preserve scroll: ${lockResult.pathFailures.join(' | ')}`);
+            helpers.assertTrue(lockResult.editCalled >= 1, 'Edit action callback must execute on click');
+            helpers.assertTrue(lockResult.deleteCalled >= 1, 'Delete action callback must execute on click');
+            helpers.assertEqual(lockResult.lockCountAfterStress, 0, 'Lock count must be 0 after 20x stress loop');
+            helpers.assertEqual(lockResult.listenerCountAfterStress, 0, 'Active scroll-lock listener count must be 0 after 20x stress loop');
+            helpers.assertEqual(lockResult.scrollYAfterUnlock, 120, 'Normal window scrolling must work immediately after unlock');
+            helpers.assertFalse(lockResult.ghostClickReachedCard, 'Synthetic ghost click after long-press release must be intercepted and suppressed');
+        }
     }
 ];
 

@@ -2569,33 +2569,56 @@ html body #vault-reveal-modal .modal-dialog {
     pointer-events: none !important;
 }
 
-@keyframes longpressClonePop {
-    0% {
-        transform: scale(1);
-        box-shadow: var(--shadow-glass-md);
-    }
-    100% {
-        transform: scale(1.024);
-        box-shadow: 0 26px 52px -12px rgba(15, 23, 42, 0.34), 0 0 0 1.5px rgba(99, 102, 241, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.65);
-    }
-}
-
 .longpress-card-clone-elevated {
     position: fixed !important;
     margin: 0 !important;
     pointer-events: none !important;
     z-index: 10 !important;
-    animation: longpressClonePop 0.26s var(--ease-apple-spring) forwards !important;
+    transform-origin: 0 0 !important;
+    box-shadow: 0 26px 52px -12px rgba(15, 23, 42, 0.36), 0 0 0 1.5px rgba(99, 102, 241, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
+    transition:
+        transform 0.38s cubic-bezier(0.32, 1.25, 0.4, 1),
+        box-shadow 0.28s var(--ease-smooth),
+        opacity 0.22s var(--ease-smooth);
     will-change: transform;
 }
 
+.longpress-card-clone-elevated.longpress-clone-cropped {
+    overflow: hidden !important;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 28px), transparent 100%);
+}
+
+#card-dynamic-popup .modal-dialog {
+    transform: none !important;
+    transition: opacity 0.2s var(--ease-smooth) !important;
+}
+
 @keyframes dynamicCardPopupBounce {
-    0% { opacity: 0; transform: scale(0.84) translate3d(0, 10px, 0); }
-    70% { opacity: 1; transform: scale(1.02) translate3d(0, -1px, 0); }
-    100% { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+    0% { opacity: 0; scale: 0.94; }
+    72% { opacity: 1; scale: 1.0; }
+    100% { opacity: 1; scale: 1.0; }
 }
 .dynamic-popup-in {
-    animation: dynamicCardPopupBounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: dynamicCardPopupBounce 0.28s cubic-bezier(0.32, 1.25, 0.4, 1) both;
+}
+
+/* Bloqueo total de scroll mientras el menú contextual de pulsación larga esté abierto */
+html.context-menu-scroll-locked,
+html.context-menu-scroll-locked body,
+html.context-menu-scroll-locked main,
+html.context-menu-scroll-locked section.view-transition,
+html.context-menu-scroll-locked .mobile-sheet-body,
+html.context-menu-scroll-locked #sidebar-drawer {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+}
+
+#card-dynamic-popup,
+#card-dynamic-popup-backdrop,
+#card-dynamic-clone-stage {
+    touch-action: none !important;
+    overscroll-behavior: none !important;
 }
 
 @keyframes noteShake {

@@ -1133,6 +1133,7 @@
         switchView(viewName) {
             this.currentView = viewName;
             window.HapticsModule?.light();
+            window.CardContextMenu?.close?.();
             // v1.4.4: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
             this.closeAllSettingsSubmenus();
 
