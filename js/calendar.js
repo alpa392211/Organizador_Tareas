@@ -198,11 +198,11 @@ window.CalendarModule = (() => {
             let baseStyles = 'cal-day-cell tap-effect min-w-0 min-h-[46px] sm:min-h-[64px] p-1 sm:p-1.5 rounded-2xl transition-all duration-150 flex flex-col items-center justify-between text-xs border relative group ';
             
             if (!isInCycle) {
-                baseStyles += 'cal-day-off bg-slate-900/[0.04] dark:bg-white/[0.03] border-dashed border-slate-900/12 dark:border-white/12 hover:bg-slate-900/[0.08] dark:hover:bg-white/[0.07] ';
+                baseStyles += 'cal-day-off bg-slate-900/[0.03] dark:bg-white/[0.02] border-dashed border-slate-900/12 dark:border-white/12 hover:bg-slate-900/[0.06] dark:hover:bg-white/[0.06] ';
             } else if (isSelected) {
                 baseStyles += 'cal-day-selected border-indigo-500/80 dark:border-indigo-400/80 bg-indigo-500/18 dark:bg-indigo-500/24 shadow-sm ring-2 ring-indigo-500/30 ';
             } else {
-                baseStyles += 'border-slate-900/10 dark:border-white/12 bg-white/45 dark:bg-white/[0.07] hover:bg-white/75 dark:hover:bg-white/[0.13] hover:border-indigo-400/50 ';
+                baseStyles += 'border-slate-900/10 dark:border-white/12 bg-white/30 dark:bg-white/[0.05] hover:bg-white/55 dark:hover:bg-white/[0.11] hover:border-indigo-400/50 ';
             }
 
             cell.className = baseStyles;
@@ -329,7 +329,7 @@ window.CalendarModule = (() => {
             classesHtml = `
                 <div class="space-y-2">
                     ${dayClasses.map(c => `
-                        <div class="cal-detail-card flex items-center justify-between gap-2 p-3 rounded-2xl bg-white/55 dark:bg-white/[0.07] border border-slate-900/10 dark:border-white/12 border-l-4" style="border-left-color: ${c.color};">
+                        <div class="cal-detail-card flex items-center justify-between gap-2 p-3 rounded-2xl bg-white/35 dark:bg-white/[0.05] border border-slate-900/10 dark:border-white/12 border-l-4" style="border-left-color: ${c.color};">
                             <div class="min-w-0">
                                 <h5 class="text-xs font-bold text-slate-900 dark:text-white truncate">${escapeHtml(c.name)}</h5>
                                 <p class="text-[11px] text-slate-600 dark:text-slate-300 truncate">${c.startTime} - ${c.endTime} hrs ${c.classroom ? `• ${escapeHtml(c.classroom)}` : ''}</p>
@@ -352,7 +352,7 @@ window.CalendarModule = (() => {
                         const subColor = sub ? sub.color : '#64748B';
                         const subName = sub ? sub.name : 'Materia';
                         return `
-                            <div class="cal-detail-card flex items-center justify-between p-3 rounded-2xl bg-white/55 dark:bg-white/[0.07] border border-slate-900/10 dark:border-white/12 border-l-4 ${t.completed ? 'opacity-60' : ''}" style="border-left-color: ${subColor};">
+                            <div class="cal-detail-card flex items-center justify-between p-3 rounded-2xl bg-white/35 dark:bg-white/[0.05] border border-slate-900/10 dark:border-white/12 border-l-4 ${t.completed ? 'opacity-60' : ''}" style="border-left-color: ${subColor};">
                                 <div class="min-w-0 flex-1 pr-2">
                                     <div class="flex items-center gap-1.5 mb-0.5 flex-wrap">
                                         <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style="background-color: ${subColor}22; color: ${subColor};">

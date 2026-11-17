@@ -29,12 +29,83 @@ window.SubjectsModule = (() => {
         { id: 'dom', label: 'Domingo', short: 'Dom' }
     ];
 
+    const BOTTOM_DRAWER_THRESHOLD = 8;
+
     let selectedColor = PRESET_COLORS[0].hex;
     let editingSubjectId = null;
+    let bottomDrawerOpen = false;
 
     function init() {
         renderPresetColors();
         setupFormListeners();
+        setupBottomDrawerListeners();
+    }
+
+    function setupBottomDrawerListeners() {
+        const toggleBtn = document.getElementById('subjects-bottom-toggle-btn');
+        if (!toggleBtn) return;
+
+        toggleBtn.addEventListener('click', () => {
+            bottomDrawerOpen = !bottomDrawerOpen;
+            window.HapticsModule?.light();
+            syncBottomDrawerUI();
+        });
+    }
+
+    function syncBottomDrawerUI() {
+        const drawer = document.getElementById('subjects-bottom-add-drawer');
+        const toggleBtn = document.getElementById('subjects-bottom-toggle-btn');
+        const panel = document.getElementById('subjects-bottom-add-panel');
+        if (!drawer || !toggleBtn || !panel) return;
+
+        drawer.classList.toggle('is-open', bottomDrawerOpen);
+        toggleBtn.setAttribute('aria-expanded', bottomDrawerOpen ? 'true' : 'false');
+        panel.setAttribute('aria-hidden', bottomDrawerOpen ? 'false' : 'true');
+    }
+
+    function updateAddButtonPlacement(subjectsCount, maxSubjects) {
+        const addBtn = document.getElementById('add-subject-btn');
+        const headerSlot = document.getElementById('subjects-header-cta-slot');
+        const bottomDrawer = document.getElementById('subjects-bottom-add-drawer');
+        const bottomContent = document.getElementById('subjects-bottom-add-content');
+        const counterChip = document.getElementById('subjects-bottom-counter-chip');
+        const subtitle = document.getElementById('subjects-bottom-drawer-subtitle');
+        const helperText = document.getElementById('subjects-bottom-helper-text');
+
+        const useBottomDrawer = subjectsCount > BOTTOM_DRAWER_THRESHOLD;
+
+        if (counterChip) {
+            counterChip.textContent = `${subjectsCount}/${maxSubjects}`;
+        }
+        if (subtitle) {
+            subtitle.textContent = subjectsCount >= maxSubjects
+                ? `Límite de ${maxSubjects} materias alcanzado`
+                : 'Toca para desplegar el botón de nueva materia';
+        }
+        if (helperText) {
+            helperText.textContent = subjectsCount >= maxSubjects
+                ? `Alcanzaste el límite máximo de ${maxSubjects} materias. Elimina alguna para agregar otra.`
+                : `Tienes ${subjectsCount} materias registradas. Añade nuevas asignaturas desde aquí (máximo ${maxSubjects}).`;
+        }
+
+        if (useBottomDrawer) {
+            if (headerSlot) headerSlot.classList.add('hidden');
+            if (bottomDrawer) bottomDrawer.classList.remove('hidden');
+            if (addBtn && bottomContent && addBtn.parentElement !== bottomContent) {
+                addBtn.classList.add('w-full', 'sm:w-auto');
+                bottomContent.appendChild(addBtn);
+            }
+            syncBottomDrawerUI();
+        } else {
+            bottomDrawerOpen = false;
+            syncBottomDrawerUI();
+            if (bottomDrawer) bottomDrawer.classList.add('hidden');
+            if (headerSlot) headerSlot.classList.remove('hidden');
+            if (addBtn && headerSlot && addBtn.parentElement !== headerSlot) {
+                addBtn.classList.remove('w-full', 'sm:w-auto');
+                headerSlot.appendChild(addBtn);
+            }
+        }
     }
 
     function renderPresetColors(targetContainerId = 'color-presets-container', hexInputId = 'subject-color-hex') {
@@ -282,6 +353,9 @@ window.SubjectsModule = (() => {
                 addBtn.title = 'Añadir nueva materia';
             }
         }
+
+        // Reubicar botón añadir al menú desplegable inferior después de 8 materias
+        updateAddButtonPlacement(subjects.length, Storage.MAX_SUBJECTS);
 
         // Regla estricta: si 0 materias, mostrar empty state y ocultar grid
         if (subjects.length === 0) {

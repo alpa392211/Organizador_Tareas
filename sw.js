@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.5.4
+ * sw.js - Service Worker for Organizador_Tareas v1.5.5
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.5.4';
+const CACHE_NAME = 'organizador-tareas-cache-v1.5.5';
 
 const PRECACHE_ASSETS = [
     './',
@@ -15,22 +15,22 @@ const PRECACHE_ASSETS = [
     './assets/fonts/inter-latin-opsz-normal.woff2',
     './assets/fonts/inter-latin-ext-opsz-normal.woff2',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.5.4',
-    './css/styles.css?v=1.5.4',
+    './css/tailwind.min.css?v=1.5.5',
+    './css/styles.css?v=1.5.5',
     // JavaScript application modules
-    './js/storage.js?v=1.5.4',
-    './js/haptics.js?v=1.5.4',
-    './js/segmented.js?v=1.5.4',
-    './js/notifications.js?v=1.5.4',
-    './js/widgets.js?v=1.5.4',
-    './js/subjects.js?v=1.5.4',
-    './js/tasks.js?v=1.5.4',
-    './js/notes.js?v=1.5.4',
-    './js/calendar.js?v=1.5.4',
-    './js/archive.js?v=1.5.4',
-    './js/photo-editor.js?v=1.5.4',
-    './js/backgrounds.js?v=1.5.4',
-    './js/app.js?v=1.5.4',
+    './js/storage.js?v=1.5.5',
+    './js/haptics.js?v=1.5.5',
+    './js/segmented.js?v=1.5.5',
+    './js/notifications.js?v=1.5.5',
+    './js/widgets.js?v=1.5.5',
+    './js/subjects.js?v=1.5.5',
+    './js/tasks.js?v=1.5.5',
+    './js/notes.js?v=1.5.5',
+    './js/calendar.js?v=1.5.5',
+    './js/archive.js?v=1.5.5',
+    './js/photo-editor.js?v=1.5.5',
+    './js/backgrounds.js?v=1.5.5',
+    './js/app.js?v=1.5.5',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
@@ -61,7 +61,7 @@ self.addEventListener('install', event => {
                         })
                 )
             );
-            console.log(`[SW v1.5.4] Precaching complete. Processed ${results.length} assets.`);
+            console.log(`[SW v1.5.5] Precaching complete. Processed ${results.length} assets.`);
         }).then(() => self.skipWaiting())
     );
 });
@@ -73,7 +73,7 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(name => {
                     if (name !== CACHE_NAME) {
-                        console.log(`[SW v1.5.4] Purging deprecated cache: ${name}`);
+                        console.log(`[SW v1.5.5] Purging deprecated cache: ${name}`);
                         return caches.delete(name);
                     }
                 })
@@ -101,7 +101,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[SW v1.5.4] Navigation offline. Serving cached index.html fallback.');
+                    console.log('[SW v1.5.5] Navigation offline. Serving cached index.html fallback.');
                     const cachedNav = await caches.match(request);
                     if (cachedNav) return cachedNav;
                     return caches.match('./index.html') || caches.match('index.html');

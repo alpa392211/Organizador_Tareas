@@ -56,8 +56,8 @@
     </script>
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.4">
-    <link rel="stylesheet" href="css/styles.css?v=1.5.4">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.5">
+    <link rel="stylesheet" href="css/styles.css?v=1.5.5">
 </head>
 <body class="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
     <!-- Capa de fondo ambiental fija para efectos de transparencia avanzados -->
@@ -366,13 +366,15 @@
                 </div>
 
                 <!-- Botón CTA con Degradado Enriquecido y Efecto Hover/Touch -->
-                <button type="button" id="add-subject-btn"
-                    class="btn-gradient-subject touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-white font-bold text-sm shrink-0">
-                    <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>Nueva Materia</span>
-                </button>
+                <div id="subjects-header-cta-slot" class="shrink-0 flex">
+                    <button type="button" id="add-subject-btn"
+                        class="btn-gradient-subject touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-white font-bold text-sm shrink-0">
+                        <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Nueva Materia</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Empty State si no hay materias creadas -->
@@ -396,6 +398,46 @@
             <!-- Tablero Principal de Materias: Regla Estricta: Solo renderiza creadas sin espacios vacíos -->
             <div id="subjects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <!-- Inyectado por subjects.js -->
+            </div>
+
+            <!-- Menú desplegable inferior para añadir materia al superar 8 materias -->
+            <div id="subjects-bottom-add-drawer" class="subjects-bottom-drawer glass-panel hidden bg-white/80 dark:bg-slate-800/80 rounded-3xl border border-slate-200/70 dark:border-slate-700/60 shadow-xs">
+                <button type="button" id="subjects-bottom-toggle-btn" aria-expanded="false" aria-controls="subjects-bottom-add-panel"
+                    class="tap-effect touch-target-44 min-h-[52px] w-full px-4 sm:px-5 py-3 flex items-center justify-between gap-3 text-left transition-colors hover:bg-indigo-500/[0.05] dark:hover:bg-white/[0.04]">
+                    <span class="flex items-center gap-3 min-w-0">
+                        <span class="w-9 h-9 rounded-2xl bg-indigo-500/12 dark:bg-indigo-400/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4 stroke-[2.4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block text-sm font-extrabold text-slate-900 dark:text-white leading-tight truncate">
+                                Agregar otra materia
+                            </span>
+                            <span id="subjects-bottom-drawer-subtitle" class="block text-[11px] font-medium text-slate-600 dark:text-slate-300/85 truncate">
+                                Toca para desplegar el botón de nueva materia
+                            </span>
+                        </span>
+                    </span>
+                    <span class="flex items-center gap-2 shrink-0">
+                        <span id="subjects-bottom-counter-chip" class="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
+                            9/16
+                        </span>
+                        <svg class="subjects-bottom-chevron w-5 h-5 text-slate-500 dark:text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </span>
+                </button>
+                <div id="subjects-bottom-add-panel" class="subjects-dropdown-panel" aria-hidden="true">
+                    <div class="subjects-dropdown-inner">
+                        <div id="subjects-bottom-add-content" class="subjects-bottom-add-content px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200/70 dark:border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <p id="subjects-bottom-helper-text" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Tienes más de 8 materias registradas. Añade nuevas asignaturas aquí abajo (máximo 16).
+                            </p>
+                            <!-- #add-subject-btn se reubica aquí dinámicamente cuando subjects.length > 8 -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -1538,17 +1580,17 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.5.4 -->
+                <!-- VERSIÓN HASTA ABAJO v1.5.5 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.5.4</span>
+                        <span>Versión 1.5.5</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="touch-target-44 min-h-[44px] px-3 tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.5.4</span>
+                        <span>✨ Ver novedades de la versión 1.5.5</span>
                     </button>
                 </div>
             </div>
@@ -2089,7 +2131,7 @@
     <!-- MODAL 4: CALENDARIO MENSUAL INTERACTIVO                   -->
     <!-- ========================================================= -->
     <div id="calendar-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-6">
-        <div id="calendar-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/35 dark:bg-slate-950/45 backdrop-blur-xs transition-opacity"></div>
+        <div id="calendar-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/10 dark:bg-slate-950/20 backdrop-blur-[2px] transition-opacity"></div>
         
         <div class="modal-dialog mobile-bottom-sheet calendar-glass-dialog relative w-full max-w-3xl rounded-t-3xl sm:rounded-3xl shadow-2xl border border-white/60 dark:border-white/15 overflow-hidden transform flex flex-col max-h-[92vh]">
             <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
@@ -2110,7 +2152,7 @@
                     <button type="button" id="cal-prev-month" class="min-w-[36px] sm:min-w-[40px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-slate-900/8 dark:hover:bg-white/12 text-slate-700 dark:text-slate-200 tap-effect transition-colors" title="Mes anterior">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button type="button" id="cal-today-btn" class="min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-1.5 text-xs font-extrabold rounded-full bg-white/55 dark:bg-white/12 border border-slate-900/10 dark:border-white/18 text-slate-800 dark:text-white hover:bg-indigo-500/15 dark:hover:bg-white/20 tap-effect transition-all shadow-xs" title="Ir a hoy">
+                    <button type="button" id="cal-today-btn" class="min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-1.5 text-xs font-extrabold rounded-full border border-slate-900/10 dark:border-white/20 text-slate-800 dark:text-white hover:bg-indigo-500/15 dark:hover:bg-white/20 tap-effect transition-all shadow-xs" title="Ir a hoy">
                         Hoy
                     </button>
                     <button type="button" id="cal-next-month" class="min-w-[36px] sm:min-w-[40px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-slate-900/8 dark:hover:bg-white/12 text-slate-700 dark:text-slate-200 tap-effect transition-colors" title="Mes siguiente">
@@ -2454,14 +2496,14 @@
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                                Novedades de la Versión 1.5.4
+                                Novedades de la Versión 1.5.5
                             </h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                                v1.5.4
+                                v1.5.5
                             </span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            ¡Calendario rápido con cristal traslúcido, notas privadas con clave y borrado seguro, y miniaturas de fotos directamente bajo tus notas!
+                            ¡Calendario aún más traslúcido, menú desplegable en Materias (+8), notas privadas con clave y miniaturas de fotos!
                         </p>
                     </div>
                 </div>
@@ -2471,9 +2513,19 @@
                     <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">📅</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Calendario rápido con cristal traslúcido</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Calendario rápido aún más traslúcido</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Nuevo panel translúcido con efectos de transparencia avanzados, cabecera más limpia en móvil y lectura adaptada en modo claro, oscuro y monocromático.
+                                Panel mejorado con efectos de transparencia avanzados más nítidos, botón Hoy traslúcido en modo oscuro y mejor integración visual con tu fondo.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex gap-3">
+                        <span class="text-xl shrink-0 select-none">📚</span>
+                        <div class="min-w-0">
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Menú desplegable al superar 8 materias</h4>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                                Al registrar más de 8 materias, el botón Nueva Materia pasa a la parte inferior dentro de un menú desplegable con animación dinámica.
                             </p>
                         </div>
                     </div>
@@ -2481,19 +2533,9 @@
                     <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">🔐</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Notas privadas con clave (PIN) y borrado único</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Notas privadas con clave (PIN) y miniaturas</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Crea y bloquea notas con PIN de forma inmediata; si olvidas tu clave, la única opción disponible es eliminar definitivamente la nota para proteger tu privacidad.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded-2xl bg-violet-50/60 dark:bg-violet-950/30 border border-violet-100 dark:border-violet-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">🖼️</span>
-                        <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Miniaturas de fotos debajo de cada nota</h4>
-                            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Las imágenes adjuntas ahora aparecen en pequeño al pie de cada nota desbloqueada para previsualizarlas al instante y abrir el visor completo con un toque.
+                                Bloqueo inmediato con PIN, borrado definitivo si olvidas tu clave y miniaturas de fotos clicables debajo de cada nota desbloqueada.
                             </p>
                         </div>
                     </div>
@@ -2503,7 +2545,7 @@
                         <div class="min-w-0">
                             <h4 class="text-xs font-bold text-slate-900 dark:text-white">Controles fluidos, fondos oscuros y menú sin superposición</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Incluye controles segmentados deslizantes, bloqueo total de scroll en menús contextuales y activación automática del modo oscuro en fondos temáticos.
+                                Incluye controles segmentados deslizantes, bloqueo de scroll en menús contextuales y activación automática del modo oscuro en fondos temáticos.
                             </p>
                         </div>
                     </div>
@@ -2517,24 +2559,34 @@
                         <span>¡Entendido! Comenzar</span>
                     </button>
                 </div>
+
+                <!-- Crédito de Estudio hasta abajo -->
+                <div id="changelog-studio-credit" class="pt-3 mt-1 border-t border-slate-100 dark:border-slate-800/80 text-center space-y-0.5">
+                    <p class="text-xs font-extrabold tracking-wide text-slate-800 dark:text-slate-100">
+                        ALPA Studio
+                    </p>
+                    <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                        Aplicaciones de Lógica, Productividad y Aprendizaje
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/storage.js?v=1.5.4"></script>
-    <script src="js/haptics.js?v=1.5.4"></script>
-    <script src="js/segmented.js?v=1.5.4"></script>
-    <script src="js/notifications.js?v=1.5.4"></script>
-    <script src="js/widgets.js?v=1.5.4"></script>
-    <script src="js/subjects.js?v=1.5.4"></script>
-    <script src="js/tasks.js?v=1.5.4"></script>
-    <script src="js/notes.js?v=1.5.4"></script>
-    <script src="js/calendar.js?v=1.5.4"></script>
-    <script src="js/archive.js?v=1.5.4"></script>
-    <script src="js/photo-editor.js?v=1.5.4"></script>
-    <script src="js/backgrounds.js?v=1.5.4"></script>
-    <script src="js/app.js?v=1.5.4"></script>
+    <script src="js/storage.js?v=1.5.5"></script>
+    <script src="js/haptics.js?v=1.5.5"></script>
+    <script src="js/segmented.js?v=1.5.5"></script>
+    <script src="js/notifications.js?v=1.5.5"></script>
+    <script src="js/widgets.js?v=1.5.5"></script>
+    <script src="js/subjects.js?v=1.5.5"></script>
+    <script src="js/tasks.js?v=1.5.5"></script>
+    <script src="js/notes.js?v=1.5.5"></script>
+    <script src="js/calendar.js?v=1.5.5"></script>
+    <script src="js/archive.js?v=1.5.5"></script>
+    <script src="js/photo-editor.js?v=1.5.5"></script>
+    <script src="js/backgrounds.js?v=1.5.5"></script>
+    <script src="js/app.js?v=1.5.5"></script>
 
     <!-- Visor de fotos de la galería a pantalla completa -->
     <div id="photo-preview-modal" class="modal-overlay photo-viewer-overlay fixed inset-0 z-[70] hidden flex-col" role="dialog" aria-modal="true" aria-labelledby="photo-preview-name" aria-hidden="true">

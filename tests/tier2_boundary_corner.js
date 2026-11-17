@@ -9,16 +9,16 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.4 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.5.5 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver 1.5.4',
+        name: 'package.json version matches strict semver 1.5.5',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.4', 'package.json version must be 1.5.4');
+            helpers.assertEqual(pkg.version, '1.5.5', 'package.json version must be 1.5.5');
         }
     },
     {
@@ -30,7 +30,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.5.4';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.5.5';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -38,14 +38,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target 1.5.4 version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.5.5 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.OrganizadorApp?.openChangelogModal?.();
                 document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.5.4', 'LocalStorage must record version 1.5.4');
+            helpers.assertEqual(saved, '1.5.5', 'LocalStorage must record version 1.5.5');
         }
     },
     {
@@ -865,10 +865,10 @@ const tests = [
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.StorageModule?.setOnboardingCompleted?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.5.4');
+                window.StorageModule?.setLastSeenVersion?.('1.5.5');
             });
             const lastSeen = await page.evaluate(() => window.StorageModule?.getLastSeenVersion?.());
-            helpers.assertEqual(lastSeen, '1.5.4', 'Last seen version should be 1.5.4');
+            helpers.assertEqual(lastSeen, '1.5.5', 'Last seen version should be 1.5.5');
         }
     },
     {
@@ -4688,7 +4688,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 localStorage.setItem('org_escolar_onboarding_completed', 'true');
                 localStorage.setItem('org_escolar_cycle_configured', 'true');
-                localStorage.setItem('org_escolar_last_seen_version', '1.5.4');
+                localStorage.setItem('org_escolar_last_seen_version', '1.5.5');
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
                 window.OrganizadorApp?.closeCycleWelcomeModal?.();
                 const cycleModal = document.getElementById('cycle-setup-modal');
@@ -4893,6 +4893,240 @@ const tests = [
                 window.NotesModule?.closePhotoPreview?.();
                 await window.StorageModule?.clearGalleryPhotosIdb?.();
             });
+        }
+    },
+
+    // =========================================================================
+    // F29: v1.5.5 Subjects (>8) Bottom Dropdown Menu & Extra-Translucent Calendar
+    // =========================================================================
+    {
+        id: 'T2_F29_01_subjects_bottom_dropdown_after_eight',
+        feature: 'F29',
+        name: 'Add subject button stays in top bar for <=8 subjects and relocates into animated bottom dropdown drawer when >8 subjects',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearAll?.();
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.5.5');
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+                const eight = Array.from({ length: 8 }, (_, idx) => ({
+                    id: `sub_f29_${idx + 1}`,
+                    name: `Materia ${idx + 1}`,
+                    color: '#6366F1',
+                    days: ['lun', 'mie'],
+                    startTime: '08:00',
+                    endTime: '09:30'
+                }));
+                window.StorageModule?.saveSubjects?.(eight);
+            });
+            await page.reload({ waitUntil: 'load' });
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('subjects');
+                window.SubjectsModule?.render?.();
+            });
+
+            const atEight = await page.evaluate(() => {
+                const headerSlot = document.getElementById('subjects-header-cta-slot');
+                const drawer = document.getElementById('subjects-bottom-add-drawer');
+                const btn = document.getElementById('add-subject-btn');
+                return {
+                    inHeader: Boolean(headerSlot && btn && btn.parentElement === headerSlot),
+                    headerVisible: Boolean(headerSlot && !headerSlot.classList.contains('hidden')),
+                    drawerHidden: Boolean(drawer && drawer.classList.contains('hidden'))
+                };
+            });
+            helpers.assertTrue(atEight.inHeader, 'With 8 subjects, #add-subject-btn must remain in top #subjects-header-cta-slot');
+            helpers.assertTrue(atEight.headerVisible, 'With 8 subjects, top header CTA slot must stay visible');
+            helpers.assertTrue(atEight.drawerHidden, 'With 8 subjects, bottom dropdown drawer must stay hidden');
+
+            // Add 9th subject -> #add-subject-btn relocates into bottom collapsed dropdown below #subjects-grid
+            await page.evaluate(() => {
+                window.StorageModule?.addSubject?.({
+                    name: 'Materia 9',
+                    color: '#10B981',
+                    days: ['mar', 'jue'],
+                    startTime: '10:00',
+                    endTime: '11:30'
+                });
+                window.SubjectsModule?.render?.();
+                document.getElementById('subjects-bottom-toggle-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+
+            const atNineCollapsed = await page.evaluate(() => {
+                const grid = document.getElementById('subjects-grid');
+                const headerSlot = document.getElementById('subjects-header-cta-slot');
+                const drawer = document.getElementById('subjects-bottom-add-drawer');
+                const bottomContent = document.getElementById('subjects-bottom-add-content');
+                const toggleBtn = document.getElementById('subjects-bottom-toggle-btn');
+                const panel = document.getElementById('subjects-bottom-add-panel');
+                const btn = document.getElementById('add-subject-btn');
+                const gridRect = grid?.getBoundingClientRect();
+                const drawerRect = drawer?.getBoundingClientRect();
+                const panelCs = panel ? getComputedStyle(panel) : null;
+                return {
+                    headerHidden: Boolean(headerSlot && headerSlot.classList.contains('hidden')),
+                    drawerVisible: Boolean(drawer && !drawer.classList.contains('hidden')),
+                    inBottomContent: Boolean(bottomContent && btn && btn.parentElement === bottomContent),
+                    drawerIsOpen: Boolean(drawer && drawer.classList.contains('is-open')),
+                    ariaExpanded: toggleBtn?.getAttribute('aria-expanded'),
+                    ariaHidden: panel?.getAttribute('aria-hidden'),
+                    belowGrid: Boolean(gridRect && drawerRect && drawerRect.top >= gridRect.bottom - 2),
+                    hasTransition: Boolean(panelCs && panelCs.transitionDuration && panelCs.transitionDuration !== '0s')
+                };
+            });
+
+            helpers.assertTrue(atNineCollapsed.headerHidden, 'With 9 subjects, top header CTA slot must hide');
+            helpers.assertTrue(atNineCollapsed.drawerVisible, 'With 9 subjects, bottom dropdown drawer must become visible');
+            helpers.assertTrue(atNineCollapsed.inBottomContent, 'With 9 subjects, #add-subject-btn must move into #subjects-bottom-add-content');
+            helpers.assertFalse(atNineCollapsed.drawerIsOpen, 'Bottom dropdown drawer must start collapsed');
+            helpers.assertEqual(atNineCollapsed.ariaExpanded, 'false', 'Drawer toggle must set aria-expanded="false" while closed');
+            helpers.assertEqual(atNineCollapsed.ariaHidden, 'true', 'Drawer panel must set aria-hidden="true" while closed');
+            helpers.assertTrue(atNineCollapsed.belowGrid, 'Bottom dropdown drawer must appear below #subjects-grid');
+            helpers.assertTrue(atNineCollapsed.hasTransition, 'Drawer panel must configure dynamic CSS transition');
+
+            // Toggle open -> expands and exposes clickable #add-subject-btn that opens subject modal
+            await page.click('#subjects-bottom-toggle-btn');
+            await new Promise(r => setTimeout(r, 420));
+            await page.evaluate(() => {
+                document.getElementById('add-subject-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+
+            const atNineExpanded = await page.evaluate(() => {
+                const drawer = document.getElementById('subjects-bottom-add-drawer');
+                const toggleBtn = document.getElementById('subjects-bottom-toggle-btn');
+                const panel = document.getElementById('subjects-bottom-add-panel');
+                const btn = document.getElementById('add-subject-btn');
+                const btnRect = btn?.getBoundingClientRect();
+                return {
+                    drawerIsOpen: Boolean(drawer && drawer.classList.contains('is-open')),
+                    ariaExpanded: toggleBtn?.getAttribute('aria-expanded'),
+                    ariaHidden: panel?.getAttribute('aria-hidden'),
+                    btnWidth: Math.round(btnRect?.width || 0),
+                    btnHeight: Math.round(btnRect?.height || 0)
+                };
+            });
+
+            helpers.assertTrue(atNineExpanded.drawerIsOpen, 'Clicking toggle must open bottom drawer (.is-open)');
+            helpers.assertEqual(atNineExpanded.ariaExpanded, 'true', 'Expanded toggle must set aria-expanded="true"');
+            helpers.assertEqual(atNineExpanded.ariaHidden, 'false', 'Expanded panel must set aria-hidden="false"');
+            helpers.assertTrue(atNineExpanded.btnWidth > 100 && atNineExpanded.btnHeight >= 44, `Expanded #add-subject-btn must have full touch dimensions (got ${atNineExpanded.btnWidth}x${atNineExpanded.btnHeight})`);
+
+            await page.click('#add-subject-btn');
+            await page.waitForSelector('#subject-modal:not(.hidden)', { timeout: 2500 });
+            await page.click('#close-subject-modal');
+            await page.waitForSelector('#subject-modal.hidden', { timeout: 2500 });
+
+            // Delete back down to 8 subjects -> returns #add-subject-btn to top header slot
+            await page.evaluate(async () => {
+                const subs = window.StorageModule?.getSubjects?.() || [];
+                if (subs.length > 8) {
+                    window.StorageModule?.deleteSubject?.(subs[subs.length - 1].id);
+                }
+                window.SubjectsModule?.render?.();
+            });
+
+            const backAtEight = await page.evaluate(() => {
+                const headerSlot = document.getElementById('subjects-header-cta-slot');
+                const drawer = document.getElementById('subjects-bottom-add-drawer');
+                const btn = document.getElementById('add-subject-btn');
+                return {
+                    inHeader: Boolean(headerSlot && btn && btn.parentElement === headerSlot),
+                    drawerHidden: Boolean(drawer && drawer.classList.contains('hidden'))
+                };
+            });
+            helpers.assertTrue(backAtEight.inHeader, 'Dropping back to 8 subjects must restore #add-subject-btn to top header slot');
+            helpers.assertTrue(backAtEight.drawerHidden, 'Dropping back to 8 subjects must hide bottom dropdown drawer');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearAll?.();
+            });
+        }
+    },
+    {
+        id: 'T2_F29_02_calendar_enhanced_translucency_and_today_btn',
+        feature: 'F29',
+        name: 'Calendar modal remains extra-translucent across normal & intense glass levels and styles Hoy pill cleanly in dark mode',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.5.5');
+            });
+            await page.reload({ waitUntil: 'load' });
+            await page.evaluate(() => {
+                window.OrganizadorApp?.closeCycleWelcomeModal?.();
+                const cm = document.getElementById('changelog-modal');
+                if (cm) cm.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            });
+
+            const parseRgba = (str) => {
+                const m = (str || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/i);
+                if (!m) return { r: 0, g: 0, b: 0, a: 1 };
+                return {
+                    r: parseInt(m[1], 10),
+                    g: parseInt(m[2], 10),
+                    b: parseInt(m[3], 10),
+                    a: m[4] === undefined ? 1 : parseFloat(m[4])
+                };
+            };
+
+            const metrics = await page.evaluate(async () => {
+                const root = document.documentElement;
+                const results = [];
+                window.CalendarModule?.openModal?.();
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+                for (const intensity of ['normal', 'intenso']) {
+                    for (const isDark of [false, true]) {
+                        root.classList.toggle('dark', isDark);
+                        window.OrganizadorApp?.applyGlassIntensity?.(intensity);
+                        const dlg = document.querySelector('#calendar-modal .calendar-glass-dialog');
+                        const backdrop = document.getElementById('calendar-modal-backdrop');
+                        const todayBtn = document.getElementById('cal-today-btn');
+                        void root.offsetHeight;
+                        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                        if (todayBtn && typeof todayBtn.getAnimations === 'function') {
+                            await Promise.all(todayBtn.getAnimations().map(a => a.finished.catch(() => {})));
+                        }
+                        await new Promise(r => setTimeout(r, 220));
+                        await new Promise(r => requestAnimationFrame(r));
+                        const dlgCs = dlg ? getComputedStyle(dlg) : null;
+                        const bdCs = backdrop ? getComputedStyle(backdrop) : null;
+                        const todayCs = todayBtn ? getComputedStyle(todayBtn) : null;
+                        results.push({
+                            intensity,
+                            isDark,
+                            rootCls: root.className,
+                            dlgBg: dlgCs?.backgroundColor || '',
+                            backdropBg: bdCs?.backgroundColor || '',
+                            todayBg: todayCs?.backgroundColor || '',
+                            todayColor: todayCs?.color || ''
+                        });
+                    }
+                }
+
+                root.classList.remove('dark');
+                window.OrganizadorApp?.applyGlassIntensity?.('normal');
+                window.CalendarModule?.closeModal?.();
+                return results;
+            });
+
+            for (const row of metrics) {
+                const dlgAlpha = parseRgba(row.dlgBg).a;
+                const bdAlpha = parseRgba(row.backdropBg).a;
+                helpers.assertTrue(dlgAlpha > 0 && dlgAlpha <= 0.30, `Calendar dialog (${row.intensity}/${row.isDark ? 'dark' : 'light'}) must be extra-translucent (alpha <= 0.30, got ${dlgAlpha})`);
+                helpers.assertTrue(bdAlpha <= 0.25, `Calendar backdrop (${row.intensity}/${row.isDark ? 'dark' : 'light'}) must keep soft scrim (alpha <= 0.25, got ${bdAlpha})`);
+                if (row.isDark) {
+                    const todayBg = parseRgba(row.todayBg);
+                    const todayFg = parseRgba(row.todayColor);
+                    helpers.assertTrue(todayBg.a <= 0.25, `Dark mode Hoy pill must use subtle frosted glass (alpha <= 0.25, got ${todayBg.a}, cls=${row.rootCls})`);
+                    helpers.assertTrue(todayFg.r > 200 && todayFg.g > 200 && todayFg.b > 200, `Dark mode Hoy text must remain light crisp white (got ${row.todayColor})`);
+                }
+            }
         }
     }
 ];
