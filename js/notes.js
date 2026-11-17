@@ -33,6 +33,11 @@ window.NotesModule = (() => {
         return Boolean(note && note.hasPassword && !unlockedNotes.has(String(note.id)));
     }
 
+    function lockNote(id) {
+        unlockedNotes.delete(String(id));
+        render();
+    }
+
     function unlockNote(id, pin) {
         const note = window.StorageModule.getNotes().find(n => String(n.id) === String(id));
         if (!note || !note.hasPassword) return false;
@@ -51,8 +56,10 @@ window.NotesModule = (() => {
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 backdrop.style.opacity = '';
             }
-            const sheet = el.querySelector('.mobile-bottom-sheet');
+            const sheet = el.querySelector('.modal-dialog, .mobile-bottom-sheet');
             if (sheet) {
+                sheet.classList.remove('hidden');
+                sheet.style.display = '';
                 sheet.style.transform = '';
                 sheet.style.transition = '';
                 sheet.style.maxHeight = '';
@@ -60,17 +67,30 @@ window.NotesModule = (() => {
             el.classList.remove('hidden');
             el.classList.add('flex');
             el.style.display = 'flex';
+            document.body.classList.add('overflow-hidden');
             requestAnimationFrame(() => el.classList.add('active'));
         } else {
             el.classList.remove('active');
             el.classList.add('hidden');
             el.classList.remove('flex');
             el.style.display = '';
+            const hasOtherOpen = document.querySelector('.modal-overlay:not(.hidden)');
+            if (!hasOtherOpen) {
+                document.body.classList.remove('overflow-hidden');
+            }
         }
+    }
+
+    function resetUnlockModalView() {
+        const mainView = document.getElementById('note-unlock-main-view');
+        const confirmView = document.getElementById('note-unlock-delete-confirm-view');
+        if (mainView) mainView.classList.remove('hidden');
+        if (confirmView) confirmView.classList.add('hidden');
     }
 
     function openUnlockModal(id) {
         pendingUnlockId = id;
+        resetUnlockModalView();
         const input = document.getElementById('note-unlock-input');
         if (input) input.value = '';
         document.getElementById('note-unlock-error')?.classList.add('hidden');
@@ -80,7 +100,30 @@ window.NotesModule = (() => {
 
     function closeUnlockModal() {
         pendingUnlockId = null;
+        resetUnlockModalView();
         showOverlay('note-unlock-modal', false);
+    }
+
+    function showUnlockDeleteConfirm() {
+        if (!pendingUnlockId) return;
+        document.getElementById('note-unlock-main-view')?.classList.add('hidden');
+        document.getElementById('note-unlock-delete-confirm-view')?.classList.remove('hidden');
+    }
+
+    function deleteLockedNoteById(id) {
+        if (!id || !window.StorageModule) return false;
+        window.HapticsModule?.double?.();
+        window.NotificationsModule?.cancelNote?.(id);
+        unlockedNotes.delete(String(id));
+        const linkedPhotos = (window.StorageModule.getGalleryPhotos?.() || []).filter(p => String(p.noteId || '') === String(id));
+        linkedPhotos.forEach(p => window.StorageModule.deleteGalleryPhoto?.(p.id));
+        window.StorageModule.deleteNote(id);
+        closeUnlockModal();
+        window.onDataChanged?.();
+        renderGallery();
+        render();
+        window.showNotification?.('Nota privada eliminada definitivamente.', 'info');
+        return true;
     }
 
     function submitUnlock() {
@@ -638,9 +681,21 @@ window.NotesModule = (() => {
         const notes = window.StorageModule.getNotes();
         grid.innerHTML = photos.map(p => {
             const linked = p.noteId ? notes.find(n => String(n.id) === String(p.noteId)) : null;
-            const noteChip = linked
-                ? (isLocked(linked) ? '🔒 Nota privada' : linked.title)
-                : (p.noteTitle || '');
+            const locked = Boolean(linked && isLocked(linked));
+            if (locked) {
+                return `
+                <div class="gallery-card">
+                    <div class="gallery-thumb flex items-center justify-center" data-photo-id="${escapeHtml(p.id)}">
+                        <button type="button" class="gallery-thumb-btn flex flex-col items-center justify-center gap-1 p-2 text-center" data-photo-unlock-note="${escapeHtml(linked.id)}" aria-label="Desbloquear nota privada">
+                            <span class="text-2xl">🔒</span>
+                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200">Nota privada</span>
+                        </button>
+                        <span class="gallery-note-chip">🔒 Toca para abrir</span>
+                    </div>
+                    <div class="gallery-name text-slate-500 dark:text-slate-400">Material privado</div>
+                </div>`;
+            }
+            const noteChip = linked ? linked.title : (p.noteTitle || '');
             return `
             <div class="gallery-card">
                 <div class="gallery-thumb" data-photo-id="${escapeHtml(p.id)}">
@@ -654,10 +709,19 @@ window.NotesModule = (() => {
             </div>`;
         }).join('');
 
-        grid.querySelectorAll('[data-photo-open]').forEach(btn => {
-            const photo = photos.find(p => String(p.id) === btn.dataset.photoOpen);
+        const unlockedPhotos = photos.filter(p => {
+            const linked = p.noteId ? notes.find(n => String(n.id) === String(p.noteId)) : null;
+            return !(linked && isLocked(linked));
+        });
+        grid.querySelectorAll('[data-photo-unlock-note]').forEach(btn => {
             btn.addEventListener('click', () => {
-                if (photo) openPhotoPreview(photo, btn, photos);
+                openUnlockModal(btn.dataset.photoUnlockNote);
+            });
+        });
+        grid.querySelectorAll('[data-photo-open]').forEach(btn => {
+            const photo = unlockedPhotos.find(p => String(p.id) === btn.dataset.photoOpen);
+            btn.addEventListener('click', () => {
+                if (photo) openPhotoPreview(photo, btn, unlockedPhotos);
             });
         });
         grid.querySelectorAll('[data-photo-del]').forEach(btn => {
@@ -988,13 +1052,18 @@ window.NotesModule = (() => {
             document.getElementById('note-password-container')?.classList.toggle('hidden', !pwToggle.checked);
         });
 
-        // Desbloqueo de notas privadas
+        // Desbloqueo de notas privadas y borrado si se olvida el PIN
         document.getElementById('note-unlock-confirm')?.addEventListener('click', submitUnlock);
         document.getElementById('note-unlock-input')?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') { e.preventDefault(); submitUnlock(); }
         });
         document.getElementById('note-unlock-cancel')?.addEventListener('click', closeUnlockModal);
         document.getElementById('note-unlock-backdrop')?.addEventListener('click', closeUnlockModal);
+        document.getElementById('note-unlock-delete-btn')?.addEventListener('click', showUnlockDeleteConfirm);
+        document.getElementById('note-unlock-delete-back')?.addEventListener('click', resetUnlockModalView);
+        document.getElementById('note-unlock-delete-confirm')?.addEventListener('click', () => {
+            if (pendingUnlockId) deleteLockedNoteById(pendingUnlockId);
+        });
 
         // Galería y adjuntos dentro del modal de nota
         document.getElementById('notes-photo-input')?.addEventListener('change', (e) => handlePhotoUpload(e.target));
@@ -1026,6 +1095,13 @@ window.NotesModule = (() => {
         const reminderContainer = document.getElementById('note-reminder-datetime-container');
         if (reminderCheckbox) reminderCheckbox.checked = false;
         if (reminderContainer) reminderContainer.classList.add('hidden');
+        const pwToggle = document.getElementById('note-password-toggle');
+        const pwInput = document.getElementById('note-password-input');
+        if (pwToggle) pwToggle.checked = false;
+        if (pwInput) {
+            pwInput.value = '';
+            pwInput.placeholder = 'PIN de la nota (mín. 4 dígitos)';
+        }
         document.getElementById('note-password-container')?.classList.add('hidden');
 
         // Seleccionar tipo por defecto
@@ -1055,7 +1131,12 @@ window.NotesModule = (() => {
         const pwInput = document.getElementById('note-password-input');
         if (pwToggle) pwToggle.checked = Boolean(note.hasPassword);
         if (pwContainer) pwContainer.classList.toggle('hidden', !note.hasPassword);
-        if (pwInput) pwInput.value = '';
+        if (pwInput) {
+            pwInput.value = '';
+            pwInput.placeholder = note.hasPassword
+                ? 'PIN actual guardado (escribe uno nuevo para cambiar)'
+                : 'PIN de la nota (mín. 4 dígitos)';
+        }
         document.getElementById('note-modal-title').textContent = 'Editar Nota';
         document.getElementById('note-title').value = note.title;
         document.getElementById('note-content').value = note.content || '';
@@ -1092,8 +1173,10 @@ window.NotesModule = (() => {
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 backdrop.style.opacity = '';
             }
-            const sheet = modal.querySelector('.mobile-bottom-sheet');
+            const sheet = modal.querySelector('.modal-dialog, .mobile-bottom-sheet');
             if (sheet) {
+                sheet.classList.remove('hidden');
+                sheet.style.display = '';
                 sheet.style.transform = '';
                 sheet.style.transition = '';
                 sheet.style.maxHeight = '';
@@ -1105,7 +1188,11 @@ window.NotesModule = (() => {
                 modal.classList.add('active');
             });
             setTimeout(() => {
-                document.getElementById('note-title')?.focus();
+                if (modal.classList.contains('hidden')) return;
+                const active = document.activeElement;
+                if (!active || active === document.body || !modal.contains(active)) {
+                    document.getElementById('note-title')?.focus();
+                }
             }, 120);
         }
     }
@@ -1185,6 +1272,9 @@ window.NotesModule = (() => {
                 passwordHash
             });
             if (updated) {
+                if (!hasPassword || !existing?.hasPassword || Boolean(pinValue)) {
+                    unlockedNotes.delete(String(editingNoteId));
+                }
                 if (hasReminder) {
                     window.NotificationsModule?.scheduleNote(updated);
                 } else {
@@ -1203,11 +1293,13 @@ window.NotesModule = (() => {
                 passwordHash
             });
             targetNoteId = newNote.id;
-            if (hasPassword) unlockedNotes.add(String(newNote.id));
             if (hasReminder) {
                 window.NotificationsModule?.scheduleNote(newNote);
             }
-            window.showNotification?.('Nota guardada correctamente.', 'success');
+            window.showNotification?.(
+                hasPassword ? 'Nota privada guardada y bloqueada.' : 'Nota guardada correctamente.',
+                'success'
+            );
         }
 
         if (pendingModalPhotoQueue.length > 0 && targetNoteId) {
@@ -1335,7 +1427,7 @@ window.NotesModule = (() => {
                      style="--stagger-i: ${index};">
                     <span class="text-3xl">🔒</span>
                     <span class="text-sm font-bold text-slate-800 dark:text-white">Nota Privada</span>
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Haz clic para desbloquear</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Toca para desbloquear o borrar</span>
                 </div>`;
             }
             const typeInfo = NOTE_TYPES[note.type] || NOTE_TYPES.apunte;
@@ -1363,12 +1455,27 @@ window.NotesModule = (() => {
                 `;
             }
 
-            const photoBadge = notePhotos.length > 0 ? `
-                <button type="button" data-note-open-photos="${escapeHtml(note.id)}"
-                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 hover:bg-indigo-500/20 tap-effect">
-                    <span>🖼️</span>
-                    <span>${notePhotos.length}</span>
-                </button>` : '';
+            const visibleThumbs = notePhotos.slice(0, 4);
+            const extraCount = notePhotos.length - visibleThumbs.length;
+            const photoThumbsHtml = notePhotos.length > 0 ? `
+                <div class="note-card-photos mt-3 mb-3 flex items-center gap-2 flex-wrap">
+                    ${visibleThumbs.map((p, idx) => `
+                        <button type="button"
+                            ${idx === 0 ? `data-note-open-photos="${escapeHtml(note.id)}"` : ''}
+                            data-note-photo-index="${idx}"
+                            class="note-card-thumb tap-effect"
+                            aria-label="Ver foto ${idx + 1} de ${escapeHtml(note.title)}">
+                            <img src="${escapeHtml(p.thumbUrl || p.dataUrl)}" alt="${escapeHtml(p.name || 'Foto adjunta')}" loading="lazy" decoding="async">
+                            ${idx === visibleThumbs.length - 1 && extraCount > 0 ? `<span class="note-card-thumb-more">+${extraCount}</span>` : ''}
+                        </button>
+                    `).join('')}
+                </div>` : '';
+
+            const photoCountLabel = notePhotos.length > 0 ? `
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-300">
+                    <span>📷</span>
+                    <span>${notePhotos.length} ${notePhotos.length === 1 ? 'foto' : 'fotos'}</span>
+                </span>` : '';
 
             return `
                 <div data-note-id="${escapeHtml(note.id)}" class="stagger-card bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs card-hover flex flex-col justify-between"
@@ -1381,7 +1488,9 @@ window.NotesModule = (() => {
                                 <span>${typeInfo.label}</span>
                             </span>
                             
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center gap-1 flex-wrap justify-end">
+                                ${note.hasPassword ? `
+                                <button type="button" data-note-lock="${escapeHtml(note.id)}" class="px-2 py-1 rounded-xl text-[11px] font-bold text-purple-700 bg-purple-50 dark:bg-purple-950/40 dark:text-purple-300 tap-effect" title="Bloquear nota privada">🔒 Bloquear</button>` : ''}
                                 ${longPress ? '' : `
                                 <button type="button" data-action="edit" data-note-edit="${note.id}" class="px-2 py-1 rounded-xl text-[11px] font-bold text-indigo-600 bg-indigo-50 dark:bg-slate-700 dark:text-indigo-300 tap-effect">✏️ Editar</button>
                                 <button type="button" data-action="delete" data-note-delete="${note.id}" class="px-2 py-1 rounded-xl text-[11px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400 tap-effect">🗑️ Eliminar</button>`}
@@ -1413,17 +1522,20 @@ window.NotesModule = (() => {
 
                         <!-- Contenido -->
                         ${note.content ? `
-                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed mb-4 line-clamp-6">
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed mb-3 line-clamp-6">
                                 ${escapeHtml(note.content)}
                             </p>
                         ` : ''}
+
+                        <!-- Miniaturas de fotos adjuntas -->
+                        ${photoThumbsHtml}
                     </div>
 
                     <!-- Fila inferior: Recordatorio, Fotos & Fecha -->
                     <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between flex-wrap gap-2 text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                        <div class="flex items-center gap-1.5 flex-wrap">
+                        <div class="flex items-center gap-2 flex-wrap">
                             ${reminderBadge}
-                            ${photoBadge}
+                            ${photoCountLabel}
                         </div>
                         <span class="font-mono">${dateFormatted}</span>
                     </div>
@@ -1449,6 +1561,10 @@ window.NotesModule = (() => {
                     onDelete: () => deleteNote(note.id)
                 });
             }
+            card.querySelector('[data-note-lock]')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                lockNote(note.id);
+            });
             card.querySelector('[data-note-edit]')?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 openEditModal(note.id);
@@ -1468,10 +1584,14 @@ window.NotesModule = (() => {
                 copyNoteContent(note.content || note.title);
             });
 
-            card.querySelector('[data-note-open-photos]')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const list = photosByNote.get(String(note.id)) || [];
-                if (list.length > 0) openPhotoPreview(list[0], e.currentTarget, list);
+            card.querySelectorAll('[data-note-photo-index]').forEach((thumbBtn) => {
+                thumbBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const list = photosByNote.get(String(note.id)) || [];
+                    const idx = Number(thumbBtn.dataset.notePhotoIndex) || 0;
+                    const target = list[idx] || list[0];
+                    if (target) openPhotoPreview(target, e.currentTarget, list);
+                });
             });
         });
     }
@@ -1493,8 +1613,10 @@ window.NotesModule = (() => {
         openEditModal,
         closeModal,
         deleteNote,
+        lockNote,
         unlockNote,
         isNoteUnlocked,
+        deleteLockedNote: deleteLockedNoteById,
         renderGallery,
         switchNotesTab,
         openPhotoPreview,

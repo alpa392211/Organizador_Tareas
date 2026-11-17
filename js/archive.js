@@ -280,22 +280,26 @@ window.ArchiveModule = (() => {
             if (currentFilter === 'all' || currentFilter === 'notes') {
                 notes.forEach(n => {
                     if (!n) return;
+                    const isProtected = Boolean(n.hasPassword);
                     combined.push({
                         itemType: 'note',
                         id: n.id,
-                        title: n.title || 'Nota sin título',
-                        content: n.content || '',
+                        hasPassword: isProtected,
+                        title: isProtected ? '🔒 Nota privada' : (n.title || 'Nota sin título'),
+                        content: isProtected ? 'Contenido protegido por clave. Restaura e ingresa tu PIN para verlo.' : (n.content || ''),
                         noteType: n.type || 'apunte',
                         archivedAt: n.archivedAt || Date.now()
                     });
                 });
             }
 
-            // Filtrar por búsqueda
+            // Filtrar por búsqueda (no exponer notas protegidas por PIN en búsqueda)
             if (searchQuery) {
                 combined = combined.filter(item =>
-                    (item.title && item.title.toLowerCase().includes(searchQuery)) ||
-                    (item.content && item.content.toLowerCase().includes(searchQuery))
+                    !item.hasPassword && (
+                        (item.title && item.title.toLowerCase().includes(searchQuery)) ||
+                        (item.content && item.content.toLowerCase().includes(searchQuery))
+                    )
                 );
             }
 

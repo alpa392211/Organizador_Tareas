@@ -124,12 +124,12 @@ window.CalendarModule = (() => {
         // Banner informativo del ciclo escolar en el calendario
         if (cycleBanner && cycle) {
             cycleBanner.innerHTML = `
-                <div class="flex flex-wrap items-center justify-between gap-1.5 min-w-0 text-xs px-3 py-1.5 rounded-xl bg-indigo-50/80 dark:bg-slate-700/60 border border-indigo-100 dark:border-slate-600 text-indigo-950 dark:text-indigo-200">
+                <div class="cal-glass-pill flex flex-wrap items-center justify-between gap-1.5 min-w-0 text-xs px-3.5 py-2 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/12 border border-indigo-500/20 dark:border-indigo-300/20 text-indigo-950 dark:text-indigo-100">
                     <span class="flex flex-wrap items-center gap-1.5 font-bold min-w-0">
                         <span>🗓️</span> Ciclo Escolar Activo:
-                        <span class="font-mono text-indigo-600 dark:text-indigo-400 font-extrabold break-all">${cycle.startDate} al ${cycle.endDate}</span>
+                        <span class="font-mono text-indigo-700 dark:text-indigo-300 font-extrabold break-all">${cycle.startDate} al ${cycle.endDate}</span>
                     </span>
-                    <span class="text-[11px] text-slate-600 dark:text-slate-300 hidden sm:inline">Clases vigentes solo en periodo activo</span>
+                    <span class="text-[11px] text-slate-600 dark:text-slate-300/90 hidden sm:inline">Clases vigentes solo en periodo activo</span>
                 </div>
             `;
         }
@@ -138,7 +138,7 @@ window.CalendarModule = (() => {
 
         DAY_LABELS.forEach(label => {
             const h = document.createElement('div');
-            h.className = 'text-center text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-400 py-1.5 uppercase tracking-wider truncate min-w-0';
+            h.className = 'text-center text-[10px] sm:text-xs font-extrabold text-slate-600 dark:text-slate-300/85 py-1.5 uppercase tracking-wider truncate min-w-0';
             h.textContent = label;
             gridEl.appendChild(h);
         });
@@ -153,7 +153,7 @@ window.CalendarModule = (() => {
         const prevMonthLastDay = new Date(year, month, 0).getDate();
         for (let i = startCol - 1; i >= 0; i--) {
             const cell = document.createElement('div');
-            cell.className = 'min-w-0 min-h-[44px] sm:min-h-[64px] p-0.5 sm:p-1 rounded-xl bg-slate-50/50 dark:bg-slate-800/20 text-slate-500 opacity-60 flex flex-col items-center justify-start text-xs border border-transparent select-none';
+            cell.className = 'min-w-0 min-h-[44px] sm:min-h-[64px] p-1 rounded-2xl bg-transparent text-slate-500/70 dark:text-slate-400/55 flex flex-col items-center justify-start text-xs border border-transparent select-none';
             cell.innerHTML = `<span>${prevMonthLastDay - i}</span>`;
             gridEl.appendChild(cell);
         }
@@ -194,15 +194,15 @@ window.CalendarModule = (() => {
             const cell = document.createElement('button');
             cell.type = 'button';
 
-            // Estilos delimitadores según vigencia del ciclo escolar
-            let baseStyles = 'min-w-0 min-h-[44px] sm:min-h-[64px] p-0.5 sm:p-1 rounded-xl transition-all duration-150 flex flex-col items-center justify-between text-xs border relative group ';
+            // Estilos delimitadores traslúcidos según vigencia del ciclo escolar
+            let baseStyles = 'cal-day-cell tap-effect min-w-0 min-h-[46px] sm:min-h-[64px] p-1 sm:p-1.5 rounded-2xl transition-all duration-150 flex flex-col items-center justify-between text-xs border relative group ';
             
             if (!isInCycle) {
-                baseStyles += 'bg-slate-100/60 dark:bg-slate-800/40 border-dashed border-slate-300 dark:border-slate-700/70 hover:opacity-90 ';
+                baseStyles += 'cal-day-off bg-slate-900/[0.04] dark:bg-white/[0.03] border-dashed border-slate-900/12 dark:border-white/12 hover:bg-slate-900/[0.08] dark:hover:bg-white/[0.07] ';
             } else if (isSelected) {
-                baseStyles += 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/40 shadow-sm ring-2 ring-indigo-500/30 ';
+                baseStyles += 'cal-day-selected border-indigo-500/80 dark:border-indigo-400/80 bg-indigo-500/18 dark:bg-indigo-500/24 shadow-sm ring-2 ring-indigo-500/30 ';
             } else {
-                baseStyles += 'border-slate-100 dark:border-slate-700/60 bg-white dark:bg-slate-800 hover:border-indigo-300 dark:hover:border-slate-600 ';
+                baseStyles += 'border-slate-900/10 dark:border-white/12 bg-white/45 dark:bg-white/[0.07] hover:bg-white/75 dark:hover:bg-white/[0.13] hover:border-indigo-400/50 ';
             }
 
             cell.className = baseStyles;
@@ -211,12 +211,12 @@ window.CalendarModule = (() => {
             const numSpan = document.createElement('span');
             numSpan.className = `w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors ${
                 isToday 
-                    ? 'bg-indigo-600 text-white font-black shadow-xs' 
+                    ? 'bg-indigo-600 text-white font-black shadow-sm shadow-indigo-500/40' 
                     : isSelected 
-                        ? 'text-indigo-600 dark:text-indigo-400 font-black' 
+                        ? 'text-indigo-700 dark:text-indigo-200 font-black' 
                         : !isInCycle 
-                            ? 'text-slate-400 dark:text-slate-400 font-bold' 
-                            : 'text-slate-900 dark:text-slate-100 font-extrabold'
+                            ? 'text-slate-500 dark:text-slate-400 font-semibold' 
+                            : 'text-slate-900 dark:text-white font-extrabold'
             }`;
             numSpan.textContent = dayNum;
 
@@ -313,7 +313,7 @@ window.CalendarModule = (() => {
         let cycleStatusBanner = '';
         if (!isInCycle) {
             cycleStatusBanner = `
-                <div class="mb-3 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2">
+                <div class="mb-3 p-3 rounded-2xl bg-amber-500/12 border border-amber-500/25 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
                     <span class="text-base shrink-0">⚠️</span>
                     <span>Esta fecha se encuentra <strong>fuera del ciclo escolar activo</strong> (${cycle.startDate} a ${cycle.endDate}). Los horarios de clase no aplican.</span>
                 </div>
@@ -322,17 +322,17 @@ window.CalendarModule = (() => {
 
         let classesHtml = '';
         if (!isInCycle) {
-            classesHtml = `<p class="text-xs text-slate-600 dark:text-slate-400 italic">No hay clases programadas (periodo vacacional / fuera de ciclo).</p>`;
+            classesHtml = `<p class="text-xs text-slate-600 dark:text-slate-300/80 italic">No hay clases programadas (periodo vacacional / fuera de ciclo).</p>`;
         } else if (dayClasses.length === 0) {
-            classesHtml = `<p class="text-xs text-slate-600 dark:text-slate-400 italic">No hay clases registradas para este día de la semana.</p>`;
+            classesHtml = `<p class="text-xs text-slate-600 dark:text-slate-300/80 italic">No hay clases registradas para este día de la semana.</p>`;
         } else {
             classesHtml = `
                 <div class="space-y-2">
                     ${dayClasses.map(c => `
-                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border-l-4" style="border-left-color: ${c.color};">
-                            <div>
-                                <h5 class="text-xs font-bold text-slate-800 dark:text-white">${escapeHtml(c.name)}</h5>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400">${c.startTime} - ${c.endTime} hrs ${c.classroom ? `• ${escapeHtml(c.classroom)}` : ''}</p>
+                        <div class="cal-detail-card flex items-center justify-between gap-2 p-3 rounded-2xl bg-white/55 dark:bg-white/[0.07] border border-slate-900/10 dark:border-white/12 border-l-4" style="border-left-color: ${c.color};">
+                            <div class="min-w-0">
+                                <h5 class="text-xs font-bold text-slate-900 dark:text-white truncate">${escapeHtml(c.name)}</h5>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-300 truncate">${c.startTime} - ${c.endTime} hrs ${c.classroom ? `• ${escapeHtml(c.classroom)}` : ''}</p>
                             </div>
                             <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${c.color}"></span>
                         </div>
@@ -343,7 +343,7 @@ window.CalendarModule = (() => {
 
         let tasksHtml = '';
         if (dayTasks.length === 0) {
-            tasksHtml = `<p class="text-xs text-slate-600 dark:text-slate-400 italic">No hay entregas de tareas programadas para esta fecha.</p>`;
+            tasksHtml = `<p class="text-xs text-slate-600 dark:text-slate-300/80 italic">No hay entregas de tareas programadas para esta fecha.</p>`;
         } else {
             tasksHtml = `
                 <div class="space-y-2">
@@ -352,15 +352,15 @@ window.CalendarModule = (() => {
                         const subColor = sub ? sub.color : '#64748B';
                         const subName = sub ? sub.name : 'Materia';
                         return `
-                            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border-l-4 ${t.completed ? 'opacity-60' : ''}" style="border-left-color: ${subColor};">
+                            <div class="cal-detail-card flex items-center justify-between p-3 rounded-2xl bg-white/55 dark:bg-white/[0.07] border border-slate-900/10 dark:border-white/12 border-l-4 ${t.completed ? 'opacity-60' : ''}" style="border-left-color: ${subColor};">
                                 <div class="min-w-0 flex-1 pr-2">
-                                    <div class="flex items-center gap-1.5 mb-0.5">
-                                        <span class="text-[10px] font-semibold px-1.5 py-0.2 rounded" style="background-color: ${subColor}20; color: ${subColor};">
+                                    <div class="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                                        <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style="background-color: ${subColor}22; color: ${subColor};">
                                             ${escapeHtml(subName)}
                                         </span>
-                                        ${t.completed ? `<span class="text-[10px] text-emerald-600 font-bold">✓ Entregada</span>` : `<span class="text-[10px] text-rose-500 font-bold">● Pendiente</span>`}
+                                        ${t.completed ? `<span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">✓ Entregada</span>` : `<span class="text-[10px] text-rose-600 dark:text-rose-400 font-bold">● Pendiente</span>`}
                                     </div>
-                                    <h5 class="text-xs font-bold text-slate-800 dark:text-white truncate ${t.completed ? 'line-through' : ''}">${escapeHtml(t.title)}</h5>
+                                    <h5 class="text-xs font-bold text-slate-900 dark:text-white truncate ${t.completed ? 'line-through' : ''}">${escapeHtml(t.title)}</h5>
                                 </div>
                             </div>
                         `;
@@ -370,30 +370,30 @@ window.CalendarModule = (() => {
         }
 
         const html = `
-            <div class="pt-3 border-t border-slate-200 dark:border-slate-700">
+            <div class="pt-3.5 border-t border-slate-900/10 dark:border-white/10">
                 ${cycleStatusBanner}
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-bold text-slate-800 dark:text-white capitalize flex items-center gap-2">
-                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <h4 class="text-sm font-extrabold text-slate-900 dark:text-white capitalize flex items-center gap-2 min-w-0">
+                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        ${dateStr}
+                        <span class="min-w-0">${dateStr}</span>
                     </h4>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-md ${isInCycle ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'}">
+                    <span class="text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap shrink-0 border ${isInCycle ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/25' : 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-500/25'}">
                         ${isInCycle ? 'En periodo lectivo' : 'Fuera de ciclo'}
                     </span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <h5 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                        <h5 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300/90 mb-2 flex items-center gap-1.5">
                             <span>📚</span> Clases Programadas (${dayClasses.length})
                         </h5>
                         ${classesHtml}
                     </div>
 
                     <div>
-                        <h5 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                        <h5 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300/90 mb-2 flex items-center gap-1.5">
                             <span>📝</span> Tareas por Entregar (${dayTasks.length})
                         </h5>
                         ${tasksHtml}

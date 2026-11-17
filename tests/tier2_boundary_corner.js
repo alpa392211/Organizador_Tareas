@@ -4588,6 +4588,312 @@ const tests = [
             helpers.assertEqual(lockResult.scrollYAfterUnlock, 120, 'Normal window scrolling must work immediately after unlock');
             helpers.assertFalse(lockResult.ghostClickReachedCard, 'Synthetic ghost click after long-press release must be intercepted and suppressed');
         }
+    },
+
+    // =========================================================================
+    // F28: Calendario Cristal Traslúcido, Notas Privadas con PIN/Borrado y Miniaturas
+    // =========================================================================
+    {
+        id: 'T2_F28_01_calendar_modal_translucent_glass_and_mobile_fit',
+        feature: 'F28',
+        name: 'Quick calendar modal renders frosted translucency across Claro/Oscuro/Monocromatico/Vault, translucent day cells, and 0px horizontal overflow at 320/360/430px',
+        run: async (page, helpers) => {
+            const parseAlpha = (rgbaStr) => {
+                if (!rgbaStr || rgbaStr === 'transparent') return 0;
+                const m = rgbaStr.match(/rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+(?:\s*,\s*([\d.]+))?\s*\)/i);
+                if (m) return m[1] !== undefined ? parseFloat(m[1]) : 1;
+                const slash = rgbaStr.match(/\/\s*([\d.]+)(%?)\s*\)$/);
+                if (slash) {
+                    const num = parseFloat(slash[1]);
+                    return slash[2] === '%' ? num / 100 : num;
+                }
+                return 1;
+            };
+
+            const themeResults = await page.evaluate(async () => {
+                window.StorageModule?.setGlassIntensity?.('intenso');
+                window.OrganizadorApp?.applyGlassIntensity?.('intenso');
+                window.CalendarModule?.openModal?.();
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+                const themes = [
+                    { name: 'claro', dark: false, gray: false, special: 'default' },
+                    { name: 'oscuro', dark: true, gray: false, special: 'default' },
+                    { name: 'mono-oscuro', dark: true, gray: true, special: 'default' },
+                    { name: 'theme-matrix', dark: true, gray: false, special: 'theme-matrix' }
+                ];
+
+                const root = document.documentElement;
+                const out = [];
+                for (const t of themes) {
+                    Array.from(root.classList).filter(c => c.startsWith('theme-')).forEach(c => root.classList.remove(c));
+                    root.classList.toggle('dark', t.dark);
+                    if (t.gray) root.classList.add('theme-gray');
+                    if (t.special !== 'default') root.classList.add(t.special);
+
+                    const dlg = document.querySelector('#calendar-modal .calendar-glass-dialog');
+                    const dayCell = document.querySelector('#cal-days-grid .cal-day-cell');
+                    const dlgCs = dlg ? getComputedStyle(dlg) : null;
+                    const cellCs = dayCell ? getComputedStyle(dayCell) : null;
+                    out.push({
+                        name: t.name,
+                        dlgBg: dlgCs?.backgroundColor || '',
+                        dlgBackdrop: dlgCs?.backdropFilter || dlgCs?.webkitBackdropFilter || '',
+                        cellBg: cellCs?.backgroundColor || ''
+                    });
+                }
+
+                Array.from(root.classList).filter(c => c.startsWith('theme-')).forEach(c => root.classList.remove(c));
+                root.classList.remove('dark');
+                window.CalendarModule?.closeModal?.();
+                return out;
+            });
+
+            for (const r of themeResults) {
+                const dlgAlpha = parseAlpha(r.dlgBg);
+                const cellAlpha = parseAlpha(r.cellBg);
+                helpers.assertTrue(r.dlgBackdrop.includes('blur'), `Calendar modal (${r.name}) must apply backdrop-filter blur (got "${r.dlgBackdrop}")`);
+                helpers.assertTrue(dlgAlpha > 0 && dlgAlpha < 0.75, `Calendar modal (${r.name}) background alpha must be translucent (<0.75, got ${dlgAlpha})`);
+                helpers.assertTrue(cellAlpha < 0.75, `Calendar day cell (${r.name}) background alpha must be translucent (<0.75, got ${cellAlpha})`);
+            }
+
+            // Mobile responsive overflow check at 320, 360, 430px
+            for (const vw of [320, 360, 430]) {
+                await page.setViewport({ width: vw, height: 780, deviceScaleFactor: 2 });
+                const overflow = await page.evaluate(async (w) => {
+                    window.CalendarModule?.openModal?.();
+                    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                    const dlg = document.querySelector('#calendar-modal .calendar-glass-dialog');
+                    const dlgSw = dlg ? dlg.scrollWidth : 0;
+                    const dlgCw = dlg ? dlg.clientWidth : w;
+                    const docSw = document.documentElement.scrollWidth;
+                    window.CalendarModule?.closeModal?.();
+                    return { dlgSw, dlgCw, docSw };
+                }, vw);
+                helpers.assertTrue(overflow.docSw <= vw + 1, `Calendar modal must cause 0px document overflow at ${vw}px (scrollWidth=${overflow.docSw})`);
+                helpers.assertTrue(overflow.dlgSw <= overflow.dlgCw + 2, `Calendar modal body must not overflow internally at ${vw}px (${overflow.dlgSw} <= ${overflow.dlgCw})`);
+            }
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+        }
+    },
+    {
+        id: 'T2_F28_02_private_note_ui_creation_lock_unlock_and_forgotten_pin_delete',
+        feature: 'F28',
+        name: 'Creating a private note via UI persists PIN, locks immediately, unlocks & re-locks cleanly, masks gallery/archive, and supports delete-only recovery when PIN is forgotten',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.StorageModule?.saveNotes?.([]);
+                localStorage.setItem('org_escolar_archive', '[]');
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                localStorage.setItem('org_escolar_onboarding_completed', 'true');
+                localStorage.setItem('org_escolar_cycle_configured', 'true');
+                localStorage.setItem('org_escolar_last_seen_version', '1.5.3');
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+                window.OrganizadorApp?.closeCycleWelcomeModal?.();
+                const cycleModal = document.getElementById('cycle-setup-modal');
+                if (cycleModal) cycleModal.classList.add('hidden');
+                const changelogModal = document.getElementById('changelog-modal');
+                if (changelogModal && !changelogModal.classList.contains('hidden')) {
+                    document.getElementById('close-changelog-modal')?.click();
+                    changelogModal.classList.add('hidden');
+                }
+                document.body.classList.remove('overflow-hidden');
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.switchNotesTab?.('notes');
+                window.NotesModule?.render?.();
+            });
+
+            // 1. Create a private note through the actual Note Modal UI
+            await page.click('#add-note-btn');
+            await page.waitForSelector('#note-modal:not(.hidden)', { timeout: 2500 });
+            await page.type('#note-title', 'Diario Secreto UI');
+            await page.type('#note-content', 'CONTENIDO_ULTRAPRIVADO_2026');
+            await page.click('#note-password-toggle');
+            await page.waitForSelector('#note-password-container:not(.hidden)', { timeout: 1500 });
+            await page.type('#note-password-input', '4321');
+            await page.click('#save-note-btn');
+            await page.waitForSelector('#note-modal.hidden', { timeout: 2500 });
+
+            const afterCreate = await page.evaluate(() => {
+                const notes = window.StorageModule?.getNotes?.() || [];
+                const target = notes.find(n => n.title === 'Diario Secreto UI');
+                const card = target ? document.querySelector(`[data-note-id="${target.id}"]`) : null;
+                return {
+                    exists: Boolean(target),
+                    hasPassword: Boolean(target?.hasPassword),
+                    hasHash: Boolean(target?.passwordHash && target.passwordHash.startsWith('h1:')),
+                    cardLocked: Boolean(card && card.classList.contains('note-card-locked')),
+                    leaksText: Boolean(card && (card.outerHTML.includes('CONTENIDO_ULTRAPRIVADO_2026') || card.outerHTML.includes('Diario Secreto UI'))),
+                    noteId: target?.id || null
+                };
+            });
+
+            helpers.assertTrue(afterCreate.exists && afterCreate.hasPassword && afterCreate.hasHash, 'UI-created private note must persist hasPassword and hashed passwordHash');
+            helpers.assertTrue(afterCreate.cardLocked, 'Newly created private note must immediately render in locked state');
+            helpers.assertFalse(afterCreate.leaksText, 'Locked card DOM must never leak title or content');
+
+            // 2. Unlock with correct PIN -> reveals content & lock button -> verify manual re-lock -> unlock & archive
+            await page.click(`[data-note-id="${afterCreate.noteId}"]`);
+            await page.waitForSelector('#note-unlock-modal:not(.hidden)', { timeout: 2500 });
+            await page.type('#note-unlock-input', '4321');
+            await page.click('#note-unlock-confirm');
+            await page.waitForSelector('#note-unlock-modal.hidden', { timeout: 2500 });
+
+            const unlockedUi = await page.evaluate((nid) => {
+                const card = document.querySelector(`[data-note-id="${nid}"]`);
+                return {
+                    isLockedClass: card?.classList.contains('note-card-locked'),
+                    hasContent: card?.textContent?.includes('CONTENIDO_ULTRAPRIVADO_2026'),
+                    hasLockBtn: Boolean(card?.querySelector(`[data-note-lock="${nid}"]`))
+                };
+            }, afterCreate.noteId);
+            helpers.assertFalse(unlockedUi.isLockedClass, 'Unlocked note card must remove locked styling');
+            helpers.assertTrue(unlockedUi.hasContent, 'Unlocked note card must reveal content');
+            helpers.assertTrue(unlockedUi.hasLockBtn, 'Unlocked private note must display 🔒 Bloquear button');
+
+            // Manual lock button works
+            await page.click(`[data-note-id="${afterCreate.noteId}"] [data-note-lock="${afterCreate.noteId}"]`);
+            const relocked = await page.evaluate((nid) => document.querySelector(`[data-note-id="${nid}"]`)?.classList.contains('note-card-locked'), afterCreate.noteId);
+            helpers.assertTrue(relocked, 'Clicking 🔒 Bloquear button must immediately re-lock the private note');
+
+            // Re-unlock & check Archive masking while protected note is archived
+            await page.evaluate((nid) => window.NotesModule?.unlockNote?.(nid, '4321'), afterCreate.noteId);
+            await page.click(`[data-note-id="${afterCreate.noteId}"] [data-note-archive]`);
+            await new Promise(r => setTimeout(r, 150));
+            const archiveLeakCheck = await page.evaluate(() => {
+                window.ArchiveModule?.render?.();
+                const html = document.getElementById('archive-items-grid')?.innerHTML || '';
+                return {
+                    hasPrivatePlaceholder: html.includes('Nota privada'),
+                    leaksSecret: html.includes('CONTENIDO_ULTRAPRIVADO_2026') || html.includes('Diario Secreto UI')
+                };
+            });
+            helpers.assertTrue(archiveLeakCheck.hasPrivatePlaceholder, 'Archived private note must show masked 🔒 Nota privada label');
+            helpers.assertFalse(archiveLeakCheck.leaksSecret, 'Archive DOM must never leak PIN-protected note title/content');
+
+            // 3. Create another private note & test forgotten-PIN delete-only recovery
+            await page.evaluate(() => {
+                const tc = document.getElementById('toast-container');
+                if (tc) tc.innerHTML = '';
+            });
+            await page.click('#add-note-btn');
+            await page.waitForSelector('#note-modal:not(.hidden)', { timeout: 2500 });
+            await page.type('#note-title', 'PIN Olvidado');
+            await page.type('#note-content', 'SECRETO_IRRECUPERABLE');
+            await page.click('#note-password-toggle');
+            await page.waitForSelector('#note-password-container:not(.hidden)', { timeout: 1500 });
+            await page.type('#note-password-input', '8765');
+            await page.click('#save-note-btn');
+            await page.waitForSelector('#note-modal.hidden', { timeout: 2500 });
+
+            const secondNoteId = await page.evaluate(() => {
+                const target = (window.StorageModule?.getNotes?.() || []).find(n => n.title === 'PIN Olvidado');
+                return target?.id || null;
+            });
+            helpers.assertTrue(Boolean(secondNoteId), 'Second private note must exist');
+
+            // Open unlock modal -> tap Borrar nota -> test Volver -> tap Borrar nota -> confirm deletion (only recovery option)
+            await page.click(`[data-note-id="${secondNoteId}"]`);
+            await page.waitForSelector('#note-unlock-modal:not(.hidden)', { timeout: 2500 });
+            await page.click('#note-unlock-delete-btn');
+            await page.waitForSelector('#note-unlock-delete-confirm-view:not(.hidden)', { timeout: 1500 });
+            await page.click('#note-unlock-delete-back');
+            await page.waitForSelector('#note-unlock-main-view:not(.hidden)', { timeout: 1500 });
+            await page.click('#note-unlock-delete-btn');
+            await page.waitForSelector('#note-unlock-delete-confirm-view:not(.hidden)', { timeout: 1500 });
+            await page.click('#note-unlock-delete-confirm');
+            await new Promise(r => setTimeout(r, 180));
+
+            const afterForgotDelete = await page.evaluate((nid) => ({
+                modalClosed: document.getElementById('note-unlock-modal')?.classList.contains('hidden'),
+                stillExists: (window.StorageModule?.getNotes?.() || []).some(n => String(n.id) === String(nid)),
+                domHasText: document.getElementById('notes-grid')?.textContent?.includes('SECRETO_IRRECUPERABLE') || false
+            }), secondNoteId);
+
+            helpers.assertTrue(afterForgotDelete.modalClosed, 'Unlock modal must close after confirming delete of locked note');
+            helpers.assertFalse(afterForgotDelete.stillExists, 'Confirming delete-only option must remove locked note from Storage');
+            helpers.assertFalse(afterForgotDelete.domHasText, 'Deleted locked note content must never appear in DOM');
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearAll?.();
+            });
+        }
+    },
+    {
+        id: 'T2_F28_03_note_card_bottom_photo_thumbnails',
+        feature: 'F28',
+        name: 'Attached photos render as small clickable <img> thumbnails directly below unlocked note content and open the photo viewer',
+        run: async (page, helpers) => {
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+                window.StorageModule?.saveNotes?.([
+                    { id: 'note_thumb_1', title: 'Apuntes con diagrama', content: 'Ver esquema abajo', type: 'apunte', createdAt: Date.now() }
+                ]);
+
+                const c = document.createElement('canvas');
+                c.width = 160;
+                c.height = 120;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#4f46e5';
+                ctx.fillRect(0, 0, 160, 120);
+                const dataUrl = c.toDataURL('image/jpeg', 0.85);
+
+                for (let i = 1; i <= 5; i++) {
+                    await window.StorageModule?.saveGalleryPhotoToIdb?.({
+                        id: `thumb_p_${i}`,
+                        name: `Diagrama ${i}.jpg`,
+                        dataUrl,
+                        thumbUrl: dataUrl,
+                        noteId: 'note_thumb_1',
+                        noteTitle: 'Apuntes con diagrama',
+                        createdAt: Date.now() + i
+                    });
+                }
+
+                window.OrganizadorApp?.switchView?.('notes');
+                window.NotesModule?.switchNotesTab?.('notes');
+                window.NotesModule?.render?.();
+            });
+            await new Promise(r => setTimeout(r, 150));
+
+            const thumbCheck = await page.evaluate(() => {
+                const card = document.querySelector('[data-note-id="note_thumb_1"]');
+                const strip = card?.querySelector('.note-card-photos');
+                const thumbs = Array.from(card?.querySelectorAll('.note-card-thumb') || []);
+                const imgs = Array.from(card?.querySelectorAll('.note-card-thumb img') || []);
+                const moreBadge = card?.querySelector('.note-card-thumb-more')?.textContent?.trim() || '';
+                const imgLoaded = imgs.length > 0 && imgs.every(im => im.getAttribute('src')?.startsWith('data:image/'));
+                const rect = imgs[0]?.getBoundingClientRect();
+                return {
+                    hasStrip: Boolean(strip),
+                    thumbCount: thumbs.length,
+                    imgCount: imgs.length,
+                    imgLoaded,
+                    moreBadge,
+                    width: Math.round(rect?.width || 0),
+                    height: Math.round(rect?.height || 0)
+                };
+            });
+
+            helpers.assertTrue(thumbCheck.hasStrip, 'Note card must contain .note-card-photos thumbnail strip below note text');
+            helpers.assertEqual(thumbCheck.thumbCount, 4, 'Thumbnail strip must cap visible thumbnails at 4 and summarize overflow');
+            helpers.assertEqual(thumbCheck.imgCount, 4, 'Each visible thumbnail must contain a rendered <img>');
+            helpers.assertTrue(thumbCheck.imgLoaded, 'Each thumbnail <img> must have valid image src');
+            helpers.assertEqual(thumbCheck.moreBadge, '+1', '5 attached photos must render +1 overflow indicator on 4th thumbnail');
+            helpers.assertTrue(thumbCheck.width >= 44 && thumbCheck.height >= 44, `Thumbnails must be compact clickable previews (>=44px, got ${thumbCheck.width}x${thumbCheck.height})`);
+
+            // Clicking 2nd thumbnail opens fullscreen viewer at index 1
+            await page.click('[data-note-id="note_thumb_1"] [data-note-photo-index="1"]');
+            await page.waitForSelector('#photo-preview-modal:not(.hidden)', { timeout: 2500 });
+            const viewerState = await page.evaluate(() => window.NotesModule?.getViewerState?.());
+            helpers.assertEqual(viewerState?.index, 1, 'Clicking 2nd thumbnail below note must open photo viewer at index 1');
+
+            await page.evaluate(async () => {
+                window.NotesModule?.closePhotoPreview?.();
+                await window.StorageModule?.clearGalleryPhotosIdb?.();
+            });
+        }
     }
 ];
 

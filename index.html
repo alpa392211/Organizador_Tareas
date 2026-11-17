@@ -2049,9 +2049,12 @@
                         <input type="checkbox" id="note-password-toggle" data-note-password-toggle class="w-4 h-4 accent-amber-500 shrink-0">
                         <span>🔒 Nota privada (proteger con PIN)</span>
                     </label>
-                    <div id="note-password-container" class="hidden">
-                        <input type="password" id="note-password-input" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="PIN de la nota (mín. 4 dígitos)"
+                    <div id="note-password-container" class="hidden space-y-1.5">
+                        <input type="password" id="note-password-input" inputmode="numeric" maxlength="12" autocomplete="new-password" placeholder="PIN de la nota (mín. 4 dígitos)"
                             class="w-full min-h-[44px] px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-sm focus:outline-none focus:border-indigo-500">
+                        <p id="note-password-hint" class="text-[11px] text-slate-500 dark:text-slate-400">
+                            Si olvidas tu clave, la única opción será eliminar la nota.
+                        </p>
                     </div>
                 </div>
 
@@ -2086,54 +2089,56 @@
     <!-- MODAL 4: CALENDARIO MENSUAL INTERACTIVO                   -->
     <!-- ========================================================= -->
     <div id="calendar-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-6">
-        <div id="calendar-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+        <div id="calendar-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/35 dark:bg-slate-950/45 backdrop-blur-xs transition-opacity"></div>
         
-        <div class="modal-dialog mobile-bottom-sheet relative w-full max-w-3xl bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform flex flex-col max-h-[92vh]">
+        <div class="modal-dialog mobile-bottom-sheet calendar-glass-dialog relative w-full max-w-3xl rounded-t-3xl sm:rounded-3xl shadow-2xl border border-white/60 dark:border-white/15 overflow-hidden transform flex flex-col max-h-[92vh]">
             <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
             <!-- Barra Superior del Calendario -->
-            <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 bg-slate-50/50 dark:bg-slate-800 shrink-0">
-                <div class="flex items-center gap-2 min-w-0 flex-1">
-                    <span class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="calendar-glass-header px-3.5 sm:px-6 py-3 sm:py-4 border-b border-slate-900/10 dark:border-white/10 flex items-center justify-between gap-1.5 sm:gap-2 shrink-0">
+                <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                    <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-indigo-500/15 border border-indigo-400/25 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0 shadow-xs">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </span>
-                    <h3 id="cal-month-title" class="text-sm sm:text-lg font-black text-slate-900 dark:text-white capitalize truncate min-w-0">
+                    <h3 id="cal-month-title" class="text-[15px] sm:text-lg font-black text-slate-900 dark:text-white capitalize truncate min-w-0 tracking-tight">
                         Noviembre 2026
                     </h3>
                 </div>
 
-                <div class="flex items-center gap-1 shrink-0">
-                    <button type="button" id="cal-prev-month" class="min-w-[40px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 tap-effect" title="Mes anterior">
+                <div class="flex items-center gap-0.5 sm:gap-1 shrink-0">
+                    <button type="button" id="cal-prev-month" class="min-w-[36px] sm:min-w-[40px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-slate-900/8 dark:hover:bg-white/12 text-slate-700 dark:text-slate-200 tap-effect transition-colors" title="Mes anterior">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button type="button" id="cal-today-btn" class="min-h-[44px] px-2.5 sm:px-3 py-1 text-xs font-bold rounded-xl bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 tap-effect" title="Ir a hoy">
+                    <button type="button" id="cal-today-btn" class="min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3.5 py-1.5 text-xs font-extrabold rounded-full bg-white/55 dark:bg-white/12 border border-slate-900/10 dark:border-white/18 text-slate-800 dark:text-white hover:bg-indigo-500/15 dark:hover:bg-white/20 tap-effect transition-all shadow-xs" title="Ir a hoy">
                         Hoy
                     </button>
-                    <button type="button" id="cal-next-month" class="min-w-[40px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 tap-effect" title="Mes siguiente">
+                    <button type="button" id="cal-next-month" class="min-w-[36px] sm:min-w-[40px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-slate-900/8 dark:hover:bg-white/12 text-slate-700 dark:text-slate-200 tap-effect transition-colors" title="Mes siguiente">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </button>
-                    <button type="button" id="close-calendar-modal" class="min-w-[44px] min-h-[44px] flex items-center justify-center ml-0.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 tap-effect" title="Cerrar calendario">
+                    <button type="button" id="close-calendar-modal" class="min-w-[40px] sm:min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-900/8 dark:hover:bg-white/12 tap-effect transition-colors" title="Cerrar calendario">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
             </div>
 
             <!-- Cuerpo del Calendario (Grid Mensual y Detalle del Día) -->
-            <div class="mobile-sheet-body p-3.5 sm:p-6 overflow-y-auto space-y-4">
+            <div class="mobile-sheet-body p-3.5 sm:p-6 overflow-y-auto space-y-3.5">
                 <!-- Banner de Delimitación del Ciclo Escolar Activo -->
                 <div id="cal-cycle-banner">
                     <!-- Inyectado por calendar.js -->
                 </div>
                 <!-- Leyenda Rápida -->
-                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 pb-1">
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Clases del día</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Entregas de tareas</span>
-                    <span class="flex items-center gap-1.5 ml-auto text-[11px] text-slate-600 dark:text-slate-300 font-mono">Toca un día para ver su detalle</span>
+                <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700 dark:text-slate-200 pb-0.5">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="flex items-center gap-1.5 font-semibold"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-xs"></span> Clases del día</span>
+                        <span class="flex items-center gap-1.5 font-semibold"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500 shadow-xs"></span> Entregas de tareas</span>
+                    </div>
+                    <span class="text-[11px] text-slate-600 dark:text-slate-300/90 font-medium">Toca un día para ver su detalle</span>
                 </div>
 
                 <!-- Grilla de 7 columnas -->
-                <div id="cal-days-grid" class="grid grid-cols-7 gap-1 sm:gap-2">
+                <div id="cal-days-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
                     <!-- Inyectado por calendar.js -->
                 </div>
 
@@ -2597,17 +2602,34 @@
     <!-- Desbloqueo de nota privada -->
     <div id="note-unlock-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-[70] hidden items-end sm:items-center justify-center p-0 sm:p-4">
         <div id="note-unlock-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-xs"></div>
-        <div id="note-unlock-dialog" class="modal-dialog mobile-bottom-sheet relative w-full max-w-xs bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col">
+        <div id="note-unlock-dialog" class="modal-dialog mobile-bottom-sheet relative w-full max-w-sm bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col">
             <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
-            <div class="mobile-sheet-body p-5 pt-3 sm:p-5 space-y-3">
+            <div id="note-unlock-main-view" class="mobile-sheet-body p-5 pt-3 sm:p-5 space-y-3">
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">🔒 Nota privada</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Ingresa el PIN para ver esta nota.</p>
                 <input type="password" id="note-unlock-input" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="PIN"
                     class="w-full min-h-[44px] px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-sm focus:outline-none focus:border-indigo-500">
-                <p id="note-unlock-error" class="hidden text-xs font-bold text-rose-600">PIN incorrecto</p>
+                <p id="note-unlock-error" class="hidden text-xs font-bold text-rose-600 dark:text-rose-400">PIN incorrecto</p>
                 <div class="flex flex-wrap justify-end gap-2 pt-1">
                     <button type="button" id="note-unlock-cancel" class="tap-effect touch-target-44 min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300">Cancelar</button>
-                    <button type="button" id="note-unlock-confirm" class="tap-effect touch-target-44 min-h-[44px] px-4 py-2 rounded-2xl bg-amber-500 text-white text-xs font-bold">Desbloquear</button>
+                    <button type="button" id="note-unlock-confirm" class="tap-effect touch-target-44 min-h-[44px] px-4 py-2 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm">Desbloquear</button>
+                </div>
+                <div class="pt-3 border-t border-slate-200/70 dark:border-white/10 flex items-center justify-between gap-2 flex-wrap">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">¿No recuerdas la clave?</span>
+                    <button type="button" id="note-unlock-delete-btn"
+                        class="tap-effect touch-target-44 min-h-[44px] px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors">
+                        🗑️ Borrar nota
+                    </button>
+                </div>
+            </div>
+            <div id="note-unlock-delete-confirm-view" class="hidden mobile-sheet-body p-5 pt-3 sm:p-5 space-y-3">
+                <h3 class="text-base font-bold text-rose-600 dark:text-rose-400">🗑️ Eliminar nota privada</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Si no recuerdas la contraseña, no es posible recuperar ni ver su contenido. La única opción es eliminarla definitivamente.
+                </p>
+                <div class="flex flex-wrap justify-end gap-2 pt-1">
+                    <button type="button" id="note-unlock-delete-back" class="tap-effect touch-target-44 min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10">Volver</button>
+                    <button type="button" id="note-unlock-delete-confirm" class="tap-effect touch-target-44 min-h-[44px] px-4 py-2 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm">Sí, borrar nota</button>
                 </div>
             </div>
         </div>

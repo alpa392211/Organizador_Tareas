@@ -1,6 +1,7 @@
 /**
  * sw.js - Service Worker for Organizador_Tareas v1.5.3
  * Offline caching, instant reload updates, and resilient network-first navigation.
+ * Cache refresh revision: calendar-glass-private-notes-thumbs
  */
 
 const CACHE_NAME = 'organizador-tareas-cache-v1.5.3';

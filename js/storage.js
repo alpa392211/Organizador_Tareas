@@ -682,6 +682,7 @@ window.StorageModule = (() => {
         },
         addNote(note) {
             const notes = this.getNotes();
+            const hasPassword = Boolean(note.hasPassword);
             const newNote = {
                 id: 'note_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
                 title: (note.title || '').trim(),
@@ -689,6 +690,8 @@ window.StorageModule = (() => {
                 type: note.type || 'apunte', // idea, apunte, pendiente, importante, personal
                 hasReminder: Boolean(note.hasReminder),
                 reminderDateTime: note.hasReminder ? (note.reminderDateTime || '') : '',
+                hasPassword,
+                passwordHash: hasPassword ? String(note.passwordHash || '') : '',
                 createdAt: Date.now(),
                 updatedAt: Date.now()
             };

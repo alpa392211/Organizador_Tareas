@@ -1803,13 +1803,17 @@ html.dark.theme-gray #view-calendar {
     color: #f1f2f5 !important;
 }
 html.dark.theme-gray #calendar-modal .modal-dialog {
-    background-color: rgba(34, 37, 45, 0.86) !important;
+    background-color: rgba(28, 31, 38, 0.48) !important;
     color: #f1f2f5 !important;
 }
 html.dark.theme-gray #cal-days-grid button {
-    background-color: rgba(34, 36, 43, 0.92) !important;
-    border-color: #353842 !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
     color: #f8fafc !important;
+}
+html.dark.theme-gray #cal-days-grid button.cal-day-off {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
 }
 html.dark.theme-gray #cal-days-grid button span {
     color: #f8fafc !important;
@@ -1818,7 +1822,7 @@ html.dark.theme-gray #cal-days-grid button .text-indigo-400 {
     color: #cbd5e1 !important;
 }
 html.dark.theme-gray #cal-days-grid div.select-none {
-    background-color: #1a1b20 !important;
+    background-color: transparent !important;
 }
 html.dark.theme-gray #cal-days-grid div.select-none span {
     color: #64748b !important;
@@ -1835,13 +1839,16 @@ html:not(.dark).theme-gray #view-calendar {
     color: #0f172a !important;
 }
 html:not(.dark).theme-gray #calendar-modal .modal-dialog {
-    background-color: rgba(241, 244, 249, 0.88) !important;
+    background-color: rgba(241, 244, 249, 0.50) !important;
     color: #0f172a !important;
 }
 html:not(.dark).theme-gray #cal-days-grid button {
-    background-color: rgba(255, 255, 255, 0.92) !important;
-    border-color: #cbd5e1 !important;
+    background-color: rgba(255, 255, 255, 0.48) !important;
+    border-color: rgba(15, 23, 42, 0.12) !important;
     color: #0f172a !important;
+}
+html:not(.dark).theme-gray #cal-days-grid button.cal-day-off {
+    background-color: rgba(15, 23, 42, 0.04) !important;
 }
 html:not(.dark).theme-gray #cal-days-grid button span {
     color: #0f172a !important;
@@ -3495,4 +3502,182 @@ html.theme-starlight .segmented-glass-indicator {
         animation: none !important;
         scale: 1 1 !important;
     }
+    .note-card-thumb img {
+        transition: none !important;
+    }
 }
+
+/* ========================================================
+   MODAL DE CALENDARIO CON CRISTAL TRASLÚCIDO Y MINIATURAS EN NOTAS
+   ======================================================== */
+#calendar-modal .calendar-glass-dialog {
+    backdrop-filter: blur(var(--lg-blur-modal, 36px)) saturate(var(--lg-sat-nav, 200%)) contrast(1.04) !important;
+    -webkit-backdrop-filter: blur(var(--lg-blur-modal, 36px)) saturate(var(--lg-sat-nav, 200%)) contrast(1.04) !important;
+    background-color: rgba(255, 255, 255, 0.28) !important;
+    background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.34) 0%, rgba(248, 250, 252, 0.16) 55%, rgba(241, 245, 249, 0.24) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.82) !important;
+    box-shadow: var(--shadow-glass-lg), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+html.dark #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(15, 23, 42, 0.32) !important;
+    background-image: linear-gradient(165deg, rgba(30, 41, 59, 0.26) 0%, rgba(15, 23, 42, 0.18) 58%, rgba(11, 17, 32, 0.28) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
+    box-shadow: var(--shadow-glass-lg), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(235, 239, 246, 0.32) !important;
+    background-image: linear-gradient(165deg, rgba(248, 250, 252, 0.34) 0%, rgba(235, 239, 246, 0.20) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.82) !important;
+}
+html.dark.theme-gray #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(24, 27, 34, 0.36) !important;
+    background-image: linear-gradient(165deg, rgba(40, 44, 54, 0.28) 0%, rgba(22, 25, 32, 0.22) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(12, 18, 34, 0.34) !important;
+    background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, rgba(12, 18, 34, 0.24) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+/* Ajuste por intensidad del cristal */
+html[data-glass-intensity="normal"] #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(255, 255, 255, 0.48) !important;
+}
+html.dark[data-glass-intensity="normal"] #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(15, 23, 42, 0.54) !important;
+}
+html[data-glass-intensity="suave"] #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(255, 255, 255, 0.88) !important;
+}
+html.dark[data-glass-intensity="suave"] #calendar-modal .calendar-glass-dialog {
+    background-color: rgba(15, 23, 42, 0.90) !important;
+}
+
+#calendar-modal .calendar-glass-header {
+    background-color: rgba(255, 255, 255, 0.22);
+    border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+html.dark #calendar-modal .calendar-glass-header,
+html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-header {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+#calendar-modal .cal-glass-pill {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+#calendar-modal #cal-days-grid .cal-day-cell {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+#calendar-modal #cal-days-grid .cal-day-selected {
+    background-color: rgba(99, 102, 241, 0.20) !important;
+    border-color: rgba(99, 102, 241, 0.72) !important;
+}
+#calendar-modal .cal-detail-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+html[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    #calendar-modal .calendar-glass-dialog {
+        background-color: #ffffff !important;
+        background-image: none !important;
+    }
+    html.dark #calendar-modal .calendar-glass-dialog,
+    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog {
+        background-color: #0f172a !important;
+        background-image: none !important;
+    }
+    html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog {
+        background-color: #edf1f6 !important;
+    }
+    html.dark.theme-gray #calendar-modal .calendar-glass-dialog {
+        background-color: #252830 !important;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    #calendar-modal .calendar-glass-dialog,
+    #calendar-modal .cal-glass-pill,
+    #calendar-modal #cal-days-grid .cal-day-cell,
+    #calendar-modal .cal-detail-card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    #calendar-modal .calendar-glass-dialog {
+        background-color: #ffffff !important;
+        background-image: none !important;
+    }
+    html.dark #calendar-modal .calendar-glass-dialog,
+    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog {
+        background-color: #0f172a !important;
+        background-image: none !important;
+    }
+    html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog {
+        background-color: #edf1f6 !important;
+    }
+    html.dark.theme-gray #calendar-modal .calendar-glass-dialog {
+        background-color: #252830 !important;
+    }
+}
+
+/* Miniaturas pequeñas de fotos adjuntas abajo de cada nota */
+.note-card-photos {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.note-card-thumb {
+    position: relative;
+    width: 3.5rem;
+    height: 3.5rem;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 0.85rem;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(148, 163, 184, 0.14);
+    box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.18);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+html.dark .note-card-thumb,
+html[class*="theme-"]:not(.theme-gray) .note-card-thumb {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(15, 23, 42, 0.45);
+}
+.note-card-thumb:focus-visible {
+    outline: 3px solid #6366f1;
+    outline-offset: 2px;
+}
+.note-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.18s var(--ease-smooth);
+}
+.note-card-thumb:hover img {
+    transform: scale(1.06);
+}
+.note-card-thumb-more {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.65);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
