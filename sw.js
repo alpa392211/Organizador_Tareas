@@ -1,5 +1,5 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.5.5
+ * sw.js - Service Worker for Organizador_Tareas v1.5.5 (quick-modals-r2)
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 

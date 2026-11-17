@@ -1925,15 +1925,15 @@
     <!-- MODAL 2: NUEVA / EDITAR TAREA                             -->
     <!-- ========================================================= -->
     <div id="task-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div id="task-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+        <div id="task-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/10 dark:bg-slate-950/20 backdrop-blur-[2px] transition-opacity"></div>
         
-        <div class="modal-dialog mobile-bottom-sheet relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform flex flex-col">
+        <div class="modal-dialog mobile-bottom-sheet quick-glass-dialog relative w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-white/60 dark:border-white/15 overflow-hidden transform flex flex-col">
             <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
-            <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 shrink-0">
+            <div class="quick-glass-header px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-900/10 dark:border-white/10 flex items-center justify-between gap-2 shrink-0">
                 <h3 id="task-modal-title" class="text-lg font-bold text-slate-900 dark:text-white truncate min-w-0">
                     Nueva Tarea Escolar
                 </h3>
-                <button type="button" id="close-task-modal" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-2xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 tap-effect shrink-0">
+                <button type="button" id="close-task-modal" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-900/8 dark:hover:bg-white/12 tap-effect shrink-0 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -1945,7 +1945,7 @@
                         Materia Asociada *
                     </label>
                     <select id="task-subject-id" required
-                        class="w-full min-h-[44px] px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        class="w-full min-h-[44px] px-4 py-2.5 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
                         <!-- Opciones cargadas por JS -->
                     </select>
                 </div>
@@ -1956,7 +1956,7 @@
                         Título de la Tarea *
                     </label>
                     <input type="text" id="task-title" required placeholder="Ej. Ejercicios de Límites y Derivadas"
-                        class="w-full min-h-[44px] px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                        class="w-full min-h-[44px] px-4 py-2.5 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-sm focus:outline-none focus:border-indigo-500 font-medium">
                 </div>
 
                 <!-- Fecha y Hora Límite -->
@@ -1966,7 +1966,7 @@
                             Fecha y Hora Límite
                         </label>
                         <input type="datetime-local" id="task-due-date"
-                            class="w-full min-h-[44px] px-3 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500">
+                            class="w-full min-h-[44px] px-3 py-2 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500">
                         <p id="task-cycle-hint" class="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-medium font-mono break-words"></p>
                     </div>
                     <div class="min-w-0">
@@ -1974,7 +1974,7 @@
                             Prioridad
                         </label>
                         <select id="task-priority"
-                            class="w-full min-h-[44px] px-3 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
+                            class="w-full min-h-[44px] px-3 py-2 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
                             <option value="alta">🔴 Alta</option>
                             <option value="media" selected>🟡 Media</option>
                             <option value="baja">🟢 Baja</option>
@@ -1988,12 +1988,12 @@
                         Notas breves / Recordatorio (Opcional)
                     </label>
                     <textarea id="task-notes" rows="2" placeholder="Ej. Llevar en hojas blancas, En equipo de 3, Capítulo 4 del libro..."
-                        class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+                        class="w-full px-4 py-2 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500 resize-none"></textarea>
                 </div>
 
-                <div class="pt-4 flex flex-wrap items-center justify-end gap-2.5 border-t border-slate-100 dark:border-slate-700">
+                <div class="pt-4 flex flex-wrap items-center justify-end gap-2.5 border-t border-slate-900/10 dark:border-white/10">
                     <button type="button" id="cancel-task-btn"
-                        class="touch-target-44 min-h-[44px] px-5 py-2.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs tap-effect transition-colors">
+                        class="touch-target-44 min-h-[44px] px-5 py-2.5 rounded-2xl text-slate-700 dark:text-slate-200 hover:bg-slate-900/8 dark:hover:bg-white/12 font-bold text-xs tap-effect transition-colors">
                         Cancelar
                     </button>
                     <button type="submit"
@@ -2009,15 +2009,15 @@
     <!-- MODAL 3: NUEVA / EDITAR NOTA RÁPIDA (NUEVO REQUERIMIENTO)  -->
     <!-- ========================================================= -->
     <div id="note-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div id="note-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+        <div id="note-modal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-900/10 dark:bg-slate-950/20 backdrop-blur-[2px] transition-opacity"></div>
         
-        <div class="modal-dialog mobile-bottom-sheet relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform flex flex-col">
+        <div class="modal-dialog mobile-bottom-sheet quick-glass-dialog relative w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-white/60 dark:border-white/15 overflow-hidden transform flex flex-col">
             <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
-            <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 shrink-0">
+            <div class="quick-glass-header px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-900/10 dark:border-white/10 flex items-center justify-between gap-2 shrink-0">
                 <h3 id="note-modal-title" class="text-lg font-bold text-slate-900 dark:text-white truncate min-w-0">
                     Nueva Nota Rápida
                 </h3>
-                <button type="button" id="close-note-modal" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-2xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 tap-effect shrink-0">
+                <button type="button" id="close-note-modal" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-900/8 dark:hover:bg-white/12 tap-effect shrink-0 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -2029,7 +2029,7 @@
                         Título de la Nota *
                     </label>
                     <input type="text" id="note-title" required placeholder="Ej. Fórmulas de examen, Idea de proyecto, Pendiente"
-                        class="w-full min-h-[44px] px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                        class="w-full min-h-[44px] px-4 py-2.5 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-sm focus:outline-none focus:border-indigo-500 font-medium">
                 </div>
 
                 <!-- Selector de Categoría / Tipo de Nota -->
@@ -2038,7 +2038,7 @@
                         Tipo de Nota / Categoría
                     </label>
                     <select id="note-type"
-                        class="w-full min-h-[44px] px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        class="w-full min-h-[44px] px-4 py-2.5 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
                         <option value="apunte" selected>📝 Apunte Rápido</option>
                         <option value="idea">💡 Idea</option>
                         <option value="pendiente">📌 Pendiente</option>
@@ -2053,11 +2053,11 @@
                         Contenido / Apunte
                     </label>
                     <textarea id="note-content" rows="4" placeholder="Escribe aquí los detalles, texto o recordatorio..."
-                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500 resize-none font-normal"></textarea>
+                        class="w-full px-4 py-2.5 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500 resize-none font-normal"></textarea>
                 </div>
 
                 <!-- Recordatorio de Notificación -->
-                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-3">
+                <div class="pt-2 border-t border-slate-900/10 dark:border-white/10 space-y-3">
                     <div class="flex items-center justify-between gap-3">
                         <div class="min-w-0 flex-1">
                             <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">
@@ -2081,19 +2081,19 @@
                             Fecha y Hora Exacta del Recordatorio *
                         </label>
                         <input type="datetime-local" id="note-reminder-datetime"
-                            class="w-full min-h-[44px] px-3 py-2 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500">
+                            class="w-full min-h-[44px] px-3 py-2 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
 
                 <!-- Nota privada con PIN -->
-                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2">
+                <div class="pt-2 border-t border-slate-900/10 dark:border-white/10 space-y-2">
                     <label class="flex items-center gap-2.5 min-h-[44px] text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
                         <input type="checkbox" id="note-password-toggle" data-note-password-toggle class="w-4 h-4 accent-amber-500 shrink-0">
                         <span>🔒 Nota privada (proteger con PIN)</span>
                     </label>
                     <div id="note-password-container" class="hidden space-y-1.5">
                         <input type="password" id="note-password-input" inputmode="numeric" maxlength="12" autocomplete="new-password" placeholder="PIN de la nota (mín. 4 dígitos)"
-                            class="w-full min-h-[44px] px-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-2xl text-sm focus:outline-none focus:border-indigo-500">
+                            class="w-full min-h-[44px] px-4 py-2.5 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-sm focus:outline-none focus:border-indigo-500">
                         <p id="note-password-hint" class="text-[11px] text-slate-500 dark:text-slate-400">
                             Si olvidas tu clave, la única opción será eliminar la nota.
                         </p>
@@ -2101,11 +2101,11 @@
                 </div>
 
                 <!-- Fotos adjuntas a la nota -->
-                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2">
+                <div class="pt-2 border-t border-slate-900/10 dark:border-white/10 space-y-2">
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-xs font-bold text-slate-700 dark:text-slate-300">🖼️ Fotos adjuntas</span>
                         <label for="note-modal-photo-input"
-                            class="touch-target-44 min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold cursor-pointer tap-effect border border-indigo-200/70 dark:border-indigo-700/50">
+                            class="touch-target-44 min-h-[44px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/15 dark:bg-indigo-400/15 text-indigo-700 dark:text-indigo-200 text-xs font-bold cursor-pointer tap-effect border border-indigo-400/30">
                             <span>+ Adjuntar foto</span>
                         </label>
                         <input type="file" id="note-modal-photo-input" accept="image/*" class="hidden">
@@ -2113,9 +2113,9 @@
                     <div id="note-modal-photos-list" class="flex flex-wrap gap-2"></div>
                 </div>
 
-                <div class="pt-4 flex flex-wrap items-center justify-end gap-2.5 border-t border-slate-100 dark:border-slate-700">
+                <div class="pt-4 flex flex-wrap items-center justify-end gap-2.5 border-t border-slate-900/10 dark:border-white/10">
                     <button type="button" id="cancel-note-btn"
-                        class="touch-target-44 min-h-[44px] px-5 py-2.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs tap-effect transition-colors">
+                        class="touch-target-44 min-h-[44px] px-5 py-2.5 rounded-2xl text-slate-700 dark:text-slate-200 hover:bg-slate-900/8 dark:hover:bg-white/12 font-bold text-xs tap-effect transition-colors">
                         Cancelar
                     </button>
                     <button type="submit" id="save-note-btn"
@@ -2503,7 +2503,7 @@
                             </span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            ¡Calendario aún más traslúcido, menú desplegable en Materias (+8), notas privadas con clave y miniaturas de fotos!
+                            ¡Accesos rápidos más traslúcidos, menú desplegable en Materias (8+), notas privadas con clave y miniaturas!
                         </p>
                     </div>
                 </div>
@@ -2513,9 +2513,9 @@
                     <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">📅</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Calendario rápido aún más traslúcido</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Calendario rápido y accesos aún más traslúcidos</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Panel mejorado con efectos de transparencia avanzados más nítidos, botón Hoy traslúcido en modo oscuro y mejor integración visual con tu fondo.
+                                Calendario rápido, Nueva Tarea y Nota Rápida con efectos de transparencia avanzados, botón Hoy traslúcido en modo oscuro y mejor integración visual.
                             </p>
                         </div>
                     </div>
@@ -2523,9 +2523,9 @@
                     <div class="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex gap-3">
                         <span class="text-xl shrink-0 select-none">📚</span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Menú desplegable al superar 8 materias</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Menú desplegable desde 8 materias</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Al registrar más de 8 materias, el botón Nueva Materia pasa a la parte inferior dentro de un menú desplegable con animación dinámica.
+                                Desde la materia número 8, el botón Nueva Materia pasa a la parte inferior dentro de un menú desplegable con animación dinámica.
                             </p>
                         </div>
                     </div>

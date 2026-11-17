@@ -378,7 +378,7 @@ html:not(.dark):not([class*="theme-"]) #sidebar-drawer {
     border: 1px solid rgba(255, 255, 255, 0.88) !important;
     box-shadow: var(--shadow-glass-lg), var(--lg-specular) !important;
 }
-html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
 html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
     background-color: var(--lg-modal-bg) !important;
     background-image: var(--lg-modal-scrim) !important;
@@ -504,7 +504,7 @@ html.dark:not([class*="theme-"]) #app-exit-btn {
     border-color: rgba(255, 255, 255, 0.18) !important;
     color: #f1f5f9 !important;
 }
-html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
 html.dark:not([class*="theme-"]) #card-dynamic-popup .modal-dialog {
     background-color: var(--lg-modal-bg) !important;
     background-image: var(--lg-modal-scrim) !important;
@@ -566,7 +566,7 @@ html:not(.dark).theme-gray .bg-white:not(header):not(#bottom-nav):not(#sidebar-d
     border: 1px solid rgba(255, 255, 255, 0.85) !important;
     box-shadow: var(--shadow-glass-md) !important;
 }
-html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
 html:not(.dark).theme-gray #card-dynamic-popup .modal-dialog {
     background-color: rgba(241, 244, 249, 0.52) !important;
     background-image: linear-gradient(180deg, rgba(248, 250, 252, 0.72) 0%, rgba(241, 244, 249, 0.58) 100%) !important;
@@ -653,7 +653,7 @@ html.dark.theme-gray .settings-accordion-card {
     border-color: rgba(255, 255, 255, 0.15) !important;
     box-shadow: var(--shadow-glass-md) !important;
 }
-html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
 html.dark.theme-gray #card-dynamic-popup .modal-dialog {
     background-color: rgba(30, 33, 41, 0.48) !important;
     background-image: linear-gradient(180deg, rgba(20, 22, 28, 0.82) 0%, rgba(30, 33, 41, 0.70) 100%) !important;
@@ -781,7 +781,7 @@ section.hidden, .modal-overlay.hidden {
     opacity: 1;
 }
 
-.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .app-modal-backdrop {
+.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .app-modal-backdrop {
     background-color: rgba(15, 23, 42, 0.34) !important;
 }
 
@@ -921,7 +921,7 @@ html.theme-gray .toast-floating-stack > div {
     -webkit-backdrop-filter: none !important;
 }
 
-.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+.modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
 #card-dynamic-popup .modal-dialog {
     backdrop-filter: blur(var(--lg-blur-modal)) saturate(var(--lg-sat-nav)) contrast(1.05);
     -webkit-backdrop-filter: blur(var(--lg-blur-modal)) saturate(var(--lg-sat-nav)) contrast(1.05);
@@ -3057,7 +3057,7 @@ html.dark .modal-sheet-grabber-bar {
     .liquid-glass-popover,
     .glass-panel,
     .settings-accordion-card,
-    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     #card-dynamic-popup .modal-dialog {
         background-color: #ffffff !important;
     }
@@ -3067,7 +3067,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark .liquid-glass-popover,
     html.dark .glass-panel,
     html.dark .settings-accordion-card,
-    html.dark .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    html.dark .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     html.dark #card-dynamic-popup .modal-dialog {
         background-color: #0f172a !important;
     }
@@ -3077,7 +3077,7 @@ html.dark .modal-sheet-grabber-bar {
     html.theme-gray .liquid-glass-popover,
     html.theme-gray .glass-panel,
     html.theme-gray .settings-accordion-card,
-    html.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    html.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     html.theme-gray #card-dynamic-popup .modal-dialog {
         background-color: #edf1f6 !important;
     }
@@ -3087,7 +3087,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark.theme-gray .liquid-glass-popover,
     html.dark.theme-gray .glass-panel,
     html.dark.theme-gray .settings-accordion-card,
-    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     html.dark.theme-gray #card-dynamic-popup .modal-dialog {
         background-color: #252830 !important;
     }
@@ -3103,7 +3103,7 @@ html.dark .modal-sheet-grabber-bar {
     #bottom-nav.liquid-glass-bottom,
     .liquid-glass-drawer,
     .liquid-glass-popover,
-    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     #card-dynamic-popup .modal-dialog,
     .glass-panel,
     .settings-accordion-card,
@@ -3119,7 +3119,7 @@ html.dark .modal-sheet-grabber-bar {
     html:not(.dark):not([class*="theme-"]) #bottom-nav.liquid-glass-bottom,
     html:not(.dark):not([class*="theme-"]) .liquid-glass-drawer,
     html:not(.dark):not([class*="theme-"]) .liquid-glass-popover,
-    html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    html:not(.dark):not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     html:not(.dark):not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
     html:not(.dark):not([class*="theme-"]) .glass-panel,
     html:not(.dark):not([class*="theme-"]) .settings-accordion-card,
@@ -3130,7 +3130,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark:not([class*="theme-"]) #bottom-nav.liquid-glass-bottom,
     html.dark:not([class*="theme-"]) .liquid-glass-drawer,
     html.dark:not([class*="theme-"]) .liquid-glass-popover,
-    html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    html.dark:not([class*="theme-"]) .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     html.dark:not([class*="theme-"]) #card-dynamic-popup .modal-dialog,
     html.dark:not([class*="theme-"]) .glass-panel,
     html.dark:not([class*="theme-"]) .settings-accordion-card,
@@ -3141,7 +3141,7 @@ html.dark .modal-sheet-grabber-bar {
     html:not(.dark).theme-gray #bottom-nav.liquid-glass-bottom,
     html:not(.dark).theme-gray .liquid-glass-drawer,
     html:not(.dark).theme-gray .liquid-glass-popover,
-    html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    html:not(.dark).theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     html:not(.dark).theme-gray #card-dynamic-popup .modal-dialog,
     html:not(.dark).theme-gray .glass-panel,
     html:not(.dark).theme-gray .settings-accordion-card,
@@ -3152,7 +3152,7 @@ html.dark .modal-sheet-grabber-bar {
     html.dark.theme-gray #bottom-nav.liquid-glass-bottom,
     html.dark.theme-gray .liquid-glass-drawer,
     html.dark.theme-gray .liquid-glass-popover,
-    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal) .modal-dialog,
+    html.dark.theme-gray .modal-overlay:not(#cycle-setup-modal):not(#vault-reveal-modal):not(#photo-preview-modal):not(#calendar-modal):not(#task-modal):not(#note-modal) .modal-dialog,
     html.dark.theme-gray #card-dynamic-popup .modal-dialog,
     html.dark.theme-gray .glass-panel,
     html.dark.theme-gray .settings-accordion-card,
@@ -3508,15 +3508,21 @@ html.theme-starlight .segmented-glass-indicator {
 }
 
 /* ========================================================
-   MODAL DE CALENDARIO CON CRISTAL TRASLÚCIDO Y MINIATURAS EN NOTAS
+   MODALES DE ACCESO RÁPIDO (CALENDARIO, TAREA, NOTA) CON CRISTAL TRASLÚCIDO
    ======================================================== */
-#calendar-modal-backdrop {
+#calendar-modal-backdrop,
+#task-modal-backdrop,
+#note-modal-backdrop {
     background-color: rgba(15, 23, 42, 0.10) !important;
 }
-html.dark #calendar-modal-backdrop {
+html.dark #calendar-modal-backdrop,
+html.dark #task-modal-backdrop,
+html.dark #note-modal-backdrop {
     background-color: rgba(2, 6, 23, 0.20) !important;
 }
-#calendar-modal .calendar-glass-dialog {
+#calendar-modal .calendar-glass-dialog,
+#task-modal .quick-glass-dialog,
+#note-modal .quick-glass-dialog {
     backdrop-filter: blur(26px) saturate(210%) contrast(1.03) !important;
     -webkit-backdrop-filter: blur(26px) saturate(210%) contrast(1.03) !important;
     background-color: rgba(255, 255, 255, 0.16) !important;
@@ -3524,7 +3530,9 @@ html.dark #calendar-modal-backdrop {
     border-color: rgba(255, 255, 255, 0.78) !important;
     box-shadow: var(--shadow-glass-lg), inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
 }
-html.dark #calendar-modal .calendar-glass-dialog {
+html.dark #calendar-modal .calendar-glass-dialog,
+html.dark #task-modal .quick-glass-dialog,
+html.dark #note-modal .quick-glass-dialog {
     backdrop-filter: blur(26px) saturate(210%) brightness(1.06) !important;
     -webkit-backdrop-filter: blur(26px) saturate(210%) brightness(1.06) !important;
     background-color: rgba(15, 23, 42, 0.18) !important;
@@ -3532,44 +3540,131 @@ html.dark #calendar-modal .calendar-glass-dialog {
     border-color: rgba(255, 255, 255, 0.24) !important;
     box-shadow: var(--shadow-glass-lg), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
-html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog {
+html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog,
+html:not(.dark).theme-gray #task-modal .quick-glass-dialog,
+html:not(.dark).theme-gray #note-modal .quick-glass-dialog {
     background-color: rgba(235, 239, 246, 0.20) !important;
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.24) 0%, rgba(235, 239, 246, 0.10) 100%) !important;
     border-color: rgba(255, 255, 255, 0.78) !important;
 }
-html.dark.theme-gray #calendar-modal .calendar-glass-dialog {
+html.dark.theme-gray #calendar-modal .calendar-glass-dialog,
+html.dark.theme-gray #task-modal .quick-glass-dialog,
+html.dark.theme-gray #note-modal .quick-glass-dialog {
     background-color: rgba(24, 27, 34, 0.20) !important;
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, rgba(22, 25, 32, 0.16) 100%) !important;
     border-color: rgba(255, 255, 255, 0.20) !important;
 }
-html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog {
+html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
+html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
+html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
     background-color: rgba(12, 18, 34, 0.20) !important;
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, rgba(12, 18, 34, 0.16) 100%) !important;
     border-color: rgba(255, 255, 255, 0.26) !important;
 }
 
 /* Ajuste por intensidad del cristal */
-html[data-glass-intensity="normal"] #calendar-modal .calendar-glass-dialog {
+html[data-glass-intensity="normal"] #calendar-modal .calendar-glass-dialog,
+html[data-glass-intensity="normal"] #task-modal .quick-glass-dialog,
+html[data-glass-intensity="normal"] #note-modal .quick-glass-dialog {
     background-color: rgba(255, 255, 255, 0.18) !important;
 }
-html.dark[data-glass-intensity="normal"] #calendar-modal .calendar-glass-dialog {
+html.dark[data-glass-intensity="normal"] #calendar-modal .calendar-glass-dialog,
+html.dark[data-glass-intensity="normal"] #task-modal .quick-glass-dialog,
+html.dark[data-glass-intensity="normal"] #note-modal .quick-glass-dialog {
     background-color: rgba(15, 23, 42, 0.20) !important;
 }
-html[data-glass-intensity="suave"] #calendar-modal .calendar-glass-dialog {
+html[data-glass-intensity="suave"] #calendar-modal .calendar-glass-dialog,
+html[data-glass-intensity="suave"] #task-modal .quick-glass-dialog,
+html[data-glass-intensity="suave"] #note-modal .quick-glass-dialog {
     background-color: rgba(255, 255, 255, 0.72) !important;
 }
-html.dark[data-glass-intensity="suave"] #calendar-modal .calendar-glass-dialog {
+html.dark[data-glass-intensity="suave"] #calendar-modal .calendar-glass-dialog,
+html.dark[data-glass-intensity="suave"] #task-modal .quick-glass-dialog,
+html.dark[data-glass-intensity="suave"] #note-modal .quick-glass-dialog {
     background-color: rgba(15, 23, 42, 0.76) !important;
 }
 
-#calendar-modal .calendar-glass-header {
+#calendar-modal .calendar-glass-header,
+#task-modal .quick-glass-header,
+#note-modal .quick-glass-header {
     background-color: rgba(255, 255, 255, 0.06);
     border-bottom-color: rgba(15, 23, 42, 0.08);
 }
 html.dark #calendar-modal .calendar-glass-header,
-html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-header {
+html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-header,
+html.dark #task-modal .quick-glass-header,
+html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-header,
+html.dark #note-modal .quick-glass-header,
+html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-header {
     background-color: rgba(255, 255, 255, 0.03);
     border-bottom-color: rgba(255, 255, 255, 0.10);
+}
+
+/* Campos traslúcidos dentro de los modales rápidos de Tarea y Nota */
+#task-modal input:not([type="checkbox"]),
+#task-modal select,
+#task-modal textarea,
+#note-modal input:not([type="checkbox"]),
+#note-modal select,
+#note-modal textarea {
+    background-color: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(15, 23, 42, 0.14) !important;
+    color: #0f172a !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+#task-modal input::placeholder,
+#task-modal textarea::placeholder,
+#note-modal input::placeholder,
+#note-modal textarea::placeholder {
+    color: rgba(51, 65, 85, 0.72);
+}
+html.dark #task-modal input:not([type="checkbox"]),
+html.dark #task-modal select,
+html.dark #task-modal textarea,
+html.dark #note-modal input:not([type="checkbox"]),
+html.dark #note-modal select,
+html.dark #note-modal textarea,
+html[class*="theme-"]:not(.theme-gray) #task-modal input:not([type="checkbox"]),
+html[class*="theme-"]:not(.theme-gray) #task-modal select,
+html[class*="theme-"]:not(.theme-gray) #task-modal textarea,
+html[class*="theme-"]:not(.theme-gray) #note-modal input:not([type="checkbox"]),
+html[class*="theme-"]:not(.theme-gray) #note-modal select,
+html[class*="theme-"]:not(.theme-gray) #note-modal textarea {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #f8fafc !important;
+}
+html.dark #task-modal input::placeholder,
+html.dark #task-modal textarea::placeholder,
+html.dark #note-modal input::placeholder,
+html.dark #note-modal textarea::placeholder,
+html[class*="theme-"]:not(.theme-gray) #task-modal input::placeholder,
+html[class*="theme-"]:not(.theme-gray) #task-modal textarea::placeholder,
+html[class*="theme-"]:not(.theme-gray) #note-modal input::placeholder,
+html[class*="theme-"]:not(.theme-gray) #note-modal textarea::placeholder {
+    color: rgba(203, 213, 225, 0.68);
+}
+#task-modal select option,
+#note-modal select option {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+html.dark #task-modal select option,
+html.dark #note-modal select option,
+html[class*="theme-"]:not(.theme-gray) #task-modal select option,
+html[class*="theme-"]:not(.theme-gray) #note-modal select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+#task-modal input:focus,
+#task-modal select:focus,
+#task-modal textarea:focus,
+#note-modal input:focus,
+#note-modal select:focus,
+#note-modal textarea:focus {
+    border-color: rgba(99, 102, 241, 0.80) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
 }
 
 #calendar-modal #cal-today-btn {
@@ -3618,19 +3713,29 @@ html[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    #calendar-modal .calendar-glass-dialog {
+    #calendar-modal .calendar-glass-dialog,
+    #task-modal .quick-glass-dialog,
+    #note-modal .quick-glass-dialog {
         background-color: #ffffff !important;
         background-image: none !important;
     }
     html.dark #calendar-modal .calendar-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog {
+    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
+    html.dark #task-modal .quick-glass-dialog,
+    html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
+    html.dark #note-modal .quick-glass-dialog,
+    html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
         background-color: #0f172a !important;
         background-image: none !important;
     }
-    html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog {
+    html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog,
+    html:not(.dark).theme-gray #task-modal .quick-glass-dialog,
+    html:not(.dark).theme-gray #note-modal .quick-glass-dialog {
         background-color: #edf1f6 !important;
     }
-    html.dark.theme-gray #calendar-modal .calendar-glass-dialog {
+    html.dark.theme-gray #calendar-modal .calendar-glass-dialog,
+    html.dark.theme-gray #task-modal .quick-glass-dialog,
+    html.dark.theme-gray #note-modal .quick-glass-dialog {
         background-color: #252830 !important;
     }
 }
@@ -3639,23 +3744,35 @@ html[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
     #calendar-modal .calendar-glass-dialog,
     #calendar-modal .cal-glass-pill,
     #calendar-modal #cal-days-grid .cal-day-cell,
-    #calendar-modal .cal-detail-card {
+    #calendar-modal .cal-detail-card,
+    #task-modal .quick-glass-dialog,
+    #note-modal .quick-glass-dialog {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
     }
-    #calendar-modal .calendar-glass-dialog {
+    #calendar-modal .calendar-glass-dialog,
+    #task-modal .quick-glass-dialog,
+    #note-modal .quick-glass-dialog {
         background-color: #ffffff !important;
         background-image: none !important;
     }
     html.dark #calendar-modal .calendar-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog {
+    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
+    html.dark #task-modal .quick-glass-dialog,
+    html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
+    html.dark #note-modal .quick-glass-dialog,
+    html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
         background-color: #0f172a !important;
         background-image: none !important;
     }
-    html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog {
+    html:not(.dark).theme-gray #calendar-modal .calendar-glass-dialog,
+    html:not(.dark).theme-gray #task-modal .quick-glass-dialog,
+    html:not(.dark).theme-gray #note-modal .quick-glass-dialog {
         background-color: #edf1f6 !important;
     }
-    html.dark.theme-gray #calendar-modal .calendar-glass-dialog {
+    html.dark.theme-gray #calendar-modal .calendar-glass-dialog,
+    html.dark.theme-gray #task-modal .quick-glass-dialog,
+    html.dark.theme-gray #note-modal .quick-glass-dialog {
         background-color: #252830 !important;
     }
 }

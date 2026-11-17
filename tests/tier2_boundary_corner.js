@@ -4897,12 +4897,12 @@ const tests = [
     },
 
     // =========================================================================
-    // F29: v1.5.5 Subjects (>8) Bottom Dropdown Menu & Extra-Translucent Calendar
+    // F29: v1.5.5 Subjects (>=8) Bottom Dropdown Menu & Extra-Translucent Quick Modals
     // =========================================================================
     {
         id: 'T2_F29_01_subjects_bottom_dropdown_after_eight',
         feature: 'F29',
-        name: 'Add subject button stays in top bar for <=8 subjects and relocates into animated bottom dropdown drawer when >8 subjects',
+        name: 'Add subject button stays in top bar for <=7 subjects and relocates into animated bottom dropdown drawer starting at 8 subjects',
         run: async (page, helpers) => {
             await page.evaluate(async () => {
                 await window.StorageModule?.clearAll?.();
@@ -4911,7 +4911,7 @@ const tests = [
                 window.StorageModule?.setCycleConfigured?.(true);
                 window.StorageModule?.setLastSeenVersion?.('1.5.5');
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
-                const eight = Array.from({ length: 8 }, (_, idx) => ({
+                const seven = Array.from({ length: 7 }, (_, idx) => ({
                     id: `sub_f29_${idx + 1}`,
                     name: `Materia ${idx + 1}`,
                     color: '#6366F1',
@@ -4919,7 +4919,7 @@ const tests = [
                     startTime: '08:00',
                     endTime: '09:30'
                 }));
-                window.StorageModule?.saveSubjects?.(eight);
+                window.StorageModule?.saveSubjects?.(seven);
             });
             await page.reload({ waitUntil: 'load' });
             await page.evaluate(() => {
@@ -4927,7 +4927,7 @@ const tests = [
                 window.SubjectsModule?.render?.();
             });
 
-            const atEight = await page.evaluate(() => {
+            const atSeven = await page.evaluate(() => {
                 const headerSlot = document.getElementById('subjects-header-cta-slot');
                 const drawer = document.getElementById('subjects-bottom-add-drawer');
                 const btn = document.getElementById('add-subject-btn');
@@ -4937,14 +4937,14 @@ const tests = [
                     drawerHidden: Boolean(drawer && drawer.classList.contains('hidden'))
                 };
             });
-            helpers.assertTrue(atEight.inHeader, 'With 8 subjects, #add-subject-btn must remain in top #subjects-header-cta-slot');
-            helpers.assertTrue(atEight.headerVisible, 'With 8 subjects, top header CTA slot must stay visible');
-            helpers.assertTrue(atEight.drawerHidden, 'With 8 subjects, bottom dropdown drawer must stay hidden');
+            helpers.assertTrue(atSeven.inHeader, 'With 7 subjects, #add-subject-btn must remain in top #subjects-header-cta-slot');
+            helpers.assertTrue(atSeven.headerVisible, 'With 7 subjects, top header CTA slot must stay visible');
+            helpers.assertTrue(atSeven.drawerHidden, 'With 7 subjects, bottom dropdown drawer must stay hidden');
 
-            // Add 9th subject -> #add-subject-btn relocates into bottom collapsed dropdown below #subjects-grid
+            // Add 8th subject -> #add-subject-btn relocates into bottom collapsed dropdown below #subjects-grid
             await page.evaluate(() => {
                 window.StorageModule?.addSubject?.({
-                    name: 'Materia 9',
+                    name: 'Materia 8',
                     color: '#10B981',
                     days: ['mar', 'jue'],
                     startTime: '10:00',
@@ -4954,7 +4954,7 @@ const tests = [
                 document.getElementById('subjects-bottom-toggle-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
             });
 
-            const atNineCollapsed = await page.evaluate(() => {
+            const atEightCollapsed = await page.evaluate(() => {
                 const grid = document.getElementById('subjects-grid');
                 const headerSlot = document.getElementById('subjects-header-cta-slot');
                 const drawer = document.getElementById('subjects-bottom-add-drawer');
@@ -4977,14 +4977,14 @@ const tests = [
                 };
             });
 
-            helpers.assertTrue(atNineCollapsed.headerHidden, 'With 9 subjects, top header CTA slot must hide');
-            helpers.assertTrue(atNineCollapsed.drawerVisible, 'With 9 subjects, bottom dropdown drawer must become visible');
-            helpers.assertTrue(atNineCollapsed.inBottomContent, 'With 9 subjects, #add-subject-btn must move into #subjects-bottom-add-content');
-            helpers.assertFalse(atNineCollapsed.drawerIsOpen, 'Bottom dropdown drawer must start collapsed');
-            helpers.assertEqual(atNineCollapsed.ariaExpanded, 'false', 'Drawer toggle must set aria-expanded="false" while closed');
-            helpers.assertEqual(atNineCollapsed.ariaHidden, 'true', 'Drawer panel must set aria-hidden="true" while closed');
-            helpers.assertTrue(atNineCollapsed.belowGrid, 'Bottom dropdown drawer must appear below #subjects-grid');
-            helpers.assertTrue(atNineCollapsed.hasTransition, 'Drawer panel must configure dynamic CSS transition');
+            helpers.assertTrue(atEightCollapsed.headerHidden, 'With 8 subjects, top header CTA slot must hide');
+            helpers.assertTrue(atEightCollapsed.drawerVisible, 'With 8 subjects, bottom dropdown drawer must become visible');
+            helpers.assertTrue(atEightCollapsed.inBottomContent, 'With 8 subjects, #add-subject-btn must move into #subjects-bottom-add-content');
+            helpers.assertFalse(atEightCollapsed.drawerIsOpen, 'Bottom dropdown drawer must start collapsed');
+            helpers.assertEqual(atEightCollapsed.ariaExpanded, 'false', 'Drawer toggle must set aria-expanded="false" while closed');
+            helpers.assertEqual(atEightCollapsed.ariaHidden, 'true', 'Drawer panel must set aria-hidden="true" while closed');
+            helpers.assertTrue(atEightCollapsed.belowGrid, 'Bottom dropdown drawer must appear below #subjects-grid');
+            helpers.assertTrue(atEightCollapsed.hasTransition, 'Drawer panel must configure dynamic CSS transition');
 
             // Toggle open -> expands and exposes clickable #add-subject-btn that opens subject modal
             await page.click('#subjects-bottom-toggle-btn');
@@ -4993,7 +4993,7 @@ const tests = [
                 document.getElementById('add-subject-btn')?.scrollIntoView({ block: 'center', behavior: 'instant' });
             });
 
-            const atNineExpanded = await page.evaluate(() => {
+            const atEightExpanded = await page.evaluate(() => {
                 const drawer = document.getElementById('subjects-bottom-add-drawer');
                 const toggleBtn = document.getElementById('subjects-bottom-toggle-btn');
                 const panel = document.getElementById('subjects-bottom-add-panel');
@@ -5008,26 +5008,26 @@ const tests = [
                 };
             });
 
-            helpers.assertTrue(atNineExpanded.drawerIsOpen, 'Clicking toggle must open bottom drawer (.is-open)');
-            helpers.assertEqual(atNineExpanded.ariaExpanded, 'true', 'Expanded toggle must set aria-expanded="true"');
-            helpers.assertEqual(atNineExpanded.ariaHidden, 'false', 'Expanded panel must set aria-hidden="false"');
-            helpers.assertTrue(atNineExpanded.btnWidth > 100 && atNineExpanded.btnHeight >= 44, `Expanded #add-subject-btn must have full touch dimensions (got ${atNineExpanded.btnWidth}x${atNineExpanded.btnHeight})`);
+            helpers.assertTrue(atEightExpanded.drawerIsOpen, 'Clicking toggle must open bottom drawer (.is-open)');
+            helpers.assertEqual(atEightExpanded.ariaExpanded, 'true', 'Expanded toggle must set aria-expanded="true"');
+            helpers.assertEqual(atEightExpanded.ariaHidden, 'false', 'Expanded panel must set aria-hidden="false"');
+            helpers.assertTrue(atEightExpanded.btnWidth > 100 && atEightExpanded.btnHeight >= 44, `Expanded #add-subject-btn must have full touch dimensions (got ${atEightExpanded.btnWidth}x${atEightExpanded.btnHeight})`);
 
             await page.click('#add-subject-btn');
             await page.waitForSelector('#subject-modal:not(.hidden)', { timeout: 2500 });
             await page.click('#close-subject-modal');
             await page.waitForSelector('#subject-modal.hidden', { timeout: 2500 });
 
-            // Delete back down to 8 subjects -> returns #add-subject-btn to top header slot
+            // Delete back down to 7 subjects -> returns #add-subject-btn to top header slot
             await page.evaluate(async () => {
                 const subs = window.StorageModule?.getSubjects?.() || [];
-                if (subs.length > 8) {
+                if (subs.length > 7) {
                     window.StorageModule?.deleteSubject?.(subs[subs.length - 1].id);
                 }
                 window.SubjectsModule?.render?.();
             });
 
-            const backAtEight = await page.evaluate(() => {
+            const backAtSeven = await page.evaluate(() => {
                 const headerSlot = document.getElementById('subjects-header-cta-slot');
                 const drawer = document.getElementById('subjects-bottom-add-drawer');
                 const btn = document.getElementById('add-subject-btn');
@@ -5036,8 +5036,8 @@ const tests = [
                     drawerHidden: Boolean(drawer && drawer.classList.contains('hidden'))
                 };
             });
-            helpers.assertTrue(backAtEight.inHeader, 'Dropping back to 8 subjects must restore #add-subject-btn to top header slot');
-            helpers.assertTrue(backAtEight.drawerHidden, 'Dropping back to 8 subjects must hide bottom dropdown drawer');
+            helpers.assertTrue(backAtSeven.inHeader, 'Dropping back to 7 subjects must restore #add-subject-btn to top header slot');
+            helpers.assertTrue(backAtSeven.drawerHidden, 'Dropping back to 7 subjects must hide bottom dropdown drawer');
 
             await page.evaluate(async () => {
                 await window.StorageModule?.clearAll?.();
@@ -5127,6 +5127,113 @@ const tests = [
                     helpers.assertTrue(todayFg.r > 200 && todayFg.g > 200 && todayFg.b > 200, `Dark mode Hoy text must remain light crisp white (got ${row.todayColor})`);
                 }
             }
+        }
+    },
+    {
+        id: 'T2_F29_03_quick_task_and_note_modals_enhanced_translucency',
+        feature: 'F29',
+        name: 'Quick-access Task and Note modals apply matching extra translucency, soft backdrop, and frosted inputs across Claro, Oscuro, Mono & Vault',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.5.5');
+                window.StorageModule?.addSubject?.({
+                    id: 'sub_quick_glass',
+                    name: 'Cálculo',
+                    color: '#6366F1',
+                    days: ['lun'],
+                    startTime: '08:00',
+                    endTime: '09:00'
+                });
+            });
+            await page.reload({ waitUntil: 'load' });
+            await page.evaluate(() => {
+                window.OrganizadorApp?.closeCycleWelcomeModal?.();
+                const cm = document.getElementById('changelog-modal');
+                if (cm) cm.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            });
+
+            const parseRgba = (str) => {
+                const m = (str || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/i);
+                if (!m) return { r: 0, g: 0, b: 0, a: 1 };
+                return {
+                    r: parseInt(m[1], 10),
+                    g: parseInt(m[2], 10),
+                    b: parseInt(m[3], 10),
+                    a: m[4] === undefined ? 1 : parseFloat(m[4])
+                };
+            };
+
+            const metrics = await page.evaluate(async () => {
+                const root = document.documentElement;
+                const configs = [
+                    { label: 'light-normal', cls: '', intensity: 'normal' },
+                    { label: 'dark-normal', cls: 'dark', intensity: 'normal' },
+                    { label: 'dark-intenso', cls: 'dark', intensity: 'intenso' },
+                    { label: 'mono-dark', cls: 'dark theme-gray', intensity: 'normal' },
+                    { label: 'vault-matrix', cls: 'dark theme-matrix', intensity: 'normal' }
+                ];
+                const modalSpecs = [
+                    {
+                        id: 'task-modal',
+                        open: () => window.TasksModule?.openAddModal?.(),
+                        close: () => window.TasksModule?.closeModal?.(),
+                        inputSel: '#task-title'
+                    },
+                    {
+                        id: 'note-modal',
+                        open: () => window.NotesModule?.openAddModal?.(),
+                        close: () => window.NotesModule?.closeModal?.(),
+                        inputSel: '#note-title'
+                    }
+                ];
+
+                const rows = [];
+                for (const spec of modalSpecs) {
+                    spec.open();
+                    for (const cfg of configs) {
+                        root.className = cfg.cls;
+                        window.OrganizadorApp?.applyGlassIntensity?.(cfg.intensity);
+                        void root.offsetHeight;
+                        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                        const dlg = document.querySelector(`#${spec.id} .quick-glass-dialog`);
+                        const backdrop = document.getElementById(`${spec.id}-backdrop`);
+                        const input = document.querySelector(spec.inputSel);
+                        const dlgCs = dlg ? getComputedStyle(dlg) : null;
+                        const bdCs = backdrop ? getComputedStyle(backdrop) : null;
+                        const inCs = input ? getComputedStyle(input) : null;
+                        rows.push({
+                            modalId: spec.id,
+                            label: cfg.label,
+                            dlgBg: dlgCs?.backgroundColor || '',
+                            dlgBf: dlgCs?.backdropFilter || '',
+                            bdBg: bdCs?.backgroundColor || '',
+                            inBg: inCs?.backgroundColor || ''
+                        });
+                    }
+                    spec.close();
+                }
+                root.className = '';
+                window.OrganizadorApp?.applyGlassIntensity?.('normal');
+                return rows;
+            });
+
+            for (const row of metrics) {
+                const dlgAlpha = parseRgba(row.dlgBg).a;
+                const bdAlpha = parseRgba(row.bdBg).a;
+                const inAlpha = parseRgba(row.inBg).a;
+                helpers.assertTrue(dlgAlpha > 0 && dlgAlpha <= 0.30, `${row.modalId} (${row.label}) must use extra-translucent glass (alpha <= 0.30, got ${dlgAlpha})`);
+                helpers.assertTrue(bdAlpha <= 0.25, `${row.modalId} backdrop (${row.label}) must keep soft scrim (alpha <= 0.25, got ${bdAlpha})`);
+                helpers.assertTrue(row.dlgBf && row.dlgBf !== 'none', `${row.modalId} (${row.label}) must keep backdropFilter blur`);
+                helpers.assertTrue(inAlpha <= 0.50, `${row.modalId} input (${row.label}) must use frosted translucent field (alpha <= 0.50, got ${inAlpha})`);
+            }
+
+            await page.evaluate(async () => {
+                await window.StorageModule?.clearAll?.();
+            });
         }
     }
 ];

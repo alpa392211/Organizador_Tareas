@@ -72,7 +72,7 @@ window.SubjectsModule = (() => {
         const subtitle = document.getElementById('subjects-bottom-drawer-subtitle');
         const helperText = document.getElementById('subjects-bottom-helper-text');
 
-        const useBottomDrawer = subjectsCount > BOTTOM_DRAWER_THRESHOLD;
+        const useBottomDrawer = subjectsCount >= BOTTOM_DRAWER_THRESHOLD;
 
         if (counterChip) {
             counterChip.textContent = `${subjectsCount}/${maxSubjects}`;
