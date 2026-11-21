@@ -309,9 +309,6 @@
             this.initGlassIntensity();
             window.BackgroundsModule?.init?.();
 
-            // Bloqueo de orientación horizontal en teléfonos móviles (Portrait Lock)
-            this.initOrientationLock();
-
             // 5. Inicializar submódulos
             SubjectsModule?.init?.();
             TasksModule?.init?.();
@@ -700,14 +697,6 @@
             });
 
             this.applyFontFamily(currentFont);
-        }
-
-        initOrientationLock() {
-            try {
-                if (window.screen?.orientation?.lock) {
-                    window.screen.orientation.lock('portrait').catch(() => {});
-                }
-            } catch (e) {}
         }
 
         applyFontFamily(fontKey) {

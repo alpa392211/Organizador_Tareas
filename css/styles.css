@@ -1784,17 +1784,6 @@ html:not(.dark) .vault-inventory-card button[data-vault-toggle][class*="emerald"
 }
 
 /* ========================================================
-   BLOQUEO DE ORIENTACIÓN HORIZONTAL EN CELULARES
-   (Sólo activa en pantallas móviles con altura reducida;
-    no interfiere con tablets u ordenadores)
-   ======================================================== */
-@media screen and (max-width: 899px) and (orientation: landscape) and (max-height: 550px) {
-    #mobile-orientation-blocker {
-        display: flex !important;
-    }
-}
-
-/* ========================================================
    CALENDARIO EN MODO MONOCROMÁTICO (THEME-GRAY)
    Contraste nítido para números, celdas y fechas
    ======================================================== */
