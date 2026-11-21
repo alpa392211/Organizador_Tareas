@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.5.6 (quick-modals-r2)
+ * sw.js - Service Worker for Organizador_Tareas v1.5.7 (quick-modals-r2)
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.5.6';
+const CACHE_NAME = 'organizador-tareas-cache-v1.5.7';
 
 const PRECACHE_ASSETS = [
     './',
@@ -15,22 +15,22 @@ const PRECACHE_ASSETS = [
     './assets/fonts/inter-latin-opsz-normal.woff2',
     './assets/fonts/inter-latin-ext-opsz-normal.woff2',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.5.6',
-    './css/styles.css?v=1.5.6',
+    './css/tailwind.min.css?v=1.5.7',
+    './css/styles.css?v=1.5.7',
     // JavaScript application modules
-    './js/storage.js?v=1.5.6',
-    './js/haptics.js?v=1.5.6',
-    './js/segmented.js?v=1.5.6',
-    './js/notifications.js?v=1.5.6',
-    './js/widgets.js?v=1.5.6',
-    './js/subjects.js?v=1.5.6',
-    './js/tasks.js?v=1.5.6',
-    './js/notes.js?v=1.5.6',
-    './js/calendar.js?v=1.5.6',
-    './js/archive.js?v=1.5.6',
-    './js/photo-editor.js?v=1.5.6',
-    './js/backgrounds.js?v=1.5.6',
-    './js/app.js?v=1.5.6',
+    './js/storage.js?v=1.5.7',
+    './js/haptics.js?v=1.5.7',
+    './js/segmented.js?v=1.5.7',
+    './js/notifications.js?v=1.5.7',
+    './js/widgets.js?v=1.5.7',
+    './js/subjects.js?v=1.5.7',
+    './js/tasks.js?v=1.5.7',
+    './js/notes.js?v=1.5.7',
+    './js/calendar.js?v=1.5.7',
+    './js/archive.js?v=1.5.7',
+    './js/photo-editor.js?v=1.5.7',
+    './js/backgrounds.js?v=1.5.7',
+    './js/app.js?v=1.5.7',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
@@ -61,7 +61,7 @@ self.addEventListener('install', event => {
                         })
                 )
             );
-            console.log(`[SW v1.5.6] Precaching complete. Processed ${results.length} assets.`);
+            console.log(`[SW v1.5.7] Precaching complete. Processed ${results.length} assets.`);
         }).then(() => self.skipWaiting())
     );
 });
@@ -73,7 +73,7 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(name => {
                     if (name !== CACHE_NAME) {
-                        console.log(`[SW v1.5.6] Purging deprecated cache: ${name}`);
+                        console.log(`[SW v1.5.7] Purging deprecated cache: ${name}`);
                         return caches.delete(name);
                     }
                 })
@@ -101,7 +101,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[SW v1.5.6] Navigation offline. Serving cached index.html fallback.');
+                    console.log('[SW v1.5.7] Navigation offline. Serving cached index.html fallback.');
                     const cachedNav = await caches.match(request);
                     if (cachedNav) return cachedNav;
                     return caches.match('./index.html') || caches.match('index.html');
@@ -110,9 +110,23 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Strategy 2: Local Static Assets -> Cache-First with Network Fallback
+    // Strategy 2: Local Static Assets -> Network-First for manifests, Cache-First for other static assets
     const requestUrl = new URL(request.url);
     if (requestUrl.origin === self.location.origin) {
+        if (requestUrl.pathname.endsWith('/manifest.webmanifest') || requestUrl.pathname.endsWith('/manifest.json')) {
+            event.respondWith(
+                fetch(request)
+                    .then(networkResponse => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            const copy = networkResponse.clone();
+                            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+                        }
+                        return networkResponse;
+                    })
+                    .catch(() => caches.match(request, { ignoreSearch: true }))
+            );
+            return;
+        }
         event.respondWith(
             caches.match(request, { ignoreSearch: true }).then(cachedResponse => {
                 if (cachedResponse) {

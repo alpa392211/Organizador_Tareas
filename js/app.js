@@ -309,6 +309,13 @@
             this.initGlassIntensity();
             window.BackgroundsModule?.init?.();
 
+            // Permitir orientación libre (desbloquear si existía un bloqueo previo en la PWA)
+            try {
+                if (window.screen?.orientation?.unlock) {
+                    window.screen.orientation.unlock();
+                }
+            } catch (e) {}
+
             // 5. Inicializar submódulos
             SubjectsModule?.init?.();
             TasksModule?.init?.();
@@ -389,9 +396,9 @@
                     window.NotificationsModule.requestPermission().catch(() => {});
                 }
 
-                // Comprobar changelog de versión 1.5.6
+                // Comprobar changelog de versión 1.5.7
                 const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.5.6') {
+                if (lastSeenVersion !== '1.5.7') {
                     setTimeout(() => {
                         this.openChangelogModal?.();
                     }, 600);
@@ -1906,7 +1913,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.6') {
+                        if (lastSeenVersion !== '1.5.7') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -1948,7 +1955,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.6') {
+                        if (lastSeenVersion !== '1.5.7') {
                             setTimeout(() => {
                                 this.openChangelogModal?.();
                             }, 800);
@@ -2472,7 +2479,7 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.5.6
+            // 11. Novedades de Versión 1.5.7
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -2501,7 +2508,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.5.6');
+                window.StorageModule.setLastSeenVersion('1.5.7');
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
