@@ -5849,6 +5849,13 @@ const tests = [
                 const updated60 = window.StorageModule.getSubjects().find(s => s.id === sub.id);
                 const badge60 = document.querySelector('[data-subject-reminder-badge="60"]')?.textContent || '';
 
+                // Verificar colores en modo oscuro y tema Matrix (nunca blanco)
+                document.documentElement.className = 'dark theme-switching';
+                const darkInactBg = getComputedStyle(document.querySelector('#subject-reminder-options [data-subject-reminder="30"]')).backgroundColor;
+                document.documentElement.className = 'dark theme-matrix theme-switching';
+                const matrixActBg = getComputedStyle(document.querySelector('#subject-reminder-options [data-subject-reminder="60"]')).backgroundColor;
+                document.documentElement.className = '';
+
                 return {
                     values,
                     pressed45,
@@ -5858,8 +5865,11 @@ const tests = [
                     loadedBeforeChange,
                     saved60: updated60?.reminderMinutes,
                     badge60,
+                    darkInactBg,
+                    matrixActBg,
                     hasScheduleFn: typeof window.NotificationsModule?.scheduleSubject === 'function',
-                    hasCancelFn: typeof window.NotificationsModule?.cancelSubject === 'function'
+                    hasCancelFn: typeof window.NotificationsModule?.cancelSubject === 'function',
+                    hasTestFn: typeof window.NotificationsModule?.testSubjectReminder === 'function'
                 };
             });
 
@@ -5871,7 +5881,9 @@ const tests = [
             helpers.assertEqual(res.loadedBeforeChange, '45', 'Re-opening edit modal must pre-load saved 45 min reminder');
             helpers.assertEqual(res.saved60, 60, 'Editing subject must persist reminderMinutes = 60 (1 hour)');
             helpers.assertTrue(res.badge60.includes('1 hora antes'), 'Subject card must display 1 hora antes reminder badge');
-            helpers.assertTrue(res.hasScheduleFn && res.hasCancelFn, 'NotificationsModule must expose scheduleSubject and cancelSubject');
+            helpers.assertFalse(res.darkInactBg.includes('255, 255, 255'), `Inactive reminder option must not be white in dark mode (got ${res.darkInactBg})`);
+            helpers.assertTrue(res.matrixActBg.includes('4, 120, 87'), `Active reminder option must adapt to Matrix emerald theme (got ${res.matrixActBg})`);
+            helpers.assertTrue(res.hasScheduleFn && res.hasCancelFn && res.hasTestFn, 'NotificationsModule must expose scheduleSubject, cancelSubject and testSubjectReminder');
         }
     },
     {

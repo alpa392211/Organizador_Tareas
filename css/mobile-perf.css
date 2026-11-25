@@ -161,24 +161,462 @@ html #vault-card-container .vault-lock-unlocked {
 }
 
 /* ---------------------------------------------------------------------------
-   3) Selector de recordatorio de Materias (15, 30, 45 min y 1 hora antes)
+   3A) Paleta temática unificada (Claro, Oscuro, Monocromático y 10 temas de Bóveda)
+       + Reducción de brillo excesivo en botones deslizables de Liquid Glass
    ------------------------------------------------------------------------- */
-.subject-reminder-option {
+:root {
+    /* Liquid Glass suave (menos brillo / menos destello blanco) */
+    --lgx-tint: 255, 255, 255;
+    --lgx-fill-a: 0.14;
+    --lgx-rim-hi: rgba(255, 255, 255, 0.46);
+    --lgx-rim-lo: rgba(255, 255, 255, 0.08);
+    --lgx-glare-a: 0.15;
+    --lgx-inset-hi: rgba(255, 255, 255, 0.48);
+    --lgx-inset-lo: rgba(255, 255, 255, 0.20);
+    --lgx-inner-glow: rgba(255, 255, 255, 0.07);
+    --lgx-sheen-op: 0.20;
+    --lgx-track-a: rgba(99, 102, 241, 0.16);
+    --lgx-track-b: rgba(20, 184, 166, 0.12);
+    --lgx-track-c: rgba(236, 72, 153, 0.10);
+
+    /* Tokens de Recordatorio de Materias (Claro) */
+    --rem-box-bg: #f8fafc;
+    --rem-box-border: #e2e8f0;
+    --rem-heading: #334155;
+    --rem-subtext: #64748b;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #cbd5e1;
+    --rem-btn-text: #334155;
+    --rem-accent: #4f46e5;
+    --rem-accent-border: #4338ca;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(79, 70, 229, 0.10);
+    --rem-badge-text: #4338ca;
+    --rem-badge-border: rgba(79, 70, 229, 0.28);
+}
+
+html.dark {
+    --lgx-tint: 51, 65, 85;
+    --lgx-fill-a: 0.26;
+    --lgx-rim-hi: rgba(255, 255, 255, 0.22);
+    --lgx-rim-lo: rgba(255, 255, 255, 0.04);
+    --lgx-glare-a: 0.08;
+    --lgx-inset-hi: rgba(255, 255, 255, 0.24);
+    --lgx-inset-lo: rgba(255, 255, 255, 0.10);
+    --lgx-inner-glow: rgba(148, 163, 184, 0.06);
+    --lgx-sheen-op: 0.14;
+    --lgx-track-a: rgba(99, 102, 241, 0.20);
+    --lgx-track-b: rgba(45, 212, 191, 0.12);
+    --lgx-track-c: rgba(99, 102, 241, 0.14);
+
+    --rem-box-bg: rgba(15, 23, 42, 0.72);
+    --rem-box-border: rgba(71, 85, 105, 0.60);
+    --rem-heading: #e2e8f0;
+    --rem-subtext: #94a3b8;
+    --rem-btn-bg: #1e293b;
+    --rem-btn-border: #334155;
+    --rem-btn-text: #e2e8f0;
+    --rem-accent: #6366f1;
+    --rem-accent-border: #818cf8;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(99, 102, 241, 0.22);
+    --rem-badge-text: #c7d2fe;
+    --rem-badge-border: rgba(129, 140, 248, 0.42);
+}
+
+/* Monocromático Claro */
+html:not(.dark).theme-gray {
+    --lgx-tint: 226, 232, 240;
+    --lgx-track-a: rgba(100, 116, 139, 0.18);
+    --lgx-track-b: rgba(148, 163, 184, 0.14);
+    --lgx-track-c: rgba(71, 85, 105, 0.16);
+    --rem-box-bg: #e8edf3;
+    --rem-box-border: #cbd5e1;
+    --rem-heading: #1e293b;
+    --rem-subtext: #475569;
+    --rem-btn-bg: #f8fafc;
+    --rem-btn-border: #94a3b8;
+    --rem-btn-text: #1e293b;
+    --rem-accent: #334155;
+    --rem-accent-border: #1e293b;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(51, 65, 85, 0.12);
+    --rem-badge-text: #1e293b;
+    --rem-badge-border: rgba(71, 85, 105, 0.35);
+}
+
+/* Monocromático Oscuro */
+html.dark.theme-gray {
+    --lgx-tint: 63, 69, 82;
+    --theme-lg-tint: 63, 69, 82;
+    --lgx-fill-a: 0.30;
+    --lgx-track-a: rgba(100, 116, 139, 0.22);
+    --lgx-track-b: rgba(71, 85, 105, 0.18);
+    --lgx-track-c: rgba(148, 163, 184, 0.16);
+    --rem-box-bg: rgba(30, 33, 41, 0.86);
+    --rem-box-border: rgba(82, 88, 102, 0.65);
+    --rem-heading: #f1f5f9;
+    --rem-subtext: #94a3b8;
+    --rem-btn-bg: #262a33;
+    --rem-btn-border: #404654;
+    --rem-btn-text: #e2e8f0;
+    --rem-accent: #64748b;
+    --rem-accent-border: #94a3b8;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(148, 163, 184, 0.18);
+    --rem-badge-text: #e2e8f0;
+    --rem-badge-border: rgba(148, 163, 184, 0.40);
+}
+
+/* 1. Apollo 11 (Cósmico) */
+html.theme-apollo {
+    --lgx-tint: 49, 64, 130;
+    --theme-lg-tint: 49, 64, 130;
+    --lgx-fill-a: 0.28;
+    --lgx-rim-hi: rgba(165, 180, 252, 0.28);
+    --lgx-track-a: rgba(99, 102, 241, 0.26);
+    --lgx-track-b: rgba(56, 189, 248, 0.16);
+    --lgx-track-c: rgba(249, 115, 22, 0.14);
+    --rem-box-bg: rgba(13, 20, 48, 0.80);
+    --rem-box-border: rgba(129, 140, 248, 0.40);
+    --rem-heading: #e0e7ff;
+    --rem-subtext: #a5b4fc;
+    --rem-btn-bg: rgba(20, 30, 68, 0.85);
+    --rem-btn-border: rgba(129, 140, 248, 0.36);
+    --rem-btn-text: #e0e7ff;
+    --rem-accent: #4f46e5;
+    --rem-accent-border: #818cf8;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(99, 102, 241, 0.24);
+    --rem-badge-text: #c7d2fe;
+    --rem-badge-border: rgba(129, 140, 248, 0.45);
+}
+
+/* 2. Eduardo VIP Gold (Dorado) */
+html.theme-eduardo-gold {
+    --lgx-tint: 110, 76, 16;
+    --theme-lg-tint: 110, 76, 16;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(251, 191, 36, 0.30);
+    --lgx-track-a: rgba(245, 158, 11, 0.26);
+    --lgx-track-b: rgba(217, 119, 6, 0.18);
+    --lgx-track-c: rgba(180, 83, 9, 0.20);
+    --rem-box-bg: rgba(32, 22, 6, 0.84);
+    --rem-box-border: rgba(245, 158, 11, 0.42);
+    --rem-heading: #fef3c7;
+    --rem-subtext: #fcd34d;
+    --rem-btn-bg: rgba(46, 31, 9, 0.88);
+    --rem-btn-border: rgba(245, 158, 11, 0.36);
+    --rem-btn-text: #fef3c7;
+    --rem-accent: #b45309;
+    --rem-accent-border: #fbbf24;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(245, 158, 11, 0.22);
+    --rem-badge-text: #fde68a;
+    --rem-badge-border: rgba(251, 191, 36, 0.46);
+}
+
+/* 3. Pingüino (Glacial Polar) */
+html.theme-penguin {
+    --lgx-tint: 14, 78, 102;
+    --theme-lg-tint: 14, 78, 102;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(103, 232, 249, 0.28);
+    --lgx-track-a: rgba(6, 182, 212, 0.24);
+    --lgx-track-b: rgba(56, 189, 248, 0.18);
+    --lgx-track-c: rgba(14, 116, 144, 0.22);
+    --rem-box-bg: rgba(6, 26, 42, 0.84);
+    --rem-box-border: rgba(6, 182, 212, 0.40);
+    --rem-heading: #ecfeff;
+    --rem-subtext: #67e8f9;
+    --rem-btn-bg: rgba(10, 38, 60, 0.88);
+    --rem-btn-border: rgba(34, 211, 238, 0.35);
+    --rem-btn-text: #cffafe;
+    --rem-accent: #0e7490;
+    --rem-accent-border: #22d3ee;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(6, 182, 212, 0.22);
+    --rem-badge-text: #a5f3fc;
+    --rem-badge-border: rgba(34, 211, 238, 0.46);
+}
+
+/* 4. Synthwave 1984 (Neón) */
+html.theme-synthwave {
+    --lgx-tint: 108, 28, 92;
+    --theme-lg-tint: 108, 28, 92;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(244, 114, 182, 0.30);
+    --lgx-track-a: rgba(236, 72, 153, 0.26);
+    --lgx-track-b: rgba(168, 85, 247, 0.22);
+    --lgx-track-c: rgba(34, 211, 238, 0.16);
+    --rem-box-bg: rgba(30, 8, 44, 0.84);
+    --rem-box-border: rgba(236, 72, 153, 0.42);
+    --rem-heading: #fdf4ff;
+    --rem-subtext: #f0abfc;
+    --rem-btn-bg: rgba(46, 12, 66, 0.88);
+    --rem-btn-border: rgba(236, 72, 153, 0.38);
+    --rem-btn-text: #fae8ff;
+    --rem-accent: #be185d;
+    --rem-accent-border: #f472b6;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(236, 72, 153, 0.22);
+    --rem-badge-text: #fbcfe8;
+    --rem-badge-border: rgba(244, 114, 182, 0.48);
+}
+
+/* 5. Terminal Matrix (Verde Fósforo) */
+html.theme-matrix {
+    --lgx-tint: 10, 74, 42;
+    --theme-lg-tint: 10, 74, 42;
+    --lgx-fill-a: 0.32;
+    --lgx-rim-hi: rgba(52, 211, 153, 0.28);
+    --lgx-track-a: rgba(16, 185, 129, 0.24);
+    --lgx-track-b: rgba(5, 150, 105, 0.18);
+    --lgx-track-c: rgba(4, 120, 87, 0.22);
+    --rem-box-bg: rgba(3, 20, 10, 0.86);
+    --rem-box-border: rgba(16, 185, 129, 0.44);
+    --rem-heading: #d1fae5;
+    --rem-subtext: #6ee7b7;
+    --rem-btn-bg: rgba(5, 32, 16, 0.90);
+    --rem-btn-border: rgba(16, 185, 129, 0.38);
+    --rem-btn-text: #a7f3d0;
+    --rem-accent: #047857;
+    --rem-accent-border: #34d399;
+    --rem-on-accent: #ecfdf5;
+    --rem-badge-bg: rgba(16, 185, 129, 0.20);
+    --rem-badge-text: #6ee7b7;
+    --rem-badge-border: rgba(52, 211, 153, 0.46);
+}
+
+/* 6. Sakura Cerezo */
+html.theme-sakura {
+    --lgx-tint: 112, 34, 58;
+    --theme-lg-tint: 112, 34, 58;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(251, 113, 133, 0.28);
+    --lgx-track-a: rgba(244, 63, 94, 0.24);
+    --lgx-track-b: rgba(251, 113, 133, 0.18);
+    --lgx-track-c: rgba(190, 18, 60, 0.20);
+    --rem-box-bg: rgba(38, 15, 22, 0.85);
+    --rem-box-border: rgba(244, 63, 94, 0.42);
+    --rem-heading: #fff1f2;
+    --rem-subtext: #fda4af;
+    --rem-btn-bg: rgba(54, 21, 31, 0.88);
+    --rem-btn-border: rgba(244, 63, 94, 0.36);
+    --rem-btn-text: #ffe4e6;
+    --rem-accent: #be123c;
+    --rem-accent-border: #fb7185;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(244, 63, 94, 0.22);
+    --rem-badge-text: #fecdd3;
+    --rem-badge-border: rgba(251, 113, 133, 0.46);
+}
+
+/* 7. Barista Coffee */
+html.theme-coffee {
+    --lgx-tint: 92, 54, 26;
+    --theme-lg-tint: 92, 54, 26;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(245, 158, 11, 0.26);
+    --lgx-track-a: rgba(217, 119, 6, 0.24);
+    --lgx-track-b: rgba(180, 83, 9, 0.18);
+    --lgx-track-c: rgba(146, 64, 14, 0.22);
+    --rem-box-bg: rgba(34, 19, 10, 0.86);
+    --rem-box-border: rgba(217, 119, 6, 0.42);
+    --rem-heading: #fef3c7;
+    --rem-subtext: #fcd34d;
+    --rem-btn-bg: rgba(48, 28, 15, 0.88);
+    --rem-btn-border: rgba(217, 119, 6, 0.36);
+    --rem-btn-text: #fde68a;
+    --rem-accent: #92400e;
+    --rem-accent-border: #f59e0b;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(217, 119, 6, 0.22);
+    --rem-badge-text: #fde68a;
+    --rem-badge-border: rgba(245, 158, 11, 0.46);
+}
+
+/* 8. Arcade 8-Bit */
+html.theme-arcade {
+    --lgx-tint: 76, 46, 128;
+    --theme-lg-tint: 76, 46, 128;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(250, 204, 21, 0.28);
+    --lgx-track-a: rgba(139, 92, 246, 0.26);
+    --lgx-track-b: rgba(234, 179, 8, 0.16);
+    --lgx-track-c: rgba(109, 40, 217, 0.22);
+    --rem-box-bg: rgba(23, 16, 39, 0.86);
+    --rem-box-border: rgba(234, 179, 8, 0.42);
+    --rem-heading: #fef08a;
+    --rem-subtext: #fde047;
+    --rem-btn-bg: rgba(35, 24, 58, 0.90);
+    --rem-btn-border: rgba(167, 139, 250, 0.38);
+    --rem-btn-text: #fef9c3;
+    --rem-accent: #6d28d9;
+    --rem-accent-border: #facc15;
+    --rem-on-accent: #fef9c3;
+    --rem-badge-bg: rgba(124, 58, 237, 0.26);
+    --rem-badge-text: #fef08a;
+    --rem-badge-border: rgba(250, 204, 21, 0.46);
+}
+
+/* 9. Hiperenfoque */
+html.theme-hyperfocus {
+    --lgx-tint: 26, 68, 128;
+    --theme-lg-tint: 26, 68, 128;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(96, 165, 250, 0.28);
+    --lgx-track-a: rgba(59, 130, 246, 0.24);
+    --lgx-track-b: rgba(37, 99, 235, 0.18);
+    --lgx-track-c: rgba(14, 165, 233, 0.18);
+    --rem-box-bg: rgba(8, 22, 42, 0.86);
+    --rem-box-border: rgba(59, 130, 246, 0.42);
+    --rem-heading: #eff6ff;
+    --rem-subtext: #93c5fd;
+    --rem-btn-bg: rgba(13, 33, 62, 0.88);
+    --rem-btn-border: rgba(96, 165, 250, 0.36);
+    --rem-btn-text: #dbeafe;
+    --rem-accent: #1d4ed8;
+    --rem-accent-border: #60a5fa;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(59, 130, 246, 0.22);
+    --rem-badge-text: #bfdbfe;
+    --rem-badge-border: rgba(96, 165, 250, 0.46);
+}
+
+/* 10. Starlight Tribute */
+html.theme-starlight {
+    --lgx-tint: 94, 34, 118;
+    --theme-lg-tint: 94, 34, 118;
+    --lgx-fill-a: 0.30;
+    --lgx-rim-hi: rgba(244, 114, 182, 0.28);
+    --lgx-track-a: rgba(236, 72, 153, 0.24);
+    --lgx-track-b: rgba(168, 85, 247, 0.22);
+    --lgx-track-c: rgba(192, 132, 252, 0.18);
+    --rem-box-bg: rgba(28, 12, 42, 0.86);
+    --rem-box-border: rgba(236, 72, 153, 0.42);
+    --rem-heading: #fce7f3;
+    --rem-subtext: #f9a8d4;
+    --rem-btn-bg: rgba(42, 18, 62, 0.88);
+    --rem-btn-border: rgba(236, 72, 153, 0.36);
+    --rem-btn-text: #fce7f3;
+    --rem-accent: #be185d;
+    --rem-accent-border: #f472b6;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(236, 72, 153, 0.22);
+    --rem-badge-text: #fbcfe8;
+    --rem-badge-border: rgba(244, 114, 182, 0.48);
+}
+
+/* Indicador deslizante inferior hereda el tinte temático en temas oscuros/bóveda */
+html.dark[class*="theme-"] .nav-sliding-indicator {
+    --lgx-tint: var(--theme-lg-tint, 51, 65, 85);
+}
+
+/* Reducción de brillo en las píldoras deslizantes Liquid Glass (mantiene refracción real) */
+html .segmented-glass-indicator,
+html .nav-sliding-indicator,
+html .chip-glass-indicator {
+    background:
+        radial-gradient(120% 140% at 18% 0%, rgba(255, 255, 255, var(--lgx-glare-a, 0.15)) 0%, rgba(255, 255, 255, 0) 52%),
+        linear-gradient(165deg, rgba(var(--lgx-tint), calc(var(--lgx-fill-a) + 0.06)) 0%, rgba(var(--lgx-tint), var(--lgx-fill-a)) 50%, rgba(var(--lgx-tint), calc(var(--lgx-fill-a) + 0.04)) 100%) !important;
+    box-shadow:
+        inset 1px 1px 0.5px -0.5px var(--lgx-inset-hi),
+        inset -1px -1px 0.5px -0.5px var(--lgx-inset-lo),
+        inset 0 0 10px 1px var(--lgx-inner-glow),
+        0 8px 18px -8px rgba(var(--lgx-shadow), 0.38),
+        0 2px 5px rgba(var(--lgx-shadow), 0.14) !important;
+}
+
+html .segmented-glass-indicator::after,
+html .nav-sliding-indicator::after,
+html .chip-glass-indicator::after {
+    opacity: var(--lgx-sheen-op, 0.20) !important;
+}
+
+/* Reducción de brillo en el thumb de los interruptores */
+html .app-switch-thumb[data-lg-surface] {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+    background-image: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 64%) !important;
+    box-shadow:
+        inset 1px 1px 0.5px rgba(255, 255, 255, 0.50),
+        inset -1px -1px 0.5px rgba(255, 255, 255, 0.22),
+        0 2px 5px rgba(var(--lgx-shadow), 0.26) !important;
+}
+
+html.dark .app-switch-thumb[data-lg-surface] {
+    background-color: rgba(226, 232, 240, 0.28) !important;
+    background-image: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.34) 0%, rgba(148, 163, 184, 0.08) 64%) !important;
+    box-shadow:
+        inset 1px 1px 0.5px rgba(255, 255, 255, 0.32),
+        inset -1px -1px 0.5px rgba(255, 255, 255, 0.14),
+        0 2px 5px rgba(2, 6, 23, 0.42) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   3B) Selector de recordatorio de Materias + Días en modal (100% adaptable a temas)
+   ------------------------------------------------------------------------- */
+html .subject-reminder-box {
+    background-color: var(--rem-box-bg) !important;
+    border-color: var(--rem-box-border) !important;
+}
+
+html .subject-reminder-heading {
+    color: var(--rem-heading) !important;
+}
+
+html .subject-reminder-subtext {
+    color: var(--rem-subtext) !important;
+}
+
+html .subject-reminder-icon {
+    color: var(--rem-accent) !important;
+}
+
+html.dark .subject-reminder-icon,
+html[class*="theme-"]:not(.theme-gray) .subject-reminder-icon {
+    color: var(--rem-accent-border) !important;
+}
+
+html .subject-reminder-option {
     min-height: 44px;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    background-color: var(--rem-btn-bg) !important;
+    border-color: var(--rem-btn-border) !important;
+    color: var(--rem-btn-text) !important;
+    transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease, transform 0.12s ease;
 }
 
-.subject-reminder-option[aria-pressed="true"] {
-    background-color: #4f46e5 !important;
-    border-color: #4f46e5 !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px -4px rgba(79, 70, 229, 0.5);
+html .subject-reminder-option[aria-pressed="true"] {
+    background-color: var(--rem-accent) !important;
+    border-color: var(--rem-accent-border) !important;
+    color: var(--rem-on-accent) !important;
+    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.38);
 }
 
-html.dark .subject-reminder-option[aria-pressed="true"] {
-    background-color: #6366f1 !important;
-    border-color: #818cf8 !important;
-    color: #ffffff !important;
+html .subject-reminder-test-btn {
+    background-color: var(--rem-badge-bg) !important;
+    border-color: var(--rem-badge-border) !important;
+    color: var(--rem-badge-text) !important;
+}
+
+html .subject-reminder-card-badge {
+    background-color: var(--rem-badge-bg) !important;
+    border-color: var(--rem-badge-border) !important;
+    color: var(--rem-badge-text) !important;
+}
+
+/* Evita que las casillas de días en #subject-modal se vean blancas en oscuro / temas de bóveda */
+html.dark #subject-modal input[name="subject-days"]:not(:checked) + span,
+html[class*="theme-"].dark #subject-modal input[name="subject-days"]:not(:checked) + span {
+    background-color: var(--rem-btn-bg) !important;
+    border-color: var(--rem-btn-border) !important;
+    color: var(--rem-btn-text) !important;
+}
+
+html[class*="theme-"] #subject-modal input[name="subject-days"]:checked + span {
+    background-color: var(--rem-accent) !important;
+    border-color: var(--rem-accent-border) !important;
+    color: var(--rem-on-accent) !important;
 }
 
 /* ---------------------------------------------------------------------------

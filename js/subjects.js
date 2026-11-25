@@ -201,6 +201,7 @@ window.SubjectsModule = (() => {
                 window.HapticsModule?.light?.();
                 if (e.target.checked) {
                     syncReminderUI(selectedReminderMinutes || 15);
+                    window.NotificationsModule?.requestPermission?.().catch?.(() => {});
                 } else {
                     syncReminderUI(null);
                 }
@@ -214,9 +215,23 @@ window.SubjectsModule = (() => {
                 btn.addEventListener('click', () => {
                     window.HapticsModule?.light?.();
                     const val = normalizeReminderMinutes(btn.getAttribute('data-subject-reminder'));
-                    // Si se toca la opción ya seleccionada, se desactiva; si no, se selecciona
-                    syncReminderUI(selectedReminderMinutes === val ? null : val);
+                    const nextVal = selectedReminderMinutes === val ? null : val;
+                    syncReminderUI(nextVal);
+                    if (nextVal) {
+                        window.NotificationsModule?.requestPermission?.().catch?.(() => {});
+                    }
                 });
+            });
+        }
+
+        const testBtn = document.getElementById('subject-reminder-test-btn');
+        if (testBtn && testBtn.dataset.bound !== 'true') {
+            testBtn.dataset.bound = 'true';
+            testBtn.addEventListener('click', () => {
+                window.HapticsModule?.light?.();
+                const name = document.getElementById('subject-name')?.value?.trim() || 'Tu materia';
+                const startTime = document.getElementById('subject-start-time')?.value || '';
+                window.NotificationsModule?.testSubjectReminder?.(name, selectedReminderMinutes || 15, startTime);
             });
         }
     }
@@ -337,6 +352,11 @@ window.SubjectsModule = (() => {
             hiddenRemVal !== undefined && hiddenRemVal !== '' ? hiddenRemVal : selectedReminderMinutes
         );
 
+        if (reminderMinutes && (selectedDays.length === 0 || !startTime)) {
+            window.showNotification?.('Selecciona al menos un día de clase y hora de inicio para activar el recordatorio.', 'warning');
+            return;
+        }
+
         const data = {
             name,
             color: selectedColor,
@@ -352,16 +372,20 @@ window.SubjectsModule = (() => {
             let savedSubject = null;
             if (editingSubjectId) {
                 savedSubject = Storage.updateSubject(editingSubjectId, data);
-                window.showNotification?.('Materia actualizada con éxito.', 'success');
             } else {
                 savedSubject = Storage.addSubject(data);
-                window.showNotification?.('¡Materia registrada exitosamente!', 'success');
             }
             if (savedSubject) {
                 if (savedSubject.reminderMinutes) {
+                    const baseMsg = editingSubjectId ? 'Materia actualizada' : '¡Materia registrada!';
+                    window.showNotification?.(`${baseMsg} • Recordatorio activo (${formatReminderShort(savedSubject.reminderMinutes)}).`, 'success');
                     window.NotificationsModule?.requestPermission?.().catch?.(() => {});
                     window.NotificationsModule?.scheduleSubject?.(savedSubject)?.catch?.(() => {});
                 } else {
+                    window.showNotification?.(
+                        editingSubjectId ? 'Materia actualizada con éxito.' : '¡Materia registrada exitosamente!',
+                        'success'
+                    );
                     window.NotificationsModule?.cancelSubject?.(savedSubject.id)?.catch?.(() => {});
                 }
             }
@@ -511,7 +535,7 @@ window.SubjectsModule = (() => {
                         </div>
 
                         ${normalizeReminderMinutes(subject.reminderMinutes) ? `
-                            <div class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-700/50" data-subject-reminder-badge="${normalizeReminderMinutes(subject.reminderMinutes)}">
+                            <div class="subject-reminder-card-badge inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-xl border" data-subject-reminder-badge="${normalizeReminderMinutes(subject.reminderMinutes)}">
                                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>

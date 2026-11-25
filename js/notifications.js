@@ -7,7 +7,21 @@
 
 window.NotificationsModule = (() => {
     const NOTIFIED_CACHE_KEY = 'org_escolar_notified_cache';
+    const subjectTimers = new Map();
     let checkIntervalId = null;
+    let visibilityListenerBound = false;
+
+    function normalizeDayId(d) {
+        const s = String(d || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        if (s.startsWith('lun')) return 'lun';
+        if (s.startsWith('mar')) return 'mar';
+        if (s.startsWith('mie')) return 'mie';
+        if (s.startsWith('jue')) return 'jue';
+        if (s.startsWith('vie')) return 'vie';
+        if (s.startsWith('sab')) return 'sab';
+        if (s.startsWith('dom')) return 'dom';
+        return s.slice(0, 3);
+    }
 
     function isAndroidNativeAvailable() {
         try {
@@ -166,18 +180,34 @@ window.NotificationsModule = (() => {
                 } catch (_) {}
             }
 
-            // 2. Web Notification
+            // 2. Web Notification (ServiceWorker primero para Android Chrome / PWA, luego Notification API)
             if (!isAndroidNativeAvailable() && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-                try {
-                    new Notification(title, {
-                        body: body,
-                        icon: resolvedIcon,
-                        tag: tag,
-                        badge: resolvedIcon
-                    });
-                    return;
-                } catch {
-                    // Fallback a toast
+                const notifOpts = {
+                    body: body,
+                    icon: resolvedIcon,
+                    tag: tag,
+                    badge: resolvedIcon,
+                    renotify: true,
+                    vibrate: [180, 80, 180],
+                    data: { action: action || 'tasks' }
+                };
+                if ('serviceWorker' in navigator && navigator.serviceWorker?.ready) {
+                    navigator.serviceWorker.ready
+                        .then(reg => {
+                            if (reg && typeof reg.showNotification === 'function') {
+                                return reg.showNotification(title, notifOpts);
+                            }
+                            new Notification(title, notifOpts);
+                        })
+                        .catch(() => {
+                            try { new Notification(title, notifOpts); } catch (_) {}
+                        });
+                } else {
+                    try {
+                        new Notification(title, notifOpts);
+                    } catch (_) {
+                        // Fallback a toast
+                    }
                 }
             }
 
@@ -391,33 +421,45 @@ window.NotificationsModule = (() => {
          * Formatea y programa recordatorios semanales de una MATERIA (15, 30, 45 o 60 min antes)
          */
         async scheduleSubject(subject) {
-            if (!subject || !subject.id) return;
+            if (!subject || !subject.id) return { scheduledCount: 0, nextTriggerMs: null, firedImmediate: false };
             await this.cancelSubject(subject.id);
 
             const remMin = Number(subject.reminderMinutes);
-            if (!(remMin === 15 || remMin === 30 || remMin === 45 || remMin === 60)) return;
-            if (!subject.startTime || !Array.isArray(subject.days) || subject.days.length === 0) return;
+            if (!(remMin === 15 || remMin === 30 || remMin === 45 || remMin === 60)) {
+                return { scheduledCount: 0, nextTriggerMs: null, firedImmediate: false };
+            }
+            if (!subject.startTime || !Array.isArray(subject.days) || subject.days.length === 0) {
+                return { scheduledCount: 0, nextTriggerMs: null, firedImmediate: false };
+            }
 
             const timeParts = String(subject.startTime).split(':');
             const startHour = Number(timeParts[0]);
             const startMin = Number(timeParts[1]);
-            if (!Number.isFinite(startHour) || !Number.isFinite(startMin)) return;
+            if (!Number.isFinite(startHour) || !Number.isFinite(startMin)) {
+                return { scheduledCount: 0, nextTriggerMs: null, firedImmediate: false };
+            }
 
             const dayMap = { dom: 0, lun: 1, mar: 2, mie: 3, jue: 4, vie: 5, sab: 6 };
             const leadLabel = remMin === 60 ? '1 hora' : `${remMin} minutos`;
             const title = `[CLASE] ${subject.name}`;
-            const extraParts = [`Inicia en ${leadLabel} (${subject.startTime} hrs)`];
-            if (subject.classroom && subject.classroom.trim()) extraParts.push(subject.classroom.trim());
-            if (subject.professor && subject.professor.trim()) extraParts.push(subject.professor.trim());
-            const body = extraParts.join(' • ');
+            const buildBody = (remainingText) => {
+                const extraParts = [`Inicia en ${remainingText} (${subject.startTime} hrs)`];
+                if (subject.classroom && subject.classroom.trim()) extraParts.push(subject.classroom.trim());
+                if (subject.professor && subject.professor.trim()) extraParts.push(subject.professor.trim());
+                return extraParts.join(' • ');
+            };
+            const body = buildBody(leadLabel);
 
             const now = new Date();
             const nowMs = now.getTime();
+            const normalizedDays = [...new Set(subject.days.map(normalizeDayId).filter(d => dayMap[d] !== undefined))];
+            const timersForSubject = [];
+            let scheduledCount = 0;
+            let nextTriggerMs = null;
+            let firedImmediate = false;
 
-            for (const dayId of subject.days) {
+            for (const dayId of normalizedDays) {
                 const targetDow = dayMap[dayId];
-                if (targetDow === undefined) continue;
-
                 const diffDays = (targetDow - now.getDay() + 7) % 7;
                 const classDate = new Date(
                     now.getFullYear(),
@@ -429,13 +471,32 @@ window.NotificationsModule = (() => {
                     0
                 );
                 let triggerMs = classDate.getTime() - (remMin * 60 * 1000);
-                if (triggerMs <= nowMs + 1000) {
+
+                // Si la clase es hoy y ya estamos dentro de la ventana del recordatorio (antes de que inicie),
+                // avisar de inmediato y programar la siguiente semana.
+                if (triggerMs <= nowMs + 1000 && classDate.getTime() > nowMs) {
+                    const sessionKey = `subject_${subject.id}_${classDate.getFullYear()}-${classDate.getMonth() + 1}-${classDate.getDate()}_${remMin}`;
+                    if (!isAlreadyNotified(sessionKey)) {
+                        markAsNotified(sessionKey);
+                        const minsLeft = Math.max(1, Math.round((classDate.getTime() - nowMs) / 60000));
+                        const minsText = minsLeft === 1 ? '1 minuto' : `${minsLeft} minutos`;
+                        this.displayNotification(title, buildBody(minsText), getAppNotificationIcon(), sessionKey, 'subjects');
+                        firedImmediate = true;
+                    }
+                    classDate.setDate(classDate.getDate() + 7);
+                    triggerMs = classDate.getTime() - (remMin * 60 * 1000);
+                } else if (triggerMs <= nowMs + 1000) {
                     classDate.setDate(classDate.getDate() + 7);
                     triggerMs = classDate.getTime() - (remMin * 60 * 1000);
                 }
 
                 const notifId = hashStringTo32BitInt(`subject_${subject.id}_${dayId}`);
+                scheduledCount += 1;
+                if (nextTriggerMs === null || triggerMs < nextTriggerMs) {
+                    nextTriggerMs = triggerMs;
+                }
 
+                // 1. Alarma exacta nativa Android (funciona incluso con la app cerrada)
                 if (isAndroidNativeAvailable() && typeof window.AndroidWidgetBridge.scheduleNativeNotification === 'function') {
                     try {
                         window.AndroidWidgetBridge.scheduleNativeNotification(notifId, title, body, triggerMs, 'subjects');
@@ -444,6 +505,7 @@ window.NotificationsModule = (() => {
                     }
                 }
 
+                // 2. Capacitor LocalNotifications fallback
                 if (isCapacitorLocalNotificationsAvailable()) {
                     try {
                         const { LocalNotifications } = window.Capacitor.Plugins;
@@ -460,7 +522,44 @@ window.NotificationsModule = (() => {
                         console.warn('Error programando materia en Capacitor:', err);
                     }
                 }
+
+                // 3. Temporizador exacto en sesión (Web/PWA y app abierta) para avisos dentro de las próximas 24h
+                const delayMs = triggerMs - nowMs;
+                if (delayMs > 0 && delayMs <= 24 * 60 * 60 * 1000) {
+                    const sessionKey = `subject_${subject.id}_${classDate.getFullYear()}-${classDate.getMonth() + 1}-${classDate.getDate()}_${remMin}`;
+                    const timerId = setTimeout(() => {
+                        if (!isAlreadyNotified(sessionKey)) {
+                            markAsNotified(sessionKey);
+                            this.displayNotification(title, body, getAppNotificationIcon(), sessionKey, 'subjects');
+                        }
+                    }, delayMs);
+                    timersForSubject.push(timerId);
+                }
             }
+
+            if (timersForSubject.length > 0) {
+                subjectTimers.set(String(subject.id), timersForSubject);
+            }
+
+            return { scheduledCount, nextTriggerMs, firedImmediate };
+        },
+
+        /**
+         * Envía una notificación de prueba para verificar permisos y avisos de materias
+         */
+        async testSubjectReminder(subjectName, reminderMinutes, startTime) {
+            await this.requestPermission();
+            const cleanName = (subjectName || '').trim() || 'Tu materia';
+            const remMin = Number(reminderMinutes) || 15;
+            const leadLabel = remMin === 60 ? '1 hora' : `${remMin} minutos`;
+            const timeTxt = startTime ? ` (${startTime} hrs)` : '';
+            this.displayNotification(
+                `[CLASE] ${cleanName}`,
+                `Prueba de recordatorio: te avisaremos ${leadLabel} antes${timeTxt}.`,
+                getAppNotificationIcon(),
+                `subject_test_${Date.now()}`,
+                'subjects'
+            );
         },
 
         /**
@@ -468,6 +567,13 @@ window.NotificationsModule = (() => {
          */
         async cancelSubject(subjectId) {
             if (!subjectId) return;
+            const key = String(subjectId);
+            const activeTimers = subjectTimers.get(key);
+            if (Array.isArray(activeTimers)) {
+                activeTimers.forEach(t => clearTimeout(t));
+                subjectTimers.delete(key);
+            }
+
             const dayIds = ['lun', 'mar', 'mie', 'jue', 'vie', 'sab', 'dom'];
             const ids = dayIds.map(d => hashStringTo32BitInt(`subject_${subjectId}_${d}`));
 
@@ -492,6 +598,11 @@ window.NotificationsModule = (() => {
          * Cancela todas las notificaciones pendientes
          */
         async cancelAll() {
+            subjectTimers.forEach(timers => {
+                if (Array.isArray(timers)) timers.forEach(t => clearTimeout(t));
+            });
+            subjectTimers.clear();
+
             if (isAndroidNativeAvailable() && typeof window.AndroidWidgetBridge.cancelAllNativeNotifications === 'function') {
                 try {
                     window.AndroidWidgetBridge.cancelAllNativeNotifications();
@@ -589,18 +700,23 @@ window.NotificationsModule = (() => {
                     const m = Number(parts[1]);
                     if (!Number.isFinite(h) || !Number.isFinite(m)) return;
 
+                    const normDays = s.days.map(normalizeDayId);
+
                     // Revisar hoy y mañana (por clases a medianoche con aviso 1h antes)
                     for (let offset = 0; offset <= 1; offset++) {
                         const classDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, h, m, 0, 0);
                         const dayId = dowIds[classDate.getDay()];
-                        if (!s.days.includes(dayId)) continue;
+                        if (!normDays.includes(dayId)) continue;
 
-                        const triggerMs = classDate.getTime() - (remMin * 60 * 1000);
-                        if (triggerMs <= nowTime + (60 * 1000) && triggerMs >= nowTime - (5 * 60 * 1000)) {
+                        const classMs = classDate.getTime();
+                        const triggerMs = classMs - (remMin * 60 * 1000);
+                        // Ventana confiable: desde 1 min antes del aviso hasta el inicio de la clase
+                        if (nowTime >= triggerMs - (60 * 1000) && nowTime <= classMs + (60 * 1000)) {
                             const sessionKey = `subject_${s.id}_${classDate.getFullYear()}-${classDate.getMonth() + 1}-${classDate.getDate()}_${remMin}`;
                             if (!isAlreadyNotified(sessionKey)) {
                                 markAsNotified(sessionKey);
-                                const leadLabel = remMin === 60 ? '1 hora' : `${remMin} minutos`;
+                                const minsLeft = Math.max(1, Math.round((classMs - nowTime) / 60000));
+                                const leadLabel = minsLeft >= 55 ? '1 hora' : (minsLeft === 1 ? '1 minuto' : `${minsLeft} minutos`);
                                 const extra = [`Inicia en ${leadLabel} (${s.startTime} hrs)`];
                                 if (s.classroom && s.classroom.trim()) extra.push(s.classroom.trim());
                                 this.displayNotification(
@@ -617,7 +733,17 @@ window.NotificationsModule = (() => {
             };
 
             check();
-            checkIntervalId = setInterval(check, 30000);
+            checkIntervalId = setInterval(check, 20000);
+
+            if (!visibilityListenerBound && typeof document !== 'undefined') {
+                visibilityListenerBound = true;
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) {
+                        check();
+                        this.resyncAllScheduled();
+                    }
+                });
+            }
         }
     };
 

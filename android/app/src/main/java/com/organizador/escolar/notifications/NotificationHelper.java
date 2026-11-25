@@ -78,6 +78,8 @@ public class NotificationHelper {
                 .setContentTitle(title != null && !title.isEmpty() ? title : "Organizador")
                 .setContentText(body != null ? body : "")
                 .setStyle(new Notification.BigTextStyle().bigText(body != null ? body : ""))
+                .setCategory(Notification.CATEGORY_REMINDER)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setAutoCancel(true)
                 .setContentIntent(contentIntent);
 
@@ -126,7 +128,15 @@ public class NotificationHelper {
             if (canExact) {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pi);
             } else {
-                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pi);
+                // Fallback de alta precisión con AlarmClock cuando SCHEDULE_EXACT_ALARM no está activo
+                Intent showIntent = new Intent(context, MainActivity.class);
+                PendingIntent showPi = PendingIntent.getActivity(
+                        context,
+                        Math.abs(id) + 2000,
+                        showIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+                am.setAlarmClock(new AlarmManager.AlarmClockInfo(triggerAtMs, showPi), pi);
             }
             rememberAlarmId(context, id);
         } catch (SecurityException se) {

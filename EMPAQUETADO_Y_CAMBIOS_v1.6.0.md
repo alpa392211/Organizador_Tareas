@@ -3,22 +3,23 @@
 **Nombre de la app Android:** `Organizador` (`com.organizador.escolar`)  
 **Versión:** `1.6.0` (`versionCode: 160`)  
 **APK compilado y firmado:** `downloads/Organizador-v1.6.0.apk`  
-- **Tamaño:** `3,859,562` bytes (`3.68 MB`)  
-- **SHA-256:** `AC3E3331B4921DBF998B96A4A6B51E5EC1539F5A909A4EA39CD5AF667911B65A`  
+- **Tamaño:** `3,864,154` bytes (`3.69 MB`)  
+- **SHA-256:** `F0466BD445C3CE3748DA95283F2C04C03342FF2C4E3B490816BC0EF8F2DDD87F`  
 - **Firma:** APK Signature Scheme v2 (`Verifies`, 1 firmante)
 
 ---
 
-## 1. Integración de Liquid Glass v2
+## 1. Integración de Liquid Glass v2 y adaptación temática
 - Se reemplazó `js/liquid-glass.js` por la versión probada con refracción convexa biselada y aberración cromática en intensidad Intenso (sin modificar `js/segmented.js`, `js/notes.js` ni las reglas de `css/styles.css`).
 - Se agregó `css/liquid-glass.css` enlazado en `index.html` justo después de `css/styles.css` con `?v=1.6.0` y precacheado en `sw.js` (`organizador-tareas-cache-v1.6.0`).
+- En `css/mobile-perf.css` se redujo el brillo excesivo de los botones deslizables (`segmented-glass-indicator`, `nav-sliding-indicator`, `chip-glass-indicator` y `app-switch-thumb`) y se adaptaron tanto los controles deslizables como el selector de recordatorios de materias a los 14 modos/temas de la app (Claro, Oscuro, Monocromático Claro/Oscuro y los 10 temas de la Bóveda), eliminando fondos blancos en modo oscuro.
 
 ---
 
 ## 2. Recordatorios de Materias antes de clase (4 opciones)
-- En el modal de creación y edición de materias (`#subject-modal`) se agregó el selector **Recordatorio de clase** con interruptor y 4 opciones táctiles: **15 min antes**, **30 min antes**, **45 min antes** y **1 hora antes**.
-- Las tarjetas de materias muestran una insignia con el recordatorio activo.
-- `js/notifications.js` ahora programa y cancela recordatorios semanales de materias (`scheduleSubject`, `cancelSubject`), tanto con `AlarmManager` nativo en el APK Android (funciona con la app cerrada) como en el vigilante web/PWA, y al tocar la notificación abre directamente la vista de Materias.
+- En el modal de creación y edición de materias (`#subject-modal`) se agregó el selector **Recordatorio de clase** con interruptor, 4 opciones táctiles (**15 min antes**, **30 min antes**, **45 min antes** y **1 hora antes**) y botón **Probar aviso**.
+- Las tarjetas de materias muestran una insignia temática con el recordatorio activo.
+- `js/notifications.js`, `sw.js`, `AndroidManifest.xml` (`SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, `WAKE_LOCK`) y `NotificationHelper.java` programan alarmas exactas semanales en Android (con fallback `AlarmClock`), notificaciones vía `ServiceWorkerRegistration.showNotification` en Chrome móvil/PWA, temporizadores de sesión y aviso inmediato si la clase ya está dentro de la ventana de recordatorio.
 
 ---
 

@@ -2064,16 +2064,16 @@
                 </div>
 
                 <!-- Recordatorio antes de la Materia (4 opciones: 15, 30, 45 min y 1 hora antes) -->
-                <div id="subject-reminder-section" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-700/35 border border-slate-200/80 dark:border-slate-600/60 space-y-2.5">
+                <div id="subject-reminder-section" class="subject-reminder-box p-3.5 rounded-2xl border space-y-2.5">
                     <div class="flex items-center justify-between gap-2">
                         <div class="min-w-0">
-                            <label for="subject-reminder-toggle" class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
-                                <svg class="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <label for="subject-reminder-toggle" class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider subject-reminder-heading">
+                                <svg class="w-4 h-4 subject-reminder-icon shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                                 <span>Recordatorio de clase</span>
                             </label>
-                            <span id="subject-reminder-status" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mt-0.5">Sin recordatorio</span>
+                            <span id="subject-reminder-status" class="text-[11px] font-medium subject-reminder-subtext block mt-0.5">Sin recordatorio</span>
                         </div>
                         <label class="app-switch shrink-0" for="subject-reminder-toggle">
                             <input type="checkbox" id="subject-reminder-toggle">
@@ -2085,20 +2085,27 @@
                     <input type="hidden" id="subject-reminder-minutes" value="">
                     <div id="subject-reminder-options" role="group" aria-label="Tiempo de recordatorio antes de clase" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <button type="button" data-subject-reminder="15" aria-pressed="false"
-                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold text-center">
+                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border text-xs font-bold text-center">
                             15 min antes
                         </button>
                         <button type="button" data-subject-reminder="30" aria-pressed="false"
-                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold text-center">
+                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border text-xs font-bold text-center">
                             30 min antes
                         </button>
                         <button type="button" data-subject-reminder="45" aria-pressed="false"
-                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold text-center">
+                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border text-xs font-bold text-center">
                             45 min antes
                         </button>
                         <button type="button" data-subject-reminder="60" aria-pressed="false"
-                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold text-center">
+                            class="subject-reminder-option touch-target-44 tap-effect px-2.5 py-2 rounded-xl border text-xs font-bold text-center">
                             1 hora antes
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 pt-0.5">
+                        <span class="text-[10px] subject-reminder-subtext">Requiere al menos un día y hora de inicio.</span>
+                        <button type="button" id="subject-reminder-test-btn"
+                            class="subject-reminder-test-btn tap-effect text-[11px] font-bold px-2.5 py-1 rounded-lg border shrink-0">
+                            Probar aviso
                         </button>
                     </div>
                 </div>
