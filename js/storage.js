@@ -395,7 +395,7 @@ window.StorageModule = (() => {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.7');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.9');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
@@ -557,6 +557,7 @@ window.StorageModule = (() => {
                 throw new Error(`No se pueden registrar más de ${MAX_SUBJECTS} materias.`);
             }
             localStorage.setItem(KEYS.SUBJECTS, JSON.stringify(subjects));
+            try { window.WidgetSyncModule?.sync?.(); } catch (_) {}
             return true;
         },
         addSubject(subject) {
@@ -616,6 +617,7 @@ window.StorageModule = (() => {
         saveTasks(tasks) {
             if (!Array.isArray(tasks)) return false;
             localStorage.setItem(KEYS.TASKS, JSON.stringify(tasks));
+            try { window.WidgetSyncModule?.sync?.(); } catch (_) {}
             return true;
         },
         addTask(task) {
@@ -678,6 +680,7 @@ window.StorageModule = (() => {
         saveNotes(notes) {
             if (!Array.isArray(notes)) return false;
             localStorage.setItem(KEYS.NOTES, JSON.stringify(notes));
+            try { window.WidgetSyncModule?.sync?.(); } catch (_) {}
             return true;
         },
         addNote(note) {
@@ -1392,9 +1395,47 @@ window.StorageModule = (() => {
                 totalBytes,
                 usedFormatted,
                 percentage,
+                quotaBytes,
                 subjectsCount: subjects.length,
                 tasksCount: tasks.length,
                 notesCount: notes.length
+            };
+        },
+
+        async getFullStorageEstimate() {
+            const syncMetrics = this.getStorageMetrics();
+            const formatSize = (bytes) => {
+                if (!bytes || bytes <= 0) return '0 KB';
+                if (bytes >= 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+                if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                return (bytes / 1024).toFixed(1) + ' KB';
+            };
+
+            try {
+                if (typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.estimate === 'function') {
+                    const est = await navigator.storage.estimate();
+                    const quota = Number(est?.quota || 0);
+                    const usage = Math.max(Number(est?.usage || 0), syncMetrics.totalBytes);
+                    if (quota > 0) {
+                        const rawPct = (usage / quota) * 100;
+                        const percentage = rawPct > 0 && rawPct < 0.1 ? '< 0.1' : Math.min(100, rawPct).toFixed(1);
+                        return {
+                            ...syncMetrics,
+                            totalBytes: usage,
+                            quotaBytes: quota,
+                            usedFormatted: formatSize(usage),
+                            quotaFormatted: formatSize(quota),
+                            percentage,
+                            barPercent: Math.min(100, Math.max(2, rawPct))
+                        };
+                    }
+                }
+            } catch (_) {}
+
+            return {
+                ...syncMetrics,
+                quotaFormatted: formatSize(syncMetrics.quotaBytes),
+                barPercent: Math.min(100, Math.max(2, Number(syncMetrics.percentage) || 2))
             };
         },
 
@@ -1450,7 +1491,7 @@ window.StorageModule = (() => {
 
         exportJson() {
             const data = {
-                version: '1.5.7',
+                version: '1.5.9',
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),

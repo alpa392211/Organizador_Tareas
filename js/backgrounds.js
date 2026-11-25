@@ -1518,7 +1518,13 @@
             this._ensureDOM();
 
             this._motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)') || null;
-            this._motionQuery?.addEventListener?.('change', this._boundMotionHandler);
+            if (this._motionQuery) {
+                if (typeof this._motionQuery.addEventListener === 'function') {
+                    this._motionQuery.addEventListener('change', this._boundMotionHandler);
+                } else if (typeof this._motionQuery.addListener === 'function') {
+                    this._motionQuery.addListener(this._boundMotionHandler);
+                }
+            }
             document.addEventListener('visibilitychange', this._boundVisibilityHandler);
             window.addEventListener('resize', this._boundResizeHandler);
 

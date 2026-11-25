@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Organizador Escolar</string>
+    <string name="app_name">Organizador</string>
     
     <!-- Widget 1: Quick Task -->
     <string name="widget_quick_task_name">Acción Rápida de Tareas</string>
     <string name="widget_quick_task_desc">Agrega tareas rápidamente y consulta tus pendientes del día.</string>
     <string name="widget_quick_task_today_label">Pendientes hoy</string>
-    <string name="widget_quick_task_no_pending">Todo al corriente ✨</string>
+    <string name="widget_quick_task_no_pending">Todo al corriente</string>
     <string name="widget_quick_task_btn_add">+ Tarea</string>
 
     <!-- Widget 2: Week Calendar -->
@@ -18,6 +18,6 @@
     <!-- Widget 3: Task Deadlines -->
     <string name="widget_task_deadlines_name">Fechas de Entrega</string>
     <string name="widget_task_deadlines_desc">Agenda cronológica de entregas de tareas con código de color institucional.</string>
-    <string name="widget_task_deadlines_empty">¡Felicidades! No hay entregas próximas 🎉</string>
+    <string name="widget_task_deadlines_empty">¡Felicidades! No hay entregas próximas</string>
     <string name="widget_task_deadlines_header">Próximas Entregas</string>
 </resources>

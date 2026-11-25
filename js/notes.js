@@ -601,6 +601,25 @@ window.NotesModule = (() => {
             return null;
         }
         const filename = buildDownloadFilename(photo, blob);
+
+        // Descarga nativa en APK Android (guarda directo en Pictures/Organizador)
+        if (typeof window !== 'undefined' && window.AndroidWidgetBridge && typeof window.AndroidWidgetBridge.saveBase64File === 'function') {
+            try {
+                const base64Data = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(String(reader.result || ''));
+                    reader.onerror = () => reject(new Error('FileReader error'));
+                    reader.readAsDataURL(blob);
+                });
+                const saved = window.AndroidWidgetBridge.saveBase64File(filename, blob.type || 'image/jpeg', base64Data);
+                if (saved) {
+                    window.HapticsModule?.light?.();
+                    window.showNotification?.(`Foto guardada en tu galería (${filename}).`, 'success');
+                    return { filename, size: blob.size, type: blob.type };
+                }
+            } catch (_) {}
+        }
+
         const objectUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = objectUrl;
@@ -1021,9 +1040,27 @@ window.NotesModule = (() => {
                 btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400', 'text-slate-700', 'dark:text-slate-200');
                 btn.setAttribute('aria-pressed', 'true');
                 currentFilter = btn.dataset.noteFilter;
+                syncNoteFilterIndicator();
                 render();
             };
         });
+
+        const noteTypeSelect = document.getElementById('note-type');
+        const noteTypeGroup = document.getElementById('note-type-segmented');
+        if (noteTypeGroup) {
+            noteTypeGroup.querySelectorAll('[data-note-type]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    window.HapticsModule?.light?.();
+                    syncNoteTypeSegmented(btn.dataset.noteType);
+                });
+            });
+        }
+        if (noteTypeSelect) {
+            noteTypeSelect.addEventListener('change', () => {
+                syncNoteTypeSegmented(noteTypeSelect.value);
+            });
+        }
+        window.addEventListener('resize', () => syncNoteFilterIndicator(true), { passive: true });
 
         // Toggle del checkbox de recordatorio en el modal
         const reminderCheckbox = document.getElementById('note-has-reminder');
@@ -1107,9 +1144,50 @@ window.NotesModule = (() => {
         // Seleccionar tipo por defecto
         const typeSelect = document.getElementById('note-type');
         if (typeSelect) typeSelect.value = 'apunte';
+        syncNoteTypeSegmented('apunte');
         renderModalPhotosList(null);
 
         openModal();
+    }
+
+    function syncNoteTypeSegmented(typeVal) {
+        const valid = ['apunte', 'idea', 'pendiente', 'importante', 'personal'];
+        const val = valid.includes(typeVal) ? typeVal : 'apunte';
+        const select = document.getElementById('note-type');
+        if (select && select.value !== val) {
+            select.value = val;
+        }
+        const group = document.getElementById('note-type-segmented');
+        if (group) {
+            group.querySelectorAll('[data-note-type]').forEach(btn => {
+                const active = btn.dataset.noteType === val;
+                btn.classList.toggle('seg-btn-active', active);
+                btn.classList.toggle('seg-btn-inactive', !active);
+                btn.setAttribute('aria-checked', active ? 'true' : 'false');
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            window.SegmentedControl?.sync?.(group);
+        }
+    }
+
+    function syncNoteFilterIndicator(instant = false) {
+        const scroller = document.getElementById('notes-filter-scroll') || document.querySelector('.notes-filter-scroll');
+        const ind = document.getElementById('notes-filter-indicator');
+        if (!scroller || !ind) return;
+        const activeBtn = scroller.querySelector('.note-filter-chip.note-filter-active') || scroller.querySelector('[data-note-filter]');
+        if (!activeBtn || activeBtn.offsetWidth <= 0) {
+            ind.style.opacity = '0';
+            return;
+        }
+        if (instant) ind.classList.add('is-instant');
+        ind.style.width = `${activeBtn.offsetWidth}px`;
+        ind.style.height = `${activeBtn.offsetHeight}px`;
+        ind.style.transform = `translate3d(${activeBtn.offsetLeft}px, ${activeBtn.offsetTop}px, 0)`;
+        ind.style.opacity = '1';
+        window.applyLiquidGlass?.(ind, { variant: 'chip-indicator', shape: 'pill' });
+        if (instant) {
+            requestAnimationFrame(() => ind.classList.remove('is-instant'));
+        }
     }
 
     function openEditModal(id) {
@@ -1141,6 +1219,7 @@ window.NotesModule = (() => {
         document.getElementById('note-title').value = note.title;
         document.getElementById('note-content').value = note.content || '';
         document.getElementById('note-type').value = note.type || 'apunte';
+        syncNoteTypeSegmented(note.type || 'apunte');
 
         const reminderCheckbox = document.getElementById('note-has-reminder');
         const reminderContainer = document.getElementById('note-reminder-datetime-container');
@@ -1378,6 +1457,7 @@ window.NotesModule = (() => {
 
         if (!container || !Storage) return;
 
+        syncNoteFilterIndicator(true);
         renderGallery();
         refreshPhotoNoteSelect();
         const longPress = typeof Storage.isLongPressEnabled === 'function' ? Storage.isLongPressEnabled() : true;
@@ -1619,6 +1699,7 @@ window.NotesModule = (() => {
         deleteLockedNote: deleteLockedNoteById,
         renderGallery,
         switchNotesTab,
+        syncNoteFilterIndicator,
         openPhotoPreview,
         closePhotoPreview,
         setViewerZoom,

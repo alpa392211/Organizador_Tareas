@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colores base de UI y fondo (Modo Oscuro automático del sistema Android) -->
+    <color name="widget_background">#0F172A</color>
+    <color name="widget_surface">#1E293B</color>
+    <color name="widget_card_inner">#1E293B</color>
+    <color name="widget_card_border">#334155</color>
+
+    <!-- Celdas y resumen del Widget Calendario (Modo Oscuro) -->
+    <color name="widget_day_cell_bg">#1E293B</color>
+    <color name="widget_day_cell_border">#334155</color>
+    <color name="widget_day_active_bg">#2E2A6E</color>
+    <color name="widget_day_active_border">#6366F1</color>
+    <color name="widget_today_bg">#6366F1</color>
+    <color name="widget_summary_bg">#1E1B4B</color>
+    <color name="widget_summary_border">#4338CA</color>
+    <color name="widget_summary_text">#E0E7FF</color>
+
+    <!-- Colores de texto (Alto contraste sobre fondo oscuro) -->
+    <color name="widget_text_primary">#F8FAFC</color>
+    <color name="widget_text_secondary">#CBD5E1</color>
+    <color name="widget_text_muted">#94A3B8</color>
+    <color name="widget_text_white">#FFFFFF</color>
+
+    <!-- Marca y acentos adaptados a modo oscuro -->
+    <color name="unam_primary">#A5B4FC</color>
+    <color name="brand_primary">#6366F1</color>
+    <color name="brand_teal">#14B8A6</color>
+    <color name="brand_emerald">#10B981</color>
+
+    <!-- Urgencias y puntos de actividad de alta visibilidad en oscuro -->
+    <color name="urgency_high">#FB7185</color>
+    <color name="urgency_medium">#FBBF24</color>
+    <color name="urgency_low">#34D399</color>
+    <color name="dot_class">#818CF8</color>
+    <color name="dot_task">#FB7185</color>
+    <color name="dot_reminder">#FBBF24</color>
+</resources>

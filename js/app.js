@@ -8,6 +8,139 @@
  */
 
 (() => {
+    const DIAG_STORAGE_KEY = 'org_escolar_diag_log_v1';
+    const DIAG_MAX_ENTRIES = 20;
+
+    const DiagnosticsModule = (() => {
+        let memoryLog = [];
+        try {
+            const raw = localStorage.getItem(DIAG_STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    memoryLog = parsed.slice(-DIAG_MAX_ENTRIES);
+                }
+            }
+        } catch (_) {
+            memoryLog = [];
+        }
+
+        function getVersion() {
+            return window.StorageModule?.APP_VERSION || '1.5.9';
+        }
+
+        function persist() {
+            try {
+                localStorage.setItem(DIAG_STORAGE_KEY, JSON.stringify(memoryLog));
+            } catch (_) {}
+        }
+
+        function record(step, err) {
+            const entry = {
+                step: String(step || 'desconocido'),
+                message: (err && err.message) ? String(err.message) : String(err || 'Error desconocido'),
+                stack: (err && err.stack) ? String(err.stack).split('\n').slice(0, 4).join(' | ') : '',
+                timestamp: new Date().toISOString(),
+                version: getVersion(),
+                userAgent: (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : 'unknown'
+            };
+            memoryLog.push(entry);
+            if (memoryLog.length > DIAG_MAX_ENTRIES) {
+                memoryLog = memoryLog.slice(-DIAG_MAX_ENTRIES);
+            }
+            persist();
+            return entry;
+        }
+
+        function getEntries() {
+            return memoryLog.slice();
+        }
+
+        function clear() {
+            memoryLog = [];
+            try {
+                localStorage.removeItem(DIAG_STORAGE_KEY);
+            } catch (_) {}
+        }
+
+        function buildReport() {
+            const entries = getEntries();
+            const header = [
+                '=== Informe de Diagnóstico — Organizador Escolar Pro ===',
+                `Versión: ${getVersion()}`,
+                `Fecha: ${new Date().toISOString()}`,
+                `Navegador: ${(typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : 'unknown'}`,
+                `Pantalla: ${window.innerWidth || 0}x${window.innerHeight || 0} (dpr ${window.devicePixelRatio || 1})`,
+                `Errores registrados (${entries.length}/${DIAG_MAX_ENTRIES}):`
+            ];
+            if (entries.length === 0) {
+                header.push('  (Sin errores registrados)');
+            } else {
+                entries.forEach((item, idx) => {
+                    header.push(`  #${idx + 1} [${item.timestamp}] paso="${item.step}" msg="${item.message}"`);
+                });
+            }
+            return header.join('\n');
+        }
+
+        async function copyReport() {
+            const report = buildReport();
+            try {
+                if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                    await navigator.clipboard.writeText(report);
+                    return { copied: true, report };
+                }
+            } catch (_) {}
+
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = report;
+                ta.setAttribute('readonly', '');
+                ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+                document.body.appendChild(ta);
+                ta.select();
+                ta.setSelectionRange(0, report.length);
+                const ok = Boolean(document.execCommand && document.execCommand('copy'));
+                ta.remove();
+                if (ok) return { copied: true, report };
+            } catch (_) {}
+
+            return { copied: false, report };
+        }
+
+        if (typeof window !== 'undefined' && !window.__diagListenersBound) {
+            window.__diagListenersBound = true;
+            window.addEventListener('error', (event) => {
+                record('window.error', event?.error || event?.message || 'Error global');
+            });
+            window.addEventListener('unhandledrejection', (event) => {
+                record('window.unhandledrejection', event?.reason || 'Promesa rechazada');
+            });
+        }
+
+        return { record, getEntries, clear, buildReport, copyReport };
+    })();
+
+    window.DiagnosticsModule = DiagnosticsModule;
+
+    function safeStep(nombre, fn) {
+        try {
+            const res = fn();
+            if (res && typeof res.then === 'function') {
+                return res.catch((err) => {
+                    DiagnosticsModule.record(nombre, err);
+                    console.error(`[safeStep:${nombre}] Error asíncrono:`, err);
+                    return undefined;
+                });
+            }
+            return res;
+        } catch (err) {
+            DiagnosticsModule.record(nombre, err);
+            console.error(`[safeStep:${nombre}] Error:`, err);
+            return undefined;
+        }
+    }
+
     const VAULT_CATALOG = {
         'APOLLO11': {
             id: 'APOLLO11',
@@ -275,150 +408,177 @@
         }
 
         init() {
-            const Storage = window.StorageModule;
-            const SubjectsModule = window.SubjectsModule;
-            const TasksModule = window.TasksModule;
-            const CalendarModule = window.CalendarModule;
-            const NotesModule = window.NotesModule;
-            const ArchiveModule = window.ArchiveModule;
-            const HapticsModule = window.HapticsModule;
-            const NotificationsModule = window.NotificationsModule;
-            const WidgetSyncModule = window.WidgetSyncModule;
-
-            // 1. Limpieza de claves heredadas e inicialización en localStorage
-            Storage.cleanupLegacyKeys?.();
-            Storage.initIfFirstTime();
-
-            // Depuración de archivados de 60 días y auto-archivo de tareas de 30 días
-            Storage.runArchivePurge?.();
-            Storage.checkAutoArchiveTasks?.();
-
-            // 2. Inicializar sistema háptico y notificaciones locales enriquecidas
-            HapticsModule?.bindGlobalInteractions?.();
-            NotificationsModule?.init?.();
-
-            // 3. Inicializar y aplicar modo oscuro / claro y visibilidad del botón de tema
-            this.initTheme();
-            this.applyHeaderThemeBtnVisibility();
-            this.applySecretFeaturesUI();
-            this.applySpecialThemeFromStorage();
-            this.updateApolloRockets();
-
-            // 4. Inicializar y aplicar tipografía e intensidad de efectos de transparencia avanzados
-            this.initFontFamily();
-            this.initGlassIntensity();
-            window.BackgroundsModule?.init?.();
-
-            // Permitir orientación libre (desbloquear si existía un bloqueo previo en la PWA)
             try {
-                if (window.screen?.orientation?.unlock) {
-                    window.screen.orientation.unlock();
-                }
-            } catch (e) {}
+                const Storage = window.StorageModule;
+                const SubjectsModule = window.SubjectsModule;
+                const TasksModule = window.TasksModule;
+                const CalendarModule = window.CalendarModule;
+                const NotesModule = window.NotesModule;
+                const ArchiveModule = window.ArchiveModule;
+                const HapticsModule = window.HapticsModule;
+                const NotificationsModule = window.NotificationsModule;
+                const WidgetSyncModule = window.WidgetSyncModule;
 
-            // 5. Inicializar submódulos
-            SubjectsModule?.init?.();
-            TasksModule?.init?.();
-            NotesModule?.init?.();
-            CalendarModule?.init?.();
-            ArchiveModule?.init?.();
-            WidgetSyncModule?.init?.();
+                // 1. Limpieza de claves heredadas e inicialización en localStorage
+                safeStep('storage.cleanupLegacyKeys', () => Storage?.cleanupLegacyKeys?.());
+                safeStep('storage.initIfFirstTime', () => Storage?.initIfFirstTime?.());
 
-            // 6. Configurar navegación, drawer, botón principal de atajo, modales y confirmación de salida
-            this.setupNavigation();
-            this.setupSidebarDrawer();
-            this.setupBottomActionButton();
-            this.setupModalsAndShortcuts();
-            this.setupMobileBottomSheets();
-            this.setupCycleWelcomeModal();
-            this.setupExitModal();
-            this.setupSettingsView();
-            this.setupSecretVault();
-            this.initPwa();
+                // Depuración de archivados de 60 días y auto-archivo de tareas de 30 días
+                safeStep('storage.runArchivePurge', () => Storage?.runArchivePurge?.());
+                safeStep('storage.checkAutoArchiveTasks', () => Storage?.checkAutoArchiveTasks?.());
 
-            // 7. Sincronizar UI inicial de perfil y periodo
-            this.syncPeriodUI();
+                // 2. Inicializar sistema háptico y notificaciones locales enriquecidas
+                safeStep('haptics.bindGlobalInteractions', () => HapticsModule?.bindGlobalInteractions?.());
+                safeStep('notifications.init', () => NotificationsModule?.init?.());
 
-            // 8. Exponer funciones globales para interacción fluida entre módulos
-            window.onDataChanged = () => this.refreshAll();
-            window.showNotification = (msg, type) => this.showToast(msg, type);
-            window.navigateToSubjects = () => this.switchView('subjects');
-            window.navigateToTasks = () => this.switchView('tasks');
-            window.navigateToNotes = () => this.switchView('notes');
-            window.navigateToCalendar = () => this.switchView('calendar');
-            window.navigateToArchive = () => this.switchView('archive');
-            window.navigateToSettings = () => this.switchView('settings');
-            window.promptPwaInstall = () => this.promptPwaInstall();
-            window.navigateToTasksWithSubject = (subjectId) => {
-                this.switchView('tasks');
-                if (window.TasksModule) {
-                    window.TasksModule.subjectFilter = subjectId;
-                    const select = document.getElementById('task-subject-filter');
-                    if (select) select.value = subjectId;
-                    window.TasksModule.render();
-                }
-            };
+                // 3. Inicializar y aplicar modo oscuro / claro y visibilidad del botón de tema
+                safeStep('app.initTheme', () => this.initTheme());
+                safeStep('app.applyHeaderThemeBtnVisibility', () => this.applyHeaderThemeBtnVisibility());
+                safeStep('app.applySecretFeaturesUI', () => this.applySecretFeaturesUI());
+                safeStep('app.applySpecialThemeFromStorage', () => this.applySpecialThemeFromStorage());
+                safeStep('app.updateApolloRockets', () => this.updateApolloRockets());
 
-            // 9. Atender posibles accesos directos desde Widgets de Android
-            WidgetSyncModule?.handleIntent?.({
-                TasksModule,
-                NotesModule,
-                CalendarModule,
-                ArchiveModule,
-                switchView: (v) => this.switchView(v)
-            });
+                // 4. Inicializar y aplicar tipografía e intensidad de efectos de transparencia avanzados
+                safeStep('app.initFontFamily', () => this.initFontFamily());
+                safeStep('app.initGlassIntensity', () => this.initGlassIntensity());
+                safeStep('liquidGlass.init', () => window.LiquidGlassModule?.init?.());
+                safeStep('backgrounds.init', () => window.BackgroundsModule?.init?.());
 
-            // 10. Soporte para parámetros URL (Widgets de Android y Deep Linking)
-            const urlParams = new URLSearchParams(window.location.search);
-            const initialView = urlParams.get('view');
-            if (initialView && ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'].includes(initialView)) {
-                this.switchView(initialView);
-            }
-            if (urlParams.get('openDrawer') === '1') {
-                setTimeout(() => document.getElementById('drawer-toggle-btn')?.click(), 50);
-            }
-            if (urlParams.get('openExit') === '1') {
-                setTimeout(() => document.getElementById('app-exit-btn')?.click(), 50);
-            }
+                // Permitir orientación libre (desbloquear si existía un bloqueo previo en la PWA)
+                safeStep('screen.orientation.unlock', () => {
+                    if (window.screen?.orientation?.unlock) {
+                        window.screen.orientation.unlock();
+                    }
+                });
 
-            // 11. Renderizado inicial completo
-            this.refreshAll();
-            this.updateVaultProgressCard?.();
-            requestAnimationFrame(() => this.updateNavIndicators?.(this.currentView));
+                // 5. Inicializar submódulos
+                safeStep('subjects.init', () => SubjectsModule?.init?.());
+                safeStep('tasks.init', () => TasksModule?.init?.());
+                safeStep('notes.init', () => NotesModule?.init?.());
+                safeStep('calendar.init', () => CalendarModule?.init?.());
+                safeStep('archive.init', () => ArchiveModule?.init?.());
+                safeStep('widgetSync.init', () => WidgetSyncModule?.init?.());
 
-            // 12. Flujo de inicio de presentación (Presentation-First Flow Ordering)
-            // Si el onboarding NO se ha completado: NO solicitar notificaciones ni mostrar changelog; abrir bienvenida primero
-            if (!Storage.isOnboardingCompleted?.() || !Storage.isCycleConfigured?.()) {
-                this.openCycleWelcomeModal?.();
-            } else {
-                // Si el onboarding YA está completado:
-                if (window.NotificationsModule?.requestPermission) {
-                    window.NotificationsModule.requestPermission().catch(() => {});
-                }
+                // 6. Configurar navegación, drawer, botón principal de atajo, modales y confirmación de salida
+                safeStep('app.setupNavigation', () => this.setupNavigation());
+                safeStep('app.setupSidebarDrawer', () => this.setupSidebarDrawer());
+                safeStep('app.setupBottomActionButton', () => this.setupBottomActionButton());
+                safeStep('app.setupModalsAndShortcuts', () => this.setupModalsAndShortcuts());
+                safeStep('app.setupMobileBottomSheets', () => this.setupMobileBottomSheets());
+                safeStep('app.setupCycleWelcomeModal', () => this.setupCycleWelcomeModal());
+                safeStep('app.setupExitModal', () => this.setupExitModal());
+                safeStep('app.setupSettingsView', () => this.setupSettingsView());
+                safeStep('app.setupSecretVault', () => this.setupSecretVault());
+                safeStep('app.initPwa', () => this.initPwa());
 
-                // Comprobar changelog de versión 1.5.7
-                const lastSeenVersion = Storage.getLastSeenVersion?.();
-                if (lastSeenVersion !== '1.5.7') {
-                    setTimeout(() => {
-                        this.openChangelogModal?.();
-                    }, 600);
-                }
+                // 7. Sincronizar UI inicial de perfil y periodo
+                safeStep('app.syncPeriodUI', () => this.syncPeriodUI());
+
+                // 8. Exponer funciones globales para interacción fluida entre módulos
+                safeStep('app.bindGlobals', () => {
+                    window.onDataChanged = () => this.refreshAll();
+                    window.showNotification = (msg, type) => this.showToast(msg, type);
+                    window.navigateToSubjects = () => this.switchView('subjects');
+                    window.navigateToTasks = () => this.switchView('tasks');
+                    window.navigateToNotes = () => this.switchView('notes');
+                    window.navigateToCalendar = () => this.switchView('calendar');
+                    window.navigateToArchive = () => this.switchView('archive');
+                    window.navigateToSettings = () => this.switchView('settings');
+                    window.promptPwaInstall = () => this.promptPwaInstall();
+                    window.navigateToTasksWithSubject = (subjectId) => {
+                        this.switchView('tasks');
+                        if (window.TasksModule) {
+                            window.TasksModule.subjectFilter = subjectId;
+                            const select = document.getElementById('task-subject-filter');
+                            if (select) select.value = subjectId;
+                            window.TasksModule.render();
+                        }
+                    };
+                });
+
+                // 9. Atender posibles accesos directos desde Widgets de Android
+                safeStep('widgetSync.handleIntent', () => WidgetSyncModule?.handleIntent?.({
+                    TasksModule,
+                    NotesModule,
+                    CalendarModule,
+                    ArchiveModule,
+                    switchView: (v) => this.switchView(v)
+                }));
+
+                // 10. Soporte para parámetros URL (Widgets de Android y Deep Linking)
+                safeStep('app.handleUrlParams', () => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const initialView = urlParams.get('view');
+                    if (initialView && ['subjects', 'tasks', 'notes', 'calendar', 'archive', 'settings', 'secret-codes'].includes(initialView)) {
+                        this.switchView(initialView);
+                    }
+                    if (urlParams.get('openDrawer') === '1') {
+                        setTimeout(() => document.getElementById('drawer-toggle-btn')?.click(), 50);
+                    }
+                    if (urlParams.get('openExit') === '1') {
+                        setTimeout(() => document.getElementById('app-exit-btn')?.click(), 50);
+                    }
+                });
+
+                // 11. Renderizado inicial completo
+                safeStep('app.refreshAll', () => this.refreshAll());
+                safeStep('app.updateVaultProgressCard', () => this.updateVaultProgressCard?.());
+                safeStep('app.updateNavIndicators', () => requestAnimationFrame(() => this.updateNavIndicators?.(this.currentView)));
+
+                // 12. Flujo de inicio de presentación (Presentation-First Flow Ordering)
+                // Si el onboarding NO se ha completado: NO solicitar notificaciones ni mostrar changelog; abrir bienvenida primero
+                safeStep('app.presentationFlow', () => {
+                    if (!Storage?.isOnboardingCompleted?.() || !Storage?.isCycleConfigured?.()) {
+                        this.openCycleWelcomeModal?.();
+                    } else {
+                        if (window.NotificationsModule?.requestPermission) {
+                            window.NotificationsModule.requestPermission().catch(() => {});
+                        }
+
+                        const lastSeenVersion = Storage.getLastSeenVersion?.();
+                        if (lastSeenVersion !== '1.5.9') {
+                            clearTimeout(this._changelogTimer);
+                            this._changelogTimer = setTimeout(() => {
+                                this.openChangelogModal?.();
+                            }, 600);
+                        } else {
+                            this.initApkDownloadBanner?.();
+                        }
+                    }
+                });
+                safeStep('app.initApkBanner', () => {
+                    if (this.isNativeAndroidApp()) {
+                        this.hideApkDownloadEntries();
+                    }
+                });
+            } finally {
+                try {
+                    window.__hideAppSplash?.();
+                } catch (_) {}
+                try {
+                    const splashEl = document.getElementById('app-splash-screen');
+                    if (splashEl) {
+                        splashEl.style.display = 'none';
+                        splashEl.setAttribute('aria-hidden', 'true');
+                    }
+                    window.__appInitDone = true;
+                } catch (_) {}
             }
         }
 
         refreshAll() {
-            this.renderHeader();
-            this.renderDrawer();
-            this.syncPeriodUI();
-            this.refreshSettingsProfileUI?.();
-            window.SubjectsModule?.render?.();
-            window.TasksModule?.render?.();
-            window.NotesModule?.render?.();
-            window.ArchiveModule?.render?.();
-            this.updateHeaderStats();
-            this.updateCycleBadges();
-            this.updateStorageMetrics();
-            window.WidgetSyncModule?.sync?.();
+            safeStep('refresh.renderHeader', () => this.renderHeader());
+            safeStep('refresh.renderDrawer', () => this.renderDrawer());
+            safeStep('refresh.syncPeriodUI', () => this.syncPeriodUI());
+            safeStep('refresh.settingsProfile', () => this.refreshSettingsProfileUI?.());
+            safeStep('refresh.subjects', () => window.SubjectsModule?.render?.());
+            safeStep('refresh.tasks', () => window.TasksModule?.render?.());
+            safeStep('refresh.notes', () => window.NotesModule?.render?.());
+            safeStep('refresh.archive', () => window.ArchiveModule?.render?.());
+            safeStep('refresh.headerStats', () => this.updateHeaderStats());
+            safeStep('refresh.cycleBadges', () => this.updateCycleBadges());
+            safeStep('refresh.storageMetrics', () => this.updateStorageMetrics());
+            safeStep('refresh.widgetSync', () => window.WidgetSyncModule?.sync?.());
         }
 
         renderHeader() {
@@ -617,6 +777,9 @@
             if (group) {
                 window.SegmentedControl?.sync?.(group);
             }
+            try {
+                window.LiquidGlassModule?.setIntensity?.(normalized);
+            } catch (_) {}
         }
 
         syncSettingsFontButtons() {
@@ -790,12 +953,18 @@
 
             // Escuchar cambios automáticos del sistema si el usuario no ha fijado una preferencia manual
             if (window.matchMedia) {
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                const darkMql = window.matchMedia('(prefers-color-scheme: dark)');
+                const onSchemeChange = (e) => {
                     const currentSaved = Storage.getTheme();
                     if (!currentSaved) {
                         this.applyTheme(e.matches ? 'dark' : 'light', false);
                     }
-                });
+                };
+                if (typeof darkMql.addEventListener === 'function') {
+                    darkMql.addEventListener('change', onSchemeChange);
+                } else if (typeof darkMql.addListener === 'function') {
+                    darkMql.addListener(onSchemeChange);
+                }
             }
 
             // Botón de cambio rápido en el Header
@@ -831,17 +1000,35 @@
             // Si hay un tema especial activo (salvo modo monocromático) o un fondo temático oscuro, se fuerza modo oscuro
             const effectiveTheme = this.isDarkModeForced() ? 'dark' : theme;
             const isDark = effectiveTheme === 'dark';
+            const root = document.documentElement;
+            const wasDark = root.classList.contains('dark');
 
-            // Alternar clase dark en la etiqueta raíz <html> para Tailwind
-            document.documentElement.classList.toggle('dark', isDark);
+            if (wasDark !== isDark) {
+                // Congelar transiciones CSS por 1 frame para evitar lag de 200+ nodos con backdrop-filter
+                root.classList.add('theme-switching');
+                root.classList.toggle('dark', isDark);
+                void root.offsetWidth;
+                clearTimeout(this._themeSwitchTimer);
+                this._themeSwitchTimer = setTimeout(() => {
+                    root.classList.remove('theme-switching');
+                }, 40);
+            } else {
+                root.classList.toggle('dark', isDark);
+            }
 
             if (save) {
                 Storage.setTheme(effectiveTheme);
             }
 
+            // Sincronizar color de barra de estado/navegación en APK Android
+            try {
+                window.AndroidWidgetBridge?.setSystemBarsTheme?.(isDark);
+            } catch (_) {}
+
             this.updateThemeUI(effectiveTheme, !Storage.getTheme());
             this.setupBottomActionButton();
-            if (window.CalendarModule?.render) {
+            const calModal = document.getElementById('calendar-modal');
+            if (calModal && !calModal.classList.contains('hidden') && window.CalendarModule?.render) {
                 window.CalendarModule.render();
             }
             window.BackgroundsModule?.applyBackground?.();
@@ -945,21 +1132,23 @@
                 }
             }
 
-            const activeBtnClass = 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20';
-            const inactiveBtnClass = 'border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700';
-
             const updateBtn = (btn, isActive) => {
                 if (!btn) return;
-                if (isActive) {
-                    btn.className = `tap-effect p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${activeBtnClass}`;
-                } else {
-                    btn.className = `tap-effect p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${inactiveBtnClass}${isLockedToDark && btn === lightBtn ? ' opacity-40 cursor-not-allowed' : ''}`;
-                }
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                btn.classList.toggle('seg-btn-active', isActive);
+                btn.classList.toggle('seg-btn-inactive', !isActive);
+                const disabledCls = (isLockedToDark && btn === lightBtn) ? ' opacity-40 cursor-not-allowed' : '';
+                btn.className = `touch-target-44 min-h-[44px] tap-effect px-3 py-2 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all ${isActive ? 'seg-btn-active' : 'seg-btn-inactive'}${disabledCls}`;
             };
 
             updateBtn(lightBtn, !isAuto && !isDark && !isLockedToDark);
             updateBtn(darkBtn, (!isAuto && isDark) || isLockedToDark);
             updateBtn(autoBtn, isAuto && !isLockedToDark);
+
+            const modeTrack = document.getElementById('settings-theme-mode-track');
+            if (modeTrack) {
+                window.SegmentedControl?.sync?.(modeTrack);
+            }
         }
 
         applyGrayMode(enabled) {
@@ -1115,6 +1304,36 @@
                 document.fonts?.ready?.then(() => {
                     requestAnimationFrame(() => this.updateNavIndicators(this.currentView));
                 });
+
+                const railToggleBtn = document.getElementById('tablet-rail-toggle-btn');
+                const railNav = document.getElementById('tablet-rail-nav');
+                if (railToggleBtn && railNav) {
+                    const setRailExpanded = (open) => {
+                        railNav.classList.toggle('tablet-rail-collapsed', !open);
+                        railNav.setAttribute('aria-hidden', open ? 'false' : 'true');
+                        railToggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                        if (open) {
+                            window.applyLiquidGlass?.(railNav, { variant: 'rail', shape: 'pill' });
+                        }
+                    };
+                    this.closeTabletRailNav = () => setRailExpanded(false);
+                    railToggleBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        window.HapticsModule?.light?.();
+                        const next = railNav.classList.contains('tablet-rail-collapsed');
+                        setRailExpanded(next);
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!railNav.classList.contains('tablet-rail-collapsed') && !e.target.closest?.('#tablet-quick-rail')) {
+                            setRailExpanded(false);
+                        }
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && !railNav.classList.contains('tablet-rail-collapsed')) {
+                            setRailExpanded(false);
+                        }
+                    });
+                }
             }
 
             requestAnimationFrame(() => this.updateNavIndicators(this.currentView));
@@ -1149,6 +1368,7 @@
                 indicator.style.height = `${height}px`;
                 indicator.style.transform = `translate3d(${activeBtn.offsetLeft}px, ${activeBtn.offsetTop}px, 0)`;
                 indicator.style.opacity = '1';
+                window.applyLiquidGlass?.(indicator, { variant: 'nav-indicator', shape: 'pill' });
             };
 
             const desktopNav = document.getElementById('desktop-nav-pill');
@@ -1170,6 +1390,7 @@
             this.currentView = viewName;
             window.HapticsModule?.light();
             window.CardContextMenu?.close?.();
+            this.closeTabletRailNav?.();
             // v1.4.4: al cambiar de vista, todos los submenús de ajustes se cierran automáticamente.
             this.closeAllSettingsSubmenus();
 
@@ -1225,6 +1446,9 @@
             window.SegmentedControl?.syncAll?.({ instant: true });
             requestAnimationFrame(() => {
                 this.updateNavIndicators(viewName);
+                if (viewName === 'notes') {
+                    window.NotesModule?.syncNoteFilterIndicator?.(true);
+                }
                 window.SegmentedControl?.syncAll?.({ instant: true });
             });
 
@@ -1289,66 +1513,80 @@
 
         setupBottomActionButton() {
             const Storage = window.StorageModule;
-            const mainBtn = document.getElementById('bottom-main-action-btn');
-            const circle = document.getElementById('bottom-main-circle');
-            const icon = document.getElementById('bottom-main-icon');
-            const label = document.getElementById('bottom-main-label');
-
-            if (!mainBtn || !circle || !icon || !label) return;
-
             const action = Storage.getBottomAction();
             const isGray = Storage.getGrayModeEnabled?.();
-            const isDark = document.documentElement.classList.contains('dark');
-
-            // Limpiar estilos en línea para permitir el acabado translúcido y resplandor
-            circle.style.removeProperty('background');
-            circle.style.removeProperty('border');
-            circle.style.removeProperty('box-shadow');
 
             const labelColorClass = isGray
                 ? 'text-slate-600 dark:text-slate-300'
                 : (action === 'notes' ? 'text-amber-600 dark:text-amber-400' : (action === 'calendar' ? 'text-indigo-600 dark:text-indigo-400' : 'text-teal-600 dark:text-teal-400'));
 
-            if (action === 'notes') {
-                circle.className = 'w-14 h-14 rounded-full btn-gradient-note text-white flex items-center justify-center transition-all opacity-100';
-                label.className = `text-[10px] font-extrabold ${labelColorClass} mt-1 truncate max-w-[80px]`;
-                icon.innerHTML = `
+            const cfg = action === 'notes' ? {
+                circleClass: 'w-14 h-14 rounded-full btn-gradient-note text-white flex items-center justify-center transition-all opacity-100',
+                iconHtml: `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
-                `;
-                label.textContent = '+ Nota';
-                mainBtn.onclick = () => {
+                `,
+                labelText: '+ Nota',
+                onClick: () => {
                     window.HapticsModule?.medium();
                     window.NotesModule?.openAddModal?.();
-                };
-            } else if (action === 'calendar') {
-                circle.className = 'w-14 h-14 rounded-full btn-gradient-subject text-white flex items-center justify-center transition-all opacity-100';
-                label.className = `text-[10px] font-extrabold ${labelColorClass} mt-1 truncate max-w-[80px]`;
-                icon.innerHTML = `
+                }
+            } : action === 'calendar' ? {
+                circleClass: 'w-14 h-14 rounded-full btn-gradient-subject text-white flex items-center justify-center transition-all opacity-100',
+                iconHtml: `
                     <svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                `;
-                label.textContent = 'Calendario';
-                mainBtn.onclick = () => {
+                `,
+                labelText: 'Calendario',
+                onClick: () => {
                     window.HapticsModule?.medium();
                     window.CalendarModule?.openModal?.();
-                };
-            } else {
-                circle.className = 'w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center transition-all opacity-100';
-                label.className = `text-[10px] font-extrabold ${labelColorClass} mt-1 truncate max-w-[80px]`;
-                icon.innerHTML = `
+                }
+            } : {
+                circleClass: 'w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center transition-all opacity-100',
+                iconHtml: `
                     <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
-                `;
-                label.textContent = '+ Tarea';
-                mainBtn.onclick = () => {
+                `,
+                labelText: '+ Tarea',
+                onClick: () => {
                     window.HapticsModule?.medium();
                     window.TasksModule?.openAddModal?.();
-                };
-            }
+                }
+            };
+
+            const targets = [
+                {
+                    btn: document.getElementById('bottom-main-action-btn'),
+                    circle: document.getElementById('bottom-main-circle'),
+                    icon: document.getElementById('bottom-main-icon'),
+                    label: document.getElementById('bottom-main-label'),
+                    baseLabelClass: 'text-[10px] font-extrabold mt-1 truncate max-w-[80px]'
+                },
+                {
+                    btn: document.getElementById('tablet-main-action-btn'),
+                    circle: document.getElementById('tablet-main-circle'),
+                    icon: document.getElementById('tablet-main-icon'),
+                    label: document.getElementById('tablet-main-label'),
+                    baseLabelClass: 'tablet-main-label text-[10px] font-extrabold mt-1 px-2 py-0.5 rounded-full truncate max-w-[84px]'
+                }
+            ];
+
+            targets.forEach(({ btn, circle, icon, label, baseLabelClass }) => {
+                if (!btn || !circle || !icon || !label) return;
+                circle.style.removeProperty('background');
+                circle.style.removeProperty('border');
+                circle.style.removeProperty('box-shadow');
+                circle.className = cfg.circleClass;
+                label.className = `${baseLabelClass} ${labelColorClass}`;
+                icon.innerHTML = cfg.iconHtml;
+                label.textContent = cfg.labelText;
+                btn.onclick = cfg.onClick;
+                window.applyLiquidGlass?.(circle, { variant: 'fab', shape: 'circle' });
+            });
 
             this.updateApolloRockets?.();
         }
@@ -1698,6 +1936,22 @@
             }
         }
 
+        cancelPendingOnboardingTimers() {
+            if (this._celebrationTimer) {
+                clearTimeout(this._celebrationTimer);
+                this._celebrationTimer = null;
+            }
+            if (this._changelogTimer) {
+                clearTimeout(this._changelogTimer);
+                this._changelogTimer = null;
+            }
+            if (this._welcomeCloseTimer) {
+                clearTimeout(this._welcomeCloseTimer);
+                this._welcomeCloseTimer = null;
+            }
+            this.isOnboardingSubmitting = false;
+        }
+
         /* ========================================================
            MODAL DE BIENVENIDA / CONFIGURACIÓN OBLIGATORIA DEL CICLO
            ======================================================== */
@@ -1718,12 +1972,87 @@
             const celebrationContainer = document.getElementById('onboarding-celebration-container');
             const progressBar = document.getElementById('onboarding-progress-bar');
             const celebrationMsg = document.getElementById('onboarding-celebration-msg');
+            const step1El = document.getElementById('welcome-step-1');
+            const step2El = document.getElementById('welcome-step-2');
+            const stepNextBtn = document.getElementById('welcome-step-next-btn');
+            const stepBackBtn = document.getElementById('welcome-step-back-btn');
+            const stepProgressFill = document.getElementById('welcome-step-progress-fill');
+            const stepPills = [1, 2, 3].map(n => document.getElementById(`welcome-pill-${n}`));
 
             const Storage = window.StorageModule;
 
             if (!modal) return;
 
             let currentAccountType = Storage?.getAccountType?.() || 'organizer';
+            let currentWelcomeStep = 1;
+
+            const setWelcomeStep = (step) => {
+                const target = step === 2 ? 2 : (step === 3 ? 3 : 1);
+                currentWelcomeStep = target;
+                const widths = { 1: '33.33%', 2: '66.66%', 3: '100%' };
+                if (stepProgressFill) {
+                    stepProgressFill.style.width = widths[target];
+                }
+                stepPills.forEach((pill, idx) => {
+                    if (!pill) return;
+                    const stepNum = idx + 1;
+                    pill.classList.toggle('is-active', stepNum === target);
+                    pill.classList.toggle('is-done', stepNum < target);
+                });
+
+                if (target === 3) {
+                    if (form) form.classList.add('hidden');
+                    if (celebrationContainer) celebrationContainer.classList.remove('hidden');
+                    return;
+                }
+
+                if (form) form.classList.remove('hidden');
+                if (celebrationContainer) celebrationContainer.classList.add('hidden');
+
+                const showPanel = (el, visible) => {
+                    if (!el) return;
+                    el.classList.toggle('welcome-step-hidden', !visible);
+                    el.classList.remove('welcome-step-enter');
+                    if (visible) {
+                        void el.offsetWidth;
+                        el.classList.add('welcome-step-enter');
+                    }
+                };
+                showPanel(step1El, target === 1);
+                showPanel(step2El, target === 2);
+            };
+
+            this.setWelcomeStep = setWelcomeStep;
+
+            if (stepNextBtn) {
+                stepNextBtn.onclick = () => {
+                    const userName = welcomeUserNameInput ? welcomeUserNameInput.value.trim() : '';
+                    if (!userName) {
+                        this.showToast('Por favor escribe tu nombre o apodo.', 'warning');
+                        welcomeUserNameInput?.focus();
+                        return;
+                    }
+                    window.HapticsModule?.light?.();
+                    setWelcomeStep(2);
+                    setTimeout(() => startInput?.focus?.(), 60);
+                };
+            }
+
+            if (stepBackBtn) {
+                stepBackBtn.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    setWelcomeStep(1);
+                };
+            }
+
+            if (welcomeUserNameInput) {
+                welcomeUserNameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && currentWelcomeStep === 1) {
+                        e.preventDefault();
+                        stepNextBtn?.click?.();
+                    }
+                });
+            }
 
             // 1. Subida de Foto de Perfil mediante Editor con recorte/zoom (512x512 JPEG 0.88)
             if (welcomePhotoInput) {
@@ -1773,11 +2102,18 @@
 
             // 2. Apertura y Cierre de Onboarding
             const openWelcome = () => {
+                this.cancelPendingOnboardingTimers();
                 modal.style.display = '';
                 const backdrop = document.getElementById('cycle-setup-backdrop');
                 if (backdrop) {
                     backdrop.classList.remove('hidden', 'opacity-0');
+                    backdrop.style.display = '';
                     backdrop.style.opacity = '';
+                }
+                const dialog = modal.querySelector('.modal-dialog');
+                if (dialog) {
+                    dialog.classList.remove('hidden');
+                    dialog.style.display = '';
                 }
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
@@ -1787,6 +2123,7 @@
                 if (celebrationContainer) celebrationContainer.classList.add('hidden');
                 if (celebrationMsg) celebrationMsg.classList.add('hidden');
                 if (progressBar) progressBar.style.width = '0%';
+                setWelcomeStep(1);
 
                 if (welcomeUserNameInput) {
                     welcomeUserNameInput.value = Storage?.getUserName?.() || '';
@@ -1823,11 +2160,18 @@
                 requestAnimationFrame(() => {
                     modal.classList.add('active');
                 });
+                setTimeout(() => {
+                    if (!modal.classList.contains('hidden')) {
+                        modal.classList.add('active');
+                    }
+                }, 60);
             };
 
             const closeWelcome = () => {
+                this.cancelPendingOnboardingTimers();
                 modal.classList.remove('active');
-                setTimeout(() => {
+                this._welcomeCloseTimer = setTimeout(() => {
+                    this._welcomeCloseTimer = null;
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
                     modal.style.display = 'none';
@@ -1840,6 +2184,7 @@
 
             // 4. Animación de Celebración con Barra de Progreso y Transición a Dashboard
             const executeCelebration = (onFinish) => {
+                setWelcomeStep(3);
                 if (form) form.classList.add('hidden');
                 if (celebrationContainer) celebrationContainer.classList.remove('hidden');
                 if (celebrationMsg) celebrationMsg.classList.remove('hidden');
@@ -1860,7 +2205,9 @@
                     }
                 }
 
-                setTimeout(() => {
+                clearTimeout(this._celebrationTimer);
+                this._celebrationTimer = setTimeout(() => {
+                    this._celebrationTimer = null;
                     if (typeof onFinish === 'function') onFinish();
                 }, animDuration);
             };
@@ -1876,17 +2223,22 @@
                     const userName = welcomeUserNameInput ? welcomeUserNameInput.value.trim() : '';
 
                     if (!userName) {
+                        setWelcomeStep(1);
                         this.showToast('Por favor escribe tu nombre o apodo.', 'warning');
                         welcomeUserNameInput?.focus();
                         return;
                     }
 
                     if (!s || !end) {
+                        setWelcomeStep(2);
                         this.showToast('Por favor confirma ambas fechas de tu ciclo.', 'warning');
+                        startInput?.focus();
                         return;
                     }
                     if (s > end) {
+                        setWelcomeStep(2);
                         this.showToast('La fecha de inicio debe ser anterior a la de término.', 'error');
+                        endInput?.focus();
                         return;
                     }
 
@@ -1913,8 +2265,10 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.7') {
-                            setTimeout(() => {
+                        if (lastSeenVersion !== '1.5.9') {
+                            clearTimeout(this._changelogTimer);
+                            this._changelogTimer = setTimeout(() => {
+                                this._changelogTimer = null;
                                 this.openChangelogModal?.();
                             }, 800);
                         }
@@ -1955,8 +2309,10 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.7') {
-                            setTimeout(() => {
+                        if (lastSeenVersion !== '1.5.9') {
+                            clearTimeout(this._changelogTimer);
+                            this._changelogTimer = setTimeout(() => {
+                                this._changelogTimer = null;
                                 this.openChangelogModal?.();
                             }, 800);
                         }
@@ -2019,7 +2375,9 @@
                     window.HapticsModule?.double();
                     closeExit();
 
-                    if (window.Capacitor?.Plugins?.App?.exitApp) {
+                    if (window.AndroidWidgetBridge && typeof window.AndroidWidgetBridge.exitApp === 'function') {
+                        window.AndroidWidgetBridge.exitApp();
+                    } else if (window.Capacitor?.Plugins?.App?.exitApp) {
                         window.Capacitor.Plugins.App.exitApp();
                     } else if (navigator.app && navigator.app.exitApp) {
                         navigator.app.exitApp();
@@ -2032,6 +2390,21 @@
                         }, 500);
                     }
                 };
+            }
+
+            // Enlaces externos (como Ko-fi) en APK Android: abrir en navegador nativo
+            if (!document._externalLinkDelegated) {
+                document._externalLinkDelegated = true;
+                document.addEventListener('click', (e) => {
+                    const link = e.target && typeof e.target.closest === 'function' ? e.target.closest('a[href]') : null;
+                    if (!link) return;
+                    const href = link.getAttribute('href') || '';
+                    if (/^https?:\/\//i.test(href) && window.AndroidWidgetBridge && typeof window.AndroidWidgetBridge.openExternalUrl === 'function') {
+                        e.preventDefault();
+                        window.HapticsModule?.light?.();
+                        window.AndroidWidgetBridge.openExternalUrl(href);
+                    }
+                });
             }
 
             window.addEventListener('popstate', () => {
@@ -2047,11 +2420,24 @@
             const barFill = document.getElementById('storage-bar-fill');
             const percentLabel = document.getElementById('storage-percentage-label');
             const detailLabel = document.getElementById('storage-detail-used');
+            const quotaLabel = document.getElementById('storage-quota-label');
 
-            if (barFill) barFill.style.width = `${Math.min(100, Math.max(2, metrics.percentage || metrics.percent || 2))}%`;
-            if (percentLabel) percentLabel.textContent = `${metrics.percentage || metrics.percent || 0}%`;
-            if (detailLabel) {
-                detailLabel.textContent = `${metrics.usedFormatted || (metrics.usedKb + ' KB')} utilizados • ${metrics.subjectsCount} materias, ${metrics.tasksCount} tareas, ${metrics.notesCount} notas`;
+            const applyMetrics = (m) => {
+                const pctVal = m.barPercent !== undefined ? m.barPercent : (Number(m.percentage || m.percent) || 2);
+                if (barFill) barFill.style.width = `${Math.min(100, Math.max(2, pctVal))}%`;
+                if (percentLabel) percentLabel.textContent = `${m.percentage || m.percent || 0}%`;
+                if (detailLabel) {
+                    detailLabel.textContent = `${m.usedFormatted || (m.usedKb + ' KB')} utilizados • ${m.subjectsCount} materias, ${m.tasksCount} tareas, ${m.notesCount} notas`;
+                }
+                if (quotaLabel && m.quotaFormatted) {
+                    quotaLabel.textContent = `Disponible: ${m.quotaFormatted}`;
+                }
+            };
+
+            applyMetrics(metrics);
+
+            if (typeof Storage.getFullStorageEstimate === 'function') {
+                Storage.getFullStorageEstimate().then(applyMetrics).catch(() => {});
             }
         }
 
@@ -2086,8 +2472,11 @@
                             card.classList.remove('open');
                         } else {
                             card.classList.add('open');
-                            window.SegmentedControl?.syncAll?.({ instant: true });
-                            requestAnimationFrame(() => window.SegmentedControl?.syncAll?.({ instant: true }));
+                            requestAnimationFrame(() => {
+                                card.querySelectorAll('.segmented-control-track').forEach(track => {
+                                    window.SegmentedControl?.sync?.(track, { instant: true });
+                                });
+                            });
                         }
                     }
                 };
@@ -2421,11 +2810,25 @@
                 exportBtn.onclick = () => {
                     window.HapticsModule?.light();
                     const dataStr = Storage.exportJson();
+                    const now = new Date();
+                    const stamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+                    const filename = `organizador_respaldo_${stamp}.json`;
+
+                    if (window.AndroidWidgetBridge && typeof window.AndroidWidgetBridge.saveTextFile === 'function') {
+                        const saved = window.AndroidWidgetBridge.saveTextFile(filename, 'application/json', dataStr);
+                        if (saved) {
+                            this.showToast(`Respaldo guardado en Descargas (${filename}).`, 'success');
+                        } else {
+                            this.showToast('No se pudo guardar el respaldo en el dispositivo.', 'error');
+                        }
+                        return;
+                    }
+
                     const blob = new Blob([dataStr], { type: 'application/json' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `organizador_escolar_${Date.now()}.json`;
+                    a.download = filename;
                     a.click();
                     URL.revokeObjectURL(url);
                     this.showToast('Respaldo descargado.', 'success');
@@ -2436,7 +2839,11 @@
             const importBtn = document.getElementById('settings-import-btn');
             if (importBtn && importInput) {
                 importBtn.onclick = () => {
-                    window.HapticsModule?.light();
+                    window.HapticsModule?.warning?.();
+                    const proceed = typeof confirm === 'function'
+                        ? confirm('⚠️ Al restaurar un respaldo se borrarán y reemplazarán todos tus datos actuales (materias, tareas, notas y configuración). ¿Deseas continuar?')
+                        : true;
+                    if (!proceed) return;
                     importInput.click();
                 };
 
@@ -2456,6 +2863,8 @@
                             this.refreshSettingsProfileUI();
                             this.syncPeriodUI();
                             this.refreshAll();
+                            window.NotificationsModule?.resyncAllScheduled?.();
+                            window.WidgetSyncModule?.sync?.();
                             this.showToast('Respaldo restaurado con éxito.', 'success');
                             this.switchView('subjects');
                         } catch (err) {
@@ -2479,7 +2888,21 @@
                 }
             });
 
-            // 11. Novedades de Versión 1.5.7
+            const copyDiagBtn = document.getElementById('settings-copy-diagnostics-btn');
+            if (copyDiagBtn) {
+                copyDiagBtn.onclick = async () => {
+                    window.HapticsModule?.light?.();
+                    const res = await DiagnosticsModule.copyReport();
+                    this.showToast(
+                        res.copied
+                            ? 'Informe de diagnóstico copiado al portapapeles.'
+                            : 'No se pudo copiar automáticamente; revisa el registro en consola.',
+                        res.copied ? 'success' : 'warning'
+                    );
+                };
+            }
+
+            // 11. Novedades de Versión 1.5.8
             const changelogBtn = document.getElementById('settings-open-changelog-btn');
             const versionPill = document.getElementById('settings-version-pill');
             const openChangelog = () => {
@@ -2508,15 +2931,22 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.5.7');
+                window.StorageModule.setLastSeenVersion('1.5.9');
+                this.initApkDownloadBanner?.();
             };
 
             if (confirmBtn) confirmBtn.onclick = closeModal;
             if (backdrop) backdrop.onclick = closeModal;
 
             modal.style.display = '';
+            const dialog = modal.querySelector('.modal-dialog');
+            if (dialog) {
+                dialog.classList.remove('hidden');
+                dialog.style.display = '';
+            }
             if (backdrop) {
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.display = '';
                 backdrop.style.opacity = '';
             }
             const sheet = modal.querySelector('.mobile-bottom-sheet');
@@ -2718,11 +3148,9 @@
                     });
                     window.StorageModule.unlockSecret?.();
                     this.applySecretFeaturesUI?.();
-                    this.syncSettingsFontButtons?.();
                 } else {
                     window.StorageModule.unlockCode(codeDef.id);
                 }
-                window.BackgroundsModule?.renderSettingsUI?.();
                 window.HapticsModule?.double?.();
 
                 const lockDiv = cardContainer?.querySelector('.text-3xl');
@@ -2741,7 +3169,7 @@
                 }
 
                 if (statusMsg) {
-                    statusMsg.className = 'min-h-[24px] text-xs font-mono font-bold text-emerald-400 animate-bounce';
+                    statusMsg.className = 'min-h-[24px] text-xs font-mono font-bold text-emerald-400';
                     statusMsg.textContent = '🔓 ¡ACCESO CONCEDIDO! Descifrando protocolo...';
                 }
 
@@ -2756,7 +3184,14 @@
 
                     this.openVaultRevealModal(codeDef);
                     this.renderVaultInventory();
-                }, 850);
+                    // Diferir actualizaciones secundarias fuera de la vista para mantener 60 FPS en el desbloqueo
+                    setTimeout(() => {
+                        window.BackgroundsModule?.renderSettingsUI?.();
+                        if (codeDef.isMasterCode || codeDef.id === 'KRONOS99') {
+                            this.syncSettingsFontButtons?.();
+                        }
+                    }, 60);
+                }, 520);
             };
 
             if (submitBtn) {
@@ -2880,8 +3315,14 @@
             window.addEventListener('keydown', handleEsc);
 
             modal.style.display = '';
+            const dialog = modal.querySelector('.modal-dialog');
+            if (dialog) {
+                dialog.classList.remove('hidden');
+                dialog.style.display = '';
+            }
             if (backdrop) {
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.display = '';
                 backdrop.style.opacity = '';
             }
             modal.classList.remove('hidden');
@@ -3082,6 +3523,7 @@
                 // Solo colocar un cohete en el botón central inferior (bottom-main-action-btn) y en los botones de añadir
                 const targets = [
                     document.getElementById('bottom-main-action-btn'),
+                    document.getElementById('tablet-main-action-btn'),
                     document.getElementById('add-task-btn'),
                     document.getElementById('add-note-btn'),
                     document.getElementById('add-subject-btn')
@@ -3181,8 +3623,78 @@
             this.initPWA();
         }
 
+        isNativeAndroidApp() {
+            if (typeof document !== 'undefined' && document.documentElement?.dataset?.platform === 'android-apk') {
+                return true;
+            }
+            if (typeof window !== 'undefined' && (window.__ORGANIZADOR_NATIVE_APK__ || window.AndroidWidgetBridge)) {
+                return true;
+            }
+            return Boolean(typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.());
+        }
+
+        hideApkDownloadEntries() {
+            const ids = ['apk-download-banner', 'apk-download-settings-card', 'drawer-apk-download-link'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+        }
+
+        initApkDownloadBanner() {
+            const banner = document.getElementById('apk-download-banner');
+            const dismissBtn = document.getElementById('apk-floating-dismiss-btn');
+
+            if (this.isNativeAndroidApp()) {
+                this.hideApkDownloadEntries();
+                return;
+            }
+            if (!banner) return;
+
+            if (dismissBtn && !dismissBtn._apkBound) {
+                dismissBtn._apkBound = true;
+                dismissBtn.addEventListener('click', () => {
+                    banner.classList.add('hidden');
+                    try {
+                        localStorage.setItem('apk_banner_dismissed', Date.now().toString());
+                    } catch (_) {}
+                });
+            }
+
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                                 window.navigator.standalone === true ||
+                                 (typeof document.referrer === 'string' && document.referrer.includes('android-app://'));
+            if (isStandalone) return;
+
+            const dismissedAt = parseInt(localStorage.getItem('apk_banner_dismissed') || '0', 10);
+            const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+            if (Date.now() - dismissedAt <= sevenDaysMs) return;
+
+            const pwaBanner = document.getElementById('pwa-floating-banner');
+            if (pwaBanner && !pwaBanner.classList.contains('hidden')) return;
+
+            clearTimeout(this._apkBannerTimer);
+            this._apkBannerTimer = setTimeout(() => {
+                const pwaVisible = pwaBanner && !pwaBanner.classList.contains('hidden');
+                const welcomeOpen = !document.getElementById('cycle-setup-modal')?.classList.contains('hidden');
+                if (!pwaVisible && !welcomeOpen && !this.isNativeAndroidApp()) {
+                    banner.classList.remove('hidden');
+                }
+            }, 1200);
+        }
+
         initPWA() {
             window.deferredInstallPrompt = null;
+
+            // En la app empaquetada (APK Android) se omite por completo SW y avisos PWA
+            if (this.isNativeAndroidApp()) {
+                this.hideApkDownloadEntries();
+                ['pwa-floating-banner', 'pwa-settings-card', 'drawer-pwa-install-btn'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                return;
+            }
 
             // 1. Guard Service Worker registration to secure contexts (HTTPS or localhost)
             // Under file://, navigator.serviceWorker.register throws a SecurityError, so skip gracefully
@@ -3192,6 +3704,7 @@
             );
 
             if ('serviceWorker' in navigator && isSecureContext) {
+                const hadInitialController = Boolean(navigator.serviceWorker.controller);
                 const registerSw = () => {
                     navigator.serviceWorker.register('./sw.js', { scope: './' })
                         .then(reg => {
@@ -3200,7 +3713,7 @@
                                 const newWorker = reg.installing;
                                 if (newWorker) {
                                     newWorker.addEventListener('statechange', () => {
-                                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller && hadInitialController) {
                                             this.showUpdateToast(newWorker);
                                         }
                                     });
@@ -3301,6 +3814,8 @@
             if (Date.now() - dismissedTime > oneDayMs) {
                 const floatingBanner = document.getElementById('pwa-floating-banner');
                 if (floatingBanner) floatingBanner.classList.remove('hidden');
+                const apkBanner = document.getElementById('apk-download-banner');
+                if (apkBanner) apkBanner.classList.add('hidden');
             }
         }
 

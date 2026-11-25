@@ -87,13 +87,16 @@ public class WidgetDataSync {
             this.id = obj.optString("id", "");
             this.title = obj.optString("title", "Sin título");
             this.dueDate = obj.optString("dueDate", "");
-            this.dueTime = obj.optString("dueTime", "23:59");
+            this.dueTime = obj.optString("dueTime", "");
             this.subjectName = obj.optString("subjectName", "General");
             this.urgency = obj.optString("urgency", "medium");
             this.urgencyLabel = obj.optString("urgencyLabel", "Media 🟡");
             this.isOverdue = obj.optBoolean("isOverdue", false);
 
             String colorHex = obj.optString("subjectColor", "#4F46E5");
+            if (colorHex == null || colorHex.trim().isEmpty()) {
+                colorHex = "#4F46E5";
+            }
             try {
                 this.subjectColor = Color.parseColor(colorHex);
             } catch (Exception e) {

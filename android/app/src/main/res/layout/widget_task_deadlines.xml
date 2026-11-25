@@ -29,9 +29,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/widget_badge_background"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="3dp"
-            android:text="Mi Agenda"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="Organizador"
             android:textColor="@color/widget_text_white"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -42,8 +44,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:background="@drawable/widget_button_add"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
             android:text="+ Tarea"
             android:textColor="@color/widget_text_white"
             android:textSize="11sp"
@@ -52,10 +56,11 @@
             android:focusable="true" />
     </LinearLayout>
 
-    <View
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/widget_card_border" />
+        android:background="@color/widget_card_border"
+        android:contentDescription="@null" />
 
     <!-- Lista Desplazable de Tareas Pendientes -->
     <FrameLayout

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
+import com.organizador.escolar.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,33 +58,19 @@ public class TaskDeadlinesService extends RemoteViewsService {
             if (position < 0 || position >= items.size()) return null;
 
             WidgetDataSync.TaskDeadlineItem item = items.get(position);
-            String packageName = context.getPackageName();
-            RemoteViews row = new RemoteViews(packageName,
-                    context.getResources().getIdentifier("widget_task_deadline_item", "layout", packageName));
+            RemoteViews row = new RemoteViews(context.getPackageName(), R.layout.widget_task_deadline_item);
 
-            int idColorBar = context.getResources().getIdentifier("item_subject_color_bar", "id", packageName);
-            int idTitle = context.getResources().getIdentifier("item_task_title", "id", packageName);
-            int idSubject = context.getResources().getIdentifier("item_subject_name", "id", packageName);
-            int idDue = context.getResources().getIdentifier("item_due_badge", "id", packageName);
-            int idUrgency = context.getResources().getIdentifier("item_urgency_badge", "id", packageName);
-
-            if (idTitle != 0) row.setTextViewText(idTitle, item.title);
-            if (idSubject != 0) row.setTextViewText(idSubject, item.subjectName);
+            row.setTextViewText(R.id.item_task_title, item.title);
+            row.setTextViewText(R.id.item_subject_name, item.subjectName);
 
             String dueText = item.dueDate + (item.dueTime != null && !item.dueTime.isEmpty() ? " " + item.dueTime : "");
-            if (idDue != 0) row.setTextViewText(idDue, dueText);
+            row.setTextViewText(R.id.item_due_badge, dueText);
+            row.setTextViewText(R.id.item_urgency_badge, item.urgencyLabel);
+            row.setInt(R.id.item_subject_color_bar, "setBackgroundColor", item.subjectColor);
 
-            if (idUrgency != 0) row.setTextViewText(idUrgency, item.urgencyLabel);
-
-            // Código de color de la materia
-            if (idColorBar != 0) {
-                row.setInt(idColorBar, "setBackgroundColor", item.subjectColor);
-            }
-
-            // Fill-in Intent para que el clic abra la tarea en la app
             Intent fillInIntent = new Intent();
             fillInIntent.putExtra("task_id", item.id);
-            row.setOnClickFillInIntent(context.getResources().getIdentifier("widget_deadline_item_root", "id", packageName), fillInIntent);
+            row.setOnClickFillInIntent(R.id.widget_deadline_item_root, fillInIntent);
 
             return row;
         }

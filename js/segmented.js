@@ -45,6 +45,9 @@ window.SegmentedControl = (() => {
         if (track.querySelector('[data-archive-filter]')) return 'track:archive-filter';
         if (track.querySelector('[data-notes-tab]')) return 'track:notes-tabs';
         if (track.querySelector('[data-glass-intensity]')) return 'track:glass-intensity';
+        if (track.querySelector('[data-theme-choice]')) return 'track:theme-mode';
+        if (track.querySelector('[data-task-priority]')) return 'track:task-priority';
+        if (track.querySelector('[data-note-type]')) return 'track:note-type';
         return '';
     }
 
@@ -61,6 +64,9 @@ window.SegmentedControl = (() => {
             btn.dataset.archiveFilter ||
             btn.dataset.notesTab ||
             btn.dataset.glassIntensity ||
+            btn.dataset.themeChoice ||
+            btn.dataset.taskPriority ||
+            btn.dataset.noteType ||
             btn.getAttribute('data-value') ||
             `idx_${index}`
         );
@@ -410,6 +416,10 @@ window.SegmentedControl = (() => {
             state.lastH = nextH;
             state.lastActiveIndex = activeIdx;
             state.lastActiveKey = activeKey;
+
+            if (!hasPrevMeasurement || geometryMoved) {
+                window.applyLiquidGlass?.(indicator, { variant: 'indicator', shape: 'pill' });
+            }
         } finally {
             try {
                 state.mutationObserver?.takeRecords?.();

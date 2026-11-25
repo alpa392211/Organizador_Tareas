@@ -85,7 +85,9 @@ window.TasksModule = (() => {
 
     function init() {
         setupEventListeners();
-        requestNotificationPermissions();
+        if (window.StorageModule?.isOnboardingCompleted?.()) {
+            requestNotificationPermissions();
+        }
     }
 
     function setupEventListeners() {
@@ -117,6 +119,41 @@ window.TasksModule = (() => {
                 subjectFilter = e.target.value;
                 render();
             };
+        }
+
+        const prioritySelect = document.getElementById('task-priority');
+        const priorityGroup = document.getElementById('task-priority-segmented');
+        if (priorityGroup) {
+            priorityGroup.querySelectorAll('[data-task-priority]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    window.HapticsModule?.light?.();
+                    syncPrioritySegmented(btn.dataset.taskPriority);
+                });
+            });
+        }
+        if (prioritySelect) {
+            prioritySelect.addEventListener('change', () => {
+                syncPrioritySegmented(prioritySelect.value);
+            });
+        }
+    }
+
+    function syncPrioritySegmented(priorityVal) {
+        const val = (priorityVal === 'alta' || priorityVal === 'baja') ? priorityVal : 'media';
+        const select = document.getElementById('task-priority');
+        if (select && select.value !== val) {
+            select.value = val;
+        }
+        const group = document.getElementById('task-priority-segmented');
+        if (group) {
+            group.querySelectorAll('[data-task-priority]').forEach(btn => {
+                const active = btn.dataset.taskPriority === val;
+                btn.classList.toggle('seg-btn-active', active);
+                btn.classList.toggle('seg-btn-inactive', !active);
+                btn.setAttribute('aria-checked', active ? 'true' : 'false');
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            window.SegmentedControl?.sync?.(group);
         }
     }
 
@@ -184,6 +221,7 @@ window.TasksModule = (() => {
         editingTaskId = null;
         document.getElementById('task-modal-title').textContent = 'Nueva Tarea Escolar';
         document.getElementById('task-form').reset();
+        syncPrioritySegmented('media');
         populateSubjectDropdown('task-subject-id', preselectedSubjectId);
 
         // Solicitar permisos de notificación si es la primera tarea registrada
@@ -252,13 +290,18 @@ window.TasksModule = (() => {
         }
 
         document.getElementById('task-priority').value = task.priority || 'media';
+        syncPrioritySegmented(task.priority || 'media');
         document.getElementById('task-notes').value = task.notes || '';
 
         populateSubjectDropdown('task-subject-id', task.subjectId);
         openModal();
     }
 
+    let closeTimer = null;
+
     function openModal() {
+        clearTimeout(closeTimer);
+        closeTimer = null;
         window.HapticsModule?.light();
         const modal = document.getElementById('task-modal');
         if (modal) {
@@ -266,10 +309,13 @@ window.TasksModule = (() => {
             const backdrop = document.getElementById('task-modal-backdrop');
             if (backdrop) {
                 backdrop.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                backdrop.style.display = '';
                 backdrop.style.opacity = '';
             }
             const sheet = modal.querySelector('.mobile-bottom-sheet');
             if (sheet) {
+                sheet.classList.remove('hidden');
+                sheet.style.display = '';
                 sheet.style.transform = '';
                 sheet.style.transition = '';
                 sheet.style.maxHeight = '';
@@ -290,8 +336,10 @@ window.TasksModule = (() => {
         window.HapticsModule?.light();
         const modal = document.getElementById('task-modal');
         if (modal) {
+            clearTimeout(closeTimer);
             modal.classList.remove('active');
-            setTimeout(() => {
+            closeTimer = setTimeout(() => {
+                closeTimer = null;
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
                 document.body.classList.remove('overflow-hidden');

@@ -3,17 +3,18 @@
     android:id="@+id/widget_deadline_item_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/widget_card_background"
+    android:background="@drawable/widget_item_background"
     android:orientation="horizontal"
-    android:padding="8dp"
+    android:padding="10dp"
     android:gravity="center_vertical">
 
-    <!-- Barra Vertical con Código de Color de la Materia -->
-    <View
+    <!-- Barra Vertical con Código de Color de la Materia (ImageView compatible con RemoteViews) -->
+    <ImageView
         android:id="@+id/item_subject_color_bar"
         android:layout_width="4dp"
         android:layout_height="36dp"
-        android:background="@color/brand_primary" />
+        android:background="@color/brand_primary"
+        android:contentDescription="@null" />
 
     <!-- Datos de la Tarea y Materia -->
     <LinearLayout

@@ -7,3 +7,10 @@ scratch/
 __pycache__/
 *.pyc
 .open-design/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/organizador-release.keystore
+tests/results/

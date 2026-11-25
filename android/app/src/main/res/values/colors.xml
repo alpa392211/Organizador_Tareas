@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Colores base de UI y fondo -->
-    <color name="widget_background">#FFFFFF</color>
-    <color name="widget_background_dark">#1E293B</color>
-    <color name="widget_surface">#F8FAFC</color>
-    <color name="widget_surface_dark">#0F172A</color>
-    <color name="widget_card_border">#E2E8F0</color>
+    <!-- Colores base de UI y fondo (Modo Claro con alto contraste) -->
+    <color name="widget_background">#F8FAFC</color>
+    <color name="widget_background_dark">#0F172A</color>
+    <color name="widget_surface">#EEF2F6</color>
+    <color name="widget_surface_dark">#1E293B</color>
+    <color name="widget_card_inner">#FFFFFF</color>
+    <color name="widget_card_border">#CBD5E1</color>
     <color name="widget_card_border_dark">#334155</color>
-    
+
+    <!-- Celdas y resumen del Widget Calendario (Modo Claro) -->
+    <color name="widget_day_cell_bg">#FFFFFF</color>
+    <color name="widget_day_cell_border">#CBD5E1</color>
+    <color name="widget_day_active_bg">#E0E7FF</color>
+    <color name="widget_day_active_border">#818CF8</color>
+    <color name="widget_today_bg">#4F46E5</color>
+    <color name="widget_summary_bg">#EEF2FF</color>
+    <color name="widget_summary_border">#C7D2FE</color>
+    <color name="widget_summary_text">#312E81</color>
+
     <!-- Colores de texto -->
     <color name="widget_text_primary">#0F172A</color>
-    <color name="widget_text_secondary">#64748B</color>
-    <color name="widget_text_muted">#94A3B8</color>
+    <color name="widget_text_secondary">#334155</color>
+    <color name="widget_text_muted">#64748B</color>
     <color name="widget_text_white">#FFFFFF</color>
 
-    <!-- Colores Institucionales -->
-    <color name="unam_primary">#002B7A</color>
+    <!-- Colores Institucionales y Marca -->
+    <color name="unam_primary">#3730A3</color>
     <color name="unam_accent">#D59F0F</color>
     <color name="ipn_primary">#6C1D45</color>
     <color name="uam_primary">#E31C23</color>
@@ -25,15 +36,15 @@
     <color name="brand_emerald">#059669</color>
 
     <!-- Urgencias e Indicadores -->
-    <color name="urgency_high">#E11D48</color>
+    <color name="urgency_high">#DC2626</color>
     <color name="urgency_high_bg">#FFE4E6</color>
     <color name="urgency_medium">#D97706</color>
     <color name="urgency_medium_bg">#FEF3C7</color>
-    <color name="urgency_low">#10B981</color>
+    <color name="urgency_low">#059669</color>
     <color name="urgency_low_bg">#D1FAE5</color>
 
     <!-- Puntos de actividad en calendario -->
-    <color name="dot_class">#3B82F6</color>
-    <color name="dot_task">#EF4444</color>
-    <color name="dot_reminder">#F59E0B</color>
+    <color name="dot_class">#4F46E5</color>
+    <color name="dot_task">#DC2626</color>
+    <color name="dot_reminder">#D97706</color>
 </resources>

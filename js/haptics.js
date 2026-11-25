@@ -380,6 +380,15 @@ window.CardContextMenu = {
             }
         }
 
+        // Reservar espacio para el dock lateral derecho en tablet/desktop (>= 768px)
+        const tabletRailEl = document.getElementById('tablet-quick-rail');
+        if (tabletRailEl && vw >= 768) {
+            const tr = tabletRailEl.getBoundingClientRect();
+            if (tr.width > 0) {
+                safeRight = Math.min(safeRight, Math.floor(tr.left - 8));
+            }
+        }
+
         if (safeBottom - safeTop < 250) {
             safeTop = offsetTop + edgePad;
             safeBottom = offsetTop + vh - edgePad;

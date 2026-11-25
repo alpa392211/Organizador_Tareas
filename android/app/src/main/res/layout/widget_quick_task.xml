@@ -45,7 +45,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="baseline"
+            android:gravity="center_vertical"
+            android:baselineAligned="true"
             android:layout_marginTop="2dp">
 
             <TextView
@@ -76,7 +77,7 @@
             android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Todo al corriente para hoy ✨"
+            android:text="Todo al corriente para hoy"
             android:textColor="@color/widget_text_muted"
             android:textSize="11sp" />
     </LinearLayout>
@@ -90,8 +91,10 @@
         android:background="@drawable/widget_button_add"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="10dp"
+        android:paddingLeft="14dp"
+        android:paddingRight="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:clickable="true"
         android:focusable="true">
 

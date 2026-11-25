@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.organizador.escolar'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.organizador.escolar"
+        minSdk 24
+        targetSdk 36
+        versionCode 159
+        versionName "1.5.9"
+    }
+
+    signingConfigs {
+        release {
+            def ksFile = file("organizador-release.keystore")
+            if (ksFile.exists()) {
+                storeFile ksFile
+                storePassword System.getenv("ORG_KEYSTORE_PASS") ?: "organizador158"
+                keyAlias System.getenv("ORG_KEY_ALIAS") ?: "organizador"
+                keyPassword System.getenv("ORG_KEY_PASS") ?: "organizador158"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            if (file("organizador-release.keystore").exists()) {
+                signingConfig signingConfigs.release
+            }
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.webkit:webkit:1.14.0'
+}
+
+configurations.configureEach {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+}
