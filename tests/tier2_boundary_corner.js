@@ -6,19 +6,20 @@
 
 const fs = require('fs');
 const path = require('path');
+const APP_PKG_VERSION = require('../package.json').version;
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.7 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.5.9 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver 1.5.7',
+        name: 'package.json version matches strict semver 1.5.9',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.7', 'package.json version must be 1.5.7');
+            helpers.assertEqual(pkg.version, '1.5.9', 'package.json version must be 1.5.9');
         }
     },
     {
@@ -30,7 +31,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.5.7';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.5.9';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -38,14 +39,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target 1.5.7 version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.5.9 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.OrganizadorApp?.openChangelogModal?.();
                 document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.5.7', 'LocalStorage must record version 1.5.7');
+            helpers.assertEqual(saved, '1.5.9', 'LocalStorage must record version 1.5.9');
         }
     },
     {
@@ -4103,7 +4104,7 @@ const tests = [
                 const c = trackChecks[key];
                 helpers.assertTrue(c.exists && c.indicatorCount === 1, `Track ${key} must have exactly 1 .segmented-glass-indicator`);
                 helpers.assertEqual(c.firstRenderAnimated, 'false', `Track ${key} must NOT animate on initial render`);
-                helpers.assertEqual(c.backdropFilter, 'none', `Track ${key} indicator must NOT use backdrop-filter`);
+                helpers.assertTrue(c.backdropFilter && c.backdropFilter !== 'none', `Track ${key} indicator must use frosted backdrop-filter`);
                 helpers.assertTrue(c.zIndexBtn > c.zIndexInd, `Track ${key} buttons must sit above indicator`);
                 helpers.assertTrue(c.posDiffX <= 1.5 && c.posDiffY <= 1.5, `Track ${key} indicator must align with active button (dx=${c.posDiffX}, dy=${c.posDiffY})`);
                 helpers.assertTrue(c.widthDiff <= 1.5 && c.heightDiff <= 1.5, `Track ${key} indicator size must match active button (dw=${c.widthDiff}, dh=${c.heightDiff})`);
@@ -4681,14 +4682,14 @@ const tests = [
         feature: 'F28',
         name: 'Creating a private note via UI persists PIN, locks immediately, unlocks & re-locks cleanly, masks gallery/archive, and supports delete-only recovery when PIN is forgotten',
         run: async (page, helpers) => {
-            await page.evaluate(async () => {
+            await page.evaluate(async (ver) => {
                 await window.StorageModule?.clearGalleryPhotosIdb?.();
                 window.StorageModule?.saveNotes?.([]);
                 localStorage.setItem('org_escolar_archive', '[]');
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 localStorage.setItem('org_escolar_onboarding_completed', 'true');
                 localStorage.setItem('org_escolar_cycle_configured', 'true');
-                localStorage.setItem('org_escolar_last_seen_version', '1.5.6');
+                localStorage.setItem('org_escolar_last_seen_version', ver);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
                 window.OrganizadorApp?.closeCycleWelcomeModal?.();
                 const cycleModal = document.getElementById('cycle-setup-modal');
@@ -4702,7 +4703,7 @@ const tests = [
                 window.OrganizadorApp?.switchView?.('notes');
                 window.NotesModule?.switchNotesTab?.('notes');
                 window.NotesModule?.render?.();
-            });
+            }, APP_PKG_VERSION);
 
             // 1. Create a private note through the actual Note Modal UI
             await page.click('#add-note-btn');
@@ -4904,12 +4905,12 @@ const tests = [
         feature: 'F29',
         name: 'Add subject button stays in top bar for <=7 subjects and relocates into animated bottom dropdown drawer starting at 8 subjects',
         run: async (page, helpers) => {
-            await page.evaluate(async () => {
+            await page.evaluate(async (ver) => {
                 await window.StorageModule?.clearAll?.();
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.5.6');
+                window.StorageModule?.setLastSeenVersion?.(ver);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
                 const seven = Array.from({ length: 7 }, (_, idx) => ({
                     id: `sub_f29_${idx + 1}`,
@@ -4920,7 +4921,7 @@ const tests = [
                     endTime: '09:30'
                 }));
                 window.StorageModule?.saveSubjects?.(seven);
-            });
+            }, APP_PKG_VERSION);
             await page.reload({ waitUntil: 'load' });
             await page.evaluate(() => {
                 window.OrganizadorApp?.switchView?.('subjects');
@@ -5049,12 +5050,12 @@ const tests = [
         feature: 'F29',
         name: 'Calendar modal remains extra-translucent across normal & intense glass levels and styles Hoy pill cleanly in dark mode',
         run: async (page, helpers) => {
-            await page.evaluate(() => {
+            await page.evaluate((ver) => {
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.5.6');
-            });
+                window.StorageModule?.setLastSeenVersion?.(ver);
+            }, APP_PKG_VERSION);
             await page.reload({ waitUntil: 'load' });
             await page.evaluate(() => {
                 window.OrganizadorApp?.closeCycleWelcomeModal?.();
@@ -5134,11 +5135,11 @@ const tests = [
         feature: 'F29',
         name: 'Quick-access Task and Note modals apply matching extra translucency, soft backdrop, and frosted inputs across Claro, Oscuro, Mono & Vault',
         run: async (page, helpers) => {
-            await page.evaluate(() => {
+            await page.evaluate((ver) => {
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.5.6');
+                window.StorageModule?.setLastSeenVersion?.(ver);
                 window.StorageModule?.addSubject?.({
                     id: 'sub_quick_glass',
                     name: 'Cálculo',
@@ -5147,7 +5148,7 @@ const tests = [
                     startTime: '08:00',
                     endTime: '09:00'
                 });
-            });
+            }, APP_PKG_VERSION);
             await page.reload({ waitUntil: 'load' });
             await page.evaluate(() => {
                 window.OrganizadorApp?.closeCycleWelcomeModal?.();
@@ -5234,6 +5235,518 @@ const tests = [
             await page.evaluate(async () => {
                 await window.StorageModule?.clearAll?.();
             });
+        }
+    },
+
+    // =========================================================================
+    // F30: v1.5.9 Hardening — First-Boot Recovery, Splash & Diagnostics
+    // =========================================================================
+    {
+        id: 'T2_F30_01_resilient_first_boot_with_failing_module',
+        feature: 'F30',
+        name: 'First launch with failing intermediate modules still opens welcome modal, keeps #bottom-nav at bottom, hides splash, and logs diagnostics capped at 20',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 360, height: 800, deviceScaleFactor: 2 });
+            const res = await page.evaluate(async () => {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.DiagnosticsModule?.clear?.();
+
+                const origSubInit = window.SubjectsModule?.init;
+                const origBgInit = window.BackgroundsModule?.init;
+                let threwUnhandled = false;
+                try {
+                    if (window.SubjectsModule) {
+                        window.SubjectsModule.init = () => {
+                            throw new Error('Fallo simulado en SubjectsModule.init');
+                        };
+                    }
+                    if (window.BackgroundsModule) {
+                        window.BackgroundsModule.init = async () => {
+                            throw new Error('Fallo asíncrono simulado en BackgroundsModule.init');
+                        };
+                    }
+                    window.OrganizadorApp?.init?.();
+                } catch (_) {
+                    threwUnhandled = true;
+                } finally {
+                    if (window.SubjectsModule && origSubInit) window.SubjectsModule.init = origSubInit;
+                    if (window.BackgroundsModule && origBgInit) window.BackgroundsModule.init = origBgInit;
+                }
+
+                await new Promise(r => setTimeout(r, 90));
+
+                const modal = document.getElementById('cycle-setup-modal');
+                const nav = document.getElementById('bottom-nav');
+                const navRect = nav ? nav.getBoundingClientRect() : null;
+                const splash = document.getElementById('app-splash-screen');
+                const retryBtn = document.getElementById('splash-retry-btn');
+                const copyBtn = document.getElementById('settings-copy-diagnostics-btn');
+
+                const entriesAfterCrash = window.DiagnosticsModule?.getEntries?.() || [];
+                const reportText = window.DiagnosticsModule?.buildReport?.() || '';
+
+                // Test 20-entry ring buffer cap
+                for (let i = 0; i < 25; i++) {
+                    window.DiagnosticsModule?.record?.(`step_${i}`, new Error(`err_${i}`));
+                }
+                const cappedEntries = window.DiagnosticsModule?.getEntries?.() || [];
+                const welcomeVisible = Boolean(modal && !modal.classList.contains('hidden') && getComputedStyle(modal).display !== 'none');
+                const welcomeActive = Boolean(modal && modal.classList.contains('active'));
+                const copyBtnText = copyBtn ? copyBtn.textContent : '';
+
+                window.DiagnosticsModule?.clear?.();
+                window.OrganizadorApp?.closeCycleWelcomeModal?.();
+
+                return {
+                    threwUnhandled,
+                    welcomeVisible,
+                    welcomeActive,
+                    navTop: navRect ? Math.round(navRect.top) : -1,
+                    innerH: window.innerHeight,
+                    splashHidden: Boolean(splash && getComputedStyle(splash).display === 'none'),
+                    hasRetryBtn: Boolean(retryBtn),
+                    hasCopyDiagBtn: Boolean(copyBtn) && copyBtnText.includes('Copiar informe de diagnóstico'),
+                    capturedStep: entriesAfterCrash.some(e => e.step === 'subjects.init' && e.message.includes('Fallo simulado')),
+                    hasUserAgentAndVersion: entriesAfterCrash.every(e => Boolean(e.userAgent) && Boolean(e.version)),
+                    reportValid: reportText.includes('Diagnóstico') && reportText.includes('Fallo simulado'),
+                    cappedLen: cappedEntries.length
+                };
+            });
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+
+            helpers.assertFalse(res.threwUnhandled, 'App.init() must NEVER throw unhandled exception when intermediate modules fail');
+            helpers.assertTrue(res.welcomeVisible, '#cycle-setup-modal must open cleanly despite intermediate module failure');
+            helpers.assertTrue(res.welcomeActive, '#cycle-setup-modal must receive .active via rAF/setTimeout fallback');
+            helpers.assertTrue(res.navTop > res.innerH * 0.6, `#bottom-nav must stay at bottom (top=${res.navTop} in vh=${res.innerH})`);
+            helpers.assertTrue(res.splashHidden, '#app-splash-screen must hide after App.init() completes');
+            helpers.assertTrue(res.hasRetryBtn, '#splash-retry-btn must exist for 4s timeout fallback');
+            helpers.assertTrue(res.hasCopyDiagBtn, '#settings-copy-diagnostics-btn must exist in Settings');
+            helpers.assertTrue(res.capturedStep, 'DiagnosticsModule must capture failing step and error message');
+            helpers.assertTrue(res.hasUserAgentAndVersion, 'Diagnostic entries must include userAgent and app version');
+            helpers.assertTrue(res.reportValid, 'Diagnostics report must include header and recorded error');
+            helpers.assertEqual(res.cappedLen, 20, 'Diagnostics log must cap stored entries at 20');
+        }
+    },
+    {
+        id: 'T2_F30_02_welcome_modal_three_steps_and_no_emojis',
+        feature: 'F30',
+        name: 'Redesigned #cycle-setup-modal uses 3-step flow, ~560px glass card on tablet, line SVGs, and no decorative emojis',
+        run: async (page, helpers) => {
+            await page.setViewport({ width: 768, height: 1024, deviceScaleFactor: 2 });
+            const res = await page.evaluate(async () => {
+                window.OrganizadorApp?.openCycleWelcomeModal?.();
+                await new Promise(r => setTimeout(r, 80));
+
+                const modal = document.getElementById('cycle-setup-modal');
+                const card = modal?.querySelector('.welcome-glass-card');
+                const step1 = document.getElementById('welcome-step-1');
+                const step2 = document.getElementById('welcome-step-2');
+                const nameInp = document.getElementById('welcome-user-name');
+                const nextBtn = document.getElementById('welcome-step-next-btn');
+                const backBtn = document.getElementById('welcome-step-back-btn');
+                const startInp = document.getElementById('welcome-cycle-start');
+                const endInp = document.getElementById('welcome-cycle-end');
+                const saveBtn = document.getElementById('welcome-cycle-save-btn');
+                const checkSvg = document.querySelector('#onboarding-celebration-container .welcome-check-svg');
+
+                const step1InitialVisible = Boolean(step1 && !step1.classList.contains('welcome-step-hidden'));
+                const step2InitialHidden = Boolean(step2 && step2.classList.contains('welcome-step-hidden'));
+
+                nameInp.value = 'Elena Torres';
+                nextBtn?.click();
+                const step1AfterNextHidden = Boolean(step1 && step1.classList.contains('welcome-step-hidden'));
+                const step2AfterNextVisible = Boolean(step2 && !step2.classList.contains('welcome-step-hidden'));
+
+                backBtn?.click();
+                const backRestoredStep1 = Boolean(step1 && !step1.classList.contains('welcome-step-hidden'));
+
+                nextBtn?.click();
+                if (!startInp.value) startInp.value = '2026-08-10';
+                if (!endInp.value) endInp.value = '2026-12-18';
+                saveBtn?.click();
+                const step3Visible = !document.getElementById('onboarding-celebration-container')?.classList.contains('hidden');
+
+                const cardWidth = card ? Math.round(card.getBoundingClientRect().width) : 0;
+                const noHorizontalOverflow = document.documentElement.scrollWidth <= window.innerWidth + 1;
+                const modalText = modal?.textContent || '';
+                const forbiddenEmojis = ['🎓', '🚀', '📷', '✕', '🎉', '🥳', '✨', '🎊', '👏'];
+                const hasDecorativeEmoji = forbiddenEmojis.some(e => modalText.includes(e));
+
+                window.OrganizadorApp?.cancelPendingOnboardingTimers?.();
+                window.OrganizadorApp?.closeCycleWelcomeModal?.();
+
+                return {
+                    step1InitialVisible,
+                    step2InitialHidden,
+                    step1AfterNextHidden,
+                    step2AfterNextVisible,
+                    backRestoredStep1,
+                    step3Visible,
+                    hasCheckSvg: Boolean(checkSvg),
+                    cardWidth,
+                    noHorizontalOverflow,
+                    hasDecorativeEmoji
+                };
+            });
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+
+            helpers.assertTrue(res.step1InitialVisible && res.step2InitialHidden, 'Onboarding must start on step 1 with step 2 hidden');
+            helpers.assertTrue(res.step1AfterNextHidden && res.step2AfterNextVisible, 'Clicking next after entering name must transition to step 2');
+            helpers.assertTrue(res.backRestoredStep1, 'Clicking back button must return to step 1');
+            helpers.assertTrue(res.step3Visible && res.hasCheckSvg, 'Submitting valid profile & cycle must open step 3 confirmation with SVG check');
+            helpers.assertTrue(res.cardWidth >= 500 && res.cardWidth <= 590, `Tablet glass card width should be ~560px (got ${res.cardWidth}px)`);
+            helpers.assertTrue(res.noHorizontalOverflow, 'Onboarding modal must have 0px horizontal overflow on tablet');
+            helpers.assertFalse(res.hasDecorativeEmoji, 'Onboarding modal must not contain decorative emojis');
+        }
+    },
+    {
+        id: 'T2_F30_03_liquid_glass_svg_refraction_and_fallbacks',
+        feature: 'F30',
+        name: 'LiquidGlassModule renders hidden 0x0 SVG filter host, caches filters across intensities, syncs modal segmented selectors, and degrades gracefully',
+        run: async (page, helpers) => {
+            const res = await page.evaluate(async () => {
+                const host = document.getElementById('lg-svg-filter-host');
+                const hostStyle = host ? getComputedStyle(host) : null;
+                const hostText = host ? (host.textContent || '').trim() : '';
+
+                // Test intensity levels via App.applyGlassIntensity
+                window.OrganizadorApp?.applyGlassIntensity?.('suave');
+                const capSuave = window.LiquidGlassModule?.getCapabilities?.();
+
+                window.OrganizadorApp?.applyGlassIntensity?.('normal');
+                const capNormal = window.LiquidGlassModule?.getCapabilities?.();
+
+                window.OrganizadorApp?.applyGlassIntensity?.('intenso');
+                const capIntenso = window.LiquidGlassModule?.getCapabilities?.();
+
+                // Verify modal priority & note type segmented controls sync with hidden <select>
+                window.StorageModule?.addSubject?.({ id: 'sub_lg_1', name: 'Física', color: '#4f46e5', days: ['lun'] });
+                window.TasksModule?.openAddModal?.();
+                const prioAltaBtn = document.querySelector('#task-priority-segmented [data-task-priority="alta"]');
+                prioAltaBtn?.click();
+                const prioValueAfterClick = document.getElementById('task-priority')?.value;
+                window.TasksModule?.closeModal?.();
+
+                window.NotesModule?.openAddModal?.();
+                const noteIdeaBtn = document.querySelector('#note-type-segmented [data-note-type="idea"]');
+                noteIdeaBtn?.click();
+                const noteTypeAfterClick = document.getElementById('note-type')?.value;
+                window.NotesModule?.closeModal?.();
+
+                // Verify settings mode track & note filter indicator
+                const hasThemeTrack = Boolean(document.getElementById('settings-theme-mode-track'));
+                const hasChipInd = Boolean(document.getElementById('notes-filter-indicator'));
+
+                window.OrganizadorApp?.applyGlassIntensity?.('normal');
+
+                return {
+                    hasHost: Boolean(host),
+                    hostDisplayNotNone: Boolean(hostStyle && hostStyle.display !== 'none' && hostStyle.position === 'absolute'),
+                    hostZeroText: hostText.length === 0,
+                    suaveRefractionOff: capSuave && capSuave.refractionActive === false,
+                    normalHasCaps: Boolean(capNormal),
+                    intensoHasCaps: Boolean(capIntenso),
+                    prioValueAfterClick,
+                    noteTypeAfterClick,
+                    hasThemeTrack,
+                    hasChipInd
+                };
+            });
+
+            helpers.assertTrue(res.hasHost, '#lg-svg-filter-host SVG host must exist');
+            helpers.assertTrue(res.hostDisplayNotNone, '#lg-svg-filter-host must use position:absolute and never display:none');
+            helpers.assertTrue(res.hostZeroText, '#lg-svg-filter-host must contain zero text nodes');
+            helpers.assertTrue(res.suaveRefractionOff, 'Intensity "suave" must disable SVG displacement refraction');
+            helpers.assertTrue(res.normalHasCaps && res.intensoHasCaps, 'LiquidGlassModule must report capabilities for normal and intenso');
+            helpers.assertEqual(res.prioValueAfterClick, 'alta', '#task-priority-segmented must sync with #task-priority select');
+            helpers.assertEqual(res.noteTypeAfterClick, 'idea', '#note-type-segmented must sync with #note-type select');
+            helpers.assertTrue(res.hasThemeTrack, '#settings-theme-mode-track must exist');
+            helpers.assertTrue(res.hasChipInd, '#notes-filter-indicator must exist');
+
+            // Verify prefers-reduced-transparency: reduce fallback
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-transparency', value: 'reduce' }]);
+            const rtCap = await page.evaluate(() => {
+                window.LiquidGlassModule?.refreshAll?.();
+                return window.LiquidGlassModule?.getCapabilities?.();
+            });
+            helpers.assertTrue(rtCap.reducedTransparency === true && rtCap.refractionActive === false, 'prefers-reduced-transparency: reduce must disable refraction fallback');
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-transparency', value: 'no-preference' }]);
+            await page.evaluate(() => window.LiquidGlassModule?.refreshAll?.());
+        }
+    },
+    {
+        id: 'T2_F30_04_tablet_quick_action_rail',
+        feature: 'F30',
+        name: 'Tablet >= 768px displays synced right-side quick action dock & expandable rail without overlaps, hidden on mobile and modals',
+        run: async (page, helpers) => {
+            // 1. Mobile (< 768px): #tablet-quick-rail hidden, #bottom-nav visible
+            await page.setViewport({ width: 360, height: 800, deviceScaleFactor: 2 });
+            const mobileRes = await page.evaluate(() => {
+                const rail = document.getElementById('tablet-quick-rail');
+                const bottom = document.getElementById('bottom-nav');
+                return {
+                    railHidden: !rail || getComputedStyle(rail).display === 'none',
+                    bottomVisible: Boolean(bottom && getComputedStyle(bottom).display !== 'none')
+                };
+            });
+            helpers.assertTrue(mobileRes.railHidden, '#tablet-quick-rail must stay hidden on mobile (<768px)');
+            helpers.assertTrue(mobileRes.bottomVisible, '#bottom-nav must remain visible on mobile');
+
+            // 2. Tablet portrait (768x1024) & landscape (1024x768)
+            for (const vp of [{ width: 768, height: 1024 }, { width: 1024, height: 768 }]) {
+                await page.setViewport({ width: vp.width, height: vp.height, deviceScaleFactor: 2 });
+                const tabRes = await page.evaluate(async () => {
+                    window.StorageModule?.addSubject?.({ id: 'sub_tab_1', name: 'Biología', color: '#10b981', days: ['mar'] });
+                    const rail = document.getElementById('tablet-quick-rail');
+                    const bottom = document.getElementById('bottom-nav');
+                    const tBtn = document.getElementById('tablet-main-action-btn');
+                    const tLabel = document.getElementById('tablet-main-label');
+                    const toggleBtn = document.getElementById('tablet-rail-toggle-btn');
+                    const railNav = document.getElementById('tablet-rail-nav');
+
+                    // Sync shortcut changes
+                    window.StorageModule?.setBottomAction?.('notes');
+                    window.OrganizadorApp?.setupBottomActionButton?.();
+                    const notesSynced = (tLabel?.textContent || '').trim() === '+ Nota';
+
+                    window.StorageModule?.setBottomAction?.('calendar');
+                    window.OrganizadorApp?.setupBottomActionButton?.();
+                    const calSynced = (tLabel?.textContent || '').trim() === 'Calendario';
+
+                    window.StorageModule?.setBottomAction?.('add_task');
+                    window.OrganizadorApp?.setupBottomActionButton?.();
+                    const taskSynced = (tLabel?.textContent || '').trim() === '+ Tarea';
+
+                    const railRect = rail.getBoundingClientRect();
+                    const btnRect = tBtn.getBoundingClientRect();
+
+                    // Check toast & pwa banner horizontal clearance
+                    const pwaBanner = document.getElementById('pwa-floating-banner');
+                    const toastStack = document.getElementById('toast-container');
+                    const pwaRight = pwaBanner ? parseFloat(getComputedStyle(pwaBanner).right) : 0;
+                    const toastRight = toastStack ? parseFloat(getComputedStyle(toastStack).right) : 0;
+
+                    // Test rail toggle & navigation
+                    toggleBtn?.click();
+                    const railExpanded = !railNav.classList.contains('tablet-rail-collapsed');
+                    railNav.querySelector('[data-view-target="notes"]')?.click();
+                    const switchedToNotes = !document.getElementById('view-notes')?.classList.contains('hidden');
+                    const railAutoCollapsed = railNav.classList.contains('tablet-rail-collapsed');
+
+                    // Clicking #tablet-main-action-btn opens task modal (and hides dock via body.overflow-hidden)
+                    tBtn.click();
+                    await new Promise(r => setTimeout(r, 80));
+                    if (typeof rail.getAnimations === 'function') {
+                        await Promise.all(rail.getAnimations().map(a => a.finished.catch(() => {})));
+                    } else {
+                        await new Promise(r => setTimeout(r, 260));
+                    }
+                    const taskModalEl = document.getElementById('task-modal');
+                    const taskModalOpened = Boolean(taskModalEl && !taskModalEl.classList.contains('hidden'));
+                    const railCs = getComputedStyle(rail);
+                    const dockHiddenBehindModal = railCs.opacity === '0' && railCs.pointerEvents === 'none';
+                    const taskCls = taskModalEl ? taskModalEl.className : '';
+                    const railOp = railCs.opacity;
+                    const railPe = railCs.pointerEvents;
+                    const bodyCls = document.body.className;
+                    const subCount = (window.StorageModule?.getSubjects?.() || []).length;
+                    window.TasksModule?.closeModal?.();
+                    await new Promise(r => setTimeout(r, 250));
+                    window.StorageModule?.saveSubjects?.([]);
+                    window.OrganizadorApp?.switchView?.('subjects');
+
+                    return {
+                        railVisible: getComputedStyle(rail).display !== 'none',
+                        bottomHidden: !bottom || getComputedStyle(bottom).display === 'none',
+                        onRightSide: railRect.left > window.innerWidth * 0.7 && btnRect.width >= 44 && btnRect.height >= 44,
+                        notesSynced,
+                        calSynced,
+                        taskSynced,
+                        pwaRight,
+                        toastRight,
+                        railExpanded,
+                        switchedToNotes,
+                        railAutoCollapsed,
+                        taskModalOpened,
+                        dockHiddenBehindModal,
+                        taskCls,
+                        railOp,
+                        railPe,
+                        bodyCls,
+                        subCount,
+                        noOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1
+                    };
+                });
+
+                helpers.assertTrue(tabRes.railVisible && tabRes.bottomHidden, `At ${vp.width}x${vp.height}, right quick rail must show and #bottom-nav hide`);
+                helpers.assertTrue(tabRes.onRightSide, `At ${vp.width}x${vp.height}, quick action must sit cleanly on right side with >=44px target`);
+                helpers.assertTrue(tabRes.notesSynced && tabRes.calSynced && tabRes.taskSynced, '#tablet-main-action-btn must stay synced with Storage.getBottomAction()');
+                helpers.assertTrue(tabRes.pwaRight >= 90 && tabRes.toastRight >= 90, `Banner/toasts must offset right >= 90px from right dock (got pwa=${tabRes.pwaRight}, toast=${tabRes.toastRight})`);
+                helpers.assertTrue(tabRes.railExpanded && tabRes.switchedToNotes && tabRes.railAutoCollapsed, 'Expandable tablet rail must open, navigate views, and auto-collapse');
+                helpers.assertTrue(tabRes.taskModalOpened, `#tablet-main-action-btn must open task modal (cls=${tabRes.taskCls}, subs=${tabRes.subCount}, bodyCls=${tabRes.bodyCls})`);
+                helpers.assertTrue(tabRes.dockHiddenBehindModal, `#tablet-quick-rail must yield when modal opens (op=${tabRes.railOp}, pe=${tabRes.railPe}, bodyCls=${tabRes.bodyCls})`);
+                helpers.assertTrue(tabRes.noOverflow, `Zero horizontal overflow at ${vp.width}x${vp.height}`);
+            }
+
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+        }
+    },
+    {
+        id: 'T2_F30_05_vault_tablet_and_laptop_layout',
+        feature: 'F30',
+        name: 'Secret Vault adapts to 2 columns on tablet (>=768px) and centered <=1200px 2-3 column protocol grid on laptop (>=1100px) with enlarged reveal modal',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                window.StorageModule?.unlockCode?.('APOLLO11');
+                window.StorageModule?.unlockCode?.('MATRIX99');
+                window.StorageModule?.unlockCode?.('RETRO80S');
+                window.StorageModule?.unlockCode?.('ZENPEACE');
+                window.StorageModule?.unlockCode?.('READABLE');
+                window.StorageModule?.unlockCode?.('FIRACODE');
+                window.OrganizadorApp?.switchView?.('secret-codes');
+            });
+
+            // 1. Mobile (360x800): 1 stacked column, no horizontal scroll
+            await page.setViewport({ width: 360, height: 800, deviceScaleFactor: 2 });
+            const mobileRes = await page.evaluate(() => {
+                const leftCard = document.getElementById('vault-card-container')?.getBoundingClientRect();
+                const inv = document.getElementById('vault-inventory-wrapper')?.getBoundingClientRect();
+                return {
+                    stacked: Boolean(leftCard && inv && inv.top >= leftCard.bottom - 2),
+                    noOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1
+                };
+            });
+            helpers.assertTrue(mobileRes.stacked, 'Mobile vault must stack terminal above unlocked protocols');
+            helpers.assertTrue(mobileRes.noOverflow, 'Mobile vault must have 0px horizontal overflow');
+
+            // 2. Tablet (768x1024): side-by-side 2 columns, no max-h-[38vh] clamp
+            await page.setViewport({ width: 768, height: 1024, deviceScaleFactor: 2 });
+            const tabletRes = await page.evaluate(() => {
+                const colLeft = document.querySelector('.vault-col-left')?.getBoundingClientRect();
+                const colRight = document.querySelector('.vault-col-right')?.getBoundingClientRect();
+                const grid = document.getElementById('vault-unlocked-grid');
+                const gridCs = grid ? getComputedStyle(grid) : null;
+                return {
+                    twoColumns: Boolean(colLeft && colRight && colRight.left >= colLeft.right - 2 && Math.abs(colLeft.top - colRight.top) < 40),
+                    noMaxHeightClamp: gridCs ? gridCs.maxHeight === 'none' : false,
+                    noOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1
+                };
+            });
+            helpers.assertTrue(tabletRes.twoColumns, 'Tablet vault must arrange terminal on left and inventory on right side-by-side');
+            helpers.assertTrue(tabletRes.noMaxHeightClamp, 'Tablet vault protocol grid must lift 38vh max-height cap');
+            helpers.assertTrue(tabletRes.noOverflow, 'Tablet vault must have 0px horizontal overflow');
+
+            // 3. Laptop (1440x900): centered <=1200px shell, >=2 protocol columns, enlarged reveal modal, Enter verifies, light mode safe
+            await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+            const laptopRes = await page.evaluate(() => {
+                const sec = document.getElementById('view-secret-codes');
+                const secWidth = sec ? Math.round(sec.getBoundingClientRect().width) : 0;
+                const cards = Array.from(document.querySelectorAll('#vault-unlocked-grid .vault-inventory-card'));
+                const rowYs = new Set(cards.slice(0, 3).map(c => Math.round(c.getBoundingClientRect().top)));
+
+                // Verify Enter key triggers verification in #vault-code-input & check reveal modal width
+                document.documentElement.classList.remove('dark');
+                const container = document.getElementById('vault-card-container');
+                const lightBg = container ? getComputedStyle(container).backgroundColor : '';
+
+                const inp = document.getElementById('vault-code-input');
+                if (inp) {
+                    inp.value = 'COFFEE42';
+                    inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+                }
+
+                window.OrganizadorApp?.openVaultRevealModal?.({
+                    id: 'COFFEE42',
+                    name: 'Modo Barista / Dark Roast',
+                    category: 'ESTUDIO NOCTURNO',
+                    phrase: 'Prueba',
+                    description: 'Prueba responsiva en laptop'
+                });
+                const revealDlg = document.querySelector('#vault-reveal-modal .modal-dialog');
+                const revealW = revealDlg ? Math.round(revealDlg.offsetWidth) : 0;
+                const revealMaxW = revealDlg ? Math.round(parseFloat(getComputedStyle(revealDlg).maxWidth) || 0) : 0;
+                document.getElementById('close-vault-reveal-modal')?.click();
+
+                return {
+                    secWidth,
+                    firstRowSameTop: rowYs.size === 1 && cards.length >= 3,
+                    colCountFirstRow: cards.filter(c => Math.round(c.getBoundingClientRect().top) === Math.round(cards[0].getBoundingClientRect().top)).length,
+                    revealW: Math.max(revealW, revealMaxW),
+                    lightBgValid: Boolean(lightBg),
+                    noOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1
+                };
+            });
+
+            helpers.assertTrue(laptopRes.secWidth > 0 && laptopRes.secWidth <= 1202, `Laptop vault container must cap around 1200px centered (got ${laptopRes.secWidth})`);
+            helpers.assertTrue(laptopRes.colCountFirstRow >= 2 && laptopRes.colCountFirstRow <= 3, `Laptop vault unlocked grid must render 2-3 columns (got ${laptopRes.colCountFirstRow})`);
+            helpers.assertTrue(laptopRes.revealW >= 520, `Laptop #vault-reveal-modal must scale wider than mobile max-w-md (got ${laptopRes.revealW})`);
+            helpers.assertTrue(laptopRes.lightBgValid && laptopRes.noOverflow, 'Laptop vault light mode and 0px horizontal overflow must hold');
+
+            await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+        }
+    },
+    {
+        id: 'T2_F30_06_select_chevron_alignment_and_apk_invite',
+        feature: 'F30',
+        name: 'All visible <select> dropdowns align right chevron cleanly with no duplicate SVG, and Web exposes APK download invite',
+        run: async (page, helpers) => {
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_onboarding_completed_v1', 'true');
+                localStorage.setItem('org_escolar_cycle_configured_v1', 'true');
+                localStorage.setItem('org_escolar_last_version', '1.5.9');
+                window.StorageModule?.saveSubjects?.([
+                    { id: 'sub_sel_1', name: 'Matemáticas', color: '#4f46e5' }
+                ]);
+                window.OrganizadorApp?.refreshAll?.();
+                window.OrganizadorApp?.switchView?.('tasks');
+            });
+
+            const selectAudit = await page.evaluate(() => {
+                function checkSel(id) {
+                    const el = document.getElementById(id);
+                    if (!el) return { found: false };
+                    const cs = getComputedStyle(el);
+                    const padRight = parseFloat(cs.paddingRight) || 0;
+                    const siblingSvg = el.parentElement ? el.parentElement.querySelector(':scope > div > svg') : null;
+                    return {
+                        found: true,
+                        appearance: cs.appearance || cs.webkitAppearance,
+                        padRight,
+                        hasBgSvg: cs.backgroundImage && cs.backgroundImage.includes('data:image/svg+xml'),
+                        hasDuplicateOverlaySvg: Boolean(siblingSvg)
+                    };
+                }
+
+                const taskFilter = checkSel('task-subject-filter');
+                window.OrganizadorApp?.switchView?.('notes');
+                const notePhotoSelect = checkSel('notes-photo-note-select');
+                window.TasksModule?.openAddModal?.();
+                const taskModalSelect = checkSel('task-subject-id');
+                document.getElementById('close-task-modal')?.click();
+
+                const apkCard = document.getElementById('apk-download-settings-card');
+                const apkDrawerLink = document.getElementById('drawer-apk-download-link');
+                const apkBanner = document.getElementById('apk-download-banner');
+                const apkHref = document.getElementById('apk-settings-download-link')?.getAttribute('href') || '';
+
+                return {
+                    taskFilter,
+                    notePhotoSelect,
+                    taskModalSelect,
+                    apkPresent: Boolean(apkCard && apkDrawerLink && apkBanner && apkHref.endsWith('.apk'))
+                };
+            });
+
+            ['taskFilter', 'notePhotoSelect', 'taskModalSelect'].forEach((key) => {
+                const s = selectAudit[key];
+                helpers.assertTrue(s.found, `${key} select element must exist`);
+                helpers.assertEqual(s.appearance, 'none', `${key} must use appearance: none`);
+                helpers.assertTrue(s.padRight >= 38, `${key} must reserve >=38px right padding for chevron (got ${s.padRight})`);
+                helpers.assertTrue(s.hasBgSvg, `${key} must render unified inline SVG chevron`);
+                helpers.assertFalse(s.hasDuplicateOverlaySvg, `${key} must not have duplicate sibling SVG arrow`);
+            });
+            helpers.assertTrue(selectAudit.apkPresent, 'Web codebase must expose APK download card, drawer link, and banner');
         }
     }
 ];

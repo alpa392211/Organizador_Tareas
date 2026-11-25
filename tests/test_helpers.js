@@ -3,10 +3,30 @@
  * Runs headless Chrome with zero external network dependencies over file://
  */
 
+const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer-core');
 
-const CHROME_PATH = process.env.CHROME_BIN || '/usr/bin/google-chrome';
+function resolveChromePath() {
+    if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
+    const candidates = [
+        '/usr/bin/google-chrome',
+        '/usr/bin/chromium',
+        '/usr/bin/chromium-browser',
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+        'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
+    ];
+    for (const c of candidates) {
+        try {
+            if (fs.existsSync(c)) return c;
+        } catch (_) {}
+    }
+    return '/usr/bin/google-chrome';
+}
+
+const CHROME_PATH = resolveChromePath();
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const TARGET_URL = `file://${path.join(PROJECT_ROOT, 'index.html')}`;
 
@@ -383,6 +403,10 @@ async function resetPageState(page) {
     try {
         await page.setViewport({ width: 1280, height: 800 });
         await page.evaluate(() => {
+            try { window.OrganizadorApp?.cancelPendingOnboardingTimers?.(); } catch (_) {}
+            try { window.CardContextMenu?.close?.(); } catch (_) {}
+            try { window.ScrollLockManager?.forceUnlockAll?.(); } catch (_) {}
+
             // Wipes storage
             try { localStorage.clear(); } catch (_) {}
             try { sessionStorage.clear(); } catch (_) {}

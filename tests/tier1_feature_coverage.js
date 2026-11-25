@@ -9,72 +9,75 @@ const path = require('path');
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.7 & Scoped Changelog
+    // F01: Version Bump 1.5.9 & Scoped Changelog
     // =========================================================================
     {
         id: 'T1_F01_01_package_json_version',
         feature: 'F01',
-        name: 'package.json specifies version 1.5.7',
+        name: 'package.json specifies version 1.5.9',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             helpers.assert(fs.existsSync(pkgPath), 'package.json must exist');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.7', 'package.json version must be 1.5.7');
+            helpers.assertEqual(pkg.version, '1.5.9', 'package.json version must be 1.5.9');
             helpers.assertEqual(typeof pkg.version, 'string', 'package.json version must be string');
         }
     },
     {
         id: 'T1_F01_02_index_html_query_param_version',
         feature: 'F01',
-        name: 'index.html asset tags include versioned query parameter v=1.5.7 without stage suffixes',
+        name: 'index.html asset tags include versioned query parameter v=1.5.9 without stage suffixes',
         run: async (page, helpers) => {
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const html = fs.readFileSync(htmlPath, 'utf8');
-            const hasVersionedStyles = html.includes('css/styles.css?v=1.5.7');
-            const hasVersionedTailwind = html.includes('css/tailwind.min.css?v=1.5.7');
-            const hasVersionedSegmented = html.includes('js/segmented.js?v=1.5.7');
-            helpers.assertTrue(hasVersionedStyles, 'styles.css must reference v=1.5.7 query parameter');
-            helpers.assertTrue(hasVersionedTailwind, 'tailwind.min.css must reference v=1.5.7 query parameter');
-            helpers.assertTrue(hasVersionedSegmented, 'segmented.js must reference v=1.5.7 query parameter');
+            const hasVersionedStyles = html.includes('css/styles.css?v=1.5.9');
+            const hasVersionedTailwind = html.includes('css/tailwind.min.css?v=1.5.9');
+            const hasVersionedLiquidGlass = html.includes('js/liquid-glass.js?v=1.5.9');
+            const hasVersionedSegmented = html.includes('js/segmented.js?v=1.5.9');
+            helpers.assertTrue(hasVersionedStyles, 'styles.css must reference v=1.5.9 query parameter');
+            helpers.assertTrue(hasVersionedTailwind, 'tailwind.min.css must reference v=1.5.9 query parameter');
+            helpers.assertTrue(hasVersionedLiquidGlass, 'liquid-glass.js must reference v=1.5.9 query parameter');
+            helpers.assertTrue(hasVersionedSegmented, 'segmented.js must reference v=1.5.9 query parameter');
             helpers.assertFalse(/\?v=[^\s"']*(-e\d+|-ui|-s\d+)/i.test(html), 'index.html must not contain temporary -e, -ui, or -s version suffixes');
         }
     },
     {
         id: 'T1_F01_03_settings_version_badge',
         feature: 'F01',
-        name: 'Settings view contains version indicator with target 1.5.7 version',
+        name: 'Settings view contains version indicator with target 1.5.9 version',
         run: async (page, helpers) => {
             const versionText = await page.evaluate(() => {
                 const pill = document.getElementById('settings-version-pill') || document.querySelector('[data-version-pill]');
                 return pill ? pill.textContent.trim() : null;
             });
             helpers.assert(versionText !== null, 'Settings version pill element must exist');
-            helpers.assert(versionText.includes('1.5.7'), 'Version indicator must display 1.5.7');
+            helpers.assert(versionText.includes('1.5.9'), 'Version indicator must display 1.5.9');
         }
     },
     {
         id: 'T1_F01_04_sw_cache_name_and_assets',
         feature: 'F01',
-        name: 'sw.js specifies v1.5.7 cache identifier, v=1.5.7 assets, and precaches segmented.js, photo-editor.js and backgrounds.js',
+        name: 'sw.js specifies v1.5.9 cache identifier, v=1.5.9 assets, and precaches liquid-glass.js, segmented.js, photo-editor.js and backgrounds.js',
         run: async (page, helpers) => {
             const swPath = path.join(helpers.PROJECT_ROOT, 'sw.js');
             const htmlPath = path.join(helpers.PROJECT_ROOT, 'index.html');
             const swCode = fs.readFileSync(swPath, 'utf8');
             const htmlCode = fs.readFileSync(htmlPath, 'utf8');
-            const hasTargetCache = swCode.includes("const CACHE_NAME = 'organizador-tareas-cache-v1.5.7';");
-            helpers.assertTrue(hasTargetCache, 'sw.js must specify organizador-tareas-cache-v1.5.7 cache name');
-            helpers.assertTrue(swCode.includes('?v=1.5.7'), 'sw.js precache assets must use ?v=1.5.7 query parameter');
-            helpers.assertTrue(htmlCode.includes('?v=1.5.7'), 'index.html assets must use ?v=1.5.7 query parameter');
+            const hasTargetCache = swCode.includes("const CACHE_NAME = 'organizador-tareas-cache-v1.5.9';");
+            helpers.assertTrue(hasTargetCache, 'sw.js must specify organizador-tareas-cache-v1.5.9 cache name');
+            helpers.assertTrue(swCode.includes('?v=1.5.9'), 'sw.js precache assets must use ?v=1.5.9 query parameter');
+            helpers.assertTrue(htmlCode.includes('?v=1.5.9'), 'index.html assets must use ?v=1.5.9 query parameter');
             helpers.assertFalse(/\?v=[^\s'"]*(-e\d+|-ui|-s\d+)/i.test(swCode), 'sw.js must not contain temporary -e, -ui, or -s query suffixes');
-            helpers.assertTrue(swCode.includes('js/segmented.js?v=1.5.7'), 'sw.js must precache js/segmented.js?v=1.5.7');
-            helpers.assertTrue(swCode.includes('js/photo-editor.js?v=1.5.7'), 'sw.js must precache js/photo-editor.js?v=1.5.7');
-            helpers.assertTrue(swCode.includes('js/backgrounds.js?v=1.5.7'), 'sw.js must precache js/backgrounds.js?v=1.5.7');
+            helpers.assertTrue(swCode.includes('js/liquid-glass.js?v=1.5.9'), 'sw.js must precache js/liquid-glass.js?v=1.5.9');
+            helpers.assertTrue(swCode.includes('js/segmented.js?v=1.5.9'), 'sw.js must precache js/segmented.js?v=1.5.9');
+            helpers.assertTrue(swCode.includes('js/photo-editor.js?v=1.5.9'), 'sw.js must precache js/photo-editor.js?v=1.5.9');
+            helpers.assertTrue(swCode.includes('js/backgrounds.js?v=1.5.9'), 'sw.js must precache js/backgrounds.js?v=1.5.9');
         }
     },
     {
         id: 'T1_F01_05_scoped_changelog_content',
         feature: 'F01',
-        name: 'Changelog modal announces 1.5.7 updates, ALPA Studio footer, and hides Liquid Glass or secret code leaks',
+        name: 'Changelog modal announces 1.5.9 updates, ALPA Studio footer, and hides Liquid Glass or secret code leaks',
         run: async (page, helpers) => {
             const modalInfo = await page.evaluate(() => {
                 const modal = document.getElementById('changelog-modal');
@@ -85,7 +88,7 @@ const tests = [
                 };
             });
             const modalText = modalInfo.modalText;
-            helpers.assertTrue(modalText.includes('1.5.7'), 'Changelog modal must display version 1.5.7');
+            helpers.assertTrue(modalText.includes('1.5.9'), 'Changelog modal must display version 1.5.9');
             helpers.assertTrue(/efectos de transparencia avanzados/i.test(modalText), 'Changelog modal must mention Efectos de transparencia avanzados');
             helpers.assertTrue(/calendario rápido/i.test(modalText), 'Changelog modal must mention Calendario rápido');
             helpers.assertTrue(/notas privadas/i.test(modalText) && /PIN/i.test(modalText), 'Changelog modal must mention Notas privadas and PIN');
@@ -1002,18 +1005,18 @@ const tests = [
     {
         id: 'T1_F12_04_celebration_emojis_rendered',
         feature: 'F12',
-        name: 'Celebration container includes congratulatory emojis',
+        name: 'Celebration renders animated SVG line checkmark without decorative emojis',
         run: async (page, helpers) => {
-            const emojis = ['🎉', '🥳', '🚀', '✨', '🎊', '👏', '🎓'];
-            const containsEmoji = await page.evaluate(emList => {
-                const el = document.getElementById('onboarding-celebration-msg') ||
-                           document.querySelector('.celebration-msg') ||
-                           document.getElementById('cycle-setup-modal');
-                if (!el) return false;
-                const text = el.textContent;
-                return emList.some(em => text.includes(em));
-            }, emojis);
-            helpers.assertTrue(containsEmoji, 'Celebration should render congratulatory emojis');
+            const iconsState = await page.evaluate(() => {
+                const modal = document.getElementById('cycle-setup-modal');
+                const checkSvg = document.querySelector('#onboarding-celebration-container .welcome-check-svg');
+                const forbiddenEmojis = ['🎓', '🚀', '📷', '✕', '🎉', '🥳', '✨', '🎊', '👏'];
+                const text = modal ? modal.textContent : '';
+                const hasEmoji = forbiddenEmojis.some(em => text.includes(em));
+                return { hasCheckSvg: Boolean(checkSvg), hasEmoji };
+            });
+            helpers.assertTrue(iconsState.hasCheckSvg, 'Celebration container should render animated SVG checkmark');
+            helpers.assertFalse(iconsState.hasEmoji, '#cycle-setup-modal must not render decorative emojis');
         }
     },
     {

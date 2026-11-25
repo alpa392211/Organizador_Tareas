@@ -26,38 +26,83 @@
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        if (typeof tailwind !== 'undefined') {
-            tailwind.config = {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        colors: {
-                            brand: {
-                                50: '#eef2ff',
-                                100: '#e0e7ff',
-                                500: '#6366f1',
-                                600: '#4f46e5',
-                                700: '#4338ca',
-                            }
-                        },
-                        borderRadius: {
-                            '2xl': '1rem',
-                            '3xl': '1.5rem',
-                        }
-                    }
-                }
-            };
-        }
-    </script>
-
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.7">
-    <link rel="stylesheet" href="css/styles.css?v=1.5.7">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.5.9">
+    <link rel="stylesheet" href="css/styles.css?v=1.5.9">
 </head>
 <body class="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+    <!-- Pantalla de arranque ligera (se oculta en cuanto App.init() finaliza; muestra Reintentar tras 4s) -->
+    <div id="app-splash-screen" role="status" aria-live="polite"
+        style="position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;background:#0f172a;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;text-align:center;">
+        <div class="app-splash-mark" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="17" rx="3"></rect>
+                <path d="M8 2v4M16 2v4M3 10h18M8 14h4M8 18h7"></path>
+            </svg>
+        </div>
+        <div class="app-splash-spinner" aria-hidden="true"></div>
+        <p id="app-splash-label" style="margin:0;font-size:13px;font-weight:700;letter-spacing:0.01em;color:#e2e8f0;">Cargando organizador...</p>
+        <div id="splash-retry-wrap" style="display:none;flex-direction:column;align-items:center;gap:10px;margin-top:6px;">
+            <p style="margin:0;font-size:12px;color:#94a3b8;">El arranque está tardando más de lo normal.</p>
+            <button type="button" id="splash-retry-btn"
+                style="min-height:44px;padding:10px 20px;border-radius:9999px;border:1px solid rgba(129,140,248,0.45);background:#4f46e5;color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;">
+                Reintentar
+            </button>
+        </div>
+    </div>
+    <script>
+        (function () {
+            window.__appInitDone = false;
+            var splashEl = document.getElementById('app-splash-screen');
+            var retryWrap = document.getElementById('splash-retry-wrap');
+            var retryBtn = document.getElementById('splash-retry-btn');
+
+            window.__hideAppSplash = function () {
+                window.__appInitDone = true;
+                if (window.__splashRetryTimer) {
+                    clearTimeout(window.__splashRetryTimer);
+                    window.__splashRetryTimer = null;
+                }
+                if (splashEl) {
+                    splashEl.style.display = 'none';
+                    splashEl.setAttribute('aria-hidden', 'true');
+                }
+            };
+
+            window.__splashRetryTimer = setTimeout(function () {
+                if (!window.__appInitDone && retryWrap) {
+                    retryWrap.style.display = 'flex';
+                }
+            }, 4000);
+
+            if (retryBtn) {
+                retryBtn.addEventListener('click', function () {
+                    retryBtn.disabled = true;
+                    retryBtn.textContent = 'Reiniciando...';
+                    var jobs = [];
+                    try {
+                        if ('serviceWorker' in navigator && navigator.serviceWorker.getRegistrations) {
+                            jobs.push(
+                                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                                    return Promise.all(regs.map(function (r) { return r.unregister().catch(function () {}); }));
+                                }).catch(function () {})
+                            );
+                        }
+                        if ('caches' in window && caches.keys) {
+                            jobs.push(
+                                caches.keys().then(function (keys) {
+                                    return Promise.all(keys.map(function (k) { return caches.delete(k).catch(function () {}); }));
+                                }).catch(function () {})
+                            );
+                        }
+                    } catch (_) {}
+                    Promise.all(jobs).finally(function () {
+                        try { window.location.reload(); } catch (_) {}
+                    });
+                });
+            }
+        })();
+    </script>
     <!-- Capa de fondo ambiental fija para efectos de transparencia avanzados -->
     <div id="app-background" aria-hidden="true"></div>
 
@@ -297,6 +342,18 @@
                     </div>
                     <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-600 text-white">PWA</span>
                 </button>
+
+                <!-- Descarga directa de APK Android (Solo Web / GitHub Pages) -->
+                <a id="drawer-apk-download-link" href="downloads/Organizador-v1.5.9.apk" download="Organizador-v1.5.9.apk"
+                    class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/12 hover:bg-emerald-500/20 tap-effect transition-all text-left">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M12 10v5m0 0l-2-2m2 2l2-2"/></svg>
+                        </span>
+                        <span class="truncate">Descargar APK Android</span>
+                    </div>
+                    <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">APK</span>
+                </a>
             </nav>
         </div>
 
@@ -511,12 +568,9 @@
                     <!-- Filtro por Materia -->
                     <div class="sm:col-span-3 relative min-w-0">
                         <select id="task-subject-filter"
-                            class="w-full min-h-[44px] appearance-none bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold pl-3 pr-8 py-2 rounded-2xl focus:border-indigo-500 focus:outline-none cursor-pointer">
+                            class="w-full min-h-[44px] appearance-none bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold pl-3 pr-10 py-2 rounded-2xl focus:border-indigo-500 focus:outline-none cursor-pointer">
                             <option value="all">Todas las materias</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -618,29 +672,30 @@
 
                     <!-- Filtros por Tipo de Nota (Pills deslizables con desvanecido suave en bordes) -->
                     <div class="sm:col-span-7 notes-filter-scroll-wrap min-w-0">
-                        <div class="notes-filter-scroll flex items-center gap-1.5 overflow-x-auto px-2 py-1 scrollbar-none">
+                        <div id="notes-filter-scroll" class="notes-filter-scroll relative flex items-center gap-1.5 overflow-x-auto px-2 py-1 scrollbar-none">
+                            <span id="notes-filter-indicator" aria-hidden="true" class="chip-glass-indicator"></span>
                             <button type="button" data-note-filter="all"
-                                class="note-filter-chip note-filter-active tap-effect shrink-0 px-3.5 py-2 text-xs font-bold rounded-full transition-transform bg-indigo-600 text-white shadow-md whitespace-nowrap">
+                                class="note-filter-chip note-filter-active relative z-10 tap-effect shrink-0 px-3.5 py-2 text-xs font-bold rounded-full transition-transform bg-indigo-600 text-white shadow-md whitespace-nowrap">
                                 Todas
                             </button>
                             <button type="button" data-note-filter="idea"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip relative z-10 tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>💡</span> <span>Ideas</span>
                             </button>
                             <button type="button" data-note-filter="apunte"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip relative z-10 tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>📝</span> <span>Apuntes</span>
                             </button>
                             <button type="button" data-note-filter="pendiente"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip relative z-10 tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>📌</span> <span>Pendientes</span>
                             </button>
                             <button type="button" data-note-filter="importante"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip relative z-10 tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>⚠️</span> <span>Importante</span>
                             </button>
                             <button type="button" data-note-filter="personal"
-                                class="note-filter-chip tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
+                                class="note-filter-chip relative z-10 tap-effect shrink-0 px-3.5 py-2 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-transform flex items-center gap-1.5 whitespace-nowrap">
                                 <span>🔒</span> <span>Personal</span>
                             </button>
                         </div>
@@ -1023,15 +1078,15 @@
                         <!-- Selección Básica de Tema -->
                         <div class="space-y-2">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Modo de Color Principal</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                                <button type="button" id="settings-theme-light" class="touch-target-44 min-h-[44px] tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
-                                    <span>☀️</span><span>Modo Claro</span>
+                            <div id="settings-theme-mode-track" role="group" aria-label="Modo de color principal" class="segmented-control-track grid grid-cols-3 gap-1 min-w-0">
+                                <button type="button" id="settings-theme-light" data-theme-choice="light" aria-pressed="false" class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 transition-colors truncate">
+                                    <span aria-hidden="true" class="shrink-0">☀️</span><span class="truncate"><span class="hidden sm:inline">Modo </span>Claro</span>
                                 </button>
-                                <button type="button" id="settings-theme-dark" class="touch-target-44 min-h-[44px] tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
-                                    <span>🌙</span><span>Modo Oscuro</span>
+                                <button type="button" id="settings-theme-dark" data-theme-choice="dark" aria-pressed="false" class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 transition-colors truncate">
+                                    <span aria-hidden="true" class="shrink-0">🌙</span><span class="truncate"><span class="hidden sm:inline">Modo </span>Oscuro</span>
                                 </button>
-                                <button type="button" id="settings-theme-auto" class="touch-target-44 min-h-[44px] tap-effect p-3 rounded-xl border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200">
-                                    <span>💻</span><span>Automático</span>
+                                <button type="button" id="settings-theme-auto" data-theme-choice="auto" aria-pressed="false" class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 transition-colors truncate">
+                                    <span aria-hidden="true" class="shrink-0">💻</span><span class="truncate"><span class="sm:hidden">Auto</span><span class="hidden sm:inline">Automático</span></span>
                                 </button>
                             </div>
                         </div>
@@ -1442,9 +1497,9 @@
                             <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div id="storage-bar-fill" class="storage-progress-bar h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full" style="width: 2%;"></div>
                             </div>
-                            <div class="flex items-center justify-between gap-2 flex-wrap text-[11px] text-slate-500 font-mono">
+                            <div class="flex items-center justify-between gap-2 flex-wrap text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                                 <span id="storage-detail-used" class="min-w-0 break-words">0.0 KB utilizados</span>
-                                <span class="shrink-0">Límite ~5 MB</span>
+                                <span id="storage-quota-label" class="shrink-0">Calculando capacidad...</span>
                             </div>
                         </div>
                         <!-- Botones de Acción -->
@@ -1458,6 +1513,16 @@
                             <input type="file" id="settings-import-input" accept=".json" class="hidden">
                             <button type="button" id="settings-clear-all" class="touch-target-44 min-h-[44px] tap-effect p-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs flex flex-col items-center justify-center text-center gap-1.5 border border-rose-200/50 dark:border-rose-800">
                                 <span class="text-lg">🗑️</span><span>Borrar Todos los Datos</span>
+                            </button>
+                        </div>
+                        <p id="settings-restore-warning" class="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 rounded-xl px-3 py-2 leading-relaxed">
+                            Aviso: al restaurar un respaldo se borrarán y reemplazarán todos tus datos actuales. Exporta una copia antes si deseas conservarlos.
+                        </p>
+                        <div class="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-700/60">
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400">¿Problemas al iniciar? Copia un informe técnico sin datos personales.</span>
+                            <button type="button" id="settings-copy-diagnostics-btn"
+                                class="touch-target-44 min-h-[44px] tap-effect px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 font-bold text-xs border border-slate-200/80 dark:border-slate-600/80 shrink-0 transition-colors">
+                                Copiar informe de diagnóstico
                             </button>
                         </div>
                     </div>
@@ -1578,17 +1643,42 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.5.7 -->
+                <!-- Tarjeta: Descarga APK para Android (Solo Web / GitHub Pages) -->
+                <div id="apk-download-settings-card" class="settings-accordion-card rounded-2xl border border-emerald-200/80 dark:border-emerald-900/60 overflow-hidden bg-gradient-to-r from-emerald-50/60 via-teal-50/40 to-white dark:from-emerald-950/40 dark:via-teal-950/20 dark:to-slate-800 p-4 sm:p-5 shadow-xs">
+                    <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap min-w-0">
+                        <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                            <img src="assets/icons/icon-192x192.png" alt="Logo Organizador APK" class="w-12 h-12 rounded-2xl shadow-md border border-emerald-200/60 dark:border-emerald-800 shrink-0 object-cover">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Descargar App para Android</h3>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 shrink-0">APK v1.5.9</span>
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Instala <strong>Organizador</strong> directamente en Android con widgets de escritorio y funcionamiento 100% sin conexión.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+                            <a id="apk-settings-download-link" href="downloads/Organizador-v1.5.9.apk" download="Organizador-v1.5.9.apk"
+                                class="touch-target-44 min-h-[44px] tap-effect w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+                                <span>Descargar APK</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VERSIÓN HASTA ABAJO v1.5.9 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.5.7</span>
+                        <span>Versión 1.5.9</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="touch-target-44 min-h-[44px] px-3 tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.5.7</span>
+                        <span>✨ Ver novedades de la versión 1.5.9</span>
                     </button>
                 </div>
             </div>
@@ -1597,7 +1687,7 @@
         <!-- ========================================================= -->
         <!-- VISTA 7: BÓVEDA DE CÓDIGOS SECRETOS (ATMÓSFERA DE SUSPENSO) -->
         <!-- ========================================================= -->
-        <section id="view-secret-codes" class="view-transition hidden min-h-[75vh] flex flex-col justify-between py-2">
+        <section id="view-secret-codes" class="view-transition hidden flex flex-col gap-4 py-2 pb-10">
             <!-- Barra Superior: Botón de Regreso a Configuración -->
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4 min-w-0">
                 <button type="button" id="vault-back-btn" data-view-target="settings"
@@ -1608,115 +1698,122 @@
                 <span class="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-3 py-1 rounded-xl border border-purple-500/20 uppercase tracking-widest shrink-0">TERMINAL SEC-08</span>
             </div>
 
-            <!-- Tarjeta de Progreso de Desbloqueo Automático (1 cada 5 tareas) -->
-            <div id="vault-progress-card" class="glass-panel w-full max-w-lg mx-auto mb-4 p-4 rounded-2xl bg-white/95 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-2.5 transition-all">
-                <div class="flex items-center justify-between gap-2 flex-wrap">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <span class="text-base select-none">⚡</span>
-                        <h3 class="text-xs sm:text-sm font-extrabold text-purple-950 dark:text-purple-200">
-                            Desbloqueo Progresivo de Códigos
-                        </h3>
-                    </div>
-                    <span id="vault-completed-tasks-badge" class="hidden px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-700">
-                        0 tareas
-                    </span>
-                </div>
-                <!-- Barra de progreso -->
-                <div class="w-full bg-slate-100 dark:bg-purple-950/80 rounded-full h-2.5 overflow-hidden border border-purple-200/60 dark:border-purple-700/50">
-                    <div id="vault-progress-bar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-                <div class="flex items-center justify-between gap-2 text-[11px] text-purple-700 dark:text-purple-300 flex-wrap">
-                    <span id="vault-next-unlock-text">Completa tareas para desbloquear el próximo código</span>
-                    <span id="vault-unlocked-count-text" class="hidden font-mono font-bold">0 / 13</span>
-                </div>
-                <p id="vault-secret-notice" class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-purple-100 dark:border-purple-900/50 pt-1.5">
-                    Cumple 5 tareas y se te dará un código
-                </p>
-            </div>
-
-            <!-- Contenedor Central con Aura de Suspenso Cinematográfica -->
-            <div id="vault-card-container" class="vault-suspense-container flex-1 rounded-3xl p-5 sm:p-10 flex flex-col items-center justify-center text-center shadow-2xl relative my-auto">
-                <div class="relative z-10 max-w-md w-full space-y-6">
-                    <!-- Icono o Símbolo Enigmático -->
-                    <div class="w-20 h-20 mx-auto rounded-3xl bg-purple-950/70 border border-purple-400/40 text-purple-300 flex items-center justify-center text-3xl shadow-lg shadow-purple-950/60 animate-pulse">
-                        🔒
-                    </div>
-
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-widest uppercase mb-1 drop-shadow-md">
-                            Bóveda Clasificada
-                        </h2>
-                        <p class="text-xs text-purple-200/90 font-mono tracking-wider">
-                            Introduce la clave de acceso o protocolo alfanumérico
+            <!-- Zona adaptativa de Bóveda: 1 col en móvil, 2 cols en tablet/laptop -->
+            <div class="vault-layout-shell">
+                <div class="vault-col-left">
+                    <!-- Tarjeta de Progreso de Desbloqueo Automático (1 cada 5 tareas) -->
+                    <div id="vault-progress-card" class="glass-panel w-full max-w-lg mx-auto mb-4 p-4 rounded-2xl bg-white/95 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-2.5 transition-all">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="text-base select-none">⚡</span>
+                                <h3 class="text-xs sm:text-sm font-extrabold text-purple-950 dark:text-purple-200">
+                                    Desbloqueo Progresivo de Códigos
+                                </h3>
+                            </div>
+                            <span id="vault-completed-tasks-badge" class="hidden px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-700">
+                                0 tareas
+                            </span>
+                        </div>
+                        <!-- Barra de progreso -->
+                        <div class="w-full bg-slate-100 dark:bg-purple-950/80 rounded-full h-2.5 overflow-hidden border border-purple-200/60 dark:border-purple-700/50">
+                            <div id="vault-progress-bar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 text-[11px] text-purple-700 dark:text-purple-300 flex-wrap">
+                            <span id="vault-next-unlock-text">Completa tareas para desbloquear el próximo código</span>
+                            <span id="vault-unlocked-count-text" class="hidden font-mono font-bold">0 / 13</span>
+                        </div>
+                        <p id="vault-secret-notice" class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-purple-100 dark:border-purple-900/50 pt-1.5">
+                            Cumple 5 tareas y se te dará un código
                         </p>
                     </div>
 
-                    <!-- Entrada de Código Continuo (con proxies ocultos para compatibilidad) -->
-                    <div class="space-y-4">
-                        <div id="vault-inputs-wrapper" class="flex items-center justify-center gap-3">
-                            <input type="text" id="vault-code-input" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="••••••••" class="w-full text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-4 rounded-2xl bg-black/70 border-2 border-purple-400/50 text-purple-100 focus:outline-none focus:border-purple-300 focus:ring-4 focus:ring-purple-500/30 transition-all placeholder:text-purple-900/60 shadow-inner">
-                            <input type="text" id="vault-code-p1" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="display:none;">
-                            <input type="text" id="vault-code-p2" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="display:none;">
+                    <!-- Contenedor Central con Aura de Suspenso Cinematográfica -->
+                    <div id="vault-card-container" class="vault-suspense-container flex-1 rounded-3xl p-5 sm:p-10 flex flex-col items-center justify-center text-center shadow-2xl relative my-auto">
+                        <div class="relative z-10 max-w-md w-full space-y-6">
+                            <!-- Icono o Símbolo Enigmático -->
+                            <div class="w-20 h-20 mx-auto rounded-3xl bg-purple-950/70 border border-purple-400/40 text-purple-300 flex items-center justify-center text-3xl shadow-lg shadow-purple-950/60">
+                                🔒
+                            </div>
+
+                            <div>
+                                <h2 class="vault-card-title text-xl sm:text-2xl font-black text-white tracking-widest uppercase mb-1 drop-shadow-md">
+                                    Bóveda Clasificada
+                                </h2>
+                                <p class="vault-card-subtitle text-xs text-purple-200/90 font-mono tracking-wider">
+                                    Introduce la clave de acceso o protocolo alfanumérico
+                                </p>
+                            </div>
+
+                            <!-- Entrada de Código Continuo (con proxies ocultos para compatibilidad) -->
+                            <div class="space-y-4">
+                                <div id="vault-inputs-wrapper" class="flex items-center justify-center gap-3">
+                                    <input type="text" id="vault-code-input" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="••••••••" class="w-full text-center text-xl sm:text-2xl font-mono font-black tracking-widest uppercase py-3.5 px-4 rounded-2xl bg-black/70 border-2 border-purple-400/50 text-purple-100 focus:outline-none focus:border-purple-300 focus:ring-4 focus:ring-purple-500/30 transition-all placeholder:text-purple-900/60 shadow-inner">
+                                    <input type="text" id="vault-code-p1" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="display:none;">
+                                    <input type="text" id="vault-code-p2" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="display:none;">
+                                </div>
+
+                                <!-- Mensaje de Retroalimentación de Error -->
+                                <div id="vault-status-message" class="min-h-[24px] text-xs font-mono font-bold transition-all"></div>
+
+                                <!-- Botón de Transmitir / Verificar Código -->
+                                <button type="button" id="vault-submit-btn"
+                                    class="touch-target-44 min-h-[44px] tap-effect w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm tracking-widest uppercase shadow-xl shadow-purple-900/50 border border-purple-400/30 transition-all">
+                                    Verificar Código
+                                </button>
+                            </div>
                         </div>
-
-                        <!-- Mensaje de Retroalimentación de Error -->
-                        <div id="vault-status-message" class="min-h-[24px] text-xs font-mono font-bold transition-all"></div>
-
-                        <!-- Botón de Transmitir / Verificar Código -->
-                        <button type="button" id="vault-submit-btn"
-                            class="touch-target-44 min-h-[44px] tap-effect w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm tracking-widest uppercase shadow-xl shadow-purple-900/50 border border-purple-400/30 transition-all">
-                            Verificar Código
-                        </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- ========================================================= -->
-            <!-- INVENTARIO DE PROTOCOLOS DESCUBIERTOS (M2)               -->
-            <!-- ========================================================= -->
-            <div id="vault-inventory-wrapper" class="w-full max-w-lg mx-auto mt-6 px-2 space-y-3">
-                <div class="flex items-center justify-between gap-2 flex-wrap border-b border-purple-500/20 pb-2">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <span class="text-base select-none">🗝️</span>
-                        <h3 class="text-xs sm:text-sm font-black text-purple-900 dark:text-purple-200 uppercase tracking-widest">
-                            Protocolos Descubiertos
-                        </h3>
-                    </div>
-                    <span class="text-[10px] font-mono text-purple-400 dark:text-purple-400 uppercase tracking-wider select-none shrink-0">Catálogo Clasificado</span>
-                </div>
-                
-                <div id="vault-unlocked-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[38vh] overflow-y-auto overflow-x-hidden pr-1">
-                    <!-- Tarjetas renderizadas dinámicamente mediante App.renderVaultInventory() -->
-                </div>
-            </div>
-
-            <!-- Proxies ocultos para compatibilidad con suites de pruebas heredadas -->
-            <input type="checkbox" id="settings-gray-mode-toggle" style="display:none;" aria-hidden="true">
-            <button type="button" id="vault-verify-btn" style="display:none;" aria-hidden="true"></button>
-
-            <!-- Funciones Especiales Secretas (Exclusivas de la Bóveda) -->
-            <div id="secret-theme-controls" data-theme-switchboard="true" style="display:none" class="hidden w-full max-w-lg mx-auto mt-4 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/80 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-3">
-                <div class="flex items-center gap-2 border-b border-purple-100 dark:border-purple-900/40 pb-2">
-                    <span class="text-base select-none">✨</span>
-                    <h3 class="text-xs sm:text-sm font-extrabold text-purple-950 dark:text-purple-200">
-                        Funciones Secretas de la Bóveda
-                    </h3>
-                </div>
-                <div class="space-y-3">
-                    <!-- Modo Monocromático / Escala de Grises -->
-                    <div class="flex items-center justify-between gap-3">
-                        <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                                <span>🔲</span> Modo Monocromático
-                            </span>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
-                                Interfaz minimalista en escala de grises para máxima concentración.
-                            </p>
+                <div class="vault-col-right">
+                    <!-- ========================================================= -->
+                    <!-- INVENTARIO DE PROTOCOLOS DESCUBIERTOS (M2)               -->
+                    <!-- ========================================================= -->
+                    <div id="vault-inventory-wrapper" class="w-full max-w-lg mx-auto mt-2 space-y-3">
+                        <div class="flex items-center justify-between gap-2 flex-wrap border-b border-purple-500/20 pb-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="text-base select-none">🗝️</span>
+                                <h3 class="text-xs sm:text-sm font-black text-purple-900 dark:text-purple-200 uppercase tracking-widest">
+                                    Protocolos Descubiertos
+                                </h3>
+                            </div>
+                            <span class="text-[10px] font-mono text-purple-400 dark:text-purple-400 uppercase tracking-wider select-none shrink-0">Catálogo Clasificado</span>
                         </div>
-                        <button type="button" id="settings-gray-mode-btn"
-                            class="touch-target-44 min-h-[44px] tap-effect shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50">
-                            Activar
-                        </button>
+                        
+                        <div id="vault-unlocked-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Tarjetas renderizadas dinámicamente mediante App.renderVaultInventory() -->
+                        </div>
+                    </div>
+
+                    <!-- Proxies ocultos para compatibilidad con suites de pruebas heredadas -->
+                    <input type="checkbox" id="settings-gray-mode-toggle" style="display:none;" aria-hidden="true">
+                    <button type="button" id="vault-verify-btn" style="display:none;" aria-hidden="true"></button>
+
+                    <!-- Funciones Especiales Secretas (Exclusivas de la Bóveda) -->
+                    <div id="secret-theme-controls" data-theme-switchboard="true" style="display:none" class="hidden w-full max-w-lg mx-auto mt-4 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/80 border border-purple-200 dark:border-purple-800/60 shadow-sm space-y-3">
+                        <div class="flex items-center gap-2 border-b border-purple-100 dark:border-purple-900/40 pb-2">
+                            <span class="text-base select-none">✨</span>
+                            <h3 class="text-xs sm:text-sm font-extrabold text-purple-950 dark:text-purple-200">
+                                Funciones Secretas de la Bóveda
+                            </h3>
+                        </div>
+                        <div class="space-y-3">
+                            <!-- Modo Monocromático / Escala de Grises -->
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="min-w-0">
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>🔲</span> Modo Monocromático
+                                    </span>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                        Interfaz minimalista en escala de grises para máxima concentración.
+                                    </p>
+                                </div>
+                                <button type="button" id="settings-gray-mode-btn"
+                                    class="touch-target-44 min-h-[44px] tap-effect shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer bg-purple-600/30 text-purple-900 dark:text-purple-200 border border-purple-500/30 hover:bg-purple-600/50">
+                                    Activar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1770,6 +1867,60 @@
             </button>
         </div>
     </nav>
+
+    <!-- ========================================================= -->
+    <!-- DOCK LATERAL DERECHO DE ACCIÓN RÁPIDA EN TABLET (>=768px) -->
+    <!-- ========================================================= -->
+    <aside id="tablet-quick-rail" class="tablet-quick-rail" aria-label="Acceso rápido lateral">
+        <!-- Rail vertical desplegable (Materias, Tareas, Notas, Calendario) -->
+        <div id="tablet-rail-nav" class="tablet-rail-panel tablet-rail-collapsed" aria-hidden="true">
+            <button type="button" data-view-target="subjects" title="Ir a Materias"
+                class="nav-link-btn touch-target-44 min-h-[44px] px-3 py-2 rounded-full text-xs font-bold flex items-center gap-2 tap-effect transition-colors text-slate-700 dark:text-slate-200">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                <span>Materias</span>
+            </button>
+            <button type="button" data-view-target="tasks" title="Ir a Tareas"
+                class="nav-link-btn touch-target-44 min-h-[44px] px-3 py-2 rounded-full text-xs font-bold flex items-center gap-2 tap-effect transition-colors text-slate-700 dark:text-slate-200">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2m-6 9l2 2 4-4"/></svg>
+                <span>Tareas</span>
+            </button>
+            <button type="button" data-view-target="notes" title="Ir a Notas"
+                class="nav-link-btn touch-target-44 min-h-[44px] px-3 py-2 rounded-full text-xs font-bold flex items-center gap-2 tap-effect transition-colors text-slate-700 dark:text-slate-200">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                <span>Notas</span>
+            </button>
+            <button type="button" data-view-target="calendar" title="Ir a Calendario"
+                class="nav-link-btn touch-target-44 min-h-[44px] px-3 py-2 rounded-full text-xs font-bold flex items-center gap-2 tap-effect transition-colors text-slate-700 dark:text-slate-200">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                <span>Calendario</span>
+            </button>
+        </div>
+
+        <!-- Conmutador del rail de navegación -->
+        <button type="button" id="tablet-rail-toggle-btn" aria-expanded="false" aria-controls="tablet-rail-nav"
+            class="tablet-rail-toggle-btn touch-target-44 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center tap-effect"
+            title="Accesos rápidos de vistas" aria-label="Mostrar u ocultar accesos rápidos de vistas">
+            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M4 6h16M4 12h16M4 18h10"/>
+            </svg>
+        </button>
+
+        <!-- Botón flotante de acción rápida sincronizado con Configuración -->
+        <button type="button" id="tablet-main-action-btn"
+            class="tablet-main-action-btn relative flex flex-col items-center tap-effect group"
+            title="Atajo de Acción Rápida" aria-label="Atajo de Acción Rápida">
+            <div id="tablet-main-circle" class="w-14 h-14 rounded-full fab-gradient-action text-white flex items-center justify-center opacity-100">
+                <span id="tablet-main-icon">
+                    <svg class="w-7 h-7 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </span>
+            </div>
+            <span id="tablet-main-label" class="tablet-main-label text-[10px] font-extrabold text-teal-600 dark:text-teal-400 mt-1 px-2 py-0.5 rounded-full truncate max-w-[84px]">
+                + Tarea
+            </span>
+        </button>
+    </aside>
 
     <!-- ========================================================= -->
     <!-- MODAL 1: NUEVA / EDITAR MATERIA (CON SELECTOR DE COLOR)   -->
@@ -1971,12 +2122,26 @@
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                             Prioridad
                         </label>
-                        <select id="task-priority"
-                            class="w-full min-h-[44px] px-3 py-2 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
-                            <option value="alta">🔴 Alta</option>
-                            <option value="media" selected>🟡 Media</option>
-                            <option value="baja">🟢 Baja</option>
+                        <select id="task-priority" class="sr-only" aria-hidden="true" tabindex="-1">
+                            <option value="alta">Alta</option>
+                            <option value="media" selected>Media</option>
+                            <option value="baja">Baja</option>
                         </select>
+                        <div id="task-priority-segmented" role="radiogroup" aria-label="Prioridad de la tarea"
+                            class="segmented-control-track rounded-full flex items-center gap-1 min-w-0">
+                            <button type="button" role="radio" data-task-priority="alta" aria-checked="false" aria-pressed="false"
+                                class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2.5 py-2 text-xs font-bold rounded-full tap-effect truncate">
+                                Alta
+                            </button>
+                            <button type="button" role="radio" data-task-priority="media" aria-checked="true" aria-pressed="true"
+                                class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2.5 py-2 text-xs font-bold rounded-full seg-btn-active tap-effect truncate">
+                                Media
+                            </button>
+                            <button type="button" role="radio" data-task-priority="baja" aria-checked="false" aria-pressed="false"
+                                class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-2.5 py-2 text-xs font-bold rounded-full tap-effect truncate">
+                                Baja
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -2031,18 +2196,40 @@
                 </div>
 
                 <!-- Selector de Categoría / Tipo de Nota -->
-                <div>
+                <div class="min-w-0">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                         Tipo de Nota / Categoría
                     </label>
-                    <select id="note-type"
-                        class="w-full min-h-[44px] px-4 py-2.5 bg-white/45 dark:bg-white/10 border border-slate-900/10 dark:border-white/15 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
-                        <option value="apunte" selected>📝 Apunte Rápido</option>
-                        <option value="idea">💡 Idea</option>
-                        <option value="pendiente">📌 Pendiente</option>
-                        <option value="importante">⚠️ Importante</option>
-                        <option value="personal">🔒 Personal</option>
+                    <select id="note-type" class="sr-only" aria-hidden="true" tabindex="-1">
+                        <option value="apunte" selected>Apunte Rápido</option>
+                        <option value="idea">Idea</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="importante">Importante</option>
+                        <option value="personal">Personal</option>
                     </select>
+                    <div id="note-type-segmented" role="radiogroup" aria-label="Tipo de nota o categoría"
+                        class="segmented-control-track note-type-segmented-track rounded-full flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0">
+                        <button type="button" role="radio" data-note-type="apunte" aria-checked="true" aria-pressed="true"
+                            class="touch-target-44 shrink-0 min-h-[44px] px-3 py-2 text-xs font-bold rounded-full seg-btn-active tap-effect whitespace-nowrap">
+                            Apunte
+                        </button>
+                        <button type="button" role="radio" data-note-type="idea" aria-checked="false" aria-pressed="false"
+                            class="touch-target-44 shrink-0 min-h-[44px] px-3 py-2 text-xs font-bold rounded-full tap-effect whitespace-nowrap">
+                            Idea
+                        </button>
+                        <button type="button" role="radio" data-note-type="pendiente" aria-checked="false" aria-pressed="false"
+                            class="touch-target-44 shrink-0 min-h-[44px] px-3 py-2 text-xs font-bold rounded-full tap-effect whitespace-nowrap">
+                            Pendiente
+                        </button>
+                        <button type="button" role="radio" data-note-type="importante" aria-checked="false" aria-pressed="false"
+                            class="touch-target-44 shrink-0 min-h-[44px] px-3 py-2 text-xs font-bold rounded-full tap-effect whitespace-nowrap">
+                            Importante
+                        </button>
+                        <button type="button" role="radio" data-note-type="personal" aria-checked="false" aria-pressed="false"
+                            class="touch-target-44 shrink-0 min-h-[44px] px-3 py-2 text-xs font-bold rounded-full tap-effect whitespace-nowrap">
+                            Personal
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Contenido -->
@@ -2265,113 +2452,164 @@
     <!-- ========================================================= -->
     <!-- MODAL DE BIENVENIDA Y CONFIGURACIÓN INICIAL (ONBOARDING)  -->
     <!-- ========================================================= -->
-    <div id="cycle-setup-modal" class="modal-overlay fixed inset-0 w-full bg-slate-900 dark:bg-slate-950 text-white z-50 overflow-y-auto hidden flex-col justify-start" style="height:100dvh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain">
-        <div id="cycle-setup-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/80 backdrop-blur-md pointer-events-none"></div>
+    <div id="cycle-setup-modal" class="modal-overlay fixed inset-0 w-full bg-slate-900 dark:bg-slate-950 text-white z-50 overflow-y-auto hidden flex-col justify-start">
+        <div id="cycle-setup-backdrop" class="app-modal-backdrop welcome-ambient-backdrop fixed inset-0 pointer-events-none"></div>
 
-        <div class="modal-dialog relative w-full max-w-xl mx-auto my-auto p-4 sm:p-10 pb-28 sm:pb-32 space-y-6">
-            <!-- Encabezado de bienvenida -->
-            <div class="flex flex-col items-center text-center gap-3">
-                <span class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-3xl leading-none shrink-0 shadow-lg shadow-indigo-950/50 mx-auto">
-                    🎓
-                </span>
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-white leading-tight">
-                        ¡Bienvenido a tu Organizador! 🚀
-                    </h2>
-                    <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                        Configuración Inicial
+        <div class="modal-dialog relative w-full mx-auto my-auto p-4 sm:p-8 pb-24 sm:pb-12 flex flex-col items-center justify-center">
+            <div class="welcome-glass-card w-full rounded-3xl p-5 sm:p-8 space-y-6">
+                <!-- Indicador fino de progreso de 3 pasos -->
+                <div id="welcome-step-indicator" class="space-y-2.5">
+                    <div class="flex items-center justify-between gap-2 text-[11px] font-bold tracking-wide text-slate-300">
+                        <span id="welcome-pill-1" data-step-pill="1" class="welcome-step-pill is-active">1. Perfil</span>
+                        <span id="welcome-pill-2" data-step-pill="2" class="welcome-step-pill">2. Ciclo escolar</span>
+                        <span id="welcome-pill-3" data-step-pill="3" class="welcome-step-pill">3. Confirmación</span>
+                    </div>
+                    <div class="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                        <div id="welcome-step-progress-fill" class="welcome-step-progress-fill h-full rounded-full" style="width: 33.33%;"></div>
+                    </div>
+                </div>
+
+                <!-- Encabezado sobrio con SVG de línea -->
+                <div class="welcome-stagger flex flex-col items-center text-center gap-3" style="--stagger-i: 0;">
+                    <span class="welcome-header-icon w-13 h-13 rounded-2xl flex items-center justify-center shrink-0 mx-auto" aria-hidden="true">
+                        <svg class="w-6 h-6 text-indigo-300" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                        </svg>
                     </span>
-                </div>
-            </div>
-
-            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed text-center">
-                Personaliza tu perfil y delimita tus fechas para comenzar:
-            </p>
-
-            <form id="cycle-setup-welcome-form" class="space-y-5 pt-1">
-                <!-- 1. Nombre de Usuario o Identidad -->
-                <div class="space-y-1.5">
-                    <label for="welcome-user-name" class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
-                        Tu Nombre o Apodo Estudiantil *
-                    </label>
-                    <input type="text" id="welcome-user-name" required placeholder="Ej: Sofía Ramírez, Alex, Carlos..."
-                        class="w-full min-h-[44px] px-3.5 py-3 bg-slate-800/80 border border-slate-700 rounded-2xl text-xs sm:text-sm font-bold text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 transition-all">
-                    <p class="text-[10px] text-slate-400">Tu nombre se mostrará en el encabezado y menú principal para personalizar tu experiencia.</p>
+                    <div class="space-y-1">
+                        <h2 class="text-xl sm:text-2xl font-black text-white leading-tight tracking-tight">
+                            Bienvenido a tu Organizador
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md mx-auto">
+                            Personaliza tu perfil y define tu periodo académico en un minuto.
+                        </p>
+                    </div>
                 </div>
 
-                <!-- 2. Foto de Perfil (Canvas Downsampling) -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
-                        Foto de Perfil (Opcional)
-                    </label>
-                    <div class="flex flex-wrap items-center gap-3.5">
-                        <div class="relative shrink-0">
-                            <div id="welcome-photo-placeholder" class="w-16 h-16 rounded-2xl bg-slate-800 border-2 border-dashed border-slate-700 flex items-center justify-center text-2xl text-slate-500 select-none">
-                                📷
+                <form id="cycle-setup-welcome-form" class="space-y-5" novalidate>
+                    <!-- PASO 1: Nombre y foto -->
+                    <div id="welcome-step-1" data-welcome-step="1" class="welcome-step-panel space-y-5">
+                        <div class="welcome-stagger space-y-1.5" style="--stagger-i: 1;">
+                            <label for="welcome-user-name" class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                                Tu Nombre o Apodo Estudiantil *
+                            </label>
+                            <input type="text" id="welcome-user-name" required placeholder="Ej: Sofía Ramírez, Alex, Carlos..."
+                                class="welcome-input w-full min-h-[44px] px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold text-white placeholder-slate-400">
+                            <p class="text-[11px] text-slate-400">Tu nombre se mostrará en el encabezado y menú lateral.</p>
+                        </div>
+
+                        <div class="welcome-stagger space-y-2.5" style="--stagger-i: 2;">
+                            <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                                Foto de Perfil (Opcional)
+                            </label>
+                            <div class="flex flex-wrap items-center gap-3.5 p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
+                                <div class="relative shrink-0">
+                                    <div id="welcome-photo-placeholder" class="w-16 h-16 rounded-2xl bg-slate-800/80 border border-dashed border-white/25 flex items-center justify-center text-slate-300 select-none" aria-hidden="true">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                            <circle cx="12" cy="13" r="4"/>
+                                        </svg>
+                                    </div>
+                                    <img id="welcome-photo-preview" class="photo-preview hidden w-16 h-16 rounded-2xl object-cover border border-indigo-400/70 shadow-lg" alt="Vista previa de foto">
+                                </div>
+
+                                <div class="flex-1 min-w-0 space-y-1.5">
+                                    <input type="file" id="welcome-photo-input" accept="image/*"
+                                        class="block w-full min-h-[44px] text-xs text-slate-300 file:mr-3 file:py-2 file:px-3.5 file:rounded-full file:border file:border-white/20 file:text-xs file:font-bold file:bg-indigo-500/80 file:text-white hover:file:bg-indigo-500 file:cursor-pointer cursor-pointer">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="text-[11px] text-slate-400">Recorte circular de 512×512 px. Ajustable luego en Configuraciones.</span>
+                                        <button type="button" id="welcome-photo-clear-btn" class="hidden min-h-[44px] px-2.5 inline-flex items-center gap-1 text-[11px] font-bold text-rose-300 hover:text-rose-200 transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                            <span>Quitar</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <img id="welcome-photo-preview" class="photo-preview hidden w-16 h-16 rounded-2xl object-cover border border-indigo-500/60 shadow-lg" alt="Vista previa de foto">
                         </div>
 
-                        <div class="flex-1 min-w-0 space-y-1.5">
-                            <input type="file" id="welcome-photo-input" accept="image/*"
-                                class="block w-full min-h-[44px] text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer cursor-pointer">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-[10px] text-slate-400">Editor con zoom y recorte (512×512 px). También puedes subirla o ajustarla luego en Configuraciones.</span>
-                                <button type="button" id="welcome-photo-clear-btn" class="hidden min-h-[44px] px-2 text-[11px] font-bold text-rose-400 hover:text-rose-300 transition-colors">
-                                    ✕ Quitar
-                                </button>
+                        <div class="welcome-stagger pt-2 space-y-2.5" style="--stagger-i: 3;">
+                            <button type="button" id="welcome-step-next-btn"
+                                class="welcome-primary-glass-btn touch-target-44 min-h-[44px] tap-effect w-full py-3.5 px-5 rounded-full text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer">
+                                <span>Continuar al Ciclo Escolar</span>
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                            </button>
+
+                            <button type="button" id="welcome-cycle-later-btn"
+                                class="touch-target-44 min-h-[44px] tap-effect w-full py-2.5 px-4 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-slate-300 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer text-center"
+                                title="Guardar perfil y usar fechas sugeridas provisionales">
+                                <span>Configurar fechas después (Ciclo Provisional)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PASO 2: Ciclo escolar -->
+                    <div id="welcome-step-2" data-welcome-step="2" class="welcome-step-panel welcome-step-hidden space-y-5">
+                        <div class="welcome-stagger flex items-center gap-3 p-3.5 rounded-2xl bg-white/[0.05] border border-white/10" style="--stagger-i: 0;">
+                            <span class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <path d="M16 2v4M8 2v4M3 10h18"/>
+                                </svg>
+                            </span>
+                            <div class="min-w-0">
+                                <h3 class="text-sm font-extrabold text-white leading-tight">Ciclo Escolar o Periodo</h3>
+                                <p class="text-[11px] text-slate-300">Define el rango oficial para tu calendario y recordatorios.</p>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- 4. Fechas del Ciclo Escolar o Periodo de Actividades -->
-                <div class="space-y-1.5 pt-1">
-                    <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
-                        Ciclo Oficial (Fechas de Inicio y Término) *
-                    </label>
-                    <div class="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3">
-                        <div class="min-w-0">
-                            <span class="block text-[10px] font-bold text-slate-400 mb-0.5">Inicio *</span>
-                            <input type="date" id="welcome-cycle-start" required
-                                class="w-full min-h-[44px] px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-indigo-500">
+                        <div class="welcome-stagger space-y-2" style="--stagger-i: 1;">
+                            <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                                Fechas de Inicio y Término *
+                            </label>
+                            <div class="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3.5">
+                                <div class="min-w-0">
+                                    <span class="block text-[11px] font-bold text-slate-300 mb-1">Inicio *</span>
+                                    <input type="date" id="welcome-cycle-start" required
+                                        class="welcome-input w-full min-h-[44px] px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-white">
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="block text-[11px] font-bold text-slate-300 mb-1">Término *</span>
+                                    <input type="date" id="welcome-cycle-end" required
+                                        class="welcome-input w-full min-h-[44px] px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-white">
+                                </div>
+                            </div>
                         </div>
-                        <div class="min-w-0">
-                            <span class="block text-[10px] font-bold text-slate-400 mb-0.5">Término *</span>
-                            <input type="date" id="welcome-cycle-end" required
-                                class="w-full min-h-[44px] px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-indigo-500">
+
+                        <div class="welcome-stagger pt-2 flex flex-col sm:flex-row items-stretch gap-2.5" style="--stagger-i: 2;">
+                            <button type="button" id="welcome-step-back-btn"
+                                class="touch-target-44 min-h-[44px] tap-effect sm:w-auto px-5 py-3 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 text-slate-200 font-bold text-xs transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                <span>Atrás</span>
+                            </button>
+                            <button type="submit" id="welcome-cycle-save-btn"
+                                class="welcome-primary-glass-btn touch-target-44 min-h-[44px] tap-effect flex-1 py-3.5 px-5 rounded-full text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                                <span>Comenzar y Guardar Perfil</span>
+                            </button>
                         </div>
                     </div>
-                </div>
+                </form>
 
-                <!-- Botones de Acción -->
-                <div class="pt-3 space-y-2">
-                    <button type="submit" id="welcome-cycle-save-btn"
-                        class="touch-target-44 min-h-[44px] tap-effect w-full py-3.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>Comenzar y Guardar Perfil</span>
-                    </button>
-
-                    <button type="button" id="welcome-cycle-later-btn"
-                        class="touch-target-44 min-h-[44px] tap-effect w-full py-2.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700/80 text-slate-300 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer text-center"
-                        title="Guardar perfil y usar fechas sugeridas provisionales">
-                        <span>Configurar fechas después (Ciclo Provisional)</span>
-                    </button>
-                </div>
-            </form>
-
-            <!-- 5. Contenedor de Celebración con Barra de Progreso animada -->
-            <div id="onboarding-celebration-container" class="hidden space-y-5 text-center py-6">
-                <div class="w-full bg-slate-800/90 rounded-full h-3.5 overflow-hidden border border-indigo-500/30 p-0.5">
-                    <div id="onboarding-progress-bar" class="onboarding-progress-bar bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%;"></div>
-                </div>
-                <div id="onboarding-celebration-msg" class="celebration-msg hidden text-center space-y-3">
-                    <div class="text-2xl sm:text-3xl font-black text-white tracking-tight animate-bounce text-center leading-snug break-words mx-auto">
-                        ¡Disfruta la app! 🎉 🥳 🚀 ✨ 🎊 👏 🎓
+                <!-- PASO 3: Confirmación sobria con check SVG trazado -->
+                <div id="onboarding-celebration-container" class="hidden space-y-5 text-center py-6">
+                    <div class="welcome-check-wrap mx-auto" aria-hidden="true">
+                        <svg class="welcome-check-svg w-16 h-16" viewBox="0 0 52 52" fill="none">
+                            <circle class="welcome-check-circle" cx="26" cy="26" r="23" stroke="currentColor" stroke-width="2.2"/>
+                            <path class="welcome-check-mark" d="M16 27l7 7 14-15" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </div>
-                    <p class="text-xs sm:text-sm text-indigo-300 font-semibold max-w-sm mx-auto">
-                        Tu perfil e inicio de ciclo se han configurado con éxito. Preparando tu organizador...
-                    </p>
+                    <div class="w-full max-w-xs mx-auto bg-white/10 rounded-full h-1.5 overflow-hidden border border-white/15">
+                        <div id="onboarding-progress-bar" class="onboarding-progress-bar bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%;"></div>
+                    </div>
+                    <div id="onboarding-celebration-msg" class="celebration-msg hidden text-center space-y-2">
+                        <div class="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug break-words mx-auto">
+                            ¡Disfruta la app!
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 font-medium max-w-sm mx-auto">
+                            Tu perfil y ciclo escolar quedaron configurados correctamente.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2381,7 +2619,7 @@
     <!-- MODAL DINÁMICO DE REVELACIÓN DE SECRETOS (M2)             -->
     <!-- ========================================================= -->
     <div id="vault-reveal-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div id="vault-reveal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/85 backdrop-blur-md transition-opacity"></div>
+        <div id="vault-reveal-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/85 transition-opacity"></div>
         
         <div class="modal-dialog relative w-full max-w-md bg-gradient-to-b from-slate-900 via-purple-950/90 to-slate-950 border border-purple-500/50 rounded-3xl p-5 sm:p-8 shadow-2xl text-white overflow-hidden vault-window-pop text-center space-y-4 max-h-[90dvh] overflow-y-auto">
             <!-- Decoración de destellos o estrellas flotantes -->
@@ -2455,6 +2693,27 @@
         </div>
     </div>
 
+    <!-- ========================================================= -->
+    <!-- BANNER FLOTANTE DE DESCARGA APK ANDROID (SOLO WEB)        -->
+    <!-- ========================================================= -->
+    <div id="apk-download-banner" class="apk-floating-banner fixed left-3 right-3 sm:left-auto sm:right-6 sm:w-96 z-40 hidden transition-opacity duration-300" role="region" aria-label="Descargar aplicación Android">
+        <div class="liquid-glass-popover bg-white/85 dark:bg-slate-800/85 rounded-2xl shadow-2xl border border-emerald-200/80 dark:border-emerald-900/60 p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3">
+            <img src="assets/icons/icon-192x192.png" alt="Logo Organizador" class="w-10 h-10 rounded-xl shadow-xs shrink-0 object-cover">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">Descarga Organizador (Android)</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">APK v1.5.9 nativa con widgets offline.</p>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+                <a id="apk-floating-download-link" href="downloads/Organizador-v1.5.9.apk" download="Organizador-v1.5.9.apk" class="tap-effect min-h-[44px] inline-flex items-center px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs hover:bg-emerald-700 transition-colors">
+                    Descargar
+                </a>
+                <button type="button" id="apk-floating-dismiss-btn" aria-label="Cerrar aviso de APK" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" title="Descartar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========================================== -->
     <!-- CONTENEDOR DE TOASTS NOTIFICACIONES       -->
     <!-- ========================================== -->
@@ -2473,28 +2732,44 @@
             <div class="mobile-sheet-body px-5 pb-6 pt-3 sm:p-7 space-y-4 overflow-y-auto">
                 <!-- Encabezado con Icono y Versión -->
                 <div class="flex items-center gap-3.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <span class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl shrink-0 shadow-inner">
-                        ✨
+                    <span class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-inner" aria-hidden="true">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                            <path d="M12 3l2.2 4.8L19 10l-4.8 2.2L12 17l-2.2-4.8L5 10l4.8-2.2z"/>
+                        </svg>
                     </span>
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                                Novedades de la Versión 1.5.7
+                                Novedades de la Versión 1.5.9
                             </h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                                v1.5.7
+                                v1.5.9
                             </span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            ¡Modo horizontal habilitado en la app instalada, mejoras en caché PWA y experiencia visual optimizada!
+                            Mayor fluidez en móvil, bóveda optimizada con desplazamiento completo, almacenamiento real, notificaciones nativas y widget semanal con materias.
                         </p>
                     </div>
                 </div>
 
                 <!-- Lista de Cambios Mayores -->
                 <div class="space-y-3 py-1">
-                    <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">🔄</span>
+                    <div class="p-3 rounded-2xl bg-purple-50/70 dark:bg-purple-950/35 border border-purple-200/80 dark:border-purple-800/60 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        </span>
+                        <div class="min-w-0">
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Rendimiento fluido, Bóveda sin trabas y almacenamiento real</h4>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                                La Bóveda y Configuración ahora corren con animaciones ligeras y desplazamiento completo en toda la pantalla. Además, se muestra tu almacenamiento real disponible, se corrigió el botón central y el widget semanal muestra hasta 4 materias por día.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-indigo-500/12 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.7 0 3-4 3-9s-1.3-9-3-9m0 18c-1.7 0-3-4-3-9s1.3-9 3-9"/></svg>
+                        </span>
                         <div class="min-w-0">
                             <h4 class="text-xs font-bold text-slate-900 dark:text-white">Modo horizontal habilitado en la app instalada</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
@@ -2503,8 +2778,10 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">📅</span>
+                    <div class="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-amber-500/12 text-amber-600 dark:text-amber-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        </span>
                         <div class="min-w-0">
                             <h4 class="text-xs font-bold text-slate-900 dark:text-white">Calendario rápido, accesos traslúcidos y menú en Materias (8+)</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
@@ -2513,8 +2790,10 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">🔐</span>
+                    <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-sky-500/12 text-sky-600 dark:text-sky-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
                         <div class="min-w-0">
                             <h4 class="text-xs font-bold text-slate-900 dark:text-white">Notas privadas con clave (PIN) y miniaturas</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
@@ -2523,8 +2802,10 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex gap-3">
-                        <span class="text-xl shrink-0 select-none">✨</span>
+                    <div class="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-emerald-500/12 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        </span>
                         <div class="min-w-0">
                             <h4 class="text-xs font-bold text-slate-900 dark:text-white">Controles fluidos, fondos oscuros y menú sin superposición</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
@@ -2557,19 +2838,20 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/storage.js?v=1.5.7"></script>
-    <script src="js/haptics.js?v=1.5.7"></script>
-    <script src="js/segmented.js?v=1.5.7"></script>
-    <script src="js/notifications.js?v=1.5.7"></script>
-    <script src="js/widgets.js?v=1.5.7"></script>
-    <script src="js/subjects.js?v=1.5.7"></script>
-    <script src="js/tasks.js?v=1.5.7"></script>
-    <script src="js/notes.js?v=1.5.7"></script>
-    <script src="js/calendar.js?v=1.5.7"></script>
-    <script src="js/archive.js?v=1.5.7"></script>
-    <script src="js/photo-editor.js?v=1.5.7"></script>
-    <script src="js/backgrounds.js?v=1.5.7"></script>
-    <script src="js/app.js?v=1.5.7"></script>
+    <script src="js/storage.js?v=1.5.9"></script>
+    <script src="js/haptics.js?v=1.5.9"></script>
+    <script src="js/liquid-glass.js?v=1.5.9"></script>
+    <script src="js/segmented.js?v=1.5.9"></script>
+    <script src="js/notifications.js?v=1.5.9"></script>
+    <script src="js/widgets.js?v=1.5.9"></script>
+    <script src="js/subjects.js?v=1.5.9"></script>
+    <script src="js/tasks.js?v=1.5.9"></script>
+    <script src="js/notes.js?v=1.5.9"></script>
+    <script src="js/calendar.js?v=1.5.9"></script>
+    <script src="js/archive.js?v=1.5.9"></script>
+    <script src="js/photo-editor.js?v=1.5.9"></script>
+    <script src="js/backgrounds.js?v=1.5.9"></script>
+    <script src="js/app.js?v=1.5.9"></script>
 
     <!-- Visor de fotos de la galería a pantalla completa -->
     <div id="photo-preview-modal" class="modal-overlay photo-viewer-overlay fixed inset-0 z-[70] hidden flex-col" role="dialog" aria-modal="true" aria-labelledby="photo-preview-name" aria-hidden="true">

@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.5.7 (quick-modals-r2)
+ * sw.js - Service Worker for Organizador_Tareas v1.5.9 (hardened-glass-responsive)
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.5.7';
+const CACHE_NAME = 'organizador-tareas-cache-v1.5.9';
 
 const PRECACHE_ASSETS = [
     './',
@@ -15,22 +15,23 @@ const PRECACHE_ASSETS = [
     './assets/fonts/inter-latin-opsz-normal.woff2',
     './assets/fonts/inter-latin-ext-opsz-normal.woff2',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.5.7',
-    './css/styles.css?v=1.5.7',
+    './css/tailwind.min.css?v=1.5.9',
+    './css/styles.css?v=1.5.9',
     // JavaScript application modules
-    './js/storage.js?v=1.5.7',
-    './js/haptics.js?v=1.5.7',
-    './js/segmented.js?v=1.5.7',
-    './js/notifications.js?v=1.5.7',
-    './js/widgets.js?v=1.5.7',
-    './js/subjects.js?v=1.5.7',
-    './js/tasks.js?v=1.5.7',
-    './js/notes.js?v=1.5.7',
-    './js/calendar.js?v=1.5.7',
-    './js/archive.js?v=1.5.7',
-    './js/photo-editor.js?v=1.5.7',
-    './js/backgrounds.js?v=1.5.7',
-    './js/app.js?v=1.5.7',
+    './js/storage.js?v=1.5.9',
+    './js/haptics.js?v=1.5.9',
+    './js/liquid-glass.js?v=1.5.9',
+    './js/segmented.js?v=1.5.9',
+    './js/notifications.js?v=1.5.9',
+    './js/widgets.js?v=1.5.9',
+    './js/subjects.js?v=1.5.9',
+    './js/tasks.js?v=1.5.9',
+    './js/notes.js?v=1.5.9',
+    './js/calendar.js?v=1.5.9',
+    './js/archive.js?v=1.5.9',
+    './js/photo-editor.js?v=1.5.9',
+    './js/backgrounds.js?v=1.5.9',
+    './js/app.js?v=1.5.9',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
@@ -42,38 +43,38 @@ const PRECACHE_ASSETS = [
     './assets/icons/favicon.ico'
 ];
 
-// Install Event: Precaches core assets using Promise.allSettled for maximum fault tolerance
+// Install Event: Precaches core assets using Promise.allSettled without forcing aggressive reload on first install
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(async cache => {
             const results = await Promise.allSettled(
                 PRECACHE_ASSETS.map(url =>
-                    fetch(new Request(url, { cache: 'reload' }))
-                        .then(networkRes => {
-                            if (networkRes && networkRes.ok) {
-                                return cache.put(url, networkRes);
-                            }
-                            return cache.add(url);
-                        })
-                        .catch(() => cache.add(url))
-                        .catch(err => {
-                            console.warn(`[SW] Precache item skipped: ${url} (${err.message})`);
-                        })
+                    cache.add(url).catch(() =>
+                        fetch(url)
+                            .then(networkRes => {
+                                if (networkRes && networkRes.ok) {
+                                    return cache.put(url, networkRes);
+                                }
+                            })
+                            .catch(err => {
+                                console.warn(`[SW] Precache item skipped: ${url} (${err.message})`);
+                            })
+                    )
                 )
             );
-            console.log(`[SW v1.5.7] Precaching complete. Processed ${results.length} assets.`);
-        }).then(() => self.skipWaiting())
+            console.log(`[SW v1.5.9] Precaching complete. Processed ${results.length} assets.`);
+        })
     );
 });
 
-// Activate Event: Purges stale caches from previous versions
+// Activate Event: Purges stale caches from previous versions without hijacking first-load state unexpectedly
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(name => {
                     if (name !== CACHE_NAME) {
-                        console.log(`[SW v1.5.7] Purging deprecated cache: ${name}`);
+                        console.log(`[SW v1.5.9] Purging deprecated cache: ${name}`);
                         return caches.delete(name);
                     }
                 })
@@ -101,7 +102,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[SW v1.5.7] Navigation offline. Serving cached index.html fallback.');
+                    console.log('[SW v1.5.9] Navigation offline. Serving cached index.html fallback.');
                     const cachedNav = await caches.match(request);
                     if (cachedNav) return cachedNav;
                     return caches.match('./index.html') || caches.match('index.html');
