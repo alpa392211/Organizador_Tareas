@@ -4,8 +4,8 @@
 **Versión:** `1.6.0` (`versionCode: 160`)  
 **APK compilado y firmado:** `downloads/Organizador-v1.6.0.apk`  
 - **Tamaño:** `3,864,154` bytes (`3.69 MB`)  
-- **SHA-256:** `F0466BD445C3CE3748DA95283F2C04C03342FF2C4E3B490816BC0EF8F2DDD87F`  
-- **Firma:** APK Signature Scheme v2 (`Verifies`, 1 firmante)
+- **SHA-256:** `AE1BEDAB4F5022AB42E3A328F4BA63AEEFC90D40F0DA8EF0A095F3FA2922A645`  
+- **Firma:** APK Signature Scheme v2 (`Verifies`, 1 firmante, certificado SHA-256 `36852c0c0dc2846a3d582e41778f86d4f382aa0bdf8f0abed03bdfa8a80ffd0b`, compatible para actualizar sobre v1.5.8/v1.5.9)
 
 ---
 
