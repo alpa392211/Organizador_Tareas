@@ -188,7 +188,7 @@ window.NotificationsModule = (() => {
         },
 
         /**
-         * Reprograma todas las tareas pendientes y notas con recordatorio futuro
+         * Reprograma todas las tareas pendientes, notas y materias con recordatorio futuro
          */
         resyncAllScheduled() {
             const Storage = window.StorageModule;
@@ -203,6 +203,12 @@ window.NotificationsModule = (() => {
             notes.forEach(n => {
                 if (n.hasReminder && n.reminderDateTime) {
                     this.scheduleNote(n).catch?.(() => {});
+                }
+            });
+            const subjects = Storage.getSubjects ? Storage.getSubjects() : [];
+            subjects.forEach(s => {
+                if (s && s.reminderMinutes) {
+                    this.scheduleSubject(s).catch?.(() => {});
                 }
             });
         },
@@ -382,6 +388,107 @@ window.NotificationsModule = (() => {
         },
 
         /**
+         * Formatea y programa recordatorios semanales de una MATERIA (15, 30, 45 o 60 min antes)
+         */
+        async scheduleSubject(subject) {
+            if (!subject || !subject.id) return;
+            await this.cancelSubject(subject.id);
+
+            const remMin = Number(subject.reminderMinutes);
+            if (!(remMin === 15 || remMin === 30 || remMin === 45 || remMin === 60)) return;
+            if (!subject.startTime || !Array.isArray(subject.days) || subject.days.length === 0) return;
+
+            const timeParts = String(subject.startTime).split(':');
+            const startHour = Number(timeParts[0]);
+            const startMin = Number(timeParts[1]);
+            if (!Number.isFinite(startHour) || !Number.isFinite(startMin)) return;
+
+            const dayMap = { dom: 0, lun: 1, mar: 2, mie: 3, jue: 4, vie: 5, sab: 6 };
+            const leadLabel = remMin === 60 ? '1 hora' : `${remMin} minutos`;
+            const title = `[CLASE] ${subject.name}`;
+            const extraParts = [`Inicia en ${leadLabel} (${subject.startTime} hrs)`];
+            if (subject.classroom && subject.classroom.trim()) extraParts.push(subject.classroom.trim());
+            if (subject.professor && subject.professor.trim()) extraParts.push(subject.professor.trim());
+            const body = extraParts.join(' • ');
+
+            const now = new Date();
+            const nowMs = now.getTime();
+
+            for (const dayId of subject.days) {
+                const targetDow = dayMap[dayId];
+                if (targetDow === undefined) continue;
+
+                const diffDays = (targetDow - now.getDay() + 7) % 7;
+                const classDate = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate() + diffDays,
+                    startHour,
+                    startMin,
+                    0,
+                    0
+                );
+                let triggerMs = classDate.getTime() - (remMin * 60 * 1000);
+                if (triggerMs <= nowMs + 1000) {
+                    classDate.setDate(classDate.getDate() + 7);
+                    triggerMs = classDate.getTime() - (remMin * 60 * 1000);
+                }
+
+                const notifId = hashStringTo32BitInt(`subject_${subject.id}_${dayId}`);
+
+                if (isAndroidNativeAvailable() && typeof window.AndroidWidgetBridge.scheduleNativeNotification === 'function') {
+                    try {
+                        window.AndroidWidgetBridge.scheduleNativeNotification(notifId, title, body, triggerMs, 'subjects');
+                    } catch (err) {
+                        console.warn('Error programando recordatorio de materia en Android:', err);
+                    }
+                }
+
+                if (isCapacitorLocalNotificationsAvailable()) {
+                    try {
+                        const { LocalNotifications } = window.Capacitor.Plugins;
+                        await LocalNotifications.schedule({
+                            notifications: [{
+                                id: notifId,
+                                title: title,
+                                body: body,
+                                schedule: { at: new Date(triggerMs) },
+                                sound: 'default'
+                            }]
+                        });
+                    } catch (err) {
+                        console.warn('Error programando materia en Capacitor:', err);
+                    }
+                }
+            }
+        },
+
+        /**
+         * Cancela todos los recordatorios programados de una MATERIA
+         */
+        async cancelSubject(subjectId) {
+            if (!subjectId) return;
+            const dayIds = ['lun', 'mar', 'mie', 'jue', 'vie', 'sab', 'dom'];
+            const ids = dayIds.map(d => hashStringTo32BitInt(`subject_${subjectId}_${d}`));
+
+            if (isAndroidNativeAvailable() && typeof window.AndroidWidgetBridge.cancelNativeNotification === 'function') {
+                ids.forEach(notifId => {
+                    try {
+                        window.AndroidWidgetBridge.cancelNativeNotification(notifId);
+                    } catch (_) {}
+                });
+            }
+
+            if (!isCapacitorLocalNotificationsAvailable()) return;
+            try {
+                const { LocalNotifications } = window.Capacitor.Plugins;
+                await LocalNotifications.cancel({ notifications: ids.map(id => ({ id })) });
+            } catch (err) {
+                console.warn('Error cancelando recordatorios de materia:', err);
+            }
+        },
+
+        /**
          * Cancela todas las notificaciones pendientes
          */
         async cancelAll() {
@@ -413,7 +520,8 @@ window.NotificationsModule = (() => {
                 const Storage = window.StorageModule;
                 if (!Storage) return;
 
-                const nowTime = Date.now();
+                const now = new Date();
+                const nowTime = now.getTime();
 
                 // 1. Verificar tareas con fecha límite próxima o recién cumplida
                 const tasks = Storage.getTasks ? Storage.getTasks() : [];
@@ -465,6 +573,44 @@ window.NotificationsModule = (() => {
                                 'note_' + n.id,
                                 'notes'
                             );
+                        }
+                    }
+                });
+
+                // 3. Verificar materias con recordatorio antes de clase (15, 30, 45 o 60 min)
+                const subjects = Storage.getSubjects ? Storage.getSubjects() : [];
+                const dowIds = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
+                subjects.forEach(s => {
+                    const remMin = Number(s?.reminderMinutes);
+                    if (!(remMin === 15 || remMin === 30 || remMin === 45 || remMin === 60)) return;
+                    if (!s.startTime || !Array.isArray(s.days) || s.days.length === 0) return;
+                    const parts = String(s.startTime).split(':');
+                    const h = Number(parts[0]);
+                    const m = Number(parts[1]);
+                    if (!Number.isFinite(h) || !Number.isFinite(m)) return;
+
+                    // Revisar hoy y mañana (por clases a medianoche con aviso 1h antes)
+                    for (let offset = 0; offset <= 1; offset++) {
+                        const classDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, h, m, 0, 0);
+                        const dayId = dowIds[classDate.getDay()];
+                        if (!s.days.includes(dayId)) continue;
+
+                        const triggerMs = classDate.getTime() - (remMin * 60 * 1000);
+                        if (triggerMs <= nowTime + (60 * 1000) && triggerMs >= nowTime - (5 * 60 * 1000)) {
+                            const sessionKey = `subject_${s.id}_${classDate.getFullYear()}-${classDate.getMonth() + 1}-${classDate.getDate()}_${remMin}`;
+                            if (!isAlreadyNotified(sessionKey)) {
+                                markAsNotified(sessionKey);
+                                const leadLabel = remMin === 60 ? '1 hora' : `${remMin} minutos`;
+                                const extra = [`Inicia en ${leadLabel} (${s.startTime} hrs)`];
+                                if (s.classroom && s.classroom.trim()) extra.push(s.classroom.trim());
+                                this.displayNotification(
+                                    `[CLASE] ${s.name}`,
+                                    extra.join(' • '),
+                                    getAppNotificationIcon(),
+                                    sessionKey,
+                                    'subjects'
+                                );
+                            }
                         }
                     }
                 });

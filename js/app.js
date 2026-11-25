@@ -26,7 +26,7 @@
         }
 
         function getVersion() {
-            return window.StorageModule?.APP_VERSION || '1.5.9';
+            return window.StorageModule?.APP_VERSION || '1.6.0';
         }
 
         function persist() {
@@ -536,7 +536,7 @@
                         }
 
                         const lastSeenVersion = Storage.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.9') {
+                        if (lastSeenVersion !== '1.6.0') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this.openChangelogModal?.();
@@ -2265,7 +2265,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.9') {
+                        if (lastSeenVersion !== '1.6.0') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this._changelogTimer = null;
@@ -2309,7 +2309,7 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.5.9') {
+                        if (lastSeenVersion !== '1.6.0') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this._changelogTimer = null;
@@ -2931,7 +2931,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.5.9');
+                window.StorageModule.setLastSeenVersion('1.6.0');
                 this.initApkDownloadBanner?.();
             };
 

@@ -1,0 +1,227 @@
+/* ============================================================================
+   liquid-glass.css v2 - Aspecto "Liquid Glass" (cargar DESPUÉS de styles.css)
+   Superficies: indicador deslizante, indicador de navegación, chips, botón central (FAB),
+   thumb de switches, barra inferior y pistas (tracks) de los controles segmentados.
+   La refracción real la aporta js/liquid-glass.js (--lg-backdrop-filter); aquí está la parte
+   visual (relleno casi transparente, bordes de luz especular, sombras y tinte de la pista).
+   ========================================================================== */
+
+:root {
+    --lgx-tint: 255, 255, 255;               /* color base del vidrio (RGB) */
+    --lgx-fill-a: 0.16;                      /* opacidad del relleno: casi transparente */
+    --lgx-rim-hi: rgba(255, 255, 255, 0.98); /* luz del borde (esquinas opuestas) */
+    --lgx-rim-lo: rgba(255, 255, 255, 0.16);
+    --lgx-shadow: 40, 52, 120;               /* color de sombra (azul índigo) */
+    --lgx-track-a: rgba(99, 102, 241, 0.26);
+    --lgx-track-b: rgba(20, 184, 166, 0.20);
+    --lgx-track-c: rgba(236, 72, 153, 0.16);
+}
+html.dark {
+    --lgx-tint: 165, 180, 252;
+    --lgx-fill-a: 0.14;
+    --lgx-rim-hi: rgba(255, 255, 255, 0.85);
+    --lgx-rim-lo: rgba(255, 255, 255, 0.10);
+    --lgx-shadow: 2, 6, 23;
+    --lgx-track-a: rgba(99, 102, 241, 0.34);
+    --lgx-track-b: rgba(45, 212, 191, 0.20);
+    --lgx-track-c: rgba(236, 72, 153, 0.18);
+}
+
+/* ---------------------------------------------------------------------------
+   1) Pistas de los controles segmentados: tinte suave para que el vidrio tenga
+      "algo que refractar" y las etiquetas se vean curvarse bajo la lente.
+   ------------------------------------------------------------------------- */
+html .segmented-control-track,
+html .notes-segmented-control {
+    background:
+        linear-gradient(105deg, var(--lgx-track-a) 0%, var(--lgx-track-b) 52%, var(--lgx-track-c) 100%),
+        rgba(255, 255, 255, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    box-shadow:
+        inset 0 2px 6px rgba(var(--lgx-shadow), 0.12),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.5),
+        0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+html.dark .segmented-control-track,
+html.dark .notes-segmented-control {
+    background:
+        linear-gradient(105deg, var(--lgx-track-a) 0%, var(--lgx-track-b) 52%, var(--lgx-track-c) 100%),
+        rgba(15, 23, 42, 0.55) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Las etiquetas quedan DEBAJO del indicador para que la lente las deforme en el borde */
+html .segmented-control-track > button,
+html .notes-segmented-control > button {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+}
+
+/* El botón activo se dibuja por ENCIMA del cristal: su texto siempre queda nítido */
+html .segmented-control-track button.seg-btn-active,
+html .segmented-control-track button[aria-selected="true"],
+html .segmented-control-track button[aria-pressed="true"],
+html .notes-segmented-control button.notes-seg-active {
+    z-index: 3;
+}
+
+/* ---------------------------------------------------------------------------
+   2) Indicador deslizante (segmented / nav / chips): la píldora de cristal
+   ------------------------------------------------------------------------- */
+html .segmented-glass-indicator,
+html .nav-sliding-indicator,
+html .chip-glass-indicator {
+    z-index: 2;                                   /* por encima de las etiquetas => las refracta */
+    border: 0 !important;
+    background:
+        radial-gradient(120% 140% at 18% 0%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 55%),
+        linear-gradient(165deg, rgba(var(--lgx-tint), calc(var(--lgx-fill-a) + 0.10)) 0%, rgba(var(--lgx-tint), var(--lgx-fill-a)) 48%, rgba(var(--lgx-tint), calc(var(--lgx-fill-a) + 0.06)) 100%) !important;
+    box-shadow:
+        inset 1.5px 1.5px 0.5px -0.5px rgba(255, 255, 255, 0.95),   /* borde de luz arriba-izquierda */
+        inset -1.5px -1.5px 0.5px -0.5px rgba(255, 255, 255, 0.55), /* borde de luz abajo-derecha */
+        inset 0 0 14px 2px rgba(255, 255, 255, 0.18),               /* resplandor interior */
+        0 10px 22px -8px rgba(var(--lgx-shadow), 0.42),
+        0 2px 6px rgba(var(--lgx-shadow), 0.14) !important;
+    backdrop-filter: var(--lg-backdrop-filter, blur(1.5px) saturate(185%) brightness(1.06)) !important;
+    -webkit-backdrop-filter: var(--lg-backdrop-filter, blur(1.5px) saturate(185%) brightness(1.06)) !important;
+}
+
+/* Aro especular: brilla en dos esquinas opuestas, tenue en el resto (como el vidrio real) */
+html .segmented-glass-indicator::before,
+html .nav-sliding-indicator::before,
+html .chip-glass-indicator::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.2px;
+    pointer-events: none;
+    background: linear-gradient(135deg, var(--lgx-rim-hi) 0%, var(--lgx-rim-lo) 28%, var(--lgx-rim-lo) 72%, var(--lgx-rim-hi) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+}
+/* Reflejo curvo superior */
+html .segmented-glass-indicator::after,
+html .nav-sliding-indicator::after,
+html .chip-glass-indicator::after {
+    content: "";
+    position: absolute;
+    inset: 2px 10% 52% 10%;
+    border-radius: 9999px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
+    opacity: 0.55;
+}
+
+/* ---------------------------------------------------------------------------
+   3) Botón central (FAB) y barra inferior
+   ------------------------------------------------------------------------- */
+html #bottom-main-circle[data-lg-surface],
+html #tablet-main-circle[data-lg-surface] {
+    backdrop-filter: var(--lg-backdrop-filter) !important;
+    -webkit-backdrop-filter: var(--lg-backdrop-filter) !important;
+    box-shadow:
+        inset 2px 2px 1px -1px rgba(255, 255, 255, 0.85),
+        inset -2px -2px 1px -1px rgba(255, 255, 255, 0.35),
+        inset 0 0 18px rgba(255, 255, 255, 0.16),
+        0 14px 26px -10px rgba(5, 150, 105, 0.65),
+        0 3px 8px rgba(15, 23, 42, 0.18) !important;
+}
+html #bottom-nav[data-lg-surface="bar"] {
+    backdrop-filter: var(--lg-backdrop-filter) !important;
+    -webkit-backdrop-filter: var(--lg-backdrop-filter) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.42)) !important;
+    box-shadow:
+        inset 1.5px 1.5px 0.5px -0.5px rgba(255, 255, 255, 0.95),
+        inset -1.5px -1.5px 0.5px -0.5px rgba(255, 255, 255, 0.55),
+        0 14px 30px -12px rgba(var(--lgx-shadow), 0.40) !important;
+}
+html.dark #bottom-nav[data-lg-surface="bar"] {
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.55), rgba(15, 23, 42, 0.42)) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   4) Switches: el thumb es una gota de cristal
+   ------------------------------------------------------------------------- */
+html .app-switch-thumb[data-lg-surface] {
+    background-color: rgba(255, 255, 255, 0.30) !important;
+    background-image: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.10) 62%) !important;
+    border: 0 !important;
+    backdrop-filter: var(--lg-backdrop-filter, blur(4px) saturate(170%)) !important;
+    -webkit-backdrop-filter: var(--lg-backdrop-filter, blur(4px) saturate(170%)) !important;
+    box-shadow:
+        inset 1px 1px 0.5px rgba(255, 255, 255, 0.95),
+        inset -1px -1px 0.5px rgba(255, 255, 255, 0.45),
+        0 3px 7px rgba(var(--lgx-shadow), 0.30) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   5) Intensidad "Suave": sin refracción, vidrio simple y ligero
+   ------------------------------------------------------------------------- */
+html[data-glass-intensity="suave"] .segmented-glass-indicator,
+html[data-glass-intensity="suave"] .nav-sliding-indicator,
+html[data-glass-intensity="suave"] .chip-glass-indicator {
+    --lgx-fill-a: 0.30;
+    backdrop-filter: blur(3px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(3px) saturate(150%) !important;
+}
+html[data-glass-intensity="suave"] .segmented-glass-indicator::after,
+html[data-glass-intensity="suave"] .nav-sliding-indicator::after,
+html[data-glass-intensity="suave"] .chip-glass-indicator::after { opacity: 0.25; }
+
+/* ---------------------------------------------------------------------------
+   6) Accesibilidad: transparencia reducida => vidrio sólido legible
+   ------------------------------------------------------------------------- */
+@media (prefers-reduced-transparency: reduce) {
+    html .segmented-glass-indicator,
+    html .nav-sliding-indicator,
+    html .chip-glass-indicator {
+        --lgx-fill-a: 0.82;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+}
+
+/* Barra inferior en oscuro: vidrio más oscuro para que el ícono activo conserve contraste */
+html.dark .nav-sliding-indicator {
+    --lgx-tint: 71, 85, 105;
+    --lgx-fill-a: 0.30;
+}
+
+/* ---------------------------------------------------------------------------
+   7) Chips de filtro de Notas: cristal translúcido (los temas especiales conservan sus colores
+      porque sus reglas, más específicas, siguen ganando).
+   ------------------------------------------------------------------------- */
+html .note-filter-chip {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.60), rgba(255, 255, 255, 0.28)),
+        linear-gradient(105deg, var(--lgx-track-a), var(--lgx-track-b)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(10px) saturate(170%);
+    -webkit-backdrop-filter: blur(10px) saturate(170%);
+    box-shadow:
+        inset 1px 1px 0.5px -0.5px rgba(255, 255, 255, 0.95),
+        inset -1px -1px 0.5px -0.5px rgba(255, 255, 255, 0.5),
+        0 4px 12px -6px rgba(var(--lgx-shadow), 0.28);
+}
+html.dark .note-filter-chip {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03)),
+        rgba(15, 23, 42, 0.55) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+}
+html .note-filter-chip.note-filter-active {
+    background:
+        radial-gradient(120% 140% at 18% 0%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 55%),
+        linear-gradient(165deg, rgba(99, 102, 241, 0.92) 0%, rgba(67, 56, 202, 0.86) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    box-shadow:
+        inset 1.5px 1.5px 0.5px -0.5px rgba(255, 255, 255, 0.85),
+        inset -1.5px -1.5px 0.5px -0.5px rgba(255, 255, 255, 0.40),
+        inset 0 0 12px rgba(255, 255, 255, 0.14),
+        0 10px 20px -8px rgba(67, 56, 202, 0.6) !important;
+}

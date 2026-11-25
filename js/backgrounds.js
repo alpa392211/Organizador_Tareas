@@ -805,6 +805,10 @@
             const wantsAnimation = Boolean(Storage?.getBackgroundAnimated?.());
             if (!wantsAnimation) return { ok: false, reason: '' };
 
+            if (Storage?.getReducedEffects?.() || document.documentElement.getAttribute('data-reduced-effects') === 'true') {
+                return { ok: false, reason: 'Animación pausada: Modo rendimiento (Reducir efectos) activado.' };
+            }
+
             const reduced = Boolean(this._motionQuery?.matches || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
             if (reduced) {
                 return { ok: false, reason: 'Animación pausada: tu sistema tiene activada la opción de movimiento reducido.' };

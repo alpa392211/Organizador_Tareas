@@ -24,7 +24,7 @@ import java.util.Set;
 public class NotificationHelper {
 
     public static final String CHANNEL_ID = "organizador_reminders";
-    public static final String CHANNEL_NAME = "Recordatorios de Tareas y Notas";
+    public static final String CHANNEL_NAME = "Recordatorios de Clases, Tareas y Notas";
     private static final String PREFS_ALARMS = "org_escolar_scheduled_alarms";
     private static final String KEY_IDS = "alarm_ids";
 
@@ -45,7 +45,7 @@ public class NotificationHelper {
                 CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_HIGH
         );
-        channel.setDescription("Avisos de fechas límite de tareas y recordatorios de notas.");
+        channel.setDescription("Avisos antes de tus materias, fechas límite de tareas y recordatorios de notas.");
         channel.enableVibration(true);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         nm.createNotificationChannel(channel);

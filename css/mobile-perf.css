@@ -1,0 +1,334 @@
+/* ============================================================================
+   mobile-perf.css - v1.6.0
+   1) Optimización global para móviles y APK Android (60 FPS, touch-action, contain)
+   2) Efecto verde GPU-only (transform + opacity) al desbloquear códigos en la Bóveda
+   3) Selector táctil de recordatorio de materias (15, 30, 45 min y 1 h antes)
+   4) Modo Rendimiento / Reducir efectos (html[data-reduced-effects="true"])
+      - Sin tocar styles.css ni liquid-glass.css; solo sobrescribe cuando está activo.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1) Optimización táctil y de scroll en celular / WebView Android
+   ------------------------------------------------------------------------- */
+button,
+a,
+label,
+input,
+select,
+.tap-effect,
+.nav-item,
+.subject-card,
+.task-card,
+.note-card {
+    touch-action: manipulation;
+}
+
+.mobile-sheet-body,
+#view-secret-codes,
+#calendar-modal .overflow-y-auto {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.subject-card,
+.task-card,
+.note-card {
+    contain: layout style;
+}
+
+/* Evita estados :hover pegajosos y repaints innecesarios en pantallas táctiles */
+@media (hover: none) and (pointer: coarse) {
+    .card-hover:hover,
+    .vault-inventory-card:hover {
+        transform: none !important;
+    }
+    .subject-card,
+    .task-card,
+    .note-card {
+        transition-property: transform, opacity, border-color;
+        transition-duration: 0.16s;
+    }
+}
+
+/* Optimización de overlays y hojas móviles en APK Android sin tocar superficies Liquid Glass */
+html[data-platform="android-apk"] .app-modal-backdrop {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+@media (max-width: 767px) {
+    .mobile-bottom-sheet .mobile-sheet-body {
+        max-height: 82dvh;
+    }
+    #view-subjects #subjects-grid,
+    #view-tasks #tasks-list,
+    #view-notes #notes-grid {
+        contain: layout style;
+    }
+}
+
+/* Espacio inferior suficiente para que el menú desplegable de 8+ materias nunca quede cubierto */
+#view-subjects {
+    padding-bottom: 5.5rem;
+}
+
+/* Cuando corre fondo animado o en fallback sin refracción, bajar blur de la barra inferior a 16px */
+html #bottom-nav[data-lg-surface="bar"][data-lg-refraction="fallback"],
+html.animated-bg-running #bottom-nav[data-lg-surface="bar"] {
+    backdrop-filter: blur(var(--lg-blur-nav, 16px)) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(var(--lg-blur-nav, 16px)) saturate(180%) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   2) Bóveda Secreta: Efecto verde esmeralda al desbloquear código (GPU-ONLY 60 FPS)
+      Solo anima transform y opacity en un pseudo-elemento ::after sin repintar box-shadow.
+   ------------------------------------------------------------------------- */
+#vault-card-container {
+    isolation: isolate;
+}
+
+#vault-card-container > * {
+    position: relative;
+    z-index: 1;
+}
+
+#vault-card-container::after {
+    content: "";
+    position: absolute;
+    inset: -18%;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.56) 0%, rgba(52, 211, 153, 0.28) 36%, rgba(5, 150, 105, 0.08) 60%, rgba(5, 150, 105, 0) 76%);
+    opacity: 0;
+    transform: scale(0.68);
+    will-change: transform, opacity;
+}
+
+@keyframes vaultGreenGlowBurst {
+    0% {
+        opacity: 0;
+        transform: scale(0.68);
+    }
+    28% {
+        opacity: 1;
+        transform: scale(1.06);
+    }
+    68% {
+        opacity: 0.72;
+        transform: scale(1.14);
+    }
+    100% {
+        opacity: 0.28;
+        transform: scale(1);
+    }
+}
+
+html #vault-card-container.vault-aura-burst {
+    border-color: rgba(16, 185, 129, 0.92) !important;
+    box-shadow:
+        inset 0 0 36px 4px rgba(16, 185, 129, 0.34),
+        0 14px 32px -10px rgba(16, 185, 129, 0.45) !important;
+}
+
+html #vault-card-container.vault-aura-burst::after {
+    animation: vaultGreenGlowBurst 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+html:not(.dark) #vault-card-container.vault-aura-burst {
+    border-color: rgba(5, 150, 105, 0.85) !important;
+    box-shadow:
+        inset 0 0 28px 2px rgba(16, 185, 129, 0.22),
+        0 18px 36px -12px rgba(16, 185, 129, 0.34) !important;
+}
+
+/* Candado verde visible tanto en modo oscuro como en modo claro */
+html #vault-card-container .vault-lock-unlocking,
+html #vault-card-container .vault-lock-unlocked {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+    border-color: #6ee7b7 !important;
+    color: #ecfdf5 !important;
+    box-shadow: 0 0 22px 2px rgba(16, 185, 129, 0.52) !important;
+}
+
+/* Detalle verde sutil (estático, 0 repaints) en el modal de recompensa */
+#vault-reveal-modal.active .modal-dialog {
+    border-color: rgba(52, 211, 153, 0.58);
+    box-shadow:
+        0 0 0 1px rgba(16, 185, 129, 0.28),
+        0 24px 48px -16px rgba(6, 78, 59, 0.65);
+}
+
+/* ---------------------------------------------------------------------------
+   3) Selector de recordatorio de Materias (15, 30, 45 min y 1 hora antes)
+   ------------------------------------------------------------------------- */
+.subject-reminder-option {
+    min-height: 44px;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+
+.subject-reminder-option[aria-pressed="true"] {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px -4px rgba(79, 70, 229, 0.5);
+}
+
+html.dark .subject-reminder-option[aria-pressed="true"] {
+    background-color: #6366f1 !important;
+    border-color: #818cf8 !important;
+    color: #ffffff !important;
+}
+
+/* ---------------------------------------------------------------------------
+   4) Modo Rendimiento / Reducir Efectos (html[data-reduced-effects="true"])
+      Elimina blurs, backdrop-filter, refracción, sombras complejas,
+      partículas y animaciones para máxima fluidez en equipos limitados.
+   ------------------------------------------------------------------------- */
+html[data-reduced-effects="true"] *,
+html[data-reduced-effects="true"] *::before,
+html[data-reduced-effects="true"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+}
+
+html[data-reduced-effects="true"] header,
+html[data-reduced-effects="true"] #bottom-nav,
+html[data-reduced-effects="true"] #bottom-nav[data-lg-surface="bar"],
+html[data-reduced-effects="true"] #bottom-main-circle,
+html[data-reduced-effects="true"] #bottom-main-circle[data-lg-surface],
+html[data-reduced-effects="true"] #tablet-main-circle,
+html[data-reduced-effects="true"] #tablet-main-circle[data-lg-surface],
+html[data-reduced-effects="true"] #tablet-quick-rail,
+html[data-reduced-effects="true"] .glass-panel,
+html[data-reduced-effects="true"] .quick-glass-dialog,
+html[data-reduced-effects="true"] .app-modal-backdrop,
+html[data-reduced-effects="true"] .segmented-control-track,
+html[data-reduced-effects="true"] .notes-segmented-control,
+html[data-reduced-effects="true"] .segmented-glass-indicator,
+html[data-reduced-effects="true"] .nav-sliding-indicator,
+html[data-reduced-effects="true"] .chip-glass-indicator,
+html[data-reduced-effects="true"] .note-filter-chip,
+html[data-reduced-effects="true"] .app-switch-thumb,
+html[data-reduced-effects="true"] .app-switch-thumb[data-lg-surface],
+html[data-reduced-effects="true"] .settings-accordion-card,
+html[data-reduced-effects="true"] .modal-dialog {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Oculta capas decorativas y partículas pesadas en Modo Rendimiento */
+html[data-reduced-effects="true"] .segmented-glass-indicator::before,
+html[data-reduced-effects="true"] .segmented-glass-indicator::after,
+html[data-reduced-effects="true"] .nav-sliding-indicator::before,
+html[data-reduced-effects="true"] .nav-sliding-indicator::after,
+html[data-reduced-effects="true"] .chip-glass-indicator::before,
+html[data-reduced-effects="true"] .chip-glass-indicator::after,
+html[data-reduced-effects="true"] .glass-panel::before,
+html[data-reduced-effects="true"] #app-bg-canvas,
+html[data-reduced-effects="true"] .celebration-emoji-particle {
+    display: none !important;
+}
+
+html[data-reduced-effects="true"] #app-bg-photo {
+    filter: none !important;
+}
+
+/* Superficies sólidas limpias y legibles sin blur en Modo Rendimiento */
+html[data-reduced-effects="true"] #bottom-nav,
+html[data-reduced-effects="true"] #bottom-nav[data-lg-surface="bar"] {
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
+    box-shadow: 0 -2px 8px rgba(15, 23, 42, 0.08) !important;
+}
+
+html[data-reduced-effects="true"].dark #bottom-nav,
+html[data-reduced-effects="true"].dark #bottom-nav[data-lg-surface="bar"] {
+    background: #0f172a !important;
+    border-top: 1px solid #1e293b !important;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-reduced-effects="true"] .segmented-control-track,
+html[data-reduced-effects="true"] .notes-segmented-control {
+    background: #eef2ff !important;
+    border: 1px solid #c7d2fe !important;
+    box-shadow: none !important;
+}
+
+html[data-reduced-effects="true"].dark .segmented-control-track,
+html[data-reduced-effects="true"].dark .notes-segmented-control {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+html[data-reduced-effects="true"] .segmented-glass-indicator,
+html[data-reduced-effects="true"] .nav-sliding-indicator,
+html[data-reduced-effects="true"] .chip-glass-indicator {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12) !important;
+}
+
+html[data-reduced-effects="true"].dark .segmented-glass-indicator,
+html[data-reduced-effects="true"].dark .nav-sliding-indicator,
+html[data-reduced-effects="true"].dark .chip-glass-indicator {
+    background: #334155 !important;
+    border: 1px solid #475569 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-reduced-effects="true"] .note-filter-chip {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+html[data-reduced-effects="true"].dark .note-filter-chip {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+html[data-reduced-effects="true"] .note-filter-chip.note-filter-active {
+    background: #4f46e5 !important;
+    border: 1px solid #4338ca !important;
+    box-shadow: none !important;
+}
+
+html[data-reduced-effects="true"] .app-switch-thumb,
+html[data-reduced-effects="true"] .app-switch-thumb[data-lg-surface] {
+    background: #ffffff !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
+}
+
+html[data-reduced-effects="true"] .quick-glass-dialog {
+    background: #ffffff !important;
+    box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.2) !important;
+}
+
+html[data-reduced-effects="true"].dark .quick-glass-dialog {
+    background: #0f172a !important;
+    box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-reduced-effects="true"] .subject-card,
+html[data-reduced-effects="true"] .task-card,
+html[data-reduced-effects="true"] .note-card,
+html[data-reduced-effects="true"] .settings-accordion-card,
+html[data-reduced-effects="true"] .glass-panel {
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* En Modo Rendimiento, el desbloqueo verde de la Bóveda sigue siendo nítido pero instantáneo */
+html[data-reduced-effects="true"] #vault-card-container::after {
+    display: none !important;
+}
+html[data-reduced-effects="true"] #vault-card-container.vault-aura-burst {
+    border-color: #10b981 !important;
+    box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.55) !important;
+}

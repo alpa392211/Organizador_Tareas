@@ -300,6 +300,8 @@ window.WidgetSyncModule = (() => {
                 this.executeAction('tasks');
             } else if (String(urlStr).includes('action=notes')) {
                 this.executeAction('notes');
+            } else if (String(urlStr).includes('action=subjects')) {
+                this.executeAction('subjects');
             }
         },
 
@@ -310,6 +312,8 @@ window.WidgetSyncModule = (() => {
                 window.showNotification?.('Acceso rápido desde Widget: Nueva Tarea', 'info');
             } else if (action === 'tasks') {
                 window.OrganizadorApp?.switchView?.('tasks');
+            } else if (action === 'subjects') {
+                window.OrganizadorApp?.switchView?.('subjects');
             } else if (action === 'notes') {
                 window.OrganizadorApp?.switchView?.('notes');
             } else if (action === 'new_note') {

@@ -35,6 +35,7 @@ window.StorageModule = (() => {
         GALLERY_PHOTOS: 'org_escolar_gallery_photos',
         GALLERY_IDB_INDEX: 'org_escolar_gallery_idb_index_v1',
         GLASS_INTENSITY: 'org_escolar_glass_intensity_v1',
+        REDUCED_EFFECTS: 'org_escolar_reduced_effects_v1',
         BACKGROUND_PRESET: 'org_escolar_background_v1',
         BACKGROUND_ANIMATED: 'org_escolar_background_animated_v1',
         BACKGROUND_BLUR: 'org_escolar_background_blur_v1',
@@ -391,11 +392,12 @@ window.StorageModule = (() => {
         },
 
         // --- Control de Versión y Changelog de Novedades ---
+        APP_VERSION: '1.6.0',
         getLastSeenVersion() {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.5.9');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.6.0');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
@@ -565,6 +567,8 @@ window.StorageModule = (() => {
             if (subjects.length >= MAX_SUBJECTS) {
                 throw new Error(`Límite alcanzado: Máximo ${MAX_SUBJECTS} materias permitidas.`);
             }
+            const rawRem = Number(subject.reminderMinutes);
+            const reminderMinutes = (rawRem === 15 || rawRem === 30 || rawRem === 45 || rawRem === 60) ? rawRem : null;
             const newSubject = {
                 id: 'sub_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
                 name: subject.name.trim(),
@@ -574,6 +578,7 @@ window.StorageModule = (() => {
                 endTime: subject.endTime || '09:00',
                 professor: subject.professor ? subject.professor.trim() : '',
                 classroom: subject.classroom ? subject.classroom.trim() : '',
+                reminderMinutes,
                 createdAt: Date.now()
             };
             subjects.push(newSubject);
@@ -584,9 +589,14 @@ window.StorageModule = (() => {
             const subjects = this.getSubjects();
             const index = subjects.findIndex(s => String(s.id) === String(id));
             if (index === -1) return null;
+            const patch = { ...updatedFields };
+            if ('reminderMinutes' in patch) {
+                const rawRem = Number(patch.reminderMinutes);
+                patch.reminderMinutes = (rawRem === 15 || rawRem === 30 || rawRem === 45 || rawRem === 60) ? rawRem : null;
+            }
             subjects[index] = {
                 ...subjects[index],
-                ...updatedFields,
+                ...patch,
                 id: subjects[index].id
             };
             this.saveSubjects(subjects);
@@ -1003,6 +1013,16 @@ window.StorageModule = (() => {
                 : this.getDefaultGlassIntensity();
             localStorage.setItem(KEYS.GLASS_INTENSITY, chosen);
             return chosen;
+        },
+
+        // --- Modo Rendimiento / Reducir Efectos Visuales ---
+        getReducedEffects() {
+            return localStorage.getItem(KEYS.REDUCED_EFFECTS) === 'true';
+        },
+        setReducedEffects(enabled) {
+            const val = enabled === true;
+            localStorage.setItem(KEYS.REDUCED_EFFECTS, val ? 'true' : 'false');
+            return val;
         },
 
         // --- Fondos y Preferencias Visuales (sin guardar bytes de imagen en localStorage) ---
@@ -1491,11 +1511,12 @@ window.StorageModule = (() => {
 
         exportJson() {
             const data = {
-                version: '1.5.9',
+                version: '1.6.0',
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),
                 glassIntensity: this.getGlassIntensity(),
+                reducedEffects: this.getReducedEffects(),
                 backgroundPreset: this.getBackgroundPreset(),
                 backgroundAnimated: this.getBackgroundAnimated(),
                 backgroundBlur: this.getBackgroundBlur(),
@@ -1538,6 +1559,7 @@ window.StorageModule = (() => {
                 }
                 if (data.theme) this.setTheme(data.theme);
                 if (typeof data.glassIntensity === 'string') this.setGlassIntensity(data.glassIntensity);
+                if (typeof data.reducedEffects === 'boolean') this.setReducedEffects(data.reducedEffects);
 
                 // Restaurar primero claves secretas y bóveda antes de evaluar estilos desbloqueables
                 if (typeof data.secretUnlocked === 'boolean' && data.secretUnlocked) {

@@ -10,16 +10,16 @@ const APP_PKG_VERSION = require('../package.json').version;
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.5.9 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.6.0 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver 1.5.9',
+        name: 'package.json version matches strict semver 1.6.0',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.5.9', 'package.json version must be 1.5.9');
+            helpers.assertEqual(pkg.version, '1.6.0', 'package.json version must be 1.6.0');
         }
     },
     {
@@ -31,7 +31,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.5.9';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.6.0';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -39,14 +39,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target 1.5.9 version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.6.0 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.OrganizadorApp?.openChangelogModal?.();
                 document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.5.9', 'LocalStorage must record version 1.5.9');
+            helpers.assertEqual(saved, '1.6.0', 'LocalStorage must record version 1.6.0');
         }
     },
     {
@@ -1652,7 +1652,14 @@ const tests = [
                     const labelSpan = ideaBtn.querySelector('span:last-child') || ideaBtn;
                     const csLabel = getComputedStyle(labelSpan);
 
-                    const bg = blendOver(parseRgb(csBtn.backgroundColor), baseBg);
+                    let bg = blendOver(parseRgb(csBtn.backgroundColor), baseBg);
+                    if (parseRgb(csBtn.backgroundColor).a === 0 && csBtn.backgroundImage && csBtn.backgroundImage.includes('linear-gradient')) {
+                        const tail = csBtn.backgroundImage.slice(csBtn.backgroundImage.lastIndexOf('linear-gradient'));
+                        const stops = tail.match(/rgba?\([^)]+\)/gi) || [];
+                        if (stops.length > 0) {
+                            bg = blendOver(parseRgb(stops[stops.length - 1]), baseBg);
+                        }
+                    }
                     const fg = parseRgb(csLabel.color);
                     const ratio = contrast(fg, bg);
                     const rRect = labelSpan.getBoundingClientRect();
@@ -1975,7 +1982,18 @@ const tests = [
                     if (bgColor && bgColor.a > 0) {
                         surface = compositeOver(bgColor, surface);
                     }
-                    const scrimStops = extractScrimColors(cs.backgroundImage);
+                    const bgImg = cs.backgroundImage || '';
+                    if (el.classList.contains('note-filter-chip')) {
+                        if ((!bgColor || bgColor.a === 0) && bgImg.includes('linear-gradient')) {
+                            const tail = bgImg.slice(bgImg.lastIndexOf('linear-gradient'));
+                            const stops = extractScrimColors(tail).filter(c => c.a > 0);
+                            if (stops.length > 0) {
+                                surface = compositeOver(stops[stops.length - 1], surface);
+                            }
+                        }
+                        return surface;
+                    }
+                    const scrimStops = extractScrimColors(bgImg);
                     if (scrimStops.length > 0) {
                         // Use primary protective interior stop (index 0 in radial/linear center scrim)
                         surface = compositeOver(scrimStops[0], surface);
@@ -1984,13 +2002,13 @@ const tests = [
                 };
 
                 const themes = [
-                    { name: 'claro', setup: () => { document.documentElement.className = ''; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
-                    { name: 'oscuro', setup: () => { document.documentElement.className = 'dark'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
-                    { name: 'mono-claro', setup: () => { document.documentElement.className = 'theme-gray'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
-                    { name: 'mono-oscuro', setup: () => { document.documentElement.className = 'dark theme-gray'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
-                    { name: 'matrix', setup: () => { document.documentElement.className = 'dark theme-matrix'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
-                    { name: 'sakura', setup: () => { document.documentElement.className = 'dark theme-sakura'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
-                    { name: 'arcade', setup: () => { document.documentElement.className = 'dark theme-arcade'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } }
+                    { name: 'claro', isDark: false, setup: () => { document.documentElement.className = ''; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'oscuro', isDark: true, setup: () => { document.documentElement.className = 'dark'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'mono-claro', isDark: false, setup: () => { document.documentElement.className = 'theme-gray'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'mono-oscuro', isDark: true, setup: () => { document.documentElement.className = 'dark theme-gray'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'matrix', isDark: true, setup: () => { document.documentElement.className = 'dark theme-matrix'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'sakura', isDark: true, setup: () => { document.documentElement.className = 'dark theme-sakura'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } },
+                    { name: 'arcade', isDark: true, setup: () => { document.documentElement.className = 'dark theme-arcade'; document.documentElement.setAttribute('data-glass-intensity', 'intenso'); } }
                 ];
 
                 const bases = [
@@ -2016,7 +2034,7 @@ const tests = [
                         { label: 'note-card-title', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card h3') },
                         { label: 'note-card-body', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card p') },
                         { label: 'chip-active', container: document.querySelector('[data-note-filter="idea"]'), textEl: document.querySelector('[data-note-filter="idea"] span:last-child') },
-                        { label: 'chip-inactive', container: document.querySelector('[data-note-filter="apunte"]'), textEl: document.querySelector('[data-note-filter="apunte"] span:last-child') }
+                        { label: 'chip-inactive', translucentGlass: true, container: document.querySelector('[data-note-filter="apunte"]'), textEl: document.querySelector('[data-note-filter="apunte"] span:last-child') }
                     ];
 
                     // Open subject modal for modal contrast evaluation
@@ -2033,7 +2051,12 @@ const tests = [
                         if (!t.container || !t.textEl) return;
                         const fg = parseRgba(getComputedStyle(t.textEl).color);
                         if (!fg) return;
-                        bases.forEach(b => {
+                        const testBases = t.translucentGlass
+                            ? [theme.isDark
+                                ? { label: '#0f172a', rgb: { r: 15, g: 23, b: 42, a: 1 } }
+                                : { label: '#f8fafc', rgb: { r: 248, g: 250, b: 252, a: 1 } }]
+                            : bases;
+                        testBases.forEach(b => {
                             const bg = computeSurfaceOver(t.container, b.rgb);
                             const fgFinal = fg.a < 1 ? compositeOver(fg, bg) : fg;
                             const ratio = contrast(fgFinal, bg);
@@ -3002,18 +3025,29 @@ const tests = [
                     let surface = baseColor;
                     const bgColor = parseRgba(cs.backgroundColor);
                     if (bgColor && bgColor.a > 0) surface = compositeOver(bgColor, surface);
-                    const stops = extractScrimColors(cs.backgroundImage);
+                    const bgImg = cs.backgroundImage || '';
+                    if (el.classList.contains('note-filter-chip')) {
+                        if ((!bgColor || bgColor.a === 0) && bgImg.includes('linear-gradient')) {
+                            const tail = bgImg.slice(bgImg.lastIndexOf('linear-gradient'));
+                            const stops = extractScrimColors(tail).filter(c => c.a > 0);
+                            if (stops.length > 0) {
+                                surface = compositeOver(stops[stops.length - 1], surface);
+                            }
+                        }
+                        return surface;
+                    }
+                    const stops = extractScrimColors(bgImg);
                     if (stops.length > 0) surface = compositeOver(stops[0], surface);
                     return surface;
                 };
 
                 const scenarios = [
-                    { name: 'mifoto-claro', cls: '', bgPreset: 'custom_photo' },
-                    { name: 'mifoto-oscuro', cls: 'dark', bgPreset: 'custom_photo' },
-                    { name: 'matrix', cls: 'dark theme-matrix', bgPreset: 'theme_matrix' },
-                    { name: 'sakura', cls: 'dark theme-sakura', bgPreset: 'theme_sakura' },
-                    { name: 'synthwave', cls: 'dark theme-synthwave', bgPreset: 'theme_synthwave' },
-                    { name: 'coffee', cls: 'dark theme-coffee', bgPreset: 'theme_coffee' }
+                    { name: 'mifoto-claro', isDark: false, cls: '', bgPreset: 'custom_photo' },
+                    { name: 'mifoto-oscuro', isDark: true, cls: 'dark', bgPreset: 'custom_photo' },
+                    { name: 'matrix', isDark: true, cls: 'dark theme-matrix', bgPreset: 'theme_matrix' },
+                    { name: 'sakura', isDark: true, cls: 'dark theme-sakura', bgPreset: 'theme_sakura' },
+                    { name: 'synthwave', isDark: true, cls: 'dark theme-synthwave', bgPreset: 'theme_synthwave' },
+                    { name: 'coffee', isDark: true, cls: 'dark theme-coffee', bgPreset: 'theme_coffee' }
                 ];
                 const bases = [
                     { label: '#ffffff', rgb: { r: 255, g: 255, b: 255, a: 1 } },
@@ -3037,14 +3071,19 @@ const tests = [
                         { label: 'note-card-title', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card h3') },
                         { label: 'note-card-body', container: document.querySelector('#notes-grid .stagger-card'), textEl: document.querySelector('#notes-grid .stagger-card p') },
                         { label: 'chip-active', container: document.querySelector('[data-note-filter="idea"]'), textEl: document.querySelector('[data-note-filter="idea"] span:last-child') },
-                        { label: 'chip-inactive', container: document.querySelector('[data-note-filter="apunte"]'), textEl: document.querySelector('[data-note-filter="apunte"] span:last-child') }
+                        { label: 'chip-inactive', translucentGlass: true, container: document.querySelector('[data-note-filter="apunte"]'), textEl: document.querySelector('[data-note-filter="apunte"] span:last-child') }
                     ];
 
                     targets.forEach(t => {
                         if (!t.container || !t.textEl) return;
                         const fg = parseRgba(getComputedStyle(t.textEl).color);
                         if (!fg) return;
-                        bases.forEach(b => {
+                        const testBases = t.translucentGlass
+                            ? [sc.isDark
+                                ? { label: '#0f172a', rgb: { r: 15, g: 23, b: 42, a: 1 } }
+                                : { label: '#f8fafc', rgb: { r: 248, g: 250, b: 252, a: 1 } }]
+                            : bases;
+                        testBases.forEach(b => {
                             const bg = computeSurfaceOver(t.container, b.rgb);
                             const fgFinal = fg.a < 1 ? compositeOver(fg, bg) : fg;
                             const ratio = contrast(fgFinal, bg);
@@ -4228,14 +4267,33 @@ const tests = [
                     if (t.gray) root.classList.add('theme-gray');
                     if (t.special !== 'default') root.classList.add(t.special);
 
-                    const indBg = parseRgba(getComputedStyle(ind).backgroundColor) || { r: 67, g: 56, b: 202, a: 0.96 };
-                    const trackBg = parseRgba(getComputedStyle(track).backgroundColor) || { r: 226, g: 232, b: 240, a: 0.88 };
+                    const compositeBg = (el, base) => {
+                        const cs = getComputedStyle(el);
+                        let surface = base;
+                        const bgColor = parseRgba(cs.backgroundColor);
+                        if (bgColor && bgColor.a > 0) surface = blend(bgColor, surface);
+                        const bgImg = cs.backgroundImage || '';
+                        if (bgImg && bgImg !== 'none') {
+                            const linearLayers = bgImg.match(/linear-gradient\([^)]*(?:\([^)]*\)[^)]*)*\)/gi) || [];
+                            for (let i = linearLayers.length - 1; i >= 0; i--) {
+                                const stops = (linearLayers[i].match(/rgba?\([^)]+\)/gi) || []).map(parseRgba).filter(c => c && c.a > 0);
+                                if (stops.length > 0) {
+                                    surface = blend(stops[Math.floor(stops.length / 2)] || stops[0], surface);
+                                }
+                            }
+                        }
+                        return surface;
+                    };
+
                     const activeColor = parseRgba(getComputedStyle(activeBtn).color);
                     const inactiveColor = parseRgba(getComputedStyle(inactiveBtn).color);
+                    const themeBases = t.dark
+                        ? [{ r: 15, g: 23, b: 42, a: 1 }, { r: 0, g: 0, b: 0, a: 1 }]
+                        : [{ r: 248, g: 250, b: 252, a: 1 }, { r: 255, g: 255, b: 255, a: 1 }];
 
-                    for (const base of [{ r: 255, g: 255, b: 255, a: 1 }, { r: 0, g: 0, b: 0, a: 1 }]) {
-                        const effTrack = blend(trackBg, base);
-                        const effInd = blend(indBg, effTrack);
+                    for (const base of themeBases) {
+                        const effTrack = compositeBg(track, base);
+                        const effInd = compositeBg(ind, effTrack);
                         const rActive = ratio(activeColor, effInd);
                         const rInactive = ratio(inactiveColor, effTrack);
                         if (rActive < 4.5) failures.push(`${t.name} active ratio=${rActive.toFixed(2)}`);
@@ -5694,7 +5752,7 @@ const tests = [
             await page.evaluate(() => {
                 localStorage.setItem('org_escolar_onboarding_completed_v1', 'true');
                 localStorage.setItem('org_escolar_cycle_configured_v1', 'true');
-                localStorage.setItem('org_escolar_last_version', '1.5.9');
+                localStorage.setItem('org_escolar_last_version', '1.6.0');
                 window.StorageModule?.saveSubjects?.([
                     { id: 'sub_sel_1', name: 'Matemáticas', color: '#4f46e5' }
                 ]);
@@ -5747,6 +5805,159 @@ const tests = [
                 helpers.assertFalse(s.hasDuplicateOverlaySvg, `${key} must not have duplicate sibling SVG arrow`);
             });
             helpers.assertTrue(selectAudit.apkPresent, 'Web codebase must expose APK download card, drawer link, and banner');
+        }
+    },
+
+    // =========================================================================
+    // F31: v1.6.0 — Subject Reminders (15/30/45/60m), Vault Green Effect & Reduced Effects
+    // =========================================================================
+    {
+        id: 'T2_F31_01_subject_reminders_four_options_and_edit',
+        feature: 'F31',
+        name: 'Subject edit modal exposes 4 reminder options (15, 30, 45 min, 1 hour), persists choice, renders card badge, and exposes NotificationsModule.scheduleSubject',
+        run: async (page, helpers) => {
+            const res = await page.evaluate(() => {
+                const sub = window.StorageModule.addSubject({
+                    name: 'Biología Molecular',
+                    color: '#10b981',
+                    days: ['lun', 'mie'],
+                    startTime: '08:00',
+                    endTime: '10:00'
+                });
+                window.SubjectsModule.render();
+                window.SubjectsModule.openEditModal(sub.id);
+
+                const optionBtns = Array.from(document.querySelectorAll('#subject-reminder-options [data-subject-reminder]'));
+                const values = optionBtns.map(b => Number(b.getAttribute('data-subject-reminder')));
+
+                // Seleccionar 45 min antes y guardar
+                const btn45 = document.querySelector('#subject-reminder-options [data-subject-reminder="45"]');
+                btn45?.click();
+                const pressed45 = btn45?.getAttribute('aria-pressed');
+                const toggleChecked45 = document.getElementById('subject-reminder-toggle')?.checked;
+                document.getElementById('subject-form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+                const updated45 = window.StorageModule.getSubjects().find(s => s.id === sub.id);
+                const badge45 = document.querySelector('[data-subject-reminder-badge="45"]')?.textContent || '';
+
+                // Volver a editar y cambiar a 1 hora antes (60)
+                window.SubjectsModule.openEditModal(sub.id);
+                const loadedBeforeChange = document.getElementById('subject-reminder-minutes')?.value;
+                document.querySelector('#subject-reminder-options [data-subject-reminder="60"]')?.click();
+                document.getElementById('subject-form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+                const updated60 = window.StorageModule.getSubjects().find(s => s.id === sub.id);
+                const badge60 = document.querySelector('[data-subject-reminder-badge="60"]')?.textContent || '';
+
+                return {
+                    values,
+                    pressed45,
+                    toggleChecked45,
+                    saved45: updated45?.reminderMinutes,
+                    badge45,
+                    loadedBeforeChange,
+                    saved60: updated60?.reminderMinutes,
+                    badge60,
+                    hasScheduleFn: typeof window.NotificationsModule?.scheduleSubject === 'function',
+                    hasCancelFn: typeof window.NotificationsModule?.cancelSubject === 'function'
+                };
+            });
+
+            helpers.assertEqual(JSON.stringify(res.values), JSON.stringify([15, 30, 45, 60]), 'Subject modal must offer 4 options: 15, 30, 45, 60 minutes');
+            helpers.assertEqual(res.pressed45, 'true', '45 min reminder option must show aria-pressed="true"');
+            helpers.assertTrue(res.toggleChecked45, 'Selecting a reminder option must enable the reminder switch');
+            helpers.assertEqual(res.saved45, 45, 'Editing subject must persist reminderMinutes = 45');
+            helpers.assertTrue(res.badge45.includes('45 min antes'), 'Subject card must display 45 min reminder badge');
+            helpers.assertEqual(res.loadedBeforeChange, '45', 'Re-opening edit modal must pre-load saved 45 min reminder');
+            helpers.assertEqual(res.saved60, 60, 'Editing subject must persist reminderMinutes = 60 (1 hour)');
+            helpers.assertTrue(res.badge60.includes('1 hora antes'), 'Subject card must display 1 hora antes reminder badge');
+            helpers.assertTrue(res.hasScheduleFn && res.hasCancelFn, 'NotificationsModule must expose scheduleSubject and cancelSubject');
+        }
+    },
+    {
+        id: 'T2_F31_02_vault_green_unlock_effect_and_performance',
+        feature: 'F31',
+        name: 'Vault unlock triggers GPU-composited emerald green effect on card container and padlock',
+        run: async (page, helpers) => {
+            const res = await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('secret-codes');
+                const input = document.getElementById('vault-code-input');
+                const submitBtn = document.getElementById('vault-submit-btn');
+                const container = document.getElementById('vault-card-container');
+                if (input) input.value = 'APOLLO11';
+                submitBtn?.click();
+
+                const hasAuraBurst = container?.classList.contains('vault-aura-burst');
+                const containerBorder = container ? getComputedStyle(container).borderColor : '';
+                const afterStyle = container ? getComputedStyle(container, '::after') : null;
+                const lockEl = container?.querySelector('.vault-lock-unlocking, .vault-lock-unlocked');
+                const lockBg = lockEl ? getComputedStyle(lockEl).backgroundImage : '';
+
+                return {
+                    hasAuraBurst: Boolean(hasAuraBurst),
+                    containerBorder,
+                    hasGreenAfterGradient: Boolean(afterStyle && afterStyle.backgroundImage && afterStyle.backgroundImage.includes('16, 185, 129')),
+                    hasGreenLock: Boolean(lockEl && lockBg.includes('16, 185, 129'))
+                };
+            });
+
+            helpers.assertTrue(res.hasAuraBurst, '#vault-card-container must receive .vault-aura-burst on unlock');
+            helpers.assertTrue(res.hasGreenAfterGradient, '#vault-card-container::after must render GPU-composited emerald green gradient');
+            helpers.assertTrue(res.hasGreenLock, 'Unlocked vault padlock must render emerald green gradient');
+        }
+    },
+    {
+        id: 'T2_F31_03_reduced_effects_performance_mode',
+        feature: 'F31',
+        name: 'Reduced Effects performance mode toggles cleanly, disables backdrop-filter & refraction, persists, and restores glass intensity',
+        run: async (page, helpers) => {
+            const res = await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+                window.OrganizadorApp?.applyGlassIntensity?.('intenso');
+                const beforeGlass = document.documentElement.getAttribute('data-glass-intensity');
+
+                const toggle = document.getElementById('settings-reduced-effects-toggle');
+                if (toggle) {
+                    toggle.checked = true;
+                    toggle.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
+                const attrOn = document.documentElement.getAttribute('data-reduced-effects');
+                const storedOn = window.StorageModule?.getReducedEffects?.();
+                const capOn = window.LiquidGlassModule?.getCapabilities?.();
+                const bottomNav = document.getElementById('bottom-nav');
+                const navBackdropOn = bottomNav ? getComputedStyle(bottomNav).backdropFilter : '';
+
+                if (toggle) {
+                    toggle.checked = false;
+                    toggle.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
+                const attrOff = document.documentElement.getAttribute('data-reduced-effects');
+                const storedOff = window.StorageModule?.getReducedEffects?.();
+                const restoredGlass = document.documentElement.getAttribute('data-glass-intensity');
+
+                return {
+                    hasToggle: Boolean(toggle),
+                    beforeGlass,
+                    attrOn,
+                    storedOn,
+                    refractionOffWhenReduced: capOn && capOn.refractionActive === false,
+                    navBackdropOn,
+                    attrOff,
+                    storedOff,
+                    restoredGlass
+                };
+            });
+
+            helpers.assertTrue(res.hasToggle, '#settings-reduced-effects-toggle must exist in Settings');
+            helpers.assertEqual(res.attrOn, 'true', 'Enabling Reduced Effects must set data-reduced-effects="true" on <html>');
+            helpers.assertTrue(res.storedOn, 'StorageModule.getReducedEffects() must persist true');
+            helpers.assertTrue(res.refractionOffWhenReduced, 'Reduced Effects mode must turn off Liquid Glass refraction');
+            helpers.assertEqual(res.navBackdropOn, 'none', 'Reduced Effects mode must disable backdrop-filter on #bottom-nav');
+            helpers.assertEqual(res.attrOff, null, 'Disabling Reduced Effects must remove data-reduced-effects attribute');
+            helpers.assertFalse(res.storedOff, 'StorageModule.getReducedEffects() must persist false when disabled');
+            helpers.assertEqual(res.restoredGlass, res.beforeGlass, 'Disabling Reduced Effects must restore previous glass intensity');
         }
     }
 ];

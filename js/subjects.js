@@ -32,12 +32,14 @@ window.SubjectsModule = (() => {
     const BOTTOM_DRAWER_THRESHOLD = 8;
 
     let selectedColor = PRESET_COLORS[0].hex;
+    let selectedReminderMinutes = null;
     let editingSubjectId = null;
     let bottomDrawerOpen = false;
 
     function init() {
         renderPresetColors();
         setupFormListeners();
+        setupReminderListeners();
         setupBottomDrawerListeners();
     }
 
@@ -155,6 +157,70 @@ window.SubjectsModule = (() => {
         };
     }
 
+    function normalizeReminderMinutes(val) {
+        const num = Number(val);
+        return (num === 15 || num === 30 || num === 45 || num === 60) ? num : null;
+    }
+
+    function formatReminderShort(minutes) {
+        const m = normalizeReminderMinutes(minutes);
+        if (!m) return '';
+        return m === 60 ? '1 hora antes' : `${m} min antes`;
+    }
+
+    function syncReminderUI(minutes = selectedReminderMinutes) {
+        const normalized = normalizeReminderMinutes(minutes);
+        selectedReminderMinutes = normalized;
+
+        const toggle = document.getElementById('subject-reminder-toggle');
+        const hiddenInput = document.getElementById('subject-reminder-minutes');
+        const statusLabel = document.getElementById('subject-reminder-status');
+        const optionsGrid = document.getElementById('subject-reminder-options');
+
+        if (toggle) toggle.checked = Boolean(normalized);
+        if (hiddenInput) hiddenInput.value = normalized ? String(normalized) : '';
+        if (statusLabel) {
+            statusLabel.textContent = normalized
+                ? `Aviso ${formatReminderShort(normalized)}`
+                : 'Sin recordatorio';
+        }
+        if (optionsGrid) {
+            optionsGrid.querySelectorAll('[data-subject-reminder]').forEach(btn => {
+                const btnVal = Number(btn.getAttribute('data-subject-reminder'));
+                const isSelected = normalized === btnVal;
+                btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            });
+        }
+    }
+
+    function setupReminderListeners() {
+        const toggle = document.getElementById('subject-reminder-toggle');
+        if (toggle && toggle.dataset.bound !== 'true') {
+            toggle.dataset.bound = 'true';
+            toggle.addEventListener('change', (e) => {
+                window.HapticsModule?.light?.();
+                if (e.target.checked) {
+                    syncReminderUI(selectedReminderMinutes || 15);
+                } else {
+                    syncReminderUI(null);
+                }
+            });
+        }
+
+        const optionsGrid = document.getElementById('subject-reminder-options');
+        if (optionsGrid && optionsGrid.dataset.bound !== 'true') {
+            optionsGrid.dataset.bound = 'true';
+            optionsGrid.querySelectorAll('[data-subject-reminder]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    window.HapticsModule?.light?.();
+                    const val = normalizeReminderMinutes(btn.getAttribute('data-subject-reminder'));
+                    // Si se toca la opción ya seleccionada, se desactiva; si no, se selecciona
+                    syncReminderUI(selectedReminderMinutes === val ? null : val);
+                });
+            });
+        }
+    }
+
     function openAddModal() {
         const Storage = window.StorageModule;
         const subjects = Storage.getSubjects();
@@ -168,6 +234,7 @@ window.SubjectsModule = (() => {
         document.getElementById('subject-form').reset();
         selectedColor = PRESET_COLORS[subjects.length % PRESET_COLORS.length].hex;
         renderPresetColors();
+        syncReminderUI(null);
 
         document.querySelectorAll('input[name="subject-days"]').forEach(cb => cb.checked = false);
         openModal();
@@ -189,6 +256,7 @@ window.SubjectsModule = (() => {
 
         selectedColor = subject.color || PRESET_COLORS[0].hex;
         renderPresetColors();
+        syncReminderUI(subject.reminderMinutes);
 
         document.querySelectorAll('input[name="subject-days"]').forEach(cb => {
             cb.checked = Array.isArray(subject.days) && subject.days.includes(cb.value);
@@ -264,6 +332,11 @@ window.SubjectsModule = (() => {
             return;
         }
 
+        const hiddenRemVal = document.getElementById('subject-reminder-minutes')?.value;
+        const reminderMinutes = normalizeReminderMinutes(
+            hiddenRemVal !== undefined && hiddenRemVal !== '' ? hiddenRemVal : selectedReminderMinutes
+        );
+
         const data = {
             name,
             color: selectedColor,
@@ -271,16 +344,26 @@ window.SubjectsModule = (() => {
             startTime,
             endTime,
             professor,
-            classroom
+            classroom,
+            reminderMinutes
         };
 
         try {
+            let savedSubject = null;
             if (editingSubjectId) {
-                Storage.updateSubject(editingSubjectId, data);
+                savedSubject = Storage.updateSubject(editingSubjectId, data);
                 window.showNotification?.('Materia actualizada con éxito.', 'success');
             } else {
-                Storage.addSubject(data);
+                savedSubject = Storage.addSubject(data);
                 window.showNotification?.('¡Materia registrada exitosamente!', 'success');
+            }
+            if (savedSubject) {
+                if (savedSubject.reminderMinutes) {
+                    window.NotificationsModule?.requestPermission?.().catch?.(() => {});
+                    window.NotificationsModule?.scheduleSubject?.(savedSubject)?.catch?.(() => {});
+                } else {
+                    window.NotificationsModule?.cancelSubject?.(savedSubject.id)?.catch?.(() => {});
+                }
             }
             window.HapticsModule?.double();
             closeModal();
@@ -305,6 +388,7 @@ window.SubjectsModule = (() => {
 
         if (confirm(confirmMsg)) {
             window.HapticsModule?.double();
+            window.NotificationsModule?.cancelSubject?.(id)?.catch?.(() => {});
             Storage.deleteSubject(id);
             window.showNotification?.(`Materia "${subject.name}" eliminada.`, 'info');
             render();
@@ -425,6 +509,15 @@ window.SubjectsModule = (() => {
                         <div class="flex flex-wrap gap-1">
                             ${daysHtml}
                         </div>
+
+                        ${normalizeReminderMinutes(subject.reminderMinutes) ? `
+                            <div class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-700/50" data-subject-reminder-badge="${normalizeReminderMinutes(subject.reminderMinutes)}">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                <span>Recordatorio: ${formatReminderShort(subject.reminderMinutes)}</span>
+                            </div>
+                        ` : ''}
 
                         ${subject.classroom ? `
                             <div class="flex items-center text-xs text-slate-600 dark:text-slate-400 gap-1.5 pt-1">
