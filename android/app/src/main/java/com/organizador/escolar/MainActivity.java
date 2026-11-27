@@ -42,6 +42,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.webkit.WebViewAssetLoader;
 
 import com.organizador.escolar.notifications.NotificationHelper;
+import com.organizador.escolar.update.AppUpdateManager;
 import com.organizador.escolar.widgets.WidgetDataSync;
 import com.organizador.escolar.widgets.WidgetJsBridge;
 
@@ -226,6 +227,26 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                     }
+
+                    @Override
+                    public String getAppVersionInfo() {
+                        return AppUpdateManager.getAppVersionInfoJson(MainActivity.this);
+                    }
+
+                    @Override
+                    public void checkForAppUpdate() {
+                        AppUpdateManager.checkForUpdateAsync(MainActivity.this, webView);
+                    }
+
+                    @Override
+                    public void downloadAndInstallUpdate(String url, String sha256) {
+                        AppUpdateManager.downloadAndInstallAsync(MainActivity.this, webView, url, sha256);
+                    }
+
+                    @Override
+                    public void openInstallPermissionSettings() {
+                        AppUpdateManager.openInstallPermissionSettings(MainActivity.this);
+                    }
                 }),
                 "AndroidWidgetBridge"
         );
@@ -340,10 +361,10 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 if (webView != null) {
                     webView.evaluateJavascript(
-                            "(function(){var open=document.querySelector('.modal-overlay:not(.hidden)');" +
-                            "if(open){var btn=open.querySelector('[id^=\"close-\"]');if(btn){btn.click();return true;}}return false;})()",
+                            "(function(){try{if(window.OrganizadorApp&&typeof window.OrganizadorApp.handleNativeBack==='function'){return String(window.OrganizadorApp.handleNativeBack());}var open=document.querySelector('.modal-overlay:not(.hidden)');if(open){var btn=open.querySelector('[id^=\"close-\"]');if(btn){btn.click();return 'handled';}}}catch(e){}return 'unhandled';})()",
                             res -> {
-                                if (!"true".equals(res)) {
+                                String cleaned = res != null ? res.replace("\"", "") : "";
+                                if (!"handled".equals(cleaned) && !"true".equals(cleaned)) {
                                     if (webView.canGoBack()) {
                                         webView.goBack();
                                     } else {

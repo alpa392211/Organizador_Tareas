@@ -10,16 +10,16 @@ const APP_PKG_VERSION = require('../package.json').version;
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.6.0 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.7.0 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver 1.6.0',
+        name: 'package.json version matches strict semver 1.7.0',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.6.0', 'package.json version must be 1.6.0');
+            helpers.assertEqual(pkg.version, '1.7.0', 'package.json version must be 1.7.0');
         }
     },
     {
@@ -31,7 +31,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.6.0';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.7.0';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -39,14 +39,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target 1.6.0 version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.7.0 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.OrganizadorApp?.openChangelogModal?.();
                 document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.6.0', 'LocalStorage must record version 1.6.0');
+            helpers.assertEqual(saved, '1.7.0', 'LocalStorage must record version 1.7.0');
         }
     },
     {
@@ -3151,11 +3151,19 @@ const tests = [
         }
     },
     {
-        id: 'T2_F22_06_thematic_backgrounds_force_dark_mode_and_block_light_mode',
+        id: 'T2_F22_06_thematic_backgrounds_and_vault_themes_support_light_mode',
         feature: 'F22',
-        name: 'Selecting any thematic background automatically activates Dark Mode, blocks Light Mode while active, and unlocks Light Mode upon returning to basic backgrounds',
+        name: 'All 10 thematic backgrounds and Vault themes support Light Mode and Dark Mode cleanly without locking #settings-theme-light',
         run: async (page, helpers) => {
             await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
             await page.reload({ waitUntil: 'load' });
 
             const res = await page.evaluate(async () => {
@@ -3163,96 +3171,67 @@ const tests = [
                 const Bg = window.BackgroundsModule;
                 const App = window.OrganizadorApp;
 
-                // Start explicitly in Light Mode with all 10 thematic backgrounds unlocked
                 Storage.setActiveSpecialTheme('default');
-                App.setTheme('light');
+                App.applyTheme('light', true);
                 const initiallyDark = document.documentElement.classList.contains('dark');
 
                 ['MATRIX99', 'ZENPEACE', 'RETRO80S', '06062009', 'ARCADE90', 'COFFEE42', 'APOLLO11', 'EDUARDO', 'PINGUINO', 'STUDYMAX']
                     .forEach(c => Storage.unlockCode(c));
 
                 App.switchView('settings');
+                document.getElementById('settings-theme-light')?.closest('.settings-accordion-card')?.classList.add('open');
                 document.getElementById('settings-acc-background')?.classList.add('open');
-                document.getElementById('settings-acc-appearance')?.classList.add('open');
                 Bg.renderSettingsUI();
+                App.renderSettingsVaultThemes?.();
 
-                // Click Jardín Sakura while in Light Mode -> must auto-enable Dark Mode & lock Light Mode button
                 const sakuraBtn = document.querySelector('#settings-bg-experimental-grid [data-bg-preset="theme_sakura"]');
                 sakuraBtn?.click();
 
-                const afterSakuraDark = document.documentElement.classList.contains('dark');
-                const afterSakuraStoredTheme = Storage.getTheme();
-                const afterSakuraLightDisabled = document.getElementById('settings-theme-light')?.disabled === true;
-                const afterSakuraPill = document.getElementById('settings-theme-pill')?.textContent || '';
+                const stayedLightAfterSakura = !document.documentElement.classList.contains('dark');
+                const lightBtnEnabledAfterSakura = document.getElementById('settings-theme-light')?.disabled === false;
 
-                // Attempt to toggle back to Light Mode via header button, settings light button, and auto mode
-                document.getElementById('theme-toggle-btn')?.click();
-                const stillDarkAfterToggle = document.documentElement.classList.contains('dark');
-                App.setTheme('light');
-                const stillDarkAfterSetLight = document.documentElement.classList.contains('dark');
-                App.setTheme('auto');
-                const stillDarkAfterAuto = document.documentElement.classList.contains('dark');
-
-                // Verify ALL 10 thematic backgrounds auto-activate Dark Mode when clicked from Light Mode
-                const failedAutoDark = [];
+                // All 10 thematic backgrounds preserve light mode when selected from light mode
+                const failedLightBg = [];
                 const thematicIds = (Bg.getAllThematicPresets?.() || []).map(p => p.id);
                 for (const id of thematicIds) {
-                    // Temporarily force clean Light Mode before clicking each card
-                    Storage.setBackgroundPreset('default');
                     App.applyTheme('light', true);
-                    if (document.documentElement.classList.contains('dark')) {
-                        failedAutoDark.push(`${id}:precondition-dark`);
-                        continue;
-                    }
                     document.querySelector(`#settings-bg-experimental-grid [data-bg-preset="${id}"]`)?.click();
-                    if (!document.documentElement.classList.contains('dark') || Storage.getTheme() !== 'dark') {
-                        failedAutoDark.push(id);
+                    if (document.documentElement.classList.contains('dark')) {
+                        failedLightBg.push(id);
                     }
                 }
 
-                // Switch back to Predeterminado -> Light Mode button unlocks & switching to light works again
-                document.querySelector('#settings-bg-basic-grid [data-bg-preset="default"]')?.click();
-                const lightUnlockedAfterDefault = document.getElementById('settings-theme-light')?.disabled === false;
-                document.getElementById('settings-theme-light')?.click();
-                const lightWorksAfterDefault = !document.documentElement.classList.contains('dark');
-
-                // Even if programmatic applyBackground runs with theme_matrix while not dark, dark mode activates
-                Storage.setBackgroundPreset('theme_matrix');
-                await Bg.applyBackground();
-                const darkForcedOnApply = document.documentElement.classList.contains('dark');
+                // Activate Vault theme in light mode and verify theme class persists across Light <-> Dark
+                App.toggleVaultTheme('sakura', { forceActivate: true });
+                App.applyTheme('light', true);
+                const lightHasSakuraClass = document.documentElement.classList.contains('theme-sakura') && !document.documentElement.classList.contains('dark');
+                App.applyTheme('dark', true);
+                const darkHasSakuraClass = document.documentElement.classList.contains('theme-sakura') && document.documentElement.classList.contains('dark');
+                App.applyTheme('light', true);
+                const backToLightHasSakura = document.documentElement.classList.contains('theme-sakura') && !document.documentElement.classList.contains('dark');
 
                 return {
                     initiallyDark,
-                    afterSakuraDark,
-                    afterSakuraStoredTheme,
-                    afterSakuraLightDisabled,
-                    afterSakuraPill,
-                    stillDarkAfterToggle,
-                    stillDarkAfterSetLight,
-                    stillDarkAfterAuto,
+                    stayedLightAfterSakura,
+                    lightBtnEnabledAfterSakura,
                     thematicCount: thematicIds.length,
-                    failedAutoDark,
-                    lightUnlockedAfterDefault,
-                    lightWorksAfterDefault,
-                    darkForcedOnApply
+                    failedLightBg,
+                    lightHasSakuraClass,
+                    darkHasSakuraClass,
+                    backToLightHasSakura
                 };
             });
 
             await helpers.resetPageState(page);
 
             helpers.assertFalse(res.initiallyDark, 'Test precondition must start in Light Mode');
-            helpers.assertTrue(res.afterSakuraDark, 'Selecting theme_sakura from Light Mode must activate Dark Mode automatically');
-            helpers.assertEqual(res.afterSakuraStoredTheme, 'dark', 'Selecting thematic background must persist theme=dark');
-            helpers.assertTrue(res.afterSakuraLightDisabled, '#settings-theme-light must be disabled while thematic background is active');
-            helpers.assertIncludes(res.afterSakuraPill, 'Modo Oscuro', '#settings-theme-pill must show Modo Oscuro requirement');
-            helpers.assertTrue(res.stillDarkAfterToggle, 'Header theme toggle must keep Dark Mode while thematic background is active');
-            helpers.assertTrue(res.stillDarkAfterSetLight, 'setTheme("light") must keep Dark Mode while thematic background is active');
-            helpers.assertTrue(res.stillDarkAfterAuto, 'setTheme("auto") must keep Dark Mode while thematic background is active');
+            helpers.assertTrue(res.stayedLightAfterSakura, 'Selecting theme_sakura from Light Mode must keep Light Mode');
+            helpers.assertTrue(res.lightBtnEnabledAfterSakura, '#settings-theme-light must remain enabled with thematic backgrounds active');
             helpers.assertEqual(res.thematicCount, 10, 'All 10 thematic backgrounds must be verified');
-            helpers.assertEqual(res.failedAutoDark.length, 0, `Every thematic background must auto-activate Dark Mode (${res.failedAutoDark.join(', ')})`);
-            helpers.assertTrue(res.lightUnlockedAfterDefault, 'Returning to Predeterminado must unlock Light Mode button');
-            helpers.assertTrue(res.lightWorksAfterDefault, 'Light Mode must work normally once thematic background is deselected');
-            helpers.assertTrue(res.darkForcedOnApply, 'Programmatic applyBackground() with thematic preset must also enforce Dark Mode');
+            helpers.assertEqual(res.failedLightBg.length, 0, `Every thematic background must work in Light Mode (${res.failedLightBg.join(', ')})`);
+            helpers.assertTrue(res.lightHasSakuraClass, 'Vault theme-sakura must support Light Mode');
+            helpers.assertTrue(res.darkHasSakuraClass, 'Vault theme-sakura must support switching to Dark Mode');
+            helpers.assertTrue(res.backToLightHasSakura, 'Vault theme-sakura must persist when switching back to Light Mode');
         }
     },
 
@@ -3265,6 +3244,14 @@ const tests = [
         name: 'Locked app DOM exposes zero Vault theme names, zero Experimental/Auto background labels, and zero visible Liquid Glass text',
         run: async (page, helpers) => {
             await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
             await page.reload({ waitUntil: 'load' });
             const result = await page.evaluate(() => {
                 document.getElementById('cycle-welcome-modal')?.classList.add('hidden');
@@ -3300,6 +3287,14 @@ const tests = [
         name: 'Storage.importJson strips locked special theme, background preset, vault font, and grayMode when codes are missing',
         run: async (page, helpers) => {
             await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
             await page.reload({ waitUntil: 'load' });
             const state = await page.evaluate(() => {
                 const payload = {
@@ -3334,6 +3329,14 @@ const tests = [
         name: 'Unlocking a single Vault code reveals only that thematic background and hides all other locked themes',
         run: async (page, helpers) => {
             await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
             await page.reload({ waitUntil: 'load' });
             const res = await page.evaluate(() => {
                 window.StorageModule.unlockCode('MATRIX99');
@@ -3357,6 +3360,14 @@ const tests = [
         name: 'Drawer, bottom sheets, longpress popup, and toasts have real backdropFilter, no backdrop-root traps, transparent drawer footer, and >= 4.5:1 contrast across mobile viewports',
         run: async (page, helpers) => {
             await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
             await page.reload({ waitUntil: 'load' });
 
             for (const w of [320, 360, 430]) {
@@ -5752,7 +5763,7 @@ const tests = [
             await page.evaluate(() => {
                 localStorage.setItem('org_escolar_onboarding_completed_v1', 'true');
                 localStorage.setItem('org_escolar_cycle_configured_v1', 'true');
-                localStorage.setItem('org_escolar_last_version', '1.6.0');
+                localStorage.setItem('org_escolar_last_version', '1.7.0');
                 window.StorageModule?.saveSubjects?.([
                     { id: 'sub_sel_1', name: 'Matemáticas', color: '#4f46e5' }
                 ]);
@@ -5970,6 +5981,233 @@ const tests = [
             helpers.assertEqual(res.attrOff, null, 'Disabling Reduced Effects must remove data-reduced-effects attribute');
             helpers.assertFalse(res.storedOff, 'StorageModule.getReducedEffects() must persist false when disabled');
             helpers.assertEqual(res.restoredGlass, res.beforeGlass, 'Disabling Reduced Effects must restore previous glass intensity');
+        }
+    },
+
+    // =========================================================================
+    // F32: v1.7.0 Comprehensive Feature Suite (UI, Performance, Audio, Tour, Updater)
+    // =========================================================================
+    {
+        id: 'T2_F32_01_task_color_bar_and_settings_accordions',
+        feature: 'F32',
+        name: 'Task card shows visible left ::before color bar and Settings accordions stay open during inner clicks',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
+            await page.reload({ waitUntil: 'load' });
+
+            const res = await page.evaluate(() => {
+                const Storage = window.StorageModule;
+                const App = window.OrganizadorApp;
+                Storage.saveSubjects([{ id: 's-color', name: 'Química', color: '#e11d48', days: ['Lun'], startTime: '08:00', endTime: '09:00' }]);
+                Storage.saveTasks([{ id: 't-color', subjectId: 's-color', title: 'Práctica', priority: 'alta', completed: false, dueDate: '' }]);
+
+                App.switchView('tasks');
+                window.TasksModule?.render?.();
+                const card = document.querySelector('#tasks-container .task-card');
+                const accent = card ? getComputedStyle(card).getPropertyValue('--task-accent-color').trim() : '';
+                const beforeContent = card ? getComputedStyle(card, '::before').content : '';
+                const beforeWidth = card ? parseFloat(getComputedStyle(card, '::before').width || '0') : 0;
+
+                App.switchView('settings');
+                const perfAcc = document.getElementById('settings-theme-light')?.closest('.settings-accordion-card');
+                perfAcc?.classList.add('open');
+                document.getElementById('settings-theme-light')?.click();
+                const stayedOpenAfterClick = perfAcc?.classList.contains('open') === true;
+
+                return {
+                    hasTaskCard: Boolean(card),
+                    accent,
+                    beforeContent,
+                    beforeWidth,
+                    stayedOpenAfterClick
+                };
+            });
+
+            helpers.assertTrue(res.hasTaskCard, 'Task card must have .task-card class');
+            helpers.assertTrue(Boolean(res.accent), 'Task card must set --task-accent-color');
+            helpers.assertTrue(res.beforeContent !== 'none' && res.beforeWidth >= 3, 'Task card ::before color bar must be rendered');
+            helpers.assertTrue(res.stayedOpenAfterClick, 'Settings accordion must stay open after inner control click');
+        }
+    },
+    {
+        id: 'T2_F32_02_vault_5_fonts_manual_codes_and_settings_themes',
+        feature: 'F32',
+        name: 'Vault keeps 5 new fonts, excludes MANUAL_ONLY_CODES from 18-item auto pool, and reveals Settings Vault themes only after unlock',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
+            await page.reload({ waitUntil: 'load' });
+
+            const res = await page.evaluate(() => {
+                const Storage = window.StorageModule;
+                const App = window.OrganizadorApp;
+
+                App.switchView('secret-codes');
+                const initialProgress = document.getElementById('vault-unlocked-count-text')?.textContent?.trim();
+                const sectionBefore = document.getElementById('settings-vault-themes-section');
+                const hiddenBefore = sectionBefore?.classList.contains('hidden') === true;
+
+                const manualPool = Array.from(Storage.MANUAL_ONLY_CODES || []);
+                const autoPool = Array.from(Storage.AUTO_UNLOCK_POOL || []);
+                const overlap = manualPool.filter(c => autoPool.includes(c));
+
+                // Unlock KRONOS99 -> unlocks all 10 themes + 10 fonts (5 new)
+                Storage.unlockCode('KRONOS99');
+                App.syncSettingsFontButtons?.();
+                App.renderSettingsVaultThemes?.();
+
+                const hiddenAfter = sectionBefore?.classList.contains('hidden') === true;
+                const renderedThemes = document.querySelectorAll('#settings-vault-themes-grid [data-vault-theme-btn]').length;
+                const newFontBtns = ['spacegrotesk', 'fredoka', 'dancingscript', 'pixelify', 'specialelite']
+                    .filter(k => Boolean(document.querySelector(`#settings-font-buttons-grid [data-font-btn="${k}"]`)));
+
+                return {
+                    initialProgress,
+                    hiddenBefore,
+                    manualCount: manualPool.length,
+                    autoCount: autoPool.length,
+                    overlapCount: overlap.length,
+                    hiddenAfter,
+                    renderedThemes,
+                    newFontCount: newFontBtns.length
+                };
+            });
+
+            await helpers.resetPageState(page);
+
+            helpers.assertEqual(res.initialProgress, '0 / 18', 'Vault initial auto-unlock progress must be 0 / 18');
+            helpers.assertTrue(res.hiddenBefore, '#settings-vault-themes-section must be hidden when 0 themes unlocked');
+            helpers.assertEqual(res.manualCount, 3, 'MANUAL_ONLY_CODES must keep 3 manual codes');
+            helpers.assertEqual(res.autoCount, 18, 'AUTO_UNLOCK_POOL must contain 18 auto codes');
+            helpers.assertEqual(res.overlapCount, 0, 'MANUAL_ONLY_CODES must never overlap AUTO_UNLOCK_POOL');
+            helpers.assertFalse(res.hiddenAfter, '#settings-vault-themes-section must reveal once Vault theme unlocked');
+            helpers.assertEqual(res.renderedThemes, 10, 'All 10 unlocked Vault themes must render in Settings');
+            helpers.assertEqual(res.newFontCount, 5, 'All 5 new Vault fonts must render in Settings once unlocked');
+        }
+    },
+    {
+        id: 'T2_F32_03_bg_quality_profiles_placement_back_exit_tour_audio_updater',
+        feature: 'F32',
+        name: 'Verify 3 BG qualities, 3 device profiles, subject add placement, back exit modal, 9-step tour, sound selector, and AppUpdater',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+            });
+            await page.reload({ waitUntil: 'load' });
+
+            const res = await page.evaluate(() => {
+                const Storage = window.StorageModule;
+                const App = window.OrganizadorApp;
+                const Perf = window.PerformanceModeModule;
+                const Subjects = window.SubjectsModule;
+                const Tour = window.TourModule;
+                const Notif = window.NotificationsModule;
+                const Updater = window.AppUpdater;
+
+                // 1. Device profile & BG quality constraints under reduced-effects
+                Perf.applyDeviceProfile('high', { persist: true, userInitiated: true });
+                const bgQualityHighOk = Storage.getBackgroundQuality() === 'high';
+                Perf.setEnabled(true, { persist: true });
+                const highDisabledWhenReduced = document.querySelector('#settings-bg-quality-track [data-bg-quality="high"]')?.disabled === true;
+                const clampedWhenReduced = Storage.getBackgroundQuality() === 'low';
+                Perf.setEnabled(false, { persist: true });
+
+                // 2. Subjects add placement (auto/top/bottom)
+                Subjects.setAddButtonPlacement('bottom');
+                const placementSaved = Storage.getSubjectsAddPlacement() === 'bottom';
+                Subjects.setAddButtonPlacement('auto');
+
+                // 3. Drawer Settings button replaces Exit + handleNativeBack opens exit modal on subjects
+                const hasOldExitInDrawer = Boolean(document.getElementById('app-exit-btn'));
+                const hasSettingsInDrawer = Boolean(document.getElementById('drawer-footer-settings-btn'));
+                App.switchView('subjects');
+                App._viewHistory = [];
+                App.handleNativeBack();
+                const exitModalEl = document.getElementById('exit-modal');
+                const exitOpenedOnBack = Boolean(exitModalEl && !exitModalEl.classList.contains('hidden'));
+                App.handleNativeBack();
+                const exitClosedOnSecondBack = Boolean(exitModalEl && !exitModalEl.classList.contains('active'));
+
+                // 4. 9-step Tour API
+                const tourStarted = Tour.start({ force: true });
+                const tourStepCount = Tour.STEPS.length;
+                Tour.next();
+                const step2Title = document.getElementById('tour-step-badge')?.textContent?.trim() || '';
+                Tour.close(true);
+                const tourClosed = !Tour.isOpen();
+
+                // 5. Notification Sound mode selector
+                Notif.setSoundMode('silent');
+                const soundModeSaved = Storage.getNotificationSoundMode() === 'silent';
+                Notif.setSoundMode('app');
+
+                // 6. AppUpdater version comparator & modal
+                const cmpNewer = Updater.compareVersions('1.8.0', '1.7.0') === 1;
+                const cmpSame = Updater.compareVersions('1.7.0', '1.7.0') === 0;
+                const hasUpdateCard = Boolean(document.getElementById('settings-app-update-card'));
+                Updater.openUpdateModal({ versionName: '1.8.0', changelog: ['Test'], apkUrl: 'https://example.com/a.apk' });
+                const updateModalOpen = !document.getElementById('app-update-modal')?.classList.contains('hidden');
+                Updater.closeUpdateModal();
+
+                return {
+                    bgQualityHighOk,
+                    highDisabledWhenReduced,
+                    clampedWhenReduced,
+                    placementSaved,
+                    hasOldExitInDrawer,
+                    hasSettingsInDrawer,
+                    exitOpenedOnBack,
+                    exitClosedOnSecondBack,
+                    tourStarted,
+                    tourStepCount,
+                    step2Title,
+                    tourClosed,
+                    soundModeSaved,
+                    cmpNewer,
+                    cmpSame,
+                    hasUpdateCard,
+                    updateModalOpen
+                };
+            });
+
+            await helpers.resetPageState(page);
+
+            helpers.assertTrue(res.bgQualityHighOk, 'High profile should allow High BG quality');
+            helpers.assertTrue(res.highDisabledWhenReduced, 'High BG quality button must be disabled under reduced-effects');
+            helpers.assertTrue(res.clampedWhenReduced, 'High BG quality must clamp to low when reduced-effects turns on');
+            helpers.assertTrue(res.placementSaved, 'Subjects add placement bottom must persist');
+            helpers.assertFalse(res.hasOldExitInDrawer, 'Drawer must not keep old #app-exit-btn');
+            helpers.assertTrue(res.hasSettingsInDrawer, 'Drawer must contain #drawer-footer-settings-btn');
+            helpers.assertTrue(res.exitOpenedOnBack, 'Back on root subjects view must open #exit-modal');
+            helpers.assertTrue(res.exitClosedOnSecondBack, 'Second Back must dismiss #exit-modal');
+            helpers.assertTrue(res.tourStarted, 'TourModule.start({ force: true }) must open tutorial');
+            helpers.assertEqual(res.tourStepCount, 9, 'TourModule must contain 9 steps');
+            helpers.assertIncludes(res.step2Title, '2 / 9', 'TourModule.next() must advance to step 2 / 9');
+            helpers.assertTrue(res.tourClosed, 'TourModule.close() must close tutorial');
+            helpers.assertTrue(res.soundModeSaved, 'NotificationsModule.setSoundMode must persist silent/app');
+            helpers.assertTrue(res.cmpNewer && res.cmpSame, 'AppUpdater.compareVersions must compare semver accurately');
+            helpers.assertTrue(res.hasUpdateCard && res.updateModalOpen, 'Settings update card and update modal must work');
         }
     }
 ];

@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.6.0 (liquid-glass-mobile-perf)
+ * sw.js - Service Worker for Organizador_Tareas v1.7.0
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.6.0';
+const CACHE_NAME = 'organizador-tareas-cache-v1.7.0';
 
 const PRECACHE_ASSETS = [
     './',
@@ -11,30 +11,65 @@ const PRECACHE_ASSETS = [
     './manifest.webmanifest',
     './manifest.json',
     './favicon.ico',
-    // Fuentes locales Inter Variable
+    // Fuentes locales (offline, sin depender de CDN)
     './assets/fonts/inter-latin-opsz-normal.woff2',
     './assets/fonts/inter-latin-ext-opsz-normal.woff2',
+    './assets/fonts/lexend-latin-400-700.woff2',
+    './assets/fonts/lexend-latin-ext-400-700.woff2',
+    './assets/fonts/montserrat-latin-400-800.woff2',
+    './assets/fonts/montserrat-latin-ext-400-800.woff2',
+    './assets/fonts/lora-latin-400-700.woff2',
+    './assets/fonts/lora-latin-ext-400-700.woff2',
+    './assets/fonts/poppins-latin-400.woff2',
+    './assets/fonts/poppins-latin-600.woff2',
+    './assets/fonts/poppins-latin-700.woff2',
+    './assets/fonts/poppins-latin-ext-400.woff2',
+    './assets/fonts/poppins-latin-ext-600.woff2',
+    './assets/fonts/poppins-latin-ext-700.woff2',
+    './assets/fonts/firacode-latin-400-700.woff2',
+    './assets/fonts/firacode-latin-ext-400-700.woff2',
+    './assets/fonts/playfair-latin-400-800.woff2',
+    './assets/fonts/playfair-latin-ext-400-800.woff2',
+    './assets/fonts/caveat-latin-400-700.woff2',
+    './assets/fonts/caveat-latin-ext-400-700.woff2',
+    './assets/fonts/orbitron-latin-400-800.woff2',
+    './assets/fonts/spacegrotesk-latin-400-700.woff2',
+    './assets/fonts/spacegrotesk-latin-ext-400-700.woff2',
+    './assets/fonts/fredoka-latin-400-700.woff2',
+    './assets/fonts/fredoka-latin-ext-400-700.woff2',
+    './assets/fonts/dancingscript-latin-400-700.woff2',
+    './assets/fonts/dancingscript-latin-ext-400-700.woff2',
+    './assets/fonts/pixelify-latin-400-700.woff2',
+    './assets/fonts/pixelify-latin-ext-400-700.woff2',
+    './assets/fonts/specialelite-latin-400.woff2',
+    './assets/fonts/specialelite-latin-ext-400.woff2',
+    // Sonidos CC0 de notificación integrados
+    './assets/sounds/notif_class.ogg',
+    './assets/sounds/notif_task.ogg',
+    './assets/sounds/notif_alert.ogg',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.6.0',
-    './css/styles.css?v=1.6.0',
-    './css/liquid-glass.css?v=1.6.0',
-    './css/mobile-perf.css?v=1.6.0',
+    './css/tailwind.min.css?v=1.7.0',
+    './css/styles.css?v=1.7.0',
+    './css/liquid-glass.css?v=1.7.0',
+    './css/mobile-perf.css?v=1.7.0',
     // JavaScript application modules
-    './js/storage.js?v=1.6.0',
-    './js/haptics.js?v=1.6.0',
-    './js/liquid-glass.js?v=1.6.0',
-    './js/segmented.js?v=1.6.0',
-    './js/notifications.js?v=1.6.0',
-    './js/widgets.js?v=1.6.0',
-    './js/subjects.js?v=1.6.0',
-    './js/tasks.js?v=1.6.0',
-    './js/notes.js?v=1.6.0',
-    './js/calendar.js?v=1.6.0',
-    './js/archive.js?v=1.6.0',
-    './js/photo-editor.js?v=1.6.0',
-    './js/backgrounds.js?v=1.6.0',
-    './js/app.js?v=1.6.0',
-    './js/performance.js?v=1.6.0',
+    './js/storage.js?v=1.7.0',
+    './js/haptics.js?v=1.7.0',
+    './js/liquid-glass.js?v=1.7.0',
+    './js/segmented.js?v=1.7.0',
+    './js/notifications.js?v=1.7.0',
+    './js/widgets.js?v=1.7.0',
+    './js/subjects.js?v=1.7.0',
+    './js/tasks.js?v=1.7.0',
+    './js/notes.js?v=1.7.0',
+    './js/calendar.js?v=1.7.0',
+    './js/archive.js?v=1.7.0',
+    './js/photo-editor.js?v=1.7.0',
+    './js/backgrounds.js?v=1.7.0',
+    './js/tour.js?v=1.7.0',
+    './js/updater.js?v=1.7.0',
+    './js/app.js?v=1.7.0',
+    './js/performance.js?v=1.7.0',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
@@ -65,7 +100,7 @@ self.addEventListener('install', event => {
                     )
                 )
             );
-            console.log(`[SW v1.6.0] Precaching complete. Processed ${results.length} assets.`);
+            console.log(`[SW v1.7.0] Precaching complete. Processed ${results.length} assets.`);
         })
     );
 });
@@ -77,7 +112,7 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(name => {
                     if (name !== CACHE_NAME) {
-                        console.log(`[SW v1.6.0] Purging deprecated cache: ${name}`);
+                        console.log(`[SW v1.7.0] Purging deprecated cache: ${name}`);
                         return caches.delete(name);
                     }
                 })
@@ -105,7 +140,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[SW v1.6.0] Navigation offline. Serving cached index.html fallback.');
+                    console.log('[SW v1.7.0] Navigation offline. Serving cached index.html fallback.');
                     const cachedNav = await caches.match(request);
                     if (cachedNav) return cachedNav;
                     return caches.match('./index.html') || caches.match('index.html');

@@ -36,6 +36,238 @@
     src: url('../assets/fonts/inter-latin-opsz-normal.woff2') format('woff2');
     unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }
+@font-face {
+    font-family: 'Lexend';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/lexend-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Lexend';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/lexend-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 800;
+    src: url('../assets/fonts/montserrat-latin-ext-400-800.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 800;
+    src: url('../assets/fonts/montserrat-latin-400-800.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Lora';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/lora-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Lora';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/lora-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url('../assets/fonts/poppins-latin-ext-400.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url('../assets/fonts/poppins-latin-400.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 600;
+    src: url('../assets/fonts/poppins-latin-ext-600.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 600;
+    src: url('../assets/fonts/poppins-latin-600.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 700;
+    src: url('../assets/fonts/poppins-latin-ext-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 700;
+    src: url('../assets/fonts/poppins-latin-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Fira Code';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/firacode-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Fira Code';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/firacode-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 800;
+    src: url('../assets/fonts/playfair-latin-ext-400-800.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 800;
+    src: url('../assets/fonts/playfair-latin-400-800.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Caveat';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/caveat-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Caveat';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/caveat-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Orbitron';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 800;
+    src: url('../assets/fonts/orbitron-latin-400-800.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/spacegrotesk-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/spacegrotesk-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Fredoka';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/fredoka-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Fredoka';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/fredoka-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Dancing Script';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/dancingscript-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Dancing Script';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/dancingscript-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Pixelify Sans';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/pixelify-latin-ext-400-700.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Pixelify Sans';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('../assets/fonts/pixelify-latin-400-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Special Elite';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url('../assets/fonts/specialelite-latin-ext-400.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Special Elite';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url('../assets/fonts/specialelite-latin-400.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 :root {
     --inst-primary: #002B7A;
@@ -212,6 +444,31 @@ body {
     font-family: var(--font-sans);
 }
 
+:root[data-font="spacegrotesk"], body[data-font="spacegrotesk"] {
+    --font-sans: 'Space Grotesk', var(--font-sf-base), sans-serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="fredoka"], body[data-font="fredoka"] {
+    --font-sans: 'Fredoka', 'Nunito', var(--font-sf-base), sans-serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="dancingscript"], body[data-font="dancingscript"] {
+    --font-sans: 'Dancing Script', 'Brush Script MT', cursive, serif;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="pixelify"], body[data-font="pixelify"] {
+    --font-sans: 'Pixelify Sans', 'Fira Code', monospace;
+    font-family: var(--font-sans);
+}
+
+:root[data-font="specialelite"], body[data-font="specialelite"] {
+    --font-sans: 'Special Elite', 'Courier New', monospace;
+    font-family: var(--font-sans);
+}
+
 /* Modo Claro: Fondo ambiental con profundidad sutil para efectos de transparencia avanzados */
 body {
     background-color: #e6ebf5;
@@ -249,10 +506,14 @@ body {
     background-repeat: no-repeat;
 }
 #app-bg-photo {
+    inset: -2%;
+    width: 104%;
+    height: 104%;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: 50% 50%;
-    transition: background-position 0.12s var(--ease-smooth), filter 0.15s linear;
+    filter: blur(var(--bg-photo-blur, 0px));
+    transition: background-position 0.12s var(--ease-smooth), filter 0.12s linear;
 }
 #app-bg-scrim {
     transition: background-color 0.15s linear;
@@ -515,7 +776,7 @@ html.dark:not([class*="theme-"]) #sidebar-drawer {
 html.dark:not([class*="theme-"]) #sidebar-drawer-footer > div {
     color: #cbd5e1 !important;
 }
-html.dark:not([class*="theme-"]) #app-exit-btn {
+html.dark:not([class*="theme-"]) #drawer-footer-settings-btn {
     background-color: rgba(255, 255, 255, 0.10) !important;
     border-color: rgba(255, 255, 255, 0.18) !important;
     color: #f1f5f9 !important;
@@ -1060,7 +1321,7 @@ select option {
     color: #0f172a;
 }
 html.dark select option,
-html[class*="theme-"]:not(.theme-gray) select option {
+html.dark[class*="theme-"]:not(.theme-gray) select option {
     background-color: #0f172a;
     color: #f8fafc;
 }
@@ -1171,7 +1432,7 @@ html[class*="theme-"]:not(.theme-gray) select option {
     box-shadow: var(--shadow-glass-sm), var(--lg-specular);
 }
 html.dark .tablet-rail-toggle-btn,
-html[class*="theme-"]:not(.theme-gray) .tablet-rail-toggle-btn {
+html.dark[class*="theme-"]:not(.theme-gray) .tablet-rail-toggle-btn {
     color: #f1f5f9;
 }
 
@@ -1191,7 +1452,7 @@ html[class*="theme-"]:not(.theme-gray) .tablet-rail-toggle-btn {
     transition: opacity 0.22s var(--ease-smooth), transform 0.24s var(--ease-smooth), visibility 0.22s ease;
 }
 html.dark .tablet-rail-panel,
-html[class*="theme-"]:not(.theme-gray) .tablet-rail-panel {
+html.dark[class*="theme-"]:not(.theme-gray) .tablet-rail-panel {
     border-color: rgba(255, 255, 255, 0.20);
 }
 .tablet-rail-panel.tablet-rail-collapsed {
@@ -1212,7 +1473,7 @@ html[class*="theme-"]:not(.theme-gray) .tablet-rail-panel {
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.14);
 }
 html.dark .tablet-main-label,
-html[class*="theme-"]:not(.theme-gray) .tablet-main-label {
+html.dark[class*="theme-"]:not(.theme-gray) .tablet-main-label {
     background-color: rgba(15, 23, 42, 0.78);
     border-color: rgba(255, 255, 255, 0.16);
 }
@@ -1569,6 +1830,46 @@ html.theme-switching *::after {
     transition: none !important;
 }
 
+/* Animación de barrido de arriba hacia abajo al cambiar claro <-> oscuro */
+@keyframes themeWipeDown {
+    from {
+        clip-path: inset(0 0 100% 0);
+    }
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+::view-transition-old(root) {
+    animation: none;
+}
+::view-transition-new(root) {
+    animation: themeWipeDown 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-new(root) {
+        animation: none !important;
+    }
+}
+html[data-reduced-effects="true"]::view-transition-new(root) {
+    animation: none !important;
+}
+.theme-wipe-fallback-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    pointer-events: none;
+    transform: translate3d(0, -100%, 0);
+    opacity: 0.96;
+    will-change: transform, opacity;
+    transition: transform 0.46s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
+}
+.theme-wipe-fallback-curtain.is-sweeping {
+    transform: translate3d(0, 0, 0);
+}
+.theme-wipe-fallback-curtain.is-fading {
+    opacity: 0;
+}
+
 /* En APK Android: eliminar 10x backdrop-filter + mask-composite en tarjetas apiladas de Configuración para 60 FPS */
 html[data-platform="android-apk"] #view-settings .settings-accordion-card {
     backdrop-filter: none !important;
@@ -1579,7 +1880,7 @@ html[data-platform="android-apk"] #view-settings .settings-accordion-card {
     contain: layout style paint;
 }
 html[data-platform="android-apk"].dark #view-settings .settings-accordion-card,
-html[data-platform="android-apk"][class*="theme-"]:not(.theme-gray) #view-settings .settings-accordion-card {
+html[data-platform="android-apk"].dark[class*="theme-"]:not(.theme-gray) #view-settings .settings-accordion-card {
     background-color: rgba(15, 23, 42, 0.90) !important;
     box-shadow: 0 6px 20px -6px rgba(0, 0, 0, 0.38) !important;
 }
@@ -1936,7 +2237,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.10);
 }
 html.dark input[type="range"]::-webkit-slider-runnable-track,
-html[class*="theme-"]:not(.theme-gray) input[type="range"]::-webkit-slider-runnable-track {
+html.dark[class*="theme-"]:not(.theme-gray) input[type="range"]::-webkit-slider-runnable-track {
     background: rgba(255, 255, 255, 0.14);
     border-color: rgba(255, 255, 255, 0.22);
 }
@@ -2412,472 +2713,935 @@ html:not(.dark).theme-gray #cal-days-grid button span {
    ======================================================== */
 
 /* 1. Apollo 11: Cósmico Interestelar */
-html.theme-apollo body {
+html.dark.theme-apollo body {
     background: radial-gradient(circle at 50% 20%, #0d122b 0%, #060914 70%, #020308 100%) !important;
     color: #f1f5f9 !important;
 }
-html.theme-apollo header,
-html.theme-apollo #bottom-nav,
-html.theme-apollo #sidebar-drawer {
+html.dark.theme-apollo header,
+html.dark.theme-apollo #bottom-nav,
+html.dark.theme-apollo #sidebar-drawer {
     background-color: rgba(10, 15, 35, 0.38) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(8, 12, 30, 0.80) 0%, rgba(10, 15, 35, 0.48) 76%, rgba(10, 15, 35, 0.24) 100%) !important;
     border-color: rgba(129, 140, 248, 0.36) !important;
 }
-html.theme-apollo .glass-panel,
-html.theme-apollo .stagger-card,
-html.theme-apollo .card-hover,
-html.theme-apollo .settings-accordion-card,
-html.theme-apollo .modal-dialog,
-html.theme-apollo #view-subjects > div.bg-white,
-html.theme-apollo #view-tasks > div.bg-white,
-html.theme-apollo #view-notes > div.bg-white,
-html.theme-apollo #view-archive > div.bg-white,
-html.theme-apollo #archive-empty-state,
-html.theme-apollo #view-settings > div.bg-white {
+html.dark.theme-apollo .glass-panel,
+html.dark.theme-apollo .stagger-card,
+html.dark.theme-apollo .card-hover,
+html.dark.theme-apollo .settings-accordion-card,
+html.dark.theme-apollo .modal-dialog,
+html.dark.theme-apollo #view-subjects > div.bg-white,
+html.dark.theme-apollo #view-tasks > div.bg-white,
+html.dark.theme-apollo #view-notes > div.bg-white,
+html.dark.theme-apollo #view-archive > div.bg-white,
+html.dark.theme-apollo #archive-empty-state,
+html.dark.theme-apollo #view-settings > div.bg-white {
     background-color: rgba(13, 20, 48, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(9, 14, 36, 0.78) 0%, rgba(13, 20, 48, 0.46) 76%, rgba(13, 20, 48, 0.24) 100%) !important;
     border-color: rgba(129, 140, 248, 0.32) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #f8fafc !important;
 }
-html.theme-apollo .text-slate-900,
-html.theme-apollo .text-slate-800 {
+html.dark.theme-apollo .text-slate-900,
+html.dark.theme-apollo .text-slate-800 {
     color: #f8fafc !important;
 }
-html.theme-apollo .text-slate-700,
-html.theme-apollo .text-slate-600,
-html.theme-apollo .text-slate-500,
-html.theme-apollo .text-slate-400 {
+html.dark.theme-apollo .text-slate-700,
+html.dark.theme-apollo .text-slate-600,
+html.dark.theme-apollo .text-slate-500,
+html.dark.theme-apollo .text-slate-400 {
     color: #cbd5e1 !important;
 }
-html.theme-apollo .fab-gradient-action,
-html.theme-apollo #bottom-main-circle,
-html.theme-apollo #tablet-main-circle {
+html.dark.theme-apollo .fab-gradient-action,
+html.dark.theme-apollo #bottom-main-circle,
+html.dark.theme-apollo #tablet-main-circle {
     background: linear-gradient(135deg, #f97316 0%, #4f46e5 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(249, 115, 22, 0.5) !important;
 }
 
 /* 2. Eduardo VIP: Tema Maestro Dorado */
-html.theme-eduardo-gold body {
+html.dark.theme-eduardo-gold body {
     background: radial-gradient(circle at 50% 20%, #231908 0%, #130d04 70%, #080501 100%) !important;
     color: #fef3c7 !important;
 }
-html.theme-eduardo-gold header,
-html.theme-eduardo-gold #bottom-nav,
-html.theme-eduardo-gold #sidebar-drawer,
-html.theme-eduardo-gold #sidebar-drawer-footer {
+html.dark.theme-eduardo-gold header,
+html.dark.theme-eduardo-gold #bottom-nav,
+html.dark.theme-eduardo-gold #sidebar-drawer,
+html.dark.theme-eduardo-gold #sidebar-drawer-footer {
     background-color: rgba(28, 20, 6, 0.40) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(22, 15, 4, 0.80) 0%, rgba(28, 20, 6, 0.48) 76%, rgba(28, 20, 6, 0.24) 100%) !important;
     border-color: rgba(245, 158, 11, 0.40) !important;
 }
-html.theme-eduardo-gold .glass-panel,
-html.theme-eduardo-gold .stagger-card,
-html.theme-eduardo-gold .card-hover,
-html.theme-eduardo-gold .settings-accordion-card,
-html.theme-eduardo-gold .modal-dialog,
-html.theme-eduardo-gold #view-subjects > div.bg-white,
-html.theme-eduardo-gold #view-tasks > div.bg-white,
-html.theme-eduardo-gold #view-notes > div.bg-white,
-html.theme-eduardo-gold #view-archive > div.bg-white,
-html.theme-eduardo-gold #archive-empty-state,
-html.theme-eduardo-gold #view-settings > div.bg-white {
+html.dark.theme-eduardo-gold .glass-panel,
+html.dark.theme-eduardo-gold .stagger-card,
+html.dark.theme-eduardo-gold .card-hover,
+html.dark.theme-eduardo-gold .settings-accordion-card,
+html.dark.theme-eduardo-gold .modal-dialog,
+html.dark.theme-eduardo-gold #view-subjects > div.bg-white,
+html.dark.theme-eduardo-gold #view-tasks > div.bg-white,
+html.dark.theme-eduardo-gold #view-notes > div.bg-white,
+html.dark.theme-eduardo-gold #view-archive > div.bg-white,
+html.dark.theme-eduardo-gold #archive-empty-state,
+html.dark.theme-eduardo-gold #view-settings > div.bg-white {
     background-color: rgba(36, 26, 8, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(26, 18, 5, 0.78) 0%, rgba(36, 26, 8, 0.46) 76%, rgba(36, 26, 8, 0.24) 100%) !important;
     border-color: rgba(245, 158, 11, 0.34) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #fef9c3 !important;
 }
-html.theme-eduardo-gold .text-slate-900,
-html.theme-eduardo-gold .text-slate-800 {
+html.dark.theme-eduardo-gold .text-slate-900,
+html.dark.theme-eduardo-gold .text-slate-800 {
     color: #fef3c7 !important;
 }
-html.theme-eduardo-gold .text-slate-700,
-html.theme-eduardo-gold .text-slate-600,
-html.theme-eduardo-gold .text-slate-500,
-html.theme-eduardo-gold .text-slate-400 {
+html.dark.theme-eduardo-gold .text-slate-700,
+html.dark.theme-eduardo-gold .text-slate-600,
+html.dark.theme-eduardo-gold .text-slate-500,
+html.dark.theme-eduardo-gold .text-slate-400 {
     color: #fde68a !important;
 }
-html.theme-eduardo-gold .fab-gradient-action,
-html.theme-eduardo-gold #bottom-main-circle,
-html.theme-eduardo-gold #tablet-main-circle {
+html.dark.theme-eduardo-gold .fab-gradient-action,
+html.dark.theme-eduardo-gold #bottom-main-circle,
+html.dark.theme-eduardo-gold #tablet-main-circle {
     background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.5) !important;
 }
 
 /* 3. Pingüino: Glacial Polar */
-html.theme-penguin body {
+html.dark.theme-penguin body {
     background: radial-gradient(circle at 50% 20%, #081d2e 0%, #030d17 70%, #01060b 100%) !important;
     color: #ecfeff !important;
 }
-html.theme-penguin header,
-html.theme-penguin #bottom-nav,
-html.theme-penguin #sidebar-drawer,
-html.theme-penguin #sidebar-drawer-footer {
+html.dark.theme-penguin header,
+html.dark.theme-penguin #bottom-nav,
+html.dark.theme-penguin #sidebar-drawer,
+html.dark.theme-penguin #sidebar-drawer-footer {
     background-color: rgba(5, 21, 35, 0.38) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(4, 16, 28, 0.80) 0%, rgba(5, 21, 35, 0.48) 76%, rgba(5, 21, 35, 0.24) 100%) !important;
     border-color: rgba(6, 182, 212, 0.38) !important;
 }
-html.theme-penguin .glass-panel,
-html.theme-penguin .stagger-card,
-html.theme-penguin .card-hover,
-html.theme-penguin .settings-accordion-card,
-html.theme-penguin .modal-dialog,
-html.theme-penguin #view-subjects > div.bg-white,
-html.theme-penguin #view-tasks > div.bg-white,
-html.theme-penguin #view-notes > div.bg-white,
-html.theme-penguin #view-archive > div.bg-white,
-html.theme-penguin #archive-empty-state,
-html.theme-penguin #view-settings > div.bg-white {
+html.dark.theme-penguin .glass-panel,
+html.dark.theme-penguin .stagger-card,
+html.dark.theme-penguin .card-hover,
+html.dark.theme-penguin .settings-accordion-card,
+html.dark.theme-penguin .modal-dialog,
+html.dark.theme-penguin #view-subjects > div.bg-white,
+html.dark.theme-penguin #view-tasks > div.bg-white,
+html.dark.theme-penguin #view-notes > div.bg-white,
+html.dark.theme-penguin #view-archive > div.bg-white,
+html.dark.theme-penguin #archive-empty-state,
+html.dark.theme-penguin #view-settings > div.bg-white {
     background-color: rgba(6, 28, 46, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(4, 20, 34, 0.78) 0%, rgba(6, 28, 46, 0.46) 76%, rgba(6, 28, 46, 0.24) 100%) !important;
     border-color: rgba(6, 182, 212, 0.32) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #f0fdfa !important;
 }
-html.theme-penguin .text-slate-900,
-html.theme-penguin .text-slate-800 {
+html.dark.theme-penguin .text-slate-900,
+html.dark.theme-penguin .text-slate-800 {
     color: #ecfeff !important;
 }
-html.theme-penguin .text-slate-700,
-html.theme-penguin .text-slate-600,
-html.theme-penguin .text-slate-500,
-html.theme-penguin .text-slate-400 {
+html.dark.theme-penguin .text-slate-700,
+html.dark.theme-penguin .text-slate-600,
+html.dark.theme-penguin .text-slate-500,
+html.dark.theme-penguin .text-slate-400 {
     color: #a5f3fc !important;
 }
-html.theme-penguin .fab-gradient-action,
-html.theme-penguin #bottom-main-circle,
-html.theme-penguin #tablet-main-circle {
+html.dark.theme-penguin .fab-gradient-action,
+html.dark.theme-penguin #bottom-main-circle,
+html.dark.theme-penguin #tablet-main-circle {
     background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.45) !important;
 }
 
 /* 4. Synthwave Neon 1984 */
-html.theme-synthwave body {
+html.dark.theme-synthwave body {
     background: radial-gradient(circle at 50% 20%, #240a33 0%, #12041c 70%, #07010a 100%) !important;
     color: #fdf4ff !important;
 }
-html.theme-synthwave header,
-html.theme-synthwave #bottom-nav,
-html.theme-synthwave #sidebar-drawer,
-html.theme-synthwave #sidebar-drawer-footer {
+html.dark.theme-synthwave header,
+html.dark.theme-synthwave #bottom-nav,
+html.dark.theme-synthwave #sidebar-drawer,
+html.dark.theme-synthwave #sidebar-drawer-footer {
     background-color: rgba(26, 7, 38, 0.40) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(20, 5, 30, 0.80) 0%, rgba(26, 7, 38, 0.48) 76%, rgba(26, 7, 38, 0.24) 100%) !important;
     border-color: rgba(236, 72, 153, 0.38) !important;
 }
-html.theme-synthwave .glass-panel,
-html.theme-synthwave .stagger-card,
-html.theme-synthwave .card-hover,
-html.theme-synthwave .settings-accordion-card,
-html.theme-synthwave .modal-dialog,
-html.theme-synthwave #view-subjects > div.bg-white,
-html.theme-synthwave #view-tasks > div.bg-white,
-html.theme-synthwave #view-notes > div.bg-white,
-html.theme-synthwave #view-archive > div.bg-white,
-html.theme-synthwave #archive-empty-state,
-html.theme-synthwave #view-settings > div.bg-white {
+html.dark.theme-synthwave .glass-panel,
+html.dark.theme-synthwave .stagger-card,
+html.dark.theme-synthwave .card-hover,
+html.dark.theme-synthwave .settings-accordion-card,
+html.dark.theme-synthwave .modal-dialog,
+html.dark.theme-synthwave #view-subjects > div.bg-white,
+html.dark.theme-synthwave #view-tasks > div.bg-white,
+html.dark.theme-synthwave #view-notes > div.bg-white,
+html.dark.theme-synthwave #view-archive > div.bg-white,
+html.dark.theme-synthwave #archive-empty-state,
+html.dark.theme-synthwave #view-settings > div.bg-white {
     background-color: rgba(35, 10, 50, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(24, 6, 36, 0.78) 0%, rgba(35, 10, 50, 0.46) 76%, rgba(35, 10, 50, 0.24) 100%) !important;
     border-color: rgba(236, 72, 153, 0.32) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #fae8ff !important;
 }
-html.theme-synthwave .text-slate-900,
-html.theme-synthwave .text-slate-800 {
+html.dark.theme-synthwave .text-slate-900,
+html.dark.theme-synthwave .text-slate-800 {
     color: #fdf4ff !important;
 }
-html.theme-synthwave .text-slate-700,
-html.theme-synthwave .text-slate-600,
-html.theme-synthwave .text-slate-500,
-html.theme-synthwave .text-slate-400 {
+html.dark.theme-synthwave .text-slate-700,
+html.dark.theme-synthwave .text-slate-600,
+html.dark.theme-synthwave .text-slate-500,
+html.dark.theme-synthwave .text-slate-400 {
     color: #f0abfc !important;
 }
-html.theme-synthwave .fab-gradient-action,
-html.theme-synthwave #bottom-main-circle,
-html.theme-synthwave #tablet-main-circle {
+html.dark.theme-synthwave .fab-gradient-action,
+html.dark.theme-synthwave #bottom-main-circle,
+html.dark.theme-synthwave #tablet-main-circle {
     background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(236, 72, 153, 0.5) !important;
 }
 
 /* 5. Terminal Matrix: Verde Fósforo Cyberspace */
-html.theme-matrix body {
+html.dark.theme-matrix body {
     background: radial-gradient(circle at 50% 15%, #04160a 0%, #020804 70%, #010402 100%) !important;
     color: #34d399 !important;
 }
-html.theme-matrix header,
-html.theme-matrix #bottom-nav,
-html.theme-matrix #sidebar-drawer,
-html.theme-matrix #sidebar-drawer-footer {
+html.dark.theme-matrix header,
+html.dark.theme-matrix #bottom-nav,
+html.dark.theme-matrix #sidebar-drawer,
+html.dark.theme-matrix #sidebar-drawer-footer {
     background-color: rgba(2, 14, 6, 0.38) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(2, 12, 5, 0.80) 0%, rgba(2, 14, 6, 0.48) 76%, rgba(2, 14, 6, 0.24) 100%) !important;
     border-color: rgba(16, 185, 129, 0.42) !important;
 }
-html.theme-matrix .glass-panel,
-html.theme-matrix .stagger-card,
-html.theme-matrix .card-hover,
-html.theme-matrix .settings-accordion-card,
-html.theme-matrix .modal-dialog,
-html.theme-matrix #view-subjects > div.bg-white,
-html.theme-matrix #view-tasks > div.bg-white,
-html.theme-matrix #view-notes > div.bg-white,
-html.theme-matrix #view-archive > div.bg-white,
-html.theme-matrix #archive-empty-state,
-html.theme-matrix #view-settings > div.bg-white {
+html.dark.theme-matrix .glass-panel,
+html.dark.theme-matrix .stagger-card,
+html.dark.theme-matrix .card-hover,
+html.dark.theme-matrix .settings-accordion-card,
+html.dark.theme-matrix .modal-dialog,
+html.dark.theme-matrix #view-subjects > div.bg-white,
+html.dark.theme-matrix #view-tasks > div.bg-white,
+html.dark.theme-matrix #view-notes > div.bg-white,
+html.dark.theme-matrix #view-archive > div.bg-white,
+html.dark.theme-matrix #archive-empty-state,
+html.dark.theme-matrix #view-settings > div.bg-white {
     background-color: rgba(4, 20, 10, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(2, 14, 7, 0.80) 0%, rgba(4, 20, 10, 0.48) 76%, rgba(4, 20, 10, 0.24) 100%) !important;
     border-color: rgba(16, 185, 129, 0.36) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #6ee7b7 !important;
 }
-html.theme-matrix .text-slate-900,
-html.theme-matrix .text-slate-800 {
+html.dark.theme-matrix .text-slate-900,
+html.dark.theme-matrix .text-slate-800 {
     color: #6ee7b7 !important;
 }
-html.theme-matrix .text-slate-700,
-html.theme-matrix .text-slate-600,
-html.theme-matrix .text-slate-500,
-html.theme-matrix .text-slate-400 {
+html.dark.theme-matrix .text-slate-700,
+html.dark.theme-matrix .text-slate-600,
+html.dark.theme-matrix .text-slate-500,
+html.dark.theme-matrix .text-slate-400 {
     color: #34d399 !important;
 }
-html.theme-matrix .fab-gradient-action,
-html.theme-matrix #bottom-main-circle,
-html.theme-matrix #tablet-main-circle {
+html.dark.theme-matrix .fab-gradient-action,
+html.dark.theme-matrix #bottom-main-circle,
+html.dark.theme-matrix #tablet-main-circle {
     background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.45) !important;
 }
 
 /* 6. Jardín Zen / Sakura Cerezo */
-html.theme-sakura body {
+html.dark.theme-sakura body {
     background: radial-gradient(circle at 50% 20%, #261118 0%, #16080d 70%, #090204 100%) !important;
     color: #fff1f2 !important;
 }
-html.theme-sakura header,
-html.theme-sakura #bottom-nav,
-html.theme-sakura #sidebar-drawer,
-html.theme-sakura #sidebar-drawer-footer {
+html.dark.theme-sakura header,
+html.dark.theme-sakura #bottom-nav,
+html.dark.theme-sakura #sidebar-drawer,
+html.dark.theme-sakura #sidebar-drawer-footer {
     background-color: rgba(30, 13, 19, 0.38) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(22, 9, 14, 0.80) 0%, rgba(30, 13, 19, 0.48) 76%, rgba(30, 13, 19, 0.24) 100%) !important;
     border-color: rgba(244, 63, 94, 0.38) !important;
 }
-html.theme-sakura .glass-panel,
-html.theme-sakura .stagger-card,
-html.theme-sakura .card-hover,
-html.theme-sakura .settings-accordion-card,
-html.theme-sakura .modal-dialog,
-html.theme-sakura #view-subjects > div.bg-white,
-html.theme-sakura #view-tasks > div.bg-white,
-html.theme-sakura #view-notes > div.bg-white,
-html.theme-sakura #view-archive > div.bg-white,
-html.theme-sakura #archive-empty-state,
-html.theme-sakura #view-settings > div.bg-white {
+html.dark.theme-sakura .glass-panel,
+html.dark.theme-sakura .stagger-card,
+html.dark.theme-sakura .card-hover,
+html.dark.theme-sakura .settings-accordion-card,
+html.dark.theme-sakura .modal-dialog,
+html.dark.theme-sakura #view-subjects > div.bg-white,
+html.dark.theme-sakura #view-tasks > div.bg-white,
+html.dark.theme-sakura #view-notes > div.bg-white,
+html.dark.theme-sakura #view-archive > div.bg-white,
+html.dark.theme-sakura #archive-empty-state,
+html.dark.theme-sakura #view-settings > div.bg-white {
     background-color: rgba(38, 17, 24, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(26, 11, 16, 0.78) 0%, rgba(38, 17, 24, 0.46) 76%, rgba(38, 17, 24, 0.24) 100%) !important;
     border-color: rgba(244, 63, 94, 0.32) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #ffe4e6 !important;
 }
-html.theme-sakura .text-slate-900,
-html.theme-sakura .text-slate-800 {
+html.dark.theme-sakura .text-slate-900,
+html.dark.theme-sakura .text-slate-800 {
     color: #fff1f2 !important;
 }
-html.theme-sakura .text-slate-700,
-html.theme-sakura .text-slate-600,
-html.theme-sakura .text-slate-500,
-html.theme-sakura .text-slate-400 {
+html.dark.theme-sakura .text-slate-700,
+html.dark.theme-sakura .text-slate-600,
+html.dark.theme-sakura .text-slate-500,
+html.dark.theme-sakura .text-slate-400 {
     color: #fecdd3 !important;
 }
-html.theme-sakura .fab-gradient-action,
-html.theme-sakura #bottom-main-circle,
-html.theme-sakura #tablet-main-circle {
+html.dark.theme-sakura .fab-gradient-action,
+html.dark.theme-sakura #bottom-main-circle,
+html.dark.theme-sakura #tablet-main-circle {
     background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(244, 63, 94, 0.45) !important;
 }
 
 /* 7. Modo Barista / Dark Roast Coffee */
-html.theme-coffee body {
+html.dark.theme-coffee body {
     background: radial-gradient(circle at 50% 20%, #24140b 0%, #150b06 70%, #080402 100%) !important;
     color: #fef3c7 !important;
 }
-html.theme-coffee header,
-html.theme-coffee #bottom-nav,
-html.theme-coffee #sidebar-drawer,
-html.theme-coffee #sidebar-drawer-footer {
+html.dark.theme-coffee header,
+html.dark.theme-coffee #bottom-nav,
+html.dark.theme-coffee #sidebar-drawer,
+html.dark.theme-coffee #sidebar-drawer-footer {
     background-color: rgba(28, 15, 8, 0.40) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(20, 10, 5, 0.80) 0%, rgba(28, 15, 8, 0.48) 76%, rgba(28, 15, 8, 0.24) 100%) !important;
     border-color: rgba(217, 119, 6, 0.38) !important;
 }
-html.theme-coffee .glass-panel,
-html.theme-coffee .stagger-card,
-html.theme-coffee .card-hover,
-html.theme-coffee .settings-accordion-card,
-html.theme-coffee .modal-dialog,
-html.theme-coffee #view-subjects > div.bg-white,
-html.theme-coffee #view-tasks > div.bg-white,
-html.theme-coffee #view-notes > div.bg-white,
-html.theme-coffee #view-archive > div.bg-white,
-html.theme-coffee #archive-empty-state,
-html.theme-coffee #view-settings > div.bg-white {
+html.dark.theme-coffee .glass-panel,
+html.dark.theme-coffee .stagger-card,
+html.dark.theme-coffee .card-hover,
+html.dark.theme-coffee .settings-accordion-card,
+html.dark.theme-coffee .modal-dialog,
+html.dark.theme-coffee #view-subjects > div.bg-white,
+html.dark.theme-coffee #view-tasks > div.bg-white,
+html.dark.theme-coffee #view-notes > div.bg-white,
+html.dark.theme-coffee #view-archive > div.bg-white,
+html.dark.theme-coffee #archive-empty-state,
+html.dark.theme-coffee #view-settings > div.bg-white {
     background-color: rgba(36, 20, 11, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(24, 13, 7, 0.78) 0%, rgba(36, 20, 11, 0.46) 76%, rgba(36, 20, 11, 0.24) 100%) !important;
     border-color: rgba(217, 119, 6, 0.32) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #fef3c7 !important;
 }
-html.theme-coffee .text-slate-900,
-html.theme-coffee .text-slate-800 {
+html.dark.theme-coffee .text-slate-900,
+html.dark.theme-coffee .text-slate-800 {
     color: #fef3c7 !important;
 }
-html.theme-coffee .text-slate-700,
-html.theme-coffee .text-slate-600,
-html.theme-coffee .text-slate-500,
-html.theme-coffee .text-slate-400 {
+html.dark.theme-coffee .text-slate-700,
+html.dark.theme-coffee .text-slate-600,
+html.dark.theme-coffee .text-slate-500,
+html.dark.theme-coffee .text-slate-400 {
     color: #fde68a !important;
 }
-html.theme-coffee .fab-gradient-action,
-html.theme-coffee #bottom-main-circle,
-html.theme-coffee #tablet-main-circle {
+html.dark.theme-coffee .fab-gradient-action,
+html.dark.theme-coffee #bottom-main-circle,
+html.dark.theme-coffee #tablet-main-circle {
     background: linear-gradient(135deg, #d97706 0%, #78350f 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.45) !important;
 }
 
 /* 8. Arcade Gamer 8-Bit */
-html.theme-arcade body {
+html.dark.theme-arcade body {
     background: radial-gradient(circle at 50% 20%, #171126 0%, #0c0817 70%, #040209 100%) !important;
     color: #fef08a !important;
 }
-html.theme-arcade header,
-html.theme-arcade #bottom-nav,
-html.theme-arcade #sidebar-drawer,
-html.theme-arcade #sidebar-drawer-footer {
+html.dark.theme-arcade header,
+html.dark.theme-arcade #bottom-nav,
+html.dark.theme-arcade #sidebar-drawer,
+html.dark.theme-arcade #sidebar-drawer-footer {
     background-color: rgba(20, 14, 33, 0.40) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(14, 9, 25, 0.80) 0%, rgba(20, 14, 33, 0.48) 76%, rgba(20, 14, 33, 0.24) 100%) !important;
     border-color: rgba(234, 179, 8, 0.42) !important;
 }
-html.theme-arcade .glass-panel,
-html.theme-arcade .stagger-card,
-html.theme-arcade .card-hover,
-html.theme-arcade .settings-accordion-card,
-html.theme-arcade .modal-dialog,
-html.theme-arcade #view-subjects > div.bg-white,
-html.theme-arcade #view-tasks > div.bg-white,
-html.theme-arcade #view-notes > div.bg-white,
-html.theme-arcade #view-archive > div.bg-white,
-html.theme-arcade #archive-empty-state,
-html.theme-arcade #view-settings > div.bg-white {
+html.dark.theme-arcade .glass-panel,
+html.dark.theme-arcade .stagger-card,
+html.dark.theme-arcade .card-hover,
+html.dark.theme-arcade .settings-accordion-card,
+html.dark.theme-arcade .modal-dialog,
+html.dark.theme-arcade #view-subjects > div.bg-white,
+html.dark.theme-arcade #view-tasks > div.bg-white,
+html.dark.theme-arcade #view-notes > div.bg-white,
+html.dark.theme-arcade #view-archive > div.bg-white,
+html.dark.theme-arcade #archive-empty-state,
+html.dark.theme-arcade #view-settings > div.bg-white {
     background-color: rgba(26, 18, 43, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(18, 12, 31, 0.78) 0%, rgba(26, 18, 43, 0.46) 76%, rgba(26, 18, 43, 0.24) 100%) !important;
     border-color: rgba(234, 179, 8, 0.34) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #fef9c3 !important;
 }
-html.theme-arcade .text-slate-900,
-html.theme-arcade .text-slate-800 {
+html.dark.theme-arcade .text-slate-900,
+html.dark.theme-arcade .text-slate-800 {
     color: #fef08a !important;
 }
-html.theme-arcade .text-slate-700,
-html.theme-arcade .text-slate-600,
-html.theme-arcade .text-slate-500,
-html.theme-arcade .text-slate-400 {
+html.dark.theme-arcade .text-slate-700,
+html.dark.theme-arcade .text-slate-600,
+html.dark.theme-arcade .text-slate-500,
+html.dark.theme-arcade .text-slate-400 {
     color: #fde047 !important;
 }
-html.theme-arcade .fab-gradient-action,
-html.theme-arcade #bottom-main-circle,
-html.theme-arcade #tablet-main-circle {
+html.dark.theme-arcade .fab-gradient-action,
+html.dark.theme-arcade #bottom-main-circle,
+html.dark.theme-arcade #tablet-main-circle {
     background: linear-gradient(135deg, #eab308 0%, #ef4444 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(234, 179, 8, 0.5) !important;
 }
 
 /* 9. Hiperenfoque / Modo Einstein */
-html.theme-hyperfocus body {
+html.dark.theme-hyperfocus body {
     background: radial-gradient(circle at 50% 20%, #091729 0%, #040c17 70%, #010408 100%) !important;
     color: #eff6ff !important;
 }
-html.theme-hyperfocus header,
-html.theme-hyperfocus #bottom-nav,
-html.theme-hyperfocus #sidebar-drawer,
-html.theme-hyperfocus #sidebar-drawer-footer {
+html.dark.theme-hyperfocus header,
+html.dark.theme-hyperfocus #bottom-nav,
+html.dark.theme-hyperfocus #sidebar-drawer,
+html.dark.theme-hyperfocus #sidebar-drawer-footer {
     background-color: rgba(7, 19, 36, 0.40) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(5, 13, 27, 0.80) 0%, rgba(7, 19, 36, 0.48) 76%, rgba(7, 19, 36, 0.24) 100%) !important;
     border-color: rgba(59, 130, 246, 0.42) !important;
 }
-html.theme-hyperfocus .glass-panel,
-html.theme-hyperfocus .stagger-card,
-html.theme-hyperfocus .card-hover,
-html.theme-hyperfocus .settings-accordion-card,
-html.theme-hyperfocus .modal-dialog,
-html.theme-hyperfocus #view-subjects > div.bg-white,
-html.theme-hyperfocus #view-tasks > div.bg-white,
-html.theme-hyperfocus #view-notes > div.bg-white,
-html.theme-hyperfocus #view-archive > div.bg-white,
-html.theme-hyperfocus #archive-empty-state,
-html.theme-hyperfocus #view-settings > div.bg-white {
+html.dark.theme-hyperfocus .glass-panel,
+html.dark.theme-hyperfocus .stagger-card,
+html.dark.theme-hyperfocus .card-hover,
+html.dark.theme-hyperfocus .settings-accordion-card,
+html.dark.theme-hyperfocus .modal-dialog,
+html.dark.theme-hyperfocus #view-subjects > div.bg-white,
+html.dark.theme-hyperfocus #view-tasks > div.bg-white,
+html.dark.theme-hyperfocus #view-notes > div.bg-white,
+html.dark.theme-hyperfocus #view-archive > div.bg-white,
+html.dark.theme-hyperfocus #archive-empty-state,
+html.dark.theme-hyperfocus #view-settings > div.bg-white {
     background-color: rgba(10, 26, 50, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(7, 18, 36, 0.78) 0%, rgba(10, 26, 50, 0.46) 76%, rgba(10, 26, 50, 0.24) 100%) !important;
     border-color: rgba(59, 130, 246, 0.34) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #dbeafe !important;
 }
-html.theme-hyperfocus .text-slate-900,
-html.theme-hyperfocus .text-slate-800 {
+html.dark.theme-hyperfocus .text-slate-900,
+html.dark.theme-hyperfocus .text-slate-800 {
     color: #eff6ff !important;
 }
-html.theme-hyperfocus .text-slate-700,
-html.theme-hyperfocus .text-slate-600,
-html.theme-hyperfocus .text-slate-500,
-html.theme-hyperfocus .text-slate-400 {
+html.dark.theme-hyperfocus .text-slate-700,
+html.dark.theme-hyperfocus .text-slate-600,
+html.dark.theme-hyperfocus .text-slate-500,
+html.dark.theme-hyperfocus .text-slate-400 {
     color: #bfdbfe !important;
 }
-html.theme-hyperfocus .fab-gradient-action,
-html.theme-hyperfocus #bottom-main-circle,
-html.theme-hyperfocus #tablet-main-circle {
+html.dark.theme-hyperfocus .fab-gradient-action,
+html.dark.theme-hyperfocus #bottom-main-circle,
+html.dark.theme-hyperfocus #tablet-main-circle {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.5) !important;
 }
 
 /* 10. Starlight Tribute 06-06-2009: Dedicatoria Celestial */
-html.theme-starlight body {
+html.dark.theme-starlight body {
     background: radial-gradient(circle at 50% 20%, #1e0c2b 0%, #0d0517 70%, #05020a 100%) !important;
     color: #fce7f3 !important;
 }
-html.theme-starlight header,
-html.theme-starlight #bottom-nav,
-html.theme-starlight #sidebar-drawer,
-html.theme-starlight #sidebar-drawer-footer {
+html.dark.theme-starlight header,
+html.dark.theme-starlight #bottom-nav,
+html.dark.theme-starlight #sidebar-drawer,
+html.dark.theme-starlight #sidebar-drawer-footer {
     background-color: rgba(22, 9, 32, 0.40) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(15, 6, 23, 0.80) 0%, rgba(22, 9, 32, 0.48) 76%, rgba(22, 9, 32, 0.24) 100%) !important;
     border-color: rgba(236, 72, 153, 0.38) !important;
 }
-html.theme-starlight .glass-panel,
-html.theme-starlight .stagger-card,
-html.theme-starlight .card-hover,
-html.theme-starlight .settings-accordion-card,
-html.theme-starlight .modal-dialog,
-html.theme-starlight #view-subjects > div.bg-white,
-html.theme-starlight #view-tasks > div.bg-white,
-html.theme-starlight #view-notes > div.bg-white,
-html.theme-starlight #view-archive > div.bg-white,
-html.theme-starlight #archive-empty-state,
-html.theme-starlight #view-settings > div.bg-white {
+html.dark.theme-starlight .glass-panel,
+html.dark.theme-starlight .stagger-card,
+html.dark.theme-starlight .card-hover,
+html.dark.theme-starlight .settings-accordion-card,
+html.dark.theme-starlight .modal-dialog,
+html.dark.theme-starlight #view-subjects > div.bg-white,
+html.dark.theme-starlight #view-tasks > div.bg-white,
+html.dark.theme-starlight #view-notes > div.bg-white,
+html.dark.theme-starlight #view-archive > div.bg-white,
+html.dark.theme-starlight #archive-empty-state,
+html.dark.theme-starlight #view-settings > div.bg-white {
     background-color: rgba(29, 12, 42, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 52%, rgba(20, 8, 30, 0.78) 0%, rgba(29, 12, 42, 0.46) 76%, rgba(29, 12, 42, 0.24) 100%) !important;
     border-color: rgba(236, 72, 153, 0.32) !important;
     box-shadow: var(--shadow-glass-md) !important;
     color: #fdf2f8 !important;
 }
-html.theme-starlight .text-slate-900,
-html.theme-starlight .text-slate-800 {
+html.dark.theme-starlight .text-slate-900,
+html.dark.theme-starlight .text-slate-800 {
     color: #fce7f3 !important;
 }
-html.theme-starlight .text-slate-700,
-html.theme-starlight .text-slate-600,
-html.theme-starlight .text-slate-500,
-html.theme-starlight .text-slate-400 {
+html.dark.theme-starlight .text-slate-700,
+html.dark.theme-starlight .text-slate-600,
+html.dark.theme-starlight .text-slate-500,
+html.dark.theme-starlight .text-slate-400 {
     color: #fbcfe8 !important;
 }
-html.theme-starlight .fab-gradient-action,
-html.theme-starlight #bottom-main-circle,
-html.theme-starlight #tablet-main-circle {
+html.dark.theme-starlight .fab-gradient-action,
+html.dark.theme-starlight #bottom-main-circle,
+html.dark.theme-starlight #tablet-main-circle {
     background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%) !important;
     box-shadow: 0 8px 24px -4px rgba(236, 72, 153, 0.5) !important;
+}
+
+
+/* Variantes de Modo Claro para los 10 temas de Bóveda (cristal translúcido legible y alto contraste) */
+/* Apollo 11 Claro */
+html:not(.dark).theme-apollo body {
+    background: linear-gradient(155deg, #eef2ff 0%, #e0e7ff 52%, #f8fafc 100%) !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-apollo header,
+html:not(.dark).theme-apollo #bottom-nav,
+html:not(.dark).theme-apollo #sidebar-drawer,
+html:not(.dark).theme-apollo #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(99, 102, 241, 0.28) !important;
+}
+html:not(.dark).theme-apollo .glass-panel,
+html:not(.dark).theme-apollo .stagger-card,
+html:not(.dark).theme-apollo .card-hover,
+html:not(.dark).theme-apollo .settings-accordion-card,
+html:not(.dark).theme-apollo .modal-dialog,
+html:not(.dark).theme-apollo #view-subjects > div.bg-white,
+html:not(.dark).theme-apollo #view-tasks > div.bg-white,
+html:not(.dark).theme-apollo #view-notes > div.bg-white,
+html:not(.dark).theme-apollo #view-archive > div.bg-white,
+html:not(.dark).theme-apollo #archive-empty-state,
+html:not(.dark).theme-apollo #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(99, 102, 241, 0.28) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-apollo .text-slate-900,
+html:not(.dark).theme-apollo .text-slate-800 {
+    color: #0f172a !important;
+}
+html:not(.dark).theme-apollo .text-slate-700,
+html:not(.dark).theme-apollo .text-slate-600,
+html:not(.dark).theme-apollo .text-slate-500,
+html:not(.dark).theme-apollo .text-slate-400 {
+    color: #334155 !important;
+}
+html:not(.dark).theme-apollo .fab-gradient-action,
+html:not(.dark).theme-apollo #bottom-main-circle,
+html:not(.dark).theme-apollo #tablet-main-circle {
+    background: linear-gradient(135deg, #f97316 0%, #4f46e5 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.36) !important;
+}
+/* Eduardo VIP Gold Claro */
+html:not(.dark).theme-eduardo-gold body {
+    background: linear-gradient(155deg, #fffbeb 0%, #fef3c7 52%, #fffdf5 100%) !important;
+    color: #451a03 !important;
+}
+html:not(.dark).theme-eduardo-gold header,
+html:not(.dark).theme-eduardo-gold #bottom-nav,
+html:not(.dark).theme-eduardo-gold #sidebar-drawer,
+html:not(.dark).theme-eduardo-gold #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(217, 119, 6, 0.30) !important;
+}
+html:not(.dark).theme-eduardo-gold .glass-panel,
+html:not(.dark).theme-eduardo-gold .stagger-card,
+html:not(.dark).theme-eduardo-gold .card-hover,
+html:not(.dark).theme-eduardo-gold .settings-accordion-card,
+html:not(.dark).theme-eduardo-gold .modal-dialog,
+html:not(.dark).theme-eduardo-gold #view-subjects > div.bg-white,
+html:not(.dark).theme-eduardo-gold #view-tasks > div.bg-white,
+html:not(.dark).theme-eduardo-gold #view-notes > div.bg-white,
+html:not(.dark).theme-eduardo-gold #view-archive > div.bg-white,
+html:not(.dark).theme-eduardo-gold #archive-empty-state,
+html:not(.dark).theme-eduardo-gold #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(217, 119, 6, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #451a03 !important;
+}
+html:not(.dark).theme-eduardo-gold .text-slate-900,
+html:not(.dark).theme-eduardo-gold .text-slate-800 {
+    color: #451a03 !important;
+}
+html:not(.dark).theme-eduardo-gold .text-slate-700,
+html:not(.dark).theme-eduardo-gold .text-slate-600,
+html:not(.dark).theme-eduardo-gold .text-slate-500,
+html:not(.dark).theme-eduardo-gold .text-slate-400 {
+    color: #78350f !important;
+}
+html:not(.dark).theme-eduardo-gold .fab-gradient-action,
+html:not(.dark).theme-eduardo-gold #bottom-main-circle,
+html:not(.dark).theme-eduardo-gold #tablet-main-circle {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.36) !important;
+}
+/* Penguin Polar Claro */
+html:not(.dark).theme-penguin body {
+    background: linear-gradient(155deg, #ecfeff 0%, #e0f2fe 52%, #f8fafc 100%) !important;
+    color: #083344 !important;
+}
+html:not(.dark).theme-penguin header,
+html:not(.dark).theme-penguin #bottom-nav,
+html:not(.dark).theme-penguin #sidebar-drawer,
+html:not(.dark).theme-penguin #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(6, 182, 212, 0.28) !important;
+}
+html:not(.dark).theme-penguin .glass-panel,
+html:not(.dark).theme-penguin .stagger-card,
+html:not(.dark).theme-penguin .card-hover,
+html:not(.dark).theme-penguin .settings-accordion-card,
+html:not(.dark).theme-penguin .modal-dialog,
+html:not(.dark).theme-penguin #view-subjects > div.bg-white,
+html:not(.dark).theme-penguin #view-tasks > div.bg-white,
+html:not(.dark).theme-penguin #view-notes > div.bg-white,
+html:not(.dark).theme-penguin #view-archive > div.bg-white,
+html:not(.dark).theme-penguin #archive-empty-state,
+html:not(.dark).theme-penguin #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(6, 182, 212, 0.28) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #083344 !important;
+}
+html:not(.dark).theme-penguin .text-slate-900,
+html:not(.dark).theme-penguin .text-slate-800 {
+    color: #083344 !important;
+}
+html:not(.dark).theme-penguin .text-slate-700,
+html:not(.dark).theme-penguin .text-slate-600,
+html:not(.dark).theme-penguin .text-slate-500,
+html:not(.dark).theme-penguin .text-slate-400 {
+    color: #155e75 !important;
+}
+html:not(.dark).theme-penguin .fab-gradient-action,
+html:not(.dark).theme-penguin #bottom-main-circle,
+html:not(.dark).theme-penguin #tablet-main-circle {
+    background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.34) !important;
+}
+/* Synthwave Sunset Claro */
+html:not(.dark).theme-synthwave body {
+    background: linear-gradient(155deg, #fdf2f8 0%, #f3e8ff 52%, #fffbeb 100%) !important;
+    color: #3b0764 !important;
+}
+html:not(.dark).theme-synthwave header,
+html:not(.dark).theme-synthwave #bottom-nav,
+html:not(.dark).theme-synthwave #sidebar-drawer,
+html:not(.dark).theme-synthwave #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(219, 39, 119, 0.28) !important;
+}
+html:not(.dark).theme-synthwave .glass-panel,
+html:not(.dark).theme-synthwave .stagger-card,
+html:not(.dark).theme-synthwave .card-hover,
+html:not(.dark).theme-synthwave .settings-accordion-card,
+html:not(.dark).theme-synthwave .modal-dialog,
+html:not(.dark).theme-synthwave #view-subjects > div.bg-white,
+html:not(.dark).theme-synthwave #view-tasks > div.bg-white,
+html:not(.dark).theme-synthwave #view-notes > div.bg-white,
+html:not(.dark).theme-synthwave #view-archive > div.bg-white,
+html:not(.dark).theme-synthwave #archive-empty-state,
+html:not(.dark).theme-synthwave #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(219, 39, 119, 0.28) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #3b0764 !important;
+}
+html:not(.dark).theme-synthwave .text-slate-900,
+html:not(.dark).theme-synthwave .text-slate-800 {
+    color: #3b0764 !important;
+}
+html:not(.dark).theme-synthwave .text-slate-700,
+html:not(.dark).theme-synthwave .text-slate-600,
+html:not(.dark).theme-synthwave .text-slate-500,
+html:not(.dark).theme-synthwave .text-slate-400 {
+    color: #6b21a8 !important;
+}
+html:not(.dark).theme-synthwave .fab-gradient-action,
+html:not(.dark).theme-synthwave #bottom-main-circle,
+html:not(.dark).theme-synthwave #tablet-main-circle {
+    background: linear-gradient(135deg, #ec4899 0%, #7c3aed 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(219, 39, 119, 0.34) !important;
+}
+/* Matrix Terminal Claro */
+html:not(.dark).theme-matrix body {
+    background: linear-gradient(155deg, #ecfdf5 0%, #d1fae5 52%, #f0fdf4 100%) !important;
+    color: #064e3b !important;
+}
+html:not(.dark).theme-matrix header,
+html:not(.dark).theme-matrix #bottom-nav,
+html:not(.dark).theme-matrix #sidebar-drawer,
+html:not(.dark).theme-matrix #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(16, 185, 129, 0.30) !important;
+}
+html:not(.dark).theme-matrix .glass-panel,
+html:not(.dark).theme-matrix .stagger-card,
+html:not(.dark).theme-matrix .card-hover,
+html:not(.dark).theme-matrix .settings-accordion-card,
+html:not(.dark).theme-matrix .modal-dialog,
+html:not(.dark).theme-matrix #view-subjects > div.bg-white,
+html:not(.dark).theme-matrix #view-tasks > div.bg-white,
+html:not(.dark).theme-matrix #view-notes > div.bg-white,
+html:not(.dark).theme-matrix #view-archive > div.bg-white,
+html:not(.dark).theme-matrix #archive-empty-state,
+html:not(.dark).theme-matrix #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(16, 185, 129, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #064e3b !important;
+}
+html:not(.dark).theme-matrix .text-slate-900,
+html:not(.dark).theme-matrix .text-slate-800 {
+    color: #064e3b !important;
+}
+html:not(.dark).theme-matrix .text-slate-700,
+html:not(.dark).theme-matrix .text-slate-600,
+html:not(.dark).theme-matrix .text-slate-500,
+html:not(.dark).theme-matrix .text-slate-400 {
+    color: #065f46 !important;
+}
+html:not(.dark).theme-matrix .fab-gradient-action,
+html:not(.dark).theme-matrix #bottom-main-circle,
+html:not(.dark).theme-matrix #tablet-main-circle {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(5, 150, 105, 0.34) !important;
+}
+/* Sakura Zen Claro */
+html:not(.dark).theme-sakura body {
+    background: linear-gradient(155deg, #fff1f2 0%, #ffe4e6 52%, #fdf2f8 100%) !important;
+    color: #4c0519 !important;
+}
+html:not(.dark).theme-sakura header,
+html:not(.dark).theme-sakura #bottom-nav,
+html:not(.dark).theme-sakura #sidebar-drawer,
+html:not(.dark).theme-sakura #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(244, 63, 94, 0.28) !important;
+}
+html:not(.dark).theme-sakura .glass-panel,
+html:not(.dark).theme-sakura .stagger-card,
+html:not(.dark).theme-sakura .card-hover,
+html:not(.dark).theme-sakura .settings-accordion-card,
+html:not(.dark).theme-sakura .modal-dialog,
+html:not(.dark).theme-sakura #view-subjects > div.bg-white,
+html:not(.dark).theme-sakura #view-tasks > div.bg-white,
+html:not(.dark).theme-sakura #view-notes > div.bg-white,
+html:not(.dark).theme-sakura #view-archive > div.bg-white,
+html:not(.dark).theme-sakura #archive-empty-state,
+html:not(.dark).theme-sakura #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(244, 63, 94, 0.28) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #4c0519 !important;
+}
+html:not(.dark).theme-sakura .text-slate-900,
+html:not(.dark).theme-sakura .text-slate-800 {
+    color: #4c0519 !important;
+}
+html:not(.dark).theme-sakura .text-slate-700,
+html:not(.dark).theme-sakura .text-slate-600,
+html:not(.dark).theme-sakura .text-slate-500,
+html:not(.dark).theme-sakura .text-slate-400 {
+    color: #881337 !important;
+}
+html:not(.dark).theme-sakura .fab-gradient-action,
+html:not(.dark).theme-sakura #bottom-main-circle,
+html:not(.dark).theme-sakura #tablet-main-circle {
+    background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(225, 29, 72, 0.34) !important;
+}
+/* Modo Café Claro */
+html:not(.dark).theme-coffee body {
+    background: linear-gradient(155deg, #fefaf4 0%, #fef3c7 52%, #f5efe6 100%) !important;
+    color: #431407 !important;
+}
+html:not(.dark).theme-coffee header,
+html:not(.dark).theme-coffee #bottom-nav,
+html:not(.dark).theme-coffee #sidebar-drawer,
+html:not(.dark).theme-coffee #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(180, 83, 9, 0.28) !important;
+}
+html:not(.dark).theme-coffee .glass-panel,
+html:not(.dark).theme-coffee .stagger-card,
+html:not(.dark).theme-coffee .card-hover,
+html:not(.dark).theme-coffee .settings-accordion-card,
+html:not(.dark).theme-coffee .modal-dialog,
+html:not(.dark).theme-coffee #view-subjects > div.bg-white,
+html:not(.dark).theme-coffee #view-tasks > div.bg-white,
+html:not(.dark).theme-coffee #view-notes > div.bg-white,
+html:not(.dark).theme-coffee #view-archive > div.bg-white,
+html:not(.dark).theme-coffee #archive-empty-state,
+html:not(.dark).theme-coffee #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(180, 83, 9, 0.28) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #431407 !important;
+}
+html:not(.dark).theme-coffee .text-slate-900,
+html:not(.dark).theme-coffee .text-slate-800 {
+    color: #431407 !important;
+}
+html:not(.dark).theme-coffee .text-slate-700,
+html:not(.dark).theme-coffee .text-slate-600,
+html:not(.dark).theme-coffee .text-slate-500,
+html:not(.dark).theme-coffee .text-slate-400 {
+    color: #7c2d12 !important;
+}
+html:not(.dark).theme-coffee .fab-gradient-action,
+html:not(.dark).theme-coffee #bottom-main-circle,
+html:not(.dark).theme-coffee #tablet-main-circle {
+    background: linear-gradient(135deg, #b45309 0%, #d97706 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(180, 83, 9, 0.32) !important;
+}
+/* Pixel Arcade 8-Bit Claro */
+html:not(.dark).theme-arcade body {
+    background: linear-gradient(155deg, #f5f3ff 0%, #ede9fe 52%, #fef9c3 100%) !important;
+    color: #2e1065 !important;
+}
+html:not(.dark).theme-arcade header,
+html:not(.dark).theme-arcade #bottom-nav,
+html:not(.dark).theme-arcade #sidebar-drawer,
+html:not(.dark).theme-arcade #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(139, 92, 246, 0.30) !important;
+}
+html:not(.dark).theme-arcade .glass-panel,
+html:not(.dark).theme-arcade .stagger-card,
+html:not(.dark).theme-arcade .card-hover,
+html:not(.dark).theme-arcade .settings-accordion-card,
+html:not(.dark).theme-arcade .modal-dialog,
+html:not(.dark).theme-arcade #view-subjects > div.bg-white,
+html:not(.dark).theme-arcade #view-tasks > div.bg-white,
+html:not(.dark).theme-arcade #view-notes > div.bg-white,
+html:not(.dark).theme-arcade #view-archive > div.bg-white,
+html:not(.dark).theme-arcade #archive-empty-state,
+html:not(.dark).theme-arcade #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(139, 92, 246, 0.30) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #2e1065 !important;
+}
+html:not(.dark).theme-arcade .text-slate-900,
+html:not(.dark).theme-arcade .text-slate-800 {
+    color: #2e1065 !important;
+}
+html:not(.dark).theme-arcade .text-slate-700,
+html:not(.dark).theme-arcade .text-slate-600,
+html:not(.dark).theme-arcade .text-slate-500,
+html:not(.dark).theme-arcade .text-slate-400 {
+    color: #5b21b6 !important;
+}
+html:not(.dark).theme-arcade .fab-gradient-action,
+html:not(.dark).theme-arcade #bottom-main-circle,
+html:not(.dark).theme-arcade #tablet-main-circle {
+    background: linear-gradient(135deg, #7c3aed 0%, #d97706 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(124, 58, 237, 0.34) !important;
+}
+/* Hyperfocus Blueprint Claro */
+html:not(.dark).theme-hyperfocus body {
+    background: linear-gradient(155deg, #eff6ff 0%, #dbeafe 52%, #f8fafc 100%) !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-hyperfocus header,
+html:not(.dark).theme-hyperfocus #bottom-nav,
+html:not(.dark).theme-hyperfocus #sidebar-drawer,
+html:not(.dark).theme-hyperfocus #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(37, 99, 235, 0.28) !important;
+}
+html:not(.dark).theme-hyperfocus .glass-panel,
+html:not(.dark).theme-hyperfocus .stagger-card,
+html:not(.dark).theme-hyperfocus .card-hover,
+html:not(.dark).theme-hyperfocus .settings-accordion-card,
+html:not(.dark).theme-hyperfocus .modal-dialog,
+html:not(.dark).theme-hyperfocus #view-subjects > div.bg-white,
+html:not(.dark).theme-hyperfocus #view-tasks > div.bg-white,
+html:not(.dark).theme-hyperfocus #view-notes > div.bg-white,
+html:not(.dark).theme-hyperfocus #view-archive > div.bg-white,
+html:not(.dark).theme-hyperfocus #archive-empty-state,
+html:not(.dark).theme-hyperfocus #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(37, 99, 235, 0.28) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #0f172a !important;
+}
+html:not(.dark).theme-hyperfocus .text-slate-900,
+html:not(.dark).theme-hyperfocus .text-slate-800 {
+    color: #0f172a !important;
+}
+html:not(.dark).theme-hyperfocus .text-slate-700,
+html:not(.dark).theme-hyperfocus .text-slate-600,
+html:not(.dark).theme-hyperfocus .text-slate-500,
+html:not(.dark).theme-hyperfocus .text-slate-400 {
+    color: #1e3a8a !important;
+}
+html:not(.dark).theme-hyperfocus .fab-gradient-action,
+html:not(.dark).theme-hyperfocus #bottom-main-circle,
+html:not(.dark).theme-hyperfocus #tablet-main-circle {
+    background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.34) !important;
+}
+/* Nebulosa Starlight Claro */
+html:not(.dark).theme-starlight body {
+    background: linear-gradient(155deg, #fdf4ff 0%, #fae8ff 52%, #eef2ff 100%) !important;
+    color: #4a044e !important;
+}
+html:not(.dark).theme-starlight header,
+html:not(.dark).theme-starlight #bottom-nav,
+html:not(.dark).theme-starlight #sidebar-drawer,
+html:not(.dark).theme-starlight #sidebar-drawer-footer {
+    background-color: rgba(255, 255, 255, 0.64) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 76%, rgba(255, 255, 255, 0.50) 100%) !important;
+    border-color: rgba(192, 38, 211, 0.28) !important;
+}
+html:not(.dark).theme-starlight .glass-panel,
+html:not(.dark).theme-starlight .stagger-card,
+html:not(.dark).theme-starlight .card-hover,
+html:not(.dark).theme-starlight .settings-accordion-card,
+html:not(.dark).theme-starlight .modal-dialog,
+html:not(.dark).theme-starlight #view-subjects > div.bg-white,
+html:not(.dark).theme-starlight #view-tasks > div.bg-white,
+html:not(.dark).theme-starlight #view-notes > div.bg-white,
+html:not(.dark).theme-starlight #view-archive > div.bg-white,
+html:not(.dark).theme-starlight #archive-empty-state,
+html:not(.dark).theme-starlight #view-settings > div.bg-white {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    background-image: radial-gradient(ellipse at 50% 52%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.72) 76%, rgba(255, 255, 255, 0.56) 100%) !important;
+    border-color: rgba(192, 38, 211, 0.28) !important;
+    box-shadow: var(--shadow-glass-md) !important;
+    color: #4a044e !important;
+}
+html:not(.dark).theme-starlight .text-slate-900,
+html:not(.dark).theme-starlight .text-slate-800 {
+    color: #4a044e !important;
+}
+html:not(.dark).theme-starlight .text-slate-700,
+html:not(.dark).theme-starlight .text-slate-600,
+html:not(.dark).theme-starlight .text-slate-500,
+html:not(.dark).theme-starlight .text-slate-400 {
+    color: #701a75 !important;
+}
+html:not(.dark).theme-starlight .fab-gradient-action,
+html:not(.dark).theme-starlight #bottom-main-circle,
+html:not(.dark).theme-starlight #tablet-main-circle {
+    background: linear-gradient(135deg, #c026d3 0%, #6366f1 100%) !important;
+    box-shadow: 0 8px 24px -4px rgba(192, 38, 211, 0.34) !important;
 }
 
 /* ========================================================
@@ -2885,34 +3649,58 @@ html.theme-starlight #tablet-main-circle {
    Garantiza que el pie del menú lateral, textos y botones
    sean 100% integrados sin parches de color blanco
    ======================================================== */
-html[class*="theme-"]:not(.theme-gray) #sidebar-drawer-footer > div {
+html.dark[class*="theme-"]:not(.theme-gray) #sidebar-drawer-footer > div {
     color: rgba(255, 255, 255, 0.85) !important;
 }
-html[class*="theme-"]:not(.theme-gray) #app-exit-btn {
+html:not(.dark)[class*="theme-"]:not(.theme-gray) #sidebar-drawer-footer > div {
+    color: #334155 !important;
+}
+html.dark[class*="theme-"]:not(.theme-gray) #drawer-footer-settings-btn {
     background: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.16) !important;
     color: #f8fafc !important;
 }
-html[class*="theme-"]:not(.theme-gray) #app-exit-btn:hover {
-    background: rgba(244, 63, 94, 0.25) !important;
-    border-color: rgba(244, 63, 94, 0.4) !important;
-    color: #fecdd3 !important;
+html.dark[class*="theme-"]:not(.theme-gray) #drawer-footer-settings-btn:hover {
+    background: rgba(99, 102, 241, 0.25) !important;
+    border-color: rgba(129, 140, 248, 0.4) !important;
+    color: #e0e7ff !important;
 }
-html[class*="theme-"]:not(.theme-gray) input:not([type="checkbox"]):not([type="radio"]),
-html[class*="theme-"]:not(.theme-gray) select,
-html[class*="theme-"]:not(.theme-gray) textarea {
+html.dark[class*="theme-"]:not(.theme-gray) input:not([type="checkbox"]):not([type="radio"]),
+html.dark[class*="theme-"]:not(.theme-gray) select,
+html.dark[class*="theme-"]:not(.theme-gray) textarea {
     background-color: rgba(255, 255, 255, 0.07) !important;
     color: inherit !important;
     border-color: rgba(255, 255, 255, 0.18) !important;
 }
-html[class*="theme-"]:not(.theme-gray) .liquid-glass-popover {
+html:not(.dark)[class*="theme-"]:not(.theme-gray) input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark)[class*="theme-"]:not(.theme-gray) select,
+html:not(.dark)[class*="theme-"]:not(.theme-gray) textarea {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    color: #0f172a !important;
+    border-color: rgba(148, 163, 184, 0.42) !important;
+}
+html.dark[class*="theme-"]:not(.theme-gray) .liquid-glass-popover {
     background-color: rgba(15, 23, 42, 0.46) !important;
     background-image: radial-gradient(ellipse at 50% 50%, rgba(11, 17, 32, 0.80) 0%, rgba(15, 23, 42, 0.50) 100%) !important;
     border-color: rgba(255, 255, 255, 0.20) !important;
     color: #f8fafc !important;
 }
-html[class*="theme-"]:not(.theme-gray) .nav-link-btn.nav-link-active {
+html:not(.dark)[class*="theme-"]:not(.theme-gray) .liquid-glass-popover {
+    background-color: rgba(255, 255, 255, 0.86) !important;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.94) 0%, rgba(248, 250, 252, 0.80) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.92) !important;
+    color: #0f172a !important;
+}
+html.dark[class*="theme-"]:not(.theme-gray) .nav-link-btn.nav-link-active {
     color: #ffffff !important;
+}
+html:not(.dark)[class*="theme-"]:not(.theme-gray) .nav-link-btn.nav-link-active {
+    color: #0f172a !important;
+}
+html:not(.dark)[class*="theme-"]:not(.theme-gray) #drawer-footer-settings-btn {
+    background: rgba(255, 255, 255, 0.70) !important;
+    border: 1px solid rgba(148, 163, 184, 0.36) !important;
+    color: #0f172a !important;
 }
 
 /* Preservar contraste oscuro nativo de Onboarding (#cycle-setup-modal) y Bóveda (#vault-reveal-modal) en todos los temas */
@@ -3583,10 +4371,15 @@ html.dark.theme-gray .note-filter-chip:not(.note-filter-active):not(.bg-indigo-6
     color: #f1f5f9 !important;
     border-color: #404552 !important;
 }
-html[class*="theme-"]:not(.theme-gray) .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
+html.dark[class*="theme-"]:not(.theme-gray) .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
     background-color: rgba(12, 18, 32, 0.80) !important;
     color: #f8fafc !important;
     border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+html:not(.dark)[class*="theme-"]:not(.theme-gray) .note-filter-chip:not(.note-filter-active):not(.bg-indigo-600) {
+    background-color: rgba(255, 255, 255, 0.80) !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(148, 163, 184, 0.36) !important;
 }
 
 /* ========================================================
@@ -3864,13 +4657,13 @@ html.dark .modal-sheet-grabber-bar {
     box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.35);
 }
 html.dark .bg-preset-card,
-html[class*="theme-"]:not(.theme-gray) .bg-preset-card {
+html.dark[class*="theme-"]:not(.theme-gray) .bg-preset-card {
     background-color: rgba(15, 23, 42, 0.86) !important;
     border-color: rgba(255, 255, 255, 0.16) !important;
     color: #f8fafc !important;
 }
 html.dark .bg-preset-card.bg-preset-active,
-html[class*="theme-"]:not(.theme-gray) .bg-preset-card.bg-preset-active {
+html.dark[class*="theme-"]:not(.theme-gray) .bg-preset-card.bg-preset-active {
     border-color: rgba(129, 140, 248, 0.85) !important;
     background-color: rgba(30, 41, 59, 0.94) !important;
 }
@@ -3943,7 +4736,7 @@ html.dark[data-bg-active="true"] .text-slate-400 {
     box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 html.dark .segmented-control-track,
-html[class*="theme-"]:not(.theme-gray) .segmented-control-track {
+html.dark[class*="theme-"]:not(.theme-gray) .segmented-control-track {
     background-color: rgba(15, 23, 42, 0.86) !important;
     border-color: rgba(255, 255, 255, 0.16) !important;
     box-shadow: inset 0 1px 2px rgba(2, 6, 23, 0.45);
@@ -3978,8 +4771,8 @@ html.dark.theme-gray .segmented-control-track {
 }
 html.dark .segmented-control-track > button.seg-btn-inactive,
 html.dark .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active),
-html[class*="theme-"]:not(.theme-gray) .segmented-control-track > button.seg-btn-inactive,
-html[class*="theme-"]:not(.theme-gray) .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active) {
+html.dark[class*="theme-"]:not(.theme-gray) .segmented-control-track > button.seg-btn-inactive,
+html.dark[class*="theme-"]:not(.theme-gray) .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active) {
     color: #f1f5f9 !important;
 }
 
@@ -4025,22 +4818,15 @@ html[class*="theme-"]:not(.theme-gray) .segmented-control-track > button:not(.se
 }
 
 /* Textos de botones activos sobre la cápsula de cristal (Claro: oscuro sobre cristal blanco; Oscuro/Temas: blanco) */
-html:not(.dark):not([class*="theme-"]) .segmented-control-track > button.seg-btn-active,
-html:not(.dark):not([class*="theme-"]) .segmented-control-track > button[aria-selected="true"],
-html:not(.dark):not([class*="theme-"]) .segmented-control-track > button[aria-pressed="true"],
-html:not(.dark):not([class*="theme-"]) .segmented-control-track > button.bg-indigo-600,
-html:not(.dark):not([class*="theme-"]) .segmented-control-track > button.notes-seg-active,
-html:not(.dark).theme-gray .segmented-control-track > button.seg-btn-active,
-html:not(.dark).theme-gray .segmented-control-track > button[aria-selected="true"],
-html:not(.dark).theme-gray .segmented-control-track > button[aria-pressed="true"],
-html:not(.dark).theme-gray .segmented-control-track > button.bg-indigo-600,
-html:not(.dark).theme-gray .segmented-control-track > button.notes-seg-active {
+html:not(.dark) .segmented-control-track > button.seg-btn-active,
+html:not(.dark) .segmented-control-track > button[aria-selected="true"],
+html:not(.dark) .segmented-control-track > button[aria-pressed="true"],
+html:not(.dark) .segmented-control-track > button.bg-indigo-600,
+html:not(.dark) .segmented-control-track > button.notes-seg-active {
     color: #0f172a !important;
 }
-html:not(.dark):not([class*="theme-"]) .segmented-control-track > button.seg-btn-active #notes-gallery-count,
-html:not(.dark):not([class*="theme-"]) .segmented-control-track > button.notes-seg-active #notes-gallery-count,
-html:not(.dark).theme-gray .segmented-control-track > button.seg-btn-active #notes-gallery-count,
-html:not(.dark).theme-gray .segmented-control-track > button.notes-seg-active #notes-gallery-count {
+html:not(.dark) .segmented-control-track > button.seg-btn-active #notes-gallery-count,
+html:not(.dark) .segmented-control-track > button.notes-seg-active #notes-gallery-count {
     background-color: rgba(79, 70, 229, 0.14) !important;
     color: #312e81 !important;
 }
@@ -4160,6 +4946,7 @@ html[data-glass-intensity="suave"] .segmented-glass-indicator::after {
 }
 
 /* Paleta de la cápsula deslizante para Monocromático y los 10 temas de la Bóveda (cristal traslúcido con contraste >= 4.5:1) */
+html:not(.dark)[class*="theme-"] .segmented-glass-indicator,
 html:not(.dark).theme-gray .segmented-glass-indicator {
     background-color: rgba(255, 255, 255, 0.62);
     background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.78) 0%, rgba(241, 245, 249, 0.46) 52%, rgba(226, 232, 240, 0.68) 100%);
@@ -4170,39 +4957,39 @@ html.dark.theme-gray .segmented-glass-indicator {
     background-image: linear-gradient(145deg, rgba(100, 116, 139, 0.60) 0%, rgba(71, 85, 105, 0.48) 52%, rgba(51, 65, 85, 0.64) 100%);
     box-shadow: 0 6px 16px -4px rgba(15, 23, 42, 0.38), 0 2px 6px -1px rgba(15, 23, 42, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.42);
 }
-html.theme-matrix .segmented-glass-indicator {
+html.dark.theme-matrix .segmented-glass-indicator {
     background-color: rgba(6, 95, 70, 0.56);
     background-image: linear-gradient(145deg, rgba(6, 95, 70, 0.62) 0%, rgba(4, 120, 87, 0.48) 52%, rgba(6, 78, 59, 0.64) 100%);
     box-shadow: 0 6px 16px -4px rgba(16, 185, 129, 0.42), 0 2px 6px -1px rgba(2, 6, 23, 0.38), inset 0 1px 1px rgba(167, 243, 208, 0.45);
 }
-html.theme-sakura .segmented-glass-indicator {
+html.dark.theme-sakura .segmented-glass-indicator {
     background-color: rgba(159, 18, 57, 0.56);
     background-image: linear-gradient(145deg, rgba(159, 18, 57, 0.62) 0%, rgba(190, 18, 60, 0.48) 52%, rgba(136, 19, 55, 0.64) 100%);
     box-shadow: 0 6px 16px -4px rgba(244, 63, 94, 0.42), 0 2px 6px -1px rgba(2, 6, 23, 0.38), inset 0 1px 1px rgba(254, 205, 211, 0.45);
 }
-html.theme-arcade .segmented-glass-indicator {
+html.dark.theme-arcade .segmented-glass-indicator {
     background-color: rgba(91, 33, 182, 0.56);
     background-image: linear-gradient(145deg, rgba(91, 33, 182, 0.62) 0%, rgba(109, 40, 217, 0.48) 52%, rgba(76, 29, 149, 0.64) 100%);
 }
-html.theme-synthwave .segmented-glass-indicator {
+html.dark.theme-synthwave .segmented-glass-indicator {
     background-color: rgba(134, 25, 143, 0.56);
     background-image: linear-gradient(145deg, rgba(134, 25, 143, 0.62) 0%, rgba(162, 28, 175, 0.48) 52%, rgba(112, 26, 117, 0.64) 100%);
 }
-html.theme-coffee .segmented-glass-indicator,
-html.theme-eduardo-gold .segmented-glass-indicator {
+html.dark.theme-coffee .segmented-glass-indicator,
+html.dark.theme-eduardo-gold .segmented-glass-indicator {
     background-color: rgba(146, 64, 14, 0.56);
     background-image: linear-gradient(145deg, rgba(146, 64, 14, 0.62) 0%, rgba(180, 83, 9, 0.48) 52%, rgba(120, 53, 15, 0.64) 100%);
 }
-html.theme-penguin .segmented-glass-indicator {
+html.dark.theme-penguin .segmented-glass-indicator {
     background-color: rgba(21, 94, 117, 0.56);
     background-image: linear-gradient(145deg, rgba(21, 94, 117, 0.62) 0%, rgba(14, 116, 144, 0.48) 52%, rgba(22, 78, 99, 0.64) 100%);
 }
-html.theme-apollo .segmented-glass-indicator,
-html.theme-hyperfocus .segmented-glass-indicator {
+html.dark.theme-apollo .segmented-glass-indicator,
+html.dark.theme-hyperfocus .segmented-glass-indicator {
     background-color: rgba(30, 64, 175, 0.56);
     background-image: linear-gradient(145deg, rgba(30, 64, 175, 0.62) 0%, rgba(29, 78, 216, 0.48) 52%, rgba(30, 58, 138, 0.64) 100%);
 }
-html.theme-starlight .segmented-glass-indicator {
+html.dark.theme-starlight .segmented-glass-indicator {
     background-color: rgba(131, 24, 67, 0.56);
     background-image: linear-gradient(145deg, rgba(131, 24, 67, 0.62) 0%, rgba(157, 23, 77, 0.48) 52%, rgba(112, 26, 117, 0.64) 100%);
 }
@@ -4286,9 +5073,9 @@ html.dark.theme-gray #note-modal .quick-glass-dialog {
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, rgba(22, 25, 32, 0.16) 100%) !important;
     border-color: rgba(255, 255, 255, 0.20) !important;
 }
-html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
-html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
-html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
+html.dark[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
     background-color: rgba(12, 18, 34, 0.20) !important;
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, rgba(12, 18, 34, 0.16) 100%) !important;
     border-color: rgba(255, 255, 255, 0.26) !important;
@@ -4323,11 +5110,11 @@ html.dark[data-glass-intensity="suave"] #note-modal .quick-glass-dialog {
     border-bottom-color: rgba(15, 23, 42, 0.08);
 }
 html.dark #calendar-modal .calendar-glass-header,
-html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-header,
+html.dark[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-header,
 html.dark #task-modal .quick-glass-header,
-html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-header,
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-header,
 html.dark #note-modal .quick-glass-header,
-html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-header {
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-header {
     background-color: rgba(255, 255, 255, 0.03);
     border-bottom-color: rgba(255, 255, 255, 0.10);
 }
@@ -4357,12 +5144,12 @@ html.dark #task-modal textarea,
 html.dark #note-modal input:not([type="checkbox"]),
 html.dark #note-modal select,
 html.dark #note-modal textarea,
-html[class*="theme-"]:not(.theme-gray) #task-modal input:not([type="checkbox"]),
-html[class*="theme-"]:not(.theme-gray) #task-modal select,
-html[class*="theme-"]:not(.theme-gray) #task-modal textarea,
-html[class*="theme-"]:not(.theme-gray) #note-modal input:not([type="checkbox"]),
-html[class*="theme-"]:not(.theme-gray) #note-modal select,
-html[class*="theme-"]:not(.theme-gray) #note-modal textarea {
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal input:not([type="checkbox"]),
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal select,
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal textarea,
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal input:not([type="checkbox"]),
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal select,
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal textarea {
     background-color: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.18) !important;
     color: #f8fafc !important;
@@ -4371,10 +5158,10 @@ html.dark #task-modal input::placeholder,
 html.dark #task-modal textarea::placeholder,
 html.dark #note-modal input::placeholder,
 html.dark #note-modal textarea::placeholder,
-html[class*="theme-"]:not(.theme-gray) #task-modal input::placeholder,
-html[class*="theme-"]:not(.theme-gray) #task-modal textarea::placeholder,
-html[class*="theme-"]:not(.theme-gray) #note-modal input::placeholder,
-html[class*="theme-"]:not(.theme-gray) #note-modal textarea::placeholder {
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal input::placeholder,
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal textarea::placeholder,
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal input::placeholder,
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal textarea::placeholder {
     color: rgba(203, 213, 225, 0.68);
 }
 #task-modal select option,
@@ -4384,8 +5171,8 @@ html[class*="theme-"]:not(.theme-gray) #note-modal textarea::placeholder {
 }
 html.dark #task-modal select option,
 html.dark #note-modal select option,
-html[class*="theme-"]:not(.theme-gray) #task-modal select option,
-html[class*="theme-"]:not(.theme-gray) #note-modal select option {
+html.dark[class*="theme-"]:not(.theme-gray) #task-modal select option,
+html.dark[class*="theme-"]:not(.theme-gray) #note-modal select option {
     background-color: #0f172a;
     color: #f8fafc;
 }
@@ -4414,7 +5201,7 @@ select:not(.sr-only)::-ms-expand {
     display: none;
 }
 html.dark select:not(.sr-only),
-html[class*="theme-"]:not(.theme-gray) select:not(.sr-only) {
+html.dark[class*="theme-"]:not(.theme-gray) select:not(.sr-only) {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
 }
 
@@ -4426,7 +5213,7 @@ html[class*="theme-"]:not(.theme-gray) select:not(.sr-only) {
     -webkit-backdrop-filter: blur(10px);
 }
 html.dark #calendar-modal #cal-today-btn,
-html[class*="theme-"]:not(.theme-gray) #calendar-modal #cal-today-btn {
+html.dark[class*="theme-"]:not(.theme-gray) #calendar-modal #cal-today-btn {
     background-color: rgba(255, 255, 255, 0.12) !important;
     border-color: rgba(255, 255, 255, 0.24) !important;
     color: #f8fafc !important;
@@ -4458,7 +5245,7 @@ html.dark.theme-gray #calendar-modal #cal-today-btn {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
-html[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
+html.dark[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
     background-color: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.16) !important;
 }
@@ -4471,11 +5258,11 @@ html[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
         background-image: none !important;
     }
     html.dark #calendar-modal .calendar-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
+    html.dark[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
     html.dark #task-modal .quick-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
+    html.dark[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
     html.dark #note-modal .quick-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
+    html.dark[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
         background-color: #0f172a !important;
         background-image: none !important;
     }
@@ -4508,11 +5295,11 @@ html[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
         background-image: none !important;
     }
     html.dark #calendar-modal .calendar-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
+    html.dark[class*="theme-"]:not(.theme-gray) #calendar-modal .calendar-glass-dialog,
     html.dark #task-modal .quick-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
+    html.dark[class*="theme-"]:not(.theme-gray) #task-modal .quick-glass-dialog,
     html.dark #note-modal .quick-glass-dialog,
-    html[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
+    html.dark[class*="theme-"]:not(.theme-gray) #note-modal .quick-glass-dialog {
         background-color: #0f172a !important;
         background-image: none !important;
     }
@@ -4551,7 +5338,7 @@ html[class*="theme-"]:not(.theme-gray) #calendar-modal .cal-detail-card {
     flex-shrink: 0;
 }
 html.dark .note-card-thumb,
-html[class*="theme-"]:not(.theme-gray) .note-card-thumb {
+html.dark[class*="theme-"]:not(.theme-gray) .note-card-thumb {
     border-color: rgba(255, 255, 255, 0.22);
     background: rgba(15, 23, 42, 0.45);
 }
@@ -4636,5 +5423,73 @@ html[class*="theme-"]:not(.theme-gray) .note-card-thumb {
     .subjects-bottom-add-content {
         transition: none !important;
         transform: none !important;
+    }
+}
+
+/* ========================================================
+   v1.7.0: FONDO ANIMADO BAJA CALIDAD (CSS TRANSFORM-ONLY) Y TUTORIAL 9 PASOS
+   ======================================================== */
+@keyframes bgLowMotionDrift {
+    0% { transform: translate3d(0, 0, 0) scale(1.04); }
+    50% { transform: translate3d(-1.5%, -1.5%, 0) scale(1.07); }
+    100% { transform: translate3d(0, 0, 0) scale(1.04); }
+}
+
+html.bg-low-motion #app-bg-gradient {
+    animation: bgLowMotionDrift 16s ease-in-out infinite;
+    will-change: transform;
+}
+
+.tour-spotlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 93;
+    border-radius: 9999px;
+    border: 2.5px solid rgba(129, 140, 248, 0.95);
+    box-shadow: 0 0 0 9999px rgba(2, 6, 23, 0.42), 0 0 20px rgba(99, 102, 241, 0.65);
+    pointer-events: none;
+    transition: transform 0.34s var(--ease-spring), width 0.34s var(--ease-spring), height 0.34s var(--ease-spring);
+}
+
+@keyframes tourFloat {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -4px, 0); }
+}
+@keyframes tourPulse {
+    0%, 100% { transform: scale(1); opacity: 0.92; }
+    50% { transform: scale(1.08); opacity: 1; }
+}
+@keyframes tourSwing {
+    0%, 100% { transform: rotate(0deg); transform-origin: 110px 28px; }
+    25% { transform: rotate(8deg); transform-origin: 110px 28px; }
+    75% { transform: rotate(-8deg); transform-origin: 110px 28px; }
+}
+@keyframes tourSwap {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -6px, 0); }
+}
+
+.tour-anim-float { animation: tourFloat 3.2s ease-in-out infinite; }
+.tour-anim-pulse { animation: tourPulse 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.tour-anim-swing { animation: tourSwing 2.8s ease-in-out infinite; }
+.tour-anim-swap  { animation: tourSwap 2.6s ease-in-out infinite; }
+
+html[data-reduced-effects="true"] .tour-anim-float,
+html[data-reduced-effects="true"] .tour-anim-pulse,
+html[data-reduced-effects="true"] .tour-anim-swing,
+html[data-reduced-effects="true"] .tour-anim-swap,
+html[data-reduced-effects="true"] #app-bg-gradient {
+    animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    .tour-anim-float,
+    .tour-anim-pulse,
+    .tour-anim-swing,
+    .tour-anim-swap,
+    .tour-spotlight,
+    html.bg-low-motion #app-bg-gradient {
+        animation: none !important;
+        transition: none !important;
     }
 }

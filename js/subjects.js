@@ -45,13 +45,92 @@ window.SubjectsModule = (() => {
 
     function setupBottomDrawerListeners() {
         const toggleBtn = document.getElementById('subjects-bottom-toggle-btn');
-        if (!toggleBtn) return;
+        if (toggleBtn && toggleBtn.dataset.bound !== 'true') {
+            toggleBtn.dataset.bound = 'true';
+            toggleBtn.addEventListener('click', () => {
+                bottomDrawerOpen = !bottomDrawerOpen;
+                window.HapticsModule?.light();
+                syncBottomDrawerUI();
+            });
+        }
 
-        toggleBtn.addEventListener('click', () => {
-            bottomDrawerOpen = !bottomDrawerOpen;
-            window.HapticsModule?.light();
-            syncBottomDrawerUI();
+        const quickBtns = [
+            document.getElementById('subjects-placement-quick-btn'),
+            document.getElementById('subjects-placement-quick-bottom-btn')
+        ];
+        quickBtns.forEach(btn => {
+            if (!btn || btn.dataset.bound === 'true') return;
+            btn.dataset.bound = 'true';
+            btn.addEventListener('click', () => {
+                toggleQuickPlacement();
+            });
         });
+    }
+
+    function isCurrentlyBottomPlaced(subjectsCount) {
+        const Storage = window.StorageModule;
+        const pref = Storage?.getSubjectsAddPlacement?.() || 'auto';
+        return pref === 'bottom' || (pref === 'auto' && subjectsCount >= BOTTOM_DRAWER_THRESHOLD);
+    }
+
+    function syncQuickPlacementButtons(useBottomDrawer) {
+        const topBtn = document.getElementById('subjects-placement-quick-btn');
+        const bottomBtn = document.getElementById('subjects-placement-quick-bottom-btn');
+        if (topBtn) {
+            topBtn.title = 'Fijar botón abajo';
+            topBtn.setAttribute('aria-label', 'Mover botón Nueva materia abajo');
+        }
+        if (bottomBtn) {
+            bottomBtn.title = 'Fijar botón arriba';
+            bottomBtn.setAttribute('aria-label', 'Mover botón Nueva materia arriba');
+        }
+    }
+
+    function syncPlacementSettingsUI() {
+        const Storage = window.StorageModule;
+        const pref = Storage?.getSubjectsAddPlacement?.() || 'auto';
+        const track = document.getElementById('settings-subjects-add-placement-track');
+        if (track) {
+            track.querySelectorAll('[data-subjects-add-placement]').forEach(btn => {
+                const active = btn.getAttribute('data-subjects-add-placement') === pref;
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+                btn.classList.toggle('seg-btn-active', active);
+                btn.classList.toggle('seg-btn-inactive', !active);
+            });
+            window.SegmentedControl?.sync?.(track, { instant: true });
+        }
+        const pill = document.getElementById('settings-subjects-placement-pill');
+        if (pill) {
+            const labels = { auto: 'Automático (8+)', top: 'Siempre arriba', bottom: 'Siempre abajo' };
+            pill.textContent = labels[pref] || 'Automático (8+)';
+        }
+    }
+
+    function setAddButtonPlacement(placement, opts = {}) {
+        const Storage = window.StorageModule;
+        const saved = Storage?.setSubjectsAddPlacement?.(placement) || 'auto';
+        const subjectsCount = Storage?.getSubjects?.().length || 0;
+        if (saved === 'bottom') {
+            bottomDrawerOpen = true;
+        }
+        updateAddButtonPlacement(subjectsCount, Storage?.MAX_SUBJECTS || 16, { animate: opts.animate !== false });
+        syncPlacementSettingsUI();
+        return saved;
+    }
+
+    function toggleQuickPlacement() {
+        const Storage = window.StorageModule;
+        const count = Storage?.getSubjects?.().length || 0;
+        const currentlyBottom = isCurrentlyBottomPlaced(count);
+        const nextPref = currentlyBottom ? 'top' : 'bottom';
+        window.HapticsModule?.light?.();
+        setAddButtonPlacement(nextPref, { animate: true });
+        window.showNotification?.(
+            nextPref === 'bottom'
+                ? 'Botón fijado abajo. Puedes volver a Automático en Configuración.'
+                : 'Botón fijado arriba. Puedes volver a Automático en Configuración.',
+            'info'
+        );
     }
 
     function syncBottomDrawerUI() {
@@ -65,16 +144,19 @@ window.SubjectsModule = (() => {
         panel.setAttribute('aria-hidden', bottomDrawerOpen ? 'false' : 'true');
     }
 
-    function updateAddButtonPlacement(subjectsCount, maxSubjects) {
+    function updateAddButtonPlacement(subjectsCount, maxSubjects, opts = {}) {
         const addBtn = document.getElementById('add-subject-btn');
         const headerSlot = document.getElementById('subjects-header-cta-slot');
         const bottomDrawer = document.getElementById('subjects-bottom-add-drawer');
         const bottomContent = document.getElementById('subjects-bottom-add-content');
+        const quickBottomBtn = document.getElementById('subjects-placement-quick-bottom-btn');
         const counterChip = document.getElementById('subjects-bottom-counter-chip');
         const subtitle = document.getElementById('subjects-bottom-drawer-subtitle');
         const helperText = document.getElementById('subjects-bottom-helper-text');
 
-        const useBottomDrawer = subjectsCount >= BOTTOM_DRAWER_THRESHOLD;
+        const useBottomDrawer = isCurrentlyBottomPlaced(subjectsCount);
+        const reducedEffects = document.documentElement.getAttribute('data-reduced-effects') === 'true'
+            || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
         if (counterChip) {
             counterChip.textContent = `${subjectsCount}/${maxSubjects}`;
@@ -90,12 +172,23 @@ window.SubjectsModule = (() => {
                 : `Tienes ${subjectsCount} materias registradas. Añade nuevas asignaturas desde aquí (máximo ${maxSubjects}).`;
         }
 
+        syncQuickPlacementButtons(useBottomDrawer);
+
         if (useBottomDrawer) {
             if (headerSlot) headerSlot.classList.add('hidden');
             if (bottomDrawer) bottomDrawer.classList.remove('hidden');
             if (addBtn && bottomContent && addBtn.parentElement !== bottomContent) {
                 addBtn.classList.add('w-full', 'sm:w-auto');
-                bottomContent.appendChild(addBtn);
+                if (quickBottomBtn && quickBottomBtn.parentElement === bottomContent) {
+                    bottomContent.insertBefore(addBtn, quickBottomBtn);
+                } else {
+                    bottomContent.appendChild(addBtn);
+                }
+                if (opts.animate && !reducedEffects) {
+                    addBtn.classList.remove('subjects-placement-swap');
+                    void addBtn.offsetWidth;
+                    addBtn.classList.add('subjects-placement-swap');
+                }
             }
             syncBottomDrawerUI();
         } else {
@@ -105,9 +198,15 @@ window.SubjectsModule = (() => {
             if (headerSlot) headerSlot.classList.remove('hidden');
             if (addBtn && headerSlot && addBtn.parentElement !== headerSlot) {
                 addBtn.classList.remove('w-full', 'sm:w-auto');
-                headerSlot.appendChild(addBtn);
+                headerSlot.insertBefore(addBtn, headerSlot.firstChild);
+                if (opts.animate && !reducedEffects) {
+                    addBtn.classList.remove('subjects-placement-swap');
+                    void addBtn.offsetWidth;
+                    addBtn.classList.add('subjects-placement-swap');
+                }
             }
         }
+        syncPlacementSettingsUI();
     }
 
     function renderPresetColors(targetContainerId = 'color-presets-container', hexInputId = 'subject-color-hex') {
@@ -619,6 +718,10 @@ window.SubjectsModule = (() => {
         openAddModal,
         openEditModal,
         closeModal,
+        setAddButtonPlacement,
+        toggleQuickPlacement,
+        syncPlacementSettingsUI,
+        updateAddButtonPlacement,
         PRESET_COLORS,
         DAYS_CONFIG
     };

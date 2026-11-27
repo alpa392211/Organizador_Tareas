@@ -36,6 +36,51 @@ select,
     contain: layout style;
 }
 
+/* Barra lateral de color permanente en tarjetas de tareas (sin border-left para evitar saltos de layout) */
+.task-card {
+    position: relative;
+    overflow: hidden;
+    padding-left: 1.35rem !important;
+}
+.task-card::before {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    bottom: 10px;
+    width: 4px;
+    border-radius: 9999px;
+    background-color: var(--task-accent-color, #6366F1);
+    pointer-events: none;
+    transform-origin: left center;
+    transition: transform 0.16s ease, opacity 0.16s ease;
+}
+.task-card.is-completed::before {
+    opacity: 0.55;
+}
+.task-card.is-overdue::before {
+    opacity: 0.85;
+}
+.task-card:active::before,
+.longpress-card-clone-elevated.task-card::before {
+    transform: scaleX(1.5);
+}
+
+/* Animación ligera al reubicar el botón Nueva materia */
+.subjects-placement-swap {
+    animation: subjectsPlacementFade 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes subjectsPlacementFade {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 6px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
 /* Evita estados :hover pegajosos y repaints innecesarios en pantallas táctiles */
 @media (hover: none) and (pointer: coarse) {
     .card-hover:hover,
@@ -269,7 +314,7 @@ html.dark.theme-gray {
 }
 
 /* 1. Apollo 11 (Cósmico) */
-html.theme-apollo {
+html.dark.theme-apollo {
     --lgx-tint: 49, 64, 130;
     --theme-lg-tint: 49, 64, 130;
     --lgx-fill-a: 0.28;
@@ -293,7 +338,7 @@ html.theme-apollo {
 }
 
 /* 2. Eduardo VIP Gold (Dorado) */
-html.theme-eduardo-gold {
+html.dark.theme-eduardo-gold {
     --lgx-tint: 110, 76, 16;
     --theme-lg-tint: 110, 76, 16;
     --lgx-fill-a: 0.30;
@@ -317,7 +362,7 @@ html.theme-eduardo-gold {
 }
 
 /* 3. Pingüino (Glacial Polar) */
-html.theme-penguin {
+html.dark.theme-penguin {
     --lgx-tint: 14, 78, 102;
     --theme-lg-tint: 14, 78, 102;
     --lgx-fill-a: 0.30;
@@ -341,7 +386,7 @@ html.theme-penguin {
 }
 
 /* 4. Synthwave 1984 (Neón) */
-html.theme-synthwave {
+html.dark.theme-synthwave {
     --lgx-tint: 108, 28, 92;
     --theme-lg-tint: 108, 28, 92;
     --lgx-fill-a: 0.30;
@@ -365,7 +410,7 @@ html.theme-synthwave {
 }
 
 /* 5. Terminal Matrix (Verde Fósforo) */
-html.theme-matrix {
+html.dark.theme-matrix {
     --lgx-tint: 10, 74, 42;
     --theme-lg-tint: 10, 74, 42;
     --lgx-fill-a: 0.32;
@@ -389,7 +434,7 @@ html.theme-matrix {
 }
 
 /* 6. Sakura Cerezo */
-html.theme-sakura {
+html.dark.theme-sakura {
     --lgx-tint: 112, 34, 58;
     --theme-lg-tint: 112, 34, 58;
     --lgx-fill-a: 0.30;
@@ -413,7 +458,7 @@ html.theme-sakura {
 }
 
 /* 7. Barista Coffee */
-html.theme-coffee {
+html.dark.theme-coffee {
     --lgx-tint: 92, 54, 26;
     --theme-lg-tint: 92, 54, 26;
     --lgx-fill-a: 0.30;
@@ -437,7 +482,7 @@ html.theme-coffee {
 }
 
 /* 8. Arcade 8-Bit */
-html.theme-arcade {
+html.dark.theme-arcade {
     --lgx-tint: 76, 46, 128;
     --theme-lg-tint: 76, 46, 128;
     --lgx-fill-a: 0.30;
@@ -461,7 +506,7 @@ html.theme-arcade {
 }
 
 /* 9. Hiperenfoque */
-html.theme-hyperfocus {
+html.dark.theme-hyperfocus {
     --lgx-tint: 26, 68, 128;
     --theme-lg-tint: 26, 68, 128;
     --lgx-fill-a: 0.30;
@@ -485,7 +530,7 @@ html.theme-hyperfocus {
 }
 
 /* 10. Starlight Tribute */
-html.theme-starlight {
+html.dark.theme-starlight {
     --lgx-tint: 94, 34, 118;
     --theme-lg-tint: 94, 34, 118;
     --lgx-fill-a: 0.30;
@@ -506,6 +551,212 @@ html.theme-starlight {
     --rem-badge-bg: rgba(236, 72, 153, 0.22);
     --rem-badge-text: #fbcfe8;
     --rem-badge-border: rgba(244, 114, 182, 0.48);
+}
+
+
+/* Variantes claras para tokens Liquid Glass y Recordatorio de los 10 temas de Bóveda */
+html:not(.dark).theme-apollo {
+    --lgx-tint: 238, 242, 255;
+    --theme-lg-tint: 238, 242, 255;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #eef2ff;
+    --rem-box-border: #c7d2fe;
+    --rem-heading: #1e1b4b;
+    --rem-subtext: #3730a3;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #a5b4fc;
+    --rem-btn-text: #1e1b4b;
+    --rem-accent: #4f46e5;
+    --rem-accent-border: #4338ca;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(79, 70, 229, 0.14);
+    --rem-badge-text: #3730a3;
+    --rem-badge-border: rgba(99, 102, 241, 0.34);
+}
+html:not(.dark).theme-eduardo-gold {
+    --lgx-tint: 254, 249, 235;
+    --theme-lg-tint: 254, 249, 235;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #fffbeb;
+    --rem-box-border: #fde68a;
+    --rem-heading: #451a03;
+    --rem-subtext: #78350f;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #fcd34d;
+    --rem-btn-text: #451a03;
+    --rem-accent: #b45309;
+    --rem-accent-border: #92400e;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(217, 119, 6, 0.14);
+    --rem-badge-text: #78350f;
+    --rem-badge-border: rgba(217, 119, 6, 0.34);
+}
+html:not(.dark).theme-penguin {
+    --lgx-tint: 236, 254, 255;
+    --theme-lg-tint: 236, 254, 255;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #ecfeff;
+    --rem-box-border: #a5f3fc;
+    --rem-heading: #083344;
+    --rem-subtext: #155e75;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #67e8f9;
+    --rem-btn-text: #083344;
+    --rem-accent: #0891b2;
+    --rem-accent-border: #0e7490;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(6, 182, 212, 0.14);
+    --rem-badge-text: #155e75;
+    --rem-badge-border: rgba(6, 182, 212, 0.34);
+}
+html:not(.dark).theme-synthwave {
+    --lgx-tint: 253, 242, 248;
+    --theme-lg-tint: 253, 242, 248;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #fdf2f8;
+    --rem-box-border: #f5d0fe;
+    --rem-heading: #4a044e;
+    --rem-subtext: #701a75;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #f0abfc;
+    --rem-btn-text: #4a044e;
+    --rem-accent: #c026d3;
+    --rem-accent-border: #a21caf;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(219, 39, 119, 0.14);
+    --rem-badge-text: #831843;
+    --rem-badge-border: rgba(219, 39, 119, 0.34);
+}
+html:not(.dark).theme-matrix {
+    --lgx-tint: 236, 253, 245;
+    --theme-lg-tint: 236, 253, 245;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #ecfdf5;
+    --rem-box-border: #a7f3d0;
+    --rem-heading: #064e3b;
+    --rem-subtext: #065f46;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #6ee7b7;
+    --rem-btn-text: #064e3b;
+    --rem-accent: #047857;
+    --rem-accent-border: #065f46;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(5, 150, 105, 0.14);
+    --rem-badge-text: #065f46;
+    --rem-badge-border: rgba(5, 150, 105, 0.34);
+}
+html:not(.dark).theme-sakura {
+    --lgx-tint: 255, 241, 242;
+    --theme-lg-tint: 255, 241, 242;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #fff1f2;
+    --rem-box-border: #fecdd3;
+    --rem-heading: #4c0519;
+    --rem-subtext: #881337;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #fda4af;
+    --rem-btn-text: #4c0519;
+    --rem-accent: #be123c;
+    --rem-accent-border: #9f1239;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(225, 29, 72, 0.14);
+    --rem-badge-text: #881337;
+    --rem-badge-border: rgba(225, 29, 72, 0.34);
+}
+html:not(.dark).theme-coffee {
+    --lgx-tint: 254, 247, 237;
+    --theme-lg-tint: 254, 247, 237;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #fefaf4;
+    --rem-box-border: #fed7aa;
+    --rem-heading: #431407;
+    --rem-subtext: #7c2d12;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #fdba74;
+    --rem-btn-text: #431407;
+    --rem-accent: #b45309;
+    --rem-accent-border: #9a3412;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(180, 83, 9, 0.14);
+    --rem-badge-text: #7c2d12;
+    --rem-badge-border: rgba(180, 83, 9, 0.34);
+}
+html:not(.dark).theme-arcade {
+    --lgx-tint: 245, 243, 255;
+    --theme-lg-tint: 245, 243, 255;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #f5f3ff;
+    --rem-box-border: #ddd6fe;
+    --rem-heading: #2e1065;
+    --rem-subtext: #5b21b6;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #c4b5fd;
+    --rem-btn-text: #2e1065;
+    --rem-accent: #6d28d9;
+    --rem-accent-border: #5b21b6;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(109, 40, 217, 0.14);
+    --rem-badge-text: #4c1d95;
+    --rem-badge-border: rgba(109, 40, 217, 0.34);
+}
+html:not(.dark).theme-hyperfocus {
+    --lgx-tint: 239, 246, 255;
+    --theme-lg-tint: 239, 246, 255;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #eff6ff;
+    --rem-box-border: #bfdbfe;
+    --rem-heading: #0f172a;
+    --rem-subtext: #1e3a8a;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #93c5fd;
+    --rem-btn-text: #0f172a;
+    --rem-accent: #1d4ed8;
+    --rem-accent-border: #1e40af;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(37, 99, 235, 0.14);
+    --rem-badge-text: #1e3a8a;
+    --rem-badge-border: rgba(37, 99, 235, 0.34);
+}
+html:not(.dark).theme-starlight {
+    --lgx-tint: 250, 245, 255;
+    --theme-lg-tint: 250, 245, 255;
+    --lgx-fill-a: 0.72;
+    --rem-box-bg: #fdf4ff;
+    --rem-box-border: #f5d0fe;
+    --rem-heading: #4a044e;
+    --rem-subtext: #701a75;
+    --rem-btn-bg: #ffffff;
+    --rem-btn-border: #f0abfc;
+    --rem-btn-text: #4a044e;
+    --rem-accent: #9d174d;
+    --rem-accent-border: #86198f;
+    --rem-on-accent: #ffffff;
+    --rem-badge-bg: rgba(192, 38, 211, 0.14);
+    --rem-badge-text: #701a75;
+    --rem-badge-border: rgba(192, 38, 211, 0.34);
+}
+
+/* Indicador deslizante inferior en modo claro: cristal blanco/azulado luminoso (sin oscurecer) */
+html:not(.dark) .nav-sliding-indicator {
+    --lgx-tint: 244, 247, 255;
+    --lgx-fill-a: 0.52;
+    --lgx-rim-hi: rgba(255, 255, 255, 0.96);
+    --lgx-rim-lo: rgba(148, 163, 184, 0.24);
+    --lgx-inset-hi: rgba(255, 255, 255, 0.94);
+    --lgx-inset-lo: rgba(99, 102, 241, 0.16);
+    --lgx-inner-glow: rgba(255, 255, 255, 0.32);
+    --lgx-shadow: 79, 70, 229;
+}
+html:not(.dark) #bottom-nav .nav-link-btn.nav-link-active,
+html:not(.dark) #desktop-nav-pill .nav-link-btn.nav-link-active {
+    color: #312e81 !important;
+}
+html:not(.dark)[class*="theme-"] #bottom-nav .nav-link-btn.nav-link-active,
+html:not(.dark)[class*="theme-"] #desktop-nav-pill .nav-link-btn.nav-link-active {
+    color: #0f172a !important;
+}
+html:not(.dark)[class*="theme-"]:not(.theme-gray) .nav-sliding-indicator {
+    --lgx-tint: var(--theme-lg-tint, 241, 245, 249);
 }
 
 /* Indicador deslizante inferior hereda el tinte temático en temas oscuros/bóveda */
@@ -574,7 +825,7 @@ html .subject-reminder-icon {
 }
 
 html.dark .subject-reminder-icon,
-html[class*="theme-"]:not(.theme-gray) .subject-reminder-icon {
+html.dark[class*="theme-"]:not(.theme-gray) .subject-reminder-icon {
     color: var(--rem-accent-border) !important;
 }
 
@@ -671,10 +922,6 @@ html[data-reduced-effects="true"] .celebration-emoji-particle {
     display: none !important;
 }
 
-html[data-reduced-effects="true"] #app-bg-photo {
-    filter: none !important;
-}
-
 /* Superficies sólidas limpias y legibles sin blur en Modo Rendimiento */
 html[data-reduced-effects="true"] #bottom-nav,
 html[data-reduced-effects="true"] #bottom-nav[data-lg-surface="bar"] {
@@ -732,9 +979,11 @@ html[data-reduced-effects="true"].dark .note-filter-chip {
     box-shadow: none !important;
 }
 
-html[data-reduced-effects="true"] .note-filter-chip.note-filter-active {
-    background: #4f46e5 !important;
-    border: 1px solid #4338ca !important;
+html[data-reduced-effects="true"] .note-filter-chip.note-filter-active,
+html[data-reduced-effects="true"] .note-filter-chip.note-filter-active * {
+    background: #4338ca !important;
+    border-color: #3730a3 !important;
+    color: #ffffff !important;
     box-shadow: none !important;
 }
 

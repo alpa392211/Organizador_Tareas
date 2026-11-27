@@ -27,10 +27,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
 
     <!-- Estilos locales y complementarios (Offline-ready & Capacitor compatible) -->
-    <link rel="stylesheet" href="css/tailwind.min.css?v=1.6.0">
-    <link rel="stylesheet" href="css/styles.css?v=1.6.0">
-    <link rel="stylesheet" href="css/liquid-glass.css?v=1.6.0">
-    <link rel="stylesheet" href="css/mobile-perf.css?v=1.6.0">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1.7.0">
+    <link rel="stylesheet" href="css/styles.css?v=1.7.0">
+    <link rel="stylesheet" href="css/liquid-glass.css?v=1.7.0">
+    <link rel="stylesheet" href="css/mobile-perf.css?v=1.7.0">
 </head>
 <body class="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
     <!-- Pantalla de arranque ligera (se oculta en cuanto App.init() finaliza; muestra Reintentar tras 4s) -->
@@ -346,7 +346,7 @@
                 </button>
 
                 <!-- Descarga directa de APK Android (Solo Web / GitHub Pages) -->
-                <a id="drawer-apk-download-link" href="downloads/Organizador-v1.6.0.apk" download="Organizador-v1.6.0.apk"
+                <a id="drawer-apk-download-link" href="downloads/Organizador-v1.7.0.apk" download="Organizador-v1.7.0.apk"
                     class="nav-link-btn touch-target-44 min-h-[44px] w-full flex items-center justify-between gap-2 px-3 py-2 rounded-full text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/12 hover:bg-emerald-500/20 tap-effect transition-all text-left">
                     <div class="flex items-center gap-3 min-w-0">
                         <span class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -378,14 +378,15 @@
                 <span>Apóyame en Ko-fi</span>
             </a>
 
-            <!-- Botón de Salida Segura de la Aplicación -->
-            <button type="button" id="app-exit-btn"
-                class="touch-target-44 min-h-[44px] w-full mt-2.5 py-2.5 px-4 rounded-full bg-white/55 dark:bg-white/10 hover:bg-rose-500/15 dark:hover:bg-rose-500/20 text-slate-700 dark:text-slate-100 hover:text-rose-700 dark:hover:text-rose-300 text-xs font-bold flex items-center justify-center gap-2 border border-white/60 dark:border-white/15 backdrop-blur-md transition-colors tap-effect"
-                title="Cerrar la aplicación">
+            <!-- Acceso directo a Configuración en pie del menú lateral -->
+            <button type="button" id="drawer-footer-settings-btn" data-view-target="settings"
+                class="touch-target-44 min-h-[44px] w-full mt-2.5 py-2.5 px-4 rounded-full bg-white/55 dark:bg-white/10 hover:bg-indigo-500/15 dark:hover:bg-indigo-500/20 text-slate-700 dark:text-slate-100 hover:text-indigo-700 dark:hover:text-indigo-300 text-xs font-bold flex items-center justify-center gap-2 border border-white/60 dark:border-white/15 backdrop-blur-md transition-colors tap-effect"
+                title="Abrir Configuración">
                 <svg class="w-4 h-4 stroke-[2.2] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <span>Salir de la aplicación</span>
+                <span>Configuración</span>
             </button>
         </div>
     </aside>
@@ -422,14 +423,21 @@
                     </p>
                 </div>
 
-                <!-- Botón CTA con Degradado Enriquecido y Efecto Hover/Touch -->
-                <div id="subjects-header-cta-slot" class="shrink-0 flex">
+                <!-- Botón CTA con Degradado Enriquecido y Acceso Rápido de Posición -->
+                <div id="subjects-header-cta-slot" class="shrink-0 flex items-center gap-2">
                     <button type="button" id="add-subject-btn"
                         class="btn-gradient-subject touch-target-44 min-h-[44px] tap-effect inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-white font-bold text-sm shrink-0">
                         <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
                         <span>Nueva Materia</span>
+                    </button>
+                    <button type="button" id="subjects-placement-quick-btn"
+                        class="touch-target-44 min-w-[44px] min-h-[44px] tap-effect inline-flex items-center justify-center rounded-full bg-slate-100/90 dark:bg-slate-700/80 hover:bg-indigo-50 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 border border-slate-200/80 dark:border-slate-600/70 transition-colors shrink-0"
+                        title="Fijar botón abajo" aria-label="Mover botón Nueva materia abajo">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -488,10 +496,17 @@
                 <div id="subjects-bottom-add-panel" class="subjects-dropdown-panel" aria-hidden="true">
                     <div class="subjects-dropdown-inner">
                         <div id="subjects-bottom-add-content" class="subjects-bottom-add-content px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200/70 dark:border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <p id="subjects-bottom-helper-text" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <p id="subjects-bottom-helper-text" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed flex-1 min-w-0">
                                 Tienes más de 8 materias registradas. Añade nuevas asignaturas aquí abajo (máximo 16).
                             </p>
-                            <!-- #add-subject-btn se reubica aquí dinámicamente cuando subjects.length > 8 -->
+                            <!-- #add-subject-btn se reubica aquí dinámicamente -->
+                            <button type="button" id="subjects-placement-quick-bottom-btn"
+                                class="touch-target-44 min-w-[44px] min-h-[44px] tap-effect inline-flex items-center justify-center rounded-full bg-slate-100/90 dark:bg-slate-700/80 hover:bg-indigo-50 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 border border-slate-200/80 dark:border-slate-600/70 transition-colors shrink-0 self-end sm:self-center"
+                                title="Fijar botón arriba" aria-label="Mover botón Nueva materia arriba">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1109,6 +1124,9 @@
                             </div>
                         </div>
 
+                        <!-- Sección dinámica: Temas de la Bóveda (oculta hasta desbloquear al menos uno) -->
+                        <div id="settings-vault-themes-section" class="hidden pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0"></div>
+
                         <!-- Intensidad del Cristal (Efectos de transparencia avanzados) -->
                         <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0">
                             <div class="flex items-center justify-between gap-2 flex-wrap min-w-0">
@@ -1158,6 +1176,24 @@
                                         </div>
                                     </label>
                                 </div>
+                            </div>
+
+                            <!-- Perfil de Dispositivo (Auto-detectado / Manual) -->
+                            <div class="pt-2 space-y-2 min-w-0">
+                                <div class="flex items-center justify-between gap-2 flex-wrap min-w-0">
+                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                                        Perfil de dispositivo
+                                    </label>
+                                    <span id="settings-device-profile-pill" class="shrink-0 text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">Media</span>
+                                </div>
+                                <div id="settings-device-profile-track" role="group" aria-label="Perfil de dispositivo" class="segmented-control-track rounded-full flex items-center gap-1 min-w-0">
+                                    <button type="button" data-device-profile="low" aria-pressed="false" class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">Baja</button>
+                                    <button type="button" data-device-profile="medium" aria-pressed="true" class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">Media</button>
+                                    <button type="button" data-device-profile="high" aria-pressed="false" class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">Alta</button>
+                                </div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                    Ajusta automáticamente cristal, partículas y velocidad según la potencia de tu teléfono o tablet.
+                                </p>
                             </div>
                         </div>
 
@@ -1341,11 +1377,11 @@
                         </div>
 
                         <!-- 5. Interruptor: Animar fondo (estático por defecto) -->
-                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0">
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-3 min-w-0">
                             <div class="settings-switch-row gap-3">
                                 <div class="settings-switch-label min-w-0">
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">Animar fondo</span>
-                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Estático por defecto. Tope a 30 FPS; se pausa en segundo plano o dispositivos lentos.</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Estático por defecto; elige la calidad de fluidez abajo. Se pausa al abrir modales.</span>
                                 </div>
                                 <div class="settings-switch-toggle shrink-0">
                                     <label class="app-switch" for="settings-bg-animate-toggle">
@@ -1354,6 +1390,19 @@
                                             <span class="app-switch-thumb"></span>
                                         </div>
                                     </label>
+                                </div>
+                            </div>
+                            <div class="space-y-2 min-w-0">
+                                <div class="flex items-center justify-between gap-2 flex-wrap min-w-0">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                        Calidad del fondo animado
+                                    </label>
+                                    <span id="settings-bg-quality-pill" class="shrink-0 text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400">Media (30 FPS)</span>
+                                </div>
+                                <div id="settings-bg-quality-track" role="group" aria-label="Calidad del fondo animado" class="segmented-control-track rounded-full flex items-center gap-1 min-w-0">
+                                    <button type="button" data-bg-quality="low" aria-pressed="false" class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">Baja</button>
+                                    <button type="button" data-bg-quality="medium" aria-pressed="true" class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">Media</button>
+                                    <button type="button" data-bg-quality="high" aria-pressed="false" class="touch-target-44 flex-1 min-w-0 min-h-[44px] px-3 py-2 text-xs font-bold tap-effect truncate">Alta</button>
                                 </div>
                             </div>
                             <p id="settings-bg-perf-notice" class="hidden text-[11px] font-semibold px-3 py-2 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"></p>
@@ -1390,6 +1439,43 @@
                                     </div>
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5b. Acordeón: Sonidos de Notificación -->
+                <div id="settings-acc-notif-sound" class="settings-accordion-card rounded-2xl border border-slate-200/80 dark:border-slate-700/70 overflow-hidden bg-white dark:bg-slate-800">
+                    <button type="button" class="settings-accordion-header touch-target-44 min-h-[44px] w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <span class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg shrink-0">🔔</span>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Sonidos de Notificación</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Tonos propios de la app, del sistema o silencio.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 ml-2">
+                            <span id="settings-notif-sound-pill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300">App</span>
+                            <svg class="settings-accordion-chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </button>
+                    <div class="settings-accordion-body border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 space-y-3 bg-slate-50/40 dark:bg-slate-800/40 min-w-0">
+                        <div id="settings-notif-sound-track" role="group" aria-label="Sonido de notificaciones"
+                            class="segmented-control-track grid grid-cols-3 gap-1 min-w-0">
+                            <button type="button" data-notif-sound-mode="app" aria-pressed="true"
+                                class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center truncate">App</button>
+                            <button type="button" data-notif-sound-mode="system" aria-pressed="false"
+                                class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center truncate">Sistema</button>
+                            <button type="button" data-notif-sound-mode="silent" aria-pressed="false"
+                                class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center truncate">Silencio</button>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 flex-1 min-w-0">
+                                Tono distinto para clases, tareas y alertas prioritarias.
+                            </p>
+                            <button type="button" id="settings-notif-sound-test-btn"
+                                class="touch-target-44 min-h-[44px] tap-effect px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors shrink-0">
+                                Probar sonido
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1458,6 +1544,34 @@
                                 <span class="text-xs font-bold text-slate-900 dark:text-white">Atajo: Calendario</span>
                                 <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Abre ventana emergente del mes.</span>
                             </label>
+                        </div>
+
+                        <!-- Posición del botón Nueva materia -->
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5 min-w-0">
+                            <div class="flex items-center justify-between gap-2 flex-wrap min-w-0">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                    Posición del botón «Nueva materia»
+                                </label>
+                                <span id="settings-subjects-placement-pill" class="shrink-0 text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">Automático (8+)</span>
+                            </div>
+                            <div id="settings-subjects-add-placement-track" role="group" aria-label="Posición del botón Nueva materia"
+                                class="segmented-control-track grid grid-cols-3 gap-1 min-w-0">
+                                <button type="button" data-subjects-add-placement="auto" aria-pressed="true"
+                                    class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center truncate">
+                                    Automático
+                                </button>
+                                <button type="button" data-subjects-add-placement="top" aria-pressed="false"
+                                    class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center truncate">
+                                    Arriba
+                                </button>
+                                <button type="button" data-subjects-add-placement="bottom" aria-pressed="false"
+                                    class="touch-target-44 min-h-[44px] min-w-0 tap-effect px-2 sm:px-3 py-2 rounded-full text-[11px] sm:text-xs font-bold flex items-center justify-center truncate">
+                                    Abajo
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                En Automático aparece arriba con hasta 7 materias y se guarda en el cajón inferior a partir de 8.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1644,6 +1758,43 @@
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"/></svg>
                 </button>
 
+                <!-- Botón Replay del Tutorial Interactivo -->
+                <div class="rounded-2xl border border-indigo-200/80 dark:border-indigo-900/60 bg-indigo-50/50 dark:bg-indigo-950/30 p-4 flex items-center justify-between gap-3 flex-wrap">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Guía Rápida Animada</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Repasa en 9 pasos materias, tareas, notas y personalización.</p>
+                    </div>
+                    <button type="button" id="settings-replay-tour-btn"
+                        class="touch-target-44 min-h-[44px] tap-effect px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-colors shrink-0">
+                        Ver tutorial otra vez
+                    </button>
+                </div>
+
+                <!-- Tarjeta: Comprobar Actualizaciones (Visible en Web y APK) -->
+                <div id="settings-app-update-card" class="settings-accordion-card rounded-2xl border border-sky-200/80 dark:border-sky-900/60 overflow-hidden bg-gradient-to-r from-sky-50/60 via-indigo-50/40 to-white dark:from-sky-950/35 dark:via-indigo-950/20 dark:to-slate-800 p-4 sm:p-5 shadow-xs">
+                    <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap min-w-0">
+                        <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                            <span class="w-11 h-11 rounded-2xl bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center text-xl shrink-0">🔄</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Actualizaciones</h3>
+                                    <span id="settings-update-current-version" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 shrink-0">v1.7.0</span>
+                                    <span id="settings-update-status-pill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shrink-0">Actualizado</span>
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Busca nuevas versiones oficiales e instálalas directamente sin perder tus datos.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+                            <button type="button" id="settings-check-update-btn"
+                                class="touch-target-44 min-h-[44px] tap-effect w-full sm:w-auto px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-500/20 transition-all flex items-center justify-center gap-2">
+                                <span>Buscar actualizaciones</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tarjeta: Instalación de la Aplicación (PWA) -->
                 <div id="pwa-settings-card" class="settings-accordion-card rounded-2xl border border-indigo-200/80 dark:border-indigo-900/60 overflow-hidden bg-gradient-to-r from-indigo-50/60 via-purple-50/40 to-white dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-800 p-4 sm:p-5 shadow-xs">
                     <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap min-w-0">
@@ -1677,7 +1828,7 @@
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Descargar App para Android</h3>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 shrink-0">APK v1.6.0</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 shrink-0">APK v1.7.0</span>
                                 </div>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                     Instala <strong>Organizador</strong> directamente en Android con widgets de escritorio y funcionamiento 100% sin conexión.
@@ -1685,7 +1836,7 @@
                             </div>
                         </div>
                         <div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
-                            <a id="apk-settings-download-link" href="downloads/Organizador-v1.6.0.apk" download="Organizador-v1.6.0.apk"
+                            <a id="apk-settings-download-link" href="downloads/Organizador-v1.7.0.apk" download="Organizador-v1.7.0.apk"
                                 class="touch-target-44 min-h-[44px] tap-effect w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
                                 <span>Descargar APK</span>
@@ -1694,17 +1845,17 @@
                     </div>
                 </div>
 
-                <!-- VERSIÓN HASTA ABAJO v1.6.0 -->
+                <!-- VERSIÓN HASTA ABAJO v1.7.0 -->
                 <div class="text-center pt-2 flex flex-col items-center gap-2">
                     <div id="settings-version-pill"
                         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 select-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         title="Ver novedades de la versión">
                         <span>✨</span>
-                        <span>Versión 1.6.0</span>
+                        <span>Versión 1.7.0</span>
                     </div>
                     <button type="button" id="settings-open-changelog-btn"
                         class="touch-target-44 min-h-[44px] px-3 tap-effect text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
-                        <span>✨ Ver novedades de la versión 1.6.0</span>
+                        <span>✨ Ver novedades de la versión 1.7.0</span>
                     </button>
                 </div>
             </div>
@@ -1746,7 +1897,7 @@
                         </div>
                         <div class="flex items-center justify-between gap-2 text-[11px] text-purple-700 dark:text-purple-300 flex-wrap">
                             <span id="vault-next-unlock-text">Completa tareas para desbloquear el próximo código</span>
-                            <span id="vault-unlocked-count-text" class="hidden font-mono font-bold">0 / 13</span>
+                            <span id="vault-unlocked-count-text" class="hidden font-mono font-bold">0 / 18</span>
                         </div>
                         <p id="vault-secret-notice" class="text-[10px] text-slate-500 dark:text-slate-400 border-t border-purple-100 dark:border-purple-900/50 pt-1.5">
                             Cumple 5 tareas y se te dará un código
@@ -2774,10 +2925,10 @@
             <img src="assets/icons/icon-192x192.png" alt="Logo Organizador" class="w-10 h-10 rounded-xl shadow-xs shrink-0 object-cover">
             <div class="flex-1 min-w-0">
                 <p class="text-xs font-bold text-slate-900 dark:text-white truncate">Descarga Organizador (Android)</p>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">APK v1.6.0 nativa con widgets y avisos de clase.</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">APK v1.7.0 nativa con widgets y avisos de clase.</p>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-                <a id="apk-floating-download-link" href="downloads/Organizador-v1.6.0.apk" download="Organizador-v1.6.0.apk" class="tap-effect min-h-[44px] inline-flex items-center px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs hover:bg-emerald-700 transition-colors">
+                <a id="apk-floating-download-link" href="downloads/Organizador-v1.7.0.apk" download="Organizador-v1.7.0.apk" class="tap-effect min-h-[44px] inline-flex items-center px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs hover:bg-emerald-700 transition-colors">
                     Descargar
                 </a>
                 <button type="button" id="apk-floating-dismiss-btn" aria-label="Cerrar aviso de APK" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" title="Descartar">
@@ -2813,64 +2964,64 @@
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <h2 class="text-lg font-black text-slate-900 dark:text-white">
-                                Novedades de la Versión 1.6.0
+                                Novedades de la Versión 1.7.0
                             </h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                                v1.6.0
+                                v1.7.0
                             </span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            Recordatorios de materias antes de clase, modo rendimiento, efectos ópticos mejorados y optimización integral para celular.
+                            Temas claros y oscuros sin límites, tonos propios de notificación, tutorial interactivo en 9 pasos, control táctil deslizable y actualización directa.
                         </p>
                     </div>
                 </div>
 
                 <!-- Lista de Cambios Mayores -->
                 <div class="space-y-3 py-1">
-                    <div class="p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/35 border border-emerald-200/80 dark:border-emerald-800/60 flex gap-3 items-start">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                    <div class="p-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/35 border border-indigo-200/80 dark:border-indigo-800/60 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4l1.4-1.4"/></svg>
+                        </span>
+                        <div class="min-w-0">
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Modo claro en todos los temas y nuevas fuentes</h4>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                                Usa modo claro u oscuro con todos los estilos visuales y fondos desbloqueados, 5 tipografías adicionales, efecto espejo al cambiar de modo y gesto deslizable en selectores.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-amber-50/70 dark:bg-amber-950/35 border border-amber-200/80 dark:border-amber-800/60 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-300 flex items-center justify-center shrink-0" aria-hidden="true">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1"/></svg>
                         </span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Recordatorios de materias antes de clase</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Sonidos de notificación propios y barra en tareas</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Al crear o editar una materia ahora puedes activar un aviso automático 15, 30, 45 minutos o 1 hora antes del inicio de clase.
+                                Tonos integrados distintos para clases, tareas y alertas (o silencio), franja de color siempre visible en cada tarea y menú inteligente en Materias.
                             </p>
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-purple-50/70 dark:bg-purple-950/35 border border-purple-200/80 dark:border-purple-800/60 flex gap-3 items-start">
-                        <span class="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                    <div class="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0" aria-hidden="true">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                         </span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Modo rendimiento, Bóveda verde y fluidez móvil</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Tutorial interactivo (9 pasos) y perfiles de rendimiento</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Nueva opción para reducir efectos en dispositivos con menores capacidades, destello verde fluido en la Bóveda y mejor respuesta táctil en celular.
+                                Guía animada paso a paso, 3 niveles de calidad para fondos, detección de perfil Baja/Media/Alta, desenfoque estable en «Mi foto» y confirmación de salida con el botón Atrás.
                             </p>
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex gap-3 items-start">
-                        <span class="w-8 h-8 rounded-xl bg-amber-500/12 text-amber-600 dark:text-amber-300 flex items-center justify-center shrink-0" aria-hidden="true">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-200/80 dark:border-sky-800/60 flex gap-3 items-start">
+                        <span class="w-8 h-8 rounded-xl bg-sky-500/15 text-sky-600 dark:text-sky-300 flex items-center justify-center shrink-0" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
                         </span>
                         <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Calendario rápido, accesos traslúcidos y menú en Materias (8+)</h4>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Actualizaciones automáticas dentro de la app</h4>
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Calendario rápido, Nueva Tarea y Nota Rápida con efectos de transparencia avanzados renovados y menú desplegable desde 8 materias.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex gap-3 items-start">
-                        <span class="w-8 h-8 rounded-xl bg-sky-500/12 text-sky-600 dark:text-sky-300 flex items-center justify-center shrink-0" aria-hidden="true">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        </span>
-                        <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Notas privadas con clave (PIN) y miniaturas</h4>
-                            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                Bloqueo inmediato con PIN, borrado definitivo si olvidas tu clave y miniaturas de fotos clicables debajo de cada nota desbloqueada.
+                                Verifica nuevas versiones e instala mejoras oficiales desde Configuración sin perder ninguno de tus datos locales.
                             </p>
                         </div>
                     </div>
@@ -2899,21 +3050,23 @@
     </div>
 
     <!-- Scripts Modulares (Carga secuencial compatible con apertura directa file:/// y servidores) -->
-    <script src="js/storage.js?v=1.6.0"></script>
-    <script src="js/haptics.js?v=1.6.0"></script>
-    <script src="js/liquid-glass.js?v=1.6.0"></script>
-    <script src="js/segmented.js?v=1.6.0"></script>
-    <script src="js/notifications.js?v=1.6.0"></script>
-    <script src="js/widgets.js?v=1.6.0"></script>
-    <script src="js/subjects.js?v=1.6.0"></script>
-    <script src="js/tasks.js?v=1.6.0"></script>
-    <script src="js/notes.js?v=1.6.0"></script>
-    <script src="js/calendar.js?v=1.6.0"></script>
-    <script src="js/archive.js?v=1.6.0"></script>
-    <script src="js/photo-editor.js?v=1.6.0"></script>
-    <script src="js/backgrounds.js?v=1.6.0"></script>
-    <script src="js/app.js?v=1.6.0"></script>
-    <script src="js/performance.js?v=1.6.0"></script>
+    <script src="js/storage.js?v=1.7.0"></script>
+    <script src="js/haptics.js?v=1.7.0"></script>
+    <script src="js/liquid-glass.js?v=1.7.0"></script>
+    <script src="js/segmented.js?v=1.7.0"></script>
+    <script src="js/notifications.js?v=1.7.0"></script>
+    <script src="js/widgets.js?v=1.7.0"></script>
+    <script src="js/subjects.js?v=1.7.0"></script>
+    <script src="js/tasks.js?v=1.7.0"></script>
+    <script src="js/notes.js?v=1.7.0"></script>
+    <script src="js/calendar.js?v=1.7.0"></script>
+    <script src="js/archive.js?v=1.7.0"></script>
+    <script src="js/photo-editor.js?v=1.7.0"></script>
+    <script src="js/backgrounds.js?v=1.7.0"></script>
+    <script src="js/tour.js?v=1.7.0"></script>
+    <script src="js/updater.js?v=1.7.0"></script>
+    <script src="js/app.js?v=1.7.0"></script>
+    <script src="js/performance.js?v=1.7.0"></script>
 
     <!-- Visor de fotos de la galería a pantalla completa -->
     <div id="photo-preview-modal" class="modal-overlay photo-viewer-overlay fixed inset-0 z-[70] hidden flex-col" role="dialog" aria-modal="true" aria-labelledby="photo-preview-name" aria-hidden="true">
@@ -3071,6 +3224,51 @@
                         class="touch-target-44 min-h-[44px] tap-effect px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-lg shadow-indigo-500/25 transition-colors flex items-center gap-1.5">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         <span data-save-label>Guardar foto</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Actualización Disponible (v1.7.0) -->
+    <div id="app-update-modal" class="modal-overlay mobile-sheet-overlay fixed inset-0 z-[85] hidden items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="app-update-title">
+        <div id="app-update-backdrop" class="app-modal-backdrop fixed inset-0 bg-slate-950/65 backdrop-blur-sm"></div>
+        <div class="modal-dialog mobile-bottom-sheet relative w-full max-w-md bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-indigo-200/80 dark:border-indigo-800/70 overflow-hidden flex flex-col max-h-[88vh]">
+            <div class="modal-sheet-grabber sm:hidden" aria-hidden="true"><span class="modal-sheet-grabber-bar"></span></div>
+            <div class="mobile-sheet-body p-5 sm:p-6 space-y-4 overflow-y-auto">
+                <div class="flex items-center gap-3">
+                    <span class="w-11 h-11 rounded-2xl bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center text-xl shrink-0">🚀</span>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 id="app-update-title" class="text-base font-extrabold text-slate-900 dark:text-white">Actualización disponible</h3>
+                            <span id="app-update-version-pill" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">v1.7.0</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Mejoras y correcciones listas para instalar.</p>
+                    </div>
+                </div>
+
+                <ul id="app-update-changelog-list" class="space-y-2 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60"></ul>
+
+                <div id="app-update-progress-wrap" class="hidden space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <span>Descargando paquete...</span>
+                        <span id="app-update-progress-label" class="font-mono tabular-nums">0%</span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                        <div id="app-update-progress-bar" class="h-full bg-gradient-to-r from-sky-500 to-indigo-600 transition-all duration-150" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <button type="button" id="app-update-permission-btn" class="hidden touch-target-44 min-h-[44px] w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold">
+                    Permitir instalar desde esta fuente
+                </button>
+
+                <div class="flex items-center justify-end gap-2 pt-1">
+                    <button type="button" id="app-update-later-btn" class="touch-target-44 min-h-[44px] tap-effect px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold">
+                        Ahora no
+                    </button>
+                    <button type="button" id="app-update-install-btn" class="touch-target-44 min-h-[44px] tap-effect px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-md shadow-indigo-500/25">
+                        Instalar actualización
                     </button>
                 </div>
             </div>

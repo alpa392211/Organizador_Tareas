@@ -26,7 +26,7 @@
         }
 
         function getVersion() {
-            return window.StorageModule?.APP_VERSION || '1.6.0';
+            return window.StorageModule?.APP_VERSION || '1.7.0';
         }
 
         function persist() {
@@ -342,6 +342,76 @@
             themeClass: null,
             supportsRockets: false
         },
+        'GROTESK': {
+            id: 'GROTESK',
+            name: 'Tipografía Space Grotesk Geométrica',
+            icon: '🛰️',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'spacegrotesk',
+            badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-400/30',
+            phrase: '«PRECISIÓN MODERNA • PROPORCIONES ARQUITECTÓNICAS»',
+            description: 'Tipografía geométrica limpia de alto carácter editorial. Equilibra claridad matemática con estilo técnico contemporáneo.',
+            actionLabel: 'Aplicar Space Grotesk 🛰️',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'FREDOKA': {
+            id: 'FREDOKA',
+            name: 'Tipografía Fredoka Redondeada',
+            icon: '🫧',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'fredoka',
+            badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+            phrase: '«ENERGÍA AMIGABLE • TUS CURSOS EN ARMONÍA»',
+            description: 'Trazos suaves, redondeados y expresivos para hacer tus listas de materias y recordatorios mucho más agradables.',
+            actionLabel: 'Aplicar Fredoka 🫧',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'SCRIPTY': {
+            id: 'SCRIPTY',
+            name: 'Tipografía Dancing Script Caligráfica',
+            icon: '🪶',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'dancingscript',
+            badgeClass: 'bg-pink-500/20 text-pink-300 border-pink-400/30',
+            phrase: '«TRAZO ARTESANAL • TU CUADERNO DE AUTOR»',
+            description: 'Caligrafía elegante de trazo fluido que convierte tus encabezados y libretas en apuntes con firma personal.',
+            actionLabel: 'Aplicar Dancing Script 🪶',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'PIXEL88': {
+            id: 'PIXEL88',
+            name: 'Tipografía Pixelify Retro 8-Bit',
+            icon: '🕹️',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'pixelify',
+            badgeClass: 'bg-violet-500/20 text-violet-300 border-violet-400/30',
+            phrase: '«READY PLAYER ONE • LEVEL UP ACADEMICS»',
+            description: 'Estilo pixel art clásico inspirado en consolas portátiles retro para acompañar sesiones de estudio con espíritu arcade.',
+            actionLabel: 'Aplicar Pixelify Retro 🕹️',
+            themeClass: null,
+            supportsRockets: false
+        },
+        'TYPEWRIT': {
+            id: 'TYPEWRIT',
+            name: 'Tipografía Special Elite Máquina de Escribir',
+            icon: '⌨️',
+            category: 'TIPOGRAFÍA SECRETA',
+            type: 'font',
+            fontKey: 'specialelite',
+            badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
+            phrase: '«EDICIÓN ARCHIVADA • BORRADOR ORIGINAL»',
+            description: 'Estética auténtica de máquina de escribir vintage sobre papel para ensayos, notas literarias y crónicas diarias.',
+            actionLabel: 'Aplicar Special Elite ⌨️',
+            themeClass: null,
+            supportsRockets: false
+        },
         'KRONOS99': {
             id: 'KRONOS99',
             name: '⚡ Llave Maestra Universal (KRONOS99)',
@@ -349,7 +419,7 @@
             category: 'PROTOCOLO MAESTRO • ACCESO TOTAL',
             badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
             phrase: '«ACCESO TOTAL CONCEDIDO • 100% PROTOCOLOS Y FUENTES DESBLOQUEADOS»',
-            description: '¡Has descifrado la clave maestra universal! Se han desbloqueado simultáneamente los 10 temas de personalización, el modo monocromático, el tributo estelar Starlight y las 5 familias tipográficas secretas en tu organizador.',
+            description: '¡Has descifrado la clave maestra universal! Se han desbloqueado simultáneamente los 10 temas de personalización (en modo claro y oscuro), el modo monocromático y las 10 familias tipográficas secretas en tu organizador.',
             actionLabel: 'Explorar Bóveda Completa 🔓',
             themeId: null,
             themeClass: null,
@@ -390,6 +460,16 @@
         'HANDNOTE': 'HANDNOTE', 'CAVEAT24': 'HANDNOTE', 'NOTEBOOK': 'HANDNOTE', 'APUNTES_': 'HANDNOTE', 'HANDMADE': 'HANDNOTE', 'CAVEAT__': 'HANDNOTE', 'CAVEAT': 'HANDNOTE',
         // ORBITRON (Orbitron)
         'ORBITRON': 'ORBITRON', 'CYBERFNT': 'ORBITRON', 'SCIFIHUD': 'ORBITRON', 'FUTURIST': 'ORBITRON', 'KINETIC_': 'ORBITRON', 'ORBITR__': 'ORBITRON',
+        // GROTESK (Space Grotesk)
+        'GROTESK': 'GROTESK', 'SPACEGROTESK': 'GROTESK', 'GEOMETRICA': 'GROTESK',
+        // FREDOKA (Fredoka)
+        'FREDOKA': 'FREDOKA', 'REDONDA': 'FREDOKA',
+        // SCRIPTY (Dancing Script)
+        'SCRIPTY': 'SCRIPTY', 'DANCINGSCRIPT': 'SCRIPTY', 'CALIGRAFICA': 'SCRIPTY',
+        // PIXEL88 (Pixelify Sans)
+        'PIXEL88': 'PIXEL88', 'PIXELIFY': 'PIXEL88', 'PIXELFONT': 'PIXEL88',
+        // TYPEWRIT (Special Elite)
+        'TYPEWRIT': 'TYPEWRIT', 'SPECIALELITE': 'TYPEWRIT', 'MAQUINA': 'TYPEWRIT',
         // KRONOS99 (Master Code - Unlocks everything)
         'KRONOS99': 'KRONOS99', 'KRONOS': 'KRONOS99', 'KRONOS__': 'KRONOS99', 'KRONOS_1': 'KRONOS99',
         'CIPHER99': 'KRONOS99', 'CIPHER': 'KRONOS99', 'X9CIPHER': 'KRONOS99',
@@ -405,6 +485,7 @@
     class App {
         constructor() {
             this.currentView = 'subjects'; // 'subjects' | 'tasks' | 'notes' | 'calendar' | 'archive' | 'settings'
+            this._viewHistory = ['subjects'];
         }
 
         init() {
@@ -470,6 +551,7 @@
                 safeStep('app.setupSettingsView', () => this.setupSettingsView());
                 safeStep('app.setupSecretVault', () => this.setupSecretVault());
                 safeStep('app.initPwa', () => this.initPwa());
+                safeStep('updater.init', () => window.AppUpdater?.init?.());
 
                 // 7. Sincronizar UI inicial de perfil y periodo
                 safeStep('app.syncPeriodUI', () => this.syncPeriodUI());
@@ -516,7 +598,7 @@
                         setTimeout(() => document.getElementById('drawer-toggle-btn')?.click(), 50);
                     }
                     if (urlParams.get('openExit') === '1') {
-                        setTimeout(() => document.getElementById('app-exit-btn')?.click(), 50);
+                        setTimeout(() => this.openExitModal?.(), 50);
                     }
                 });
 
@@ -536,7 +618,7 @@
                         }
 
                         const lastSeenVersion = Storage.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.6.0') {
+                        if (lastSeenVersion !== '1.7.0') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this.openChangelogModal?.();
@@ -827,6 +909,46 @@
                     icon: '🛸',
                     desc: 'Futurista angular con display cibernético táctico.',
                     fontClass: ''
+                },
+                {
+                    codeId: 'GROTESK',
+                    fontKey: 'spacegrotesk',
+                    name: 'Space Grotesk',
+                    icon: '🛰️',
+                    desc: 'Geométrica moderna con proporciones arquitectónicas.',
+                    fontClass: ''
+                },
+                {
+                    codeId: 'FREDOKA',
+                    fontKey: 'fredoka',
+                    name: 'Fredoka (Redonda)',
+                    icon: '🫧',
+                    desc: 'Suave, redondeada y amigable para estudio diario.',
+                    fontClass: ''
+                },
+                {
+                    codeId: 'SCRIPTY',
+                    fontKey: 'dancingscript',
+                    name: 'Dancing Script',
+                    icon: '🪶',
+                    desc: 'Caligrafía fluida con estilo artesanal de cuaderno.',
+                    fontClass: ''
+                },
+                {
+                    codeId: 'PIXEL88',
+                    fontKey: 'pixelify',
+                    name: 'Pixelify Sans (8-Bit)',
+                    icon: '🕹️',
+                    desc: 'Estética retro pixel art inspirada en consolas arcade.',
+                    fontClass: ''
+                },
+                {
+                    codeId: 'TYPEWRIT',
+                    fontKey: 'specialelite',
+                    name: 'Special Elite (Máquina)',
+                    icon: '⌨️',
+                    desc: 'Máquina de escribir clásica para ensayos y notas.',
+                    fontClass: 'font-mono'
                 }
             ];
 
@@ -872,7 +994,8 @@
         applyFontFamily(fontKey) {
             const valid = [
                 'calibri', 'times', 'montserrat', 'lora', 'poppins',
-                'readable', 'firacode', 'playfair', 'caveat', 'orbitron'
+                'readable', 'firacode', 'playfair', 'caveat', 'orbitron',
+                'spacegrotesk', 'fredoka', 'dancingscript', 'pixelify', 'specialelite'
             ];
             const activeFont = valid.includes(fontKey) ? fontKey : 'calibri';
 
@@ -890,7 +1013,12 @@
                 firacode: 'Fira Code (Hacker)',
                 playfair: 'Playfair Display (Imperial)',
                 caveat: 'Caveat (Cuaderno)',
-                orbitron: 'Orbitron (Cyber HUD)'
+                orbitron: 'Orbitron (Cyber HUD)',
+                spacegrotesk: 'Space Grotesk',
+                fredoka: 'Fredoka',
+                dancingscript: 'Dancing Script',
+                pixelify: 'Pixelify Sans',
+                specialelite: 'Special Elite'
             };
 
             const descs = {
@@ -903,7 +1031,12 @@
                 firacode: 'Monoespaciada de desarrollo estilo terminal, ideal para futuros ingenieros y programadores.',
                 playfair: 'Serif editorial de alto contraste con remates clásicos y aura de prestigio académico.',
                 caveat: 'Estilo manuscrito fluido y cálido que emula los mejores apuntes en tu libreta de estudio.',
-                orbitron: 'Geométrica futurista HUD con estética cibernética de panel táctico espacial.'
+                orbitron: 'Geométrica futurista HUD con estética cibernética de panel táctico espacial.',
+                spacegrotesk: 'Geométrica estilizada con personalidad técnica de diseño contemporáneo.',
+                fredoka: 'Trazo amigable y redondeado ideal para una experiencia visual relajada.',
+                dancingscript: 'Caligrafía expresiva y elegante con apariencia de firma manuscrita.',
+                pixelify: 'Pixel art clásico retro de 8-bit para el modo arcade y notas creativas.',
+                specialelite: 'Auténtico estilo de máquina de escribir sobre papel archivado.'
             };
 
             const fontPill = document.getElementById('settings-font-pill');
@@ -992,98 +1125,108 @@
         }
 
         isDarkModeForced() {
-            return Boolean(this.isSpecialThemeActive() || this.isDarkOnlyBackgroundActive());
+            return false;
         }
 
-        applyTheme(theme, save = true) {
+        applyTheme(theme, save = true, options = {}) {
             const Storage = window.StorageModule;
-            // Si hay un tema especial activo (salvo modo monocromático) o un fondo temático oscuro, se fuerza modo oscuro
             const effectiveTheme = this.isDarkModeForced() ? 'dark' : theme;
             const isDark = effectiveTheme === 'dark';
             const root = document.documentElement;
             const wasDark = root.classList.contains('dark');
 
-            if (wasDark !== isDark) {
-                // Congelar transiciones CSS por 1 frame para evitar lag de 200+ nodos con backdrop-filter
-                root.classList.add('theme-switching');
-                root.classList.toggle('dark', isDark);
-                void root.offsetWidth;
-                clearTimeout(this._themeSwitchTimer);
-                this._themeSwitchTimer = setTimeout(() => {
-                    root.classList.remove('theme-switching');
-                }, 40);
-            } else {
-                root.classList.toggle('dark', isDark);
+            const reducedEffects = root.getAttribute('data-reduced-effects') === 'true'
+                || root.getAttribute('data-device-profile') === 'low'
+                || Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            const shouldWipe = Boolean(options.animate && wasDark !== isDark && !reducedEffects);
+
+            const applyCoreDom = () => {
+                if (wasDark !== isDark) {
+                    // Congelar transiciones CSS por 1 frame para evitar lag de 200+ nodos con backdrop-filter
+                    root.classList.add('theme-switching');
+                    root.classList.toggle('dark', isDark);
+                    void root.offsetWidth;
+                    clearTimeout(this._themeSwitchTimer);
+                    this._themeSwitchTimer = setTimeout(() => {
+                        root.classList.remove('theme-switching');
+                    }, 40);
+                } else {
+                    root.classList.toggle('dark', isDark);
+                }
+
+                if (save) {
+                    Storage.setTheme(effectiveTheme);
+                }
+
+                // Sincronizar color de barra de estado/navegación en APK Android
+                try {
+                    window.AndroidWidgetBridge?.setSystemBarsTheme?.(isDark);
+                } catch (_) {}
+
+                this.updateThemeUI(effectiveTheme, !Storage.getTheme());
+                this.setupBottomActionButton();
+                const calModal = document.getElementById('calendar-modal');
+                if (calModal && !calModal.classList.contains('hidden') && window.CalendarModule?.render) {
+                    window.CalendarModule.render();
+                }
+                window.BackgroundsModule?.applyBackground?.();
+            };
+
+            if (shouldWipe && typeof document.startViewTransition === 'function') {
+                try {
+                    if (this._activeThemeTransition && typeof this._activeThemeTransition.skipTransition === 'function') {
+                        try { this._activeThemeTransition.skipTransition(); } catch (_) {}
+                    }
+                    const vt = document.startViewTransition(() => applyCoreDom());
+                    this._activeThemeTransition = vt;
+                    vt?.ready?.catch?.(() => {});
+                    vt?.updateCallbackDone?.catch?.(() => {});
+                    vt?.finished?.catch?.(() => {})?.finally?.(() => {
+                        if (this._activeThemeTransition === vt) {
+                            this._activeThemeTransition = null;
+                        }
+                    });
+                    return;
+                } catch (_) {}
             }
 
-            if (save) {
-                Storage.setTheme(effectiveTheme);
+            if (shouldWipe) {
+                try {
+                    document.querySelectorAll('.theme-wipe-fallback-curtain').forEach(el => el.remove());
+                    const curtain = document.createElement('div');
+                    curtain.className = 'theme-wipe-fallback-curtain';
+                    curtain.setAttribute('aria-hidden', 'true');
+                    curtain.style.backgroundColor = isDark ? '#070b15' : '#f8fafc';
+                    document.body?.appendChild(curtain);
+                    void curtain.offsetHeight;
+                    requestAnimationFrame(() => curtain.classList.add('is-sweeping'));
+                    setTimeout(() => applyCoreDom(), 210);
+                    setTimeout(() => curtain.classList.add('is-fading'), 450);
+                    setTimeout(() => curtain.remove(), 660);
+                    return;
+                } catch (_) {}
             }
 
-            // Sincronizar color de barra de estado/navegación en APK Android
-            try {
-                window.AndroidWidgetBridge?.setSystemBarsTheme?.(isDark);
-            } catch (_) {}
-
-            this.updateThemeUI(effectiveTheme, !Storage.getTheme());
-            this.setupBottomActionButton();
-            const calModal = document.getElementById('calendar-modal');
-            if (calModal && !calModal.classList.contains('hidden') && window.CalendarModule?.render) {
-                window.CalendarModule.render();
-            }
-            window.BackgroundsModule?.applyBackground?.();
+            applyCoreDom();
         }
 
         setTheme(themeMode) {
             const Storage = window.StorageModule;
             window.HapticsModule?.light();
 
-            const isSpecialLocked = this.isSpecialThemeActive();
-            const isBgLocked = !isSpecialLocked && this.isDarkOnlyBackgroundActive();
-
-            if (isSpecialLocked || isBgLocked) {
-                if (themeMode === 'light') {
-                    window.HapticsModule?.warning?.();
-                    this.showToast(
-                        isSpecialLocked
-                            ? '⚠️ El Modo Claro no está disponible con este tema especial activo. Desactívalo en Bóveda para volver al modo claro.'
-                            : '⚠️ El Modo Claro no está disponible con este fondo temático activo. Elige otro fondo para volver al modo claro.',
-                        'warning'
-                    );
-                    return;
-                }
-            }
-
             if (themeMode === 'auto') {
                 Storage.setTheme(null);
                 const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const effectiveMode = this.isDarkModeForced() ? 'dark' : (systemPrefersDark ? 'dark' : 'light');
-                this.applyTheme(effectiveMode, false);
-                this.showToast(
-                    this.isDarkModeForced()
-                        ? '🌙 Modo Oscuro mantenido porque los fondos temáticos solo funcionan en modo oscuro.'
-                        : 'Tema ajustado automáticamente según tu sistema.',
-                    'info'
-                );
+                const effectiveMode = systemPrefersDark ? 'dark' : 'light';
+                this.applyTheme(effectiveMode, false, { animate: true });
+                this.showToast('Tema ajustado automáticamente según tu sistema.', 'info');
             } else {
-                this.applyTheme(themeMode, true);
+                this.applyTheme(themeMode, true, { animate: true });
                 this.showToast(`Modo ${themeMode === 'dark' ? 'Oscuro' : 'Claro'} activado.`, 'success');
             }
         }
 
         toggleTheme() {
-            const isSpecialLocked = this.isSpecialThemeActive();
-            const isBgLocked = !isSpecialLocked && this.isDarkOnlyBackgroundActive();
-            if (isSpecialLocked || isBgLocked) {
-                window.HapticsModule?.warning?.();
-                this.showToast(
-                    isSpecialLocked
-                        ? '⚠️ El Modo Claro está bloqueado mientras este tema especial esté activo.'
-                        : '⚠️ El Modo Claro no está disponible con este fondo temático activo. Elige otro fondo para volver al modo claro.',
-                    'warning'
-                );
-                return;
-            }
             const isCurrentlyDark = document.documentElement.classList.contains('dark');
             const newTheme = isCurrentlyDark ? 'light' : 'dark';
             this.setTheme(newTheme);
@@ -1091,9 +1234,6 @@
 
         updateThemeUI(activeTheme, isAuto = false) {
             const isDark = activeTheme === 'dark';
-            const isSpecialLocked = this.isSpecialThemeActive();
-            const isBgLocked = !isSpecialLocked && this.isDarkOnlyBackgroundActive();
-            const isLockedToDark = isSpecialLocked || isBgLocked;
 
             // Sincronizar iconos de Sol y Luna en Header explícitamente
             const sunIcon = document.getElementById('theme-icon-sun');
@@ -1103,11 +1243,7 @@
 
             const pill = document.getElementById('settings-theme-pill');
             if (pill) {
-                if (isSpecialLocked) {
-                    pill.textContent = '🌙 Modo Oscuro (Bloqueado por Tema Especial)';
-                } else if (isBgLocked) {
-                    pill.textContent = '🌙 Modo Oscuro (Requerido por Fondo Temático)';
-                } else if (isAuto) {
+                if (isAuto) {
                     pill.textContent = `💻 Sistema (${isDark ? 'Oscuro' : 'Claro'})`;
                 } else {
                     pill.textContent = isDark ? '🌙 Modo Oscuro' : '☀️ Modo Claro';
@@ -1119,31 +1255,20 @@
             const autoBtn = document.getElementById('settings-theme-auto');
 
             if (lightBtn) {
-                if (isLockedToDark) {
-                    lightBtn.disabled = true;
-                    lightBtn.classList.add('opacity-40', 'cursor-not-allowed');
-                    lightBtn.title = isSpecialLocked
-                        ? 'Modo Claro bloqueado: los temas clasificados de la bóveda requieren Modo Oscuro.'
-                        : 'Modo Claro bloqueado: los fondos temáticos solo funcionan en Modo Oscuro.';
-                } else {
-                    lightBtn.disabled = false;
-                    lightBtn.classList.remove('opacity-40', 'cursor-not-allowed');
-                    lightBtn.title = 'Activar Modo Claro';
-                }
+                lightBtn.disabled = false;
+                lightBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+                lightBtn.title = 'Activar Modo Claro';
             }
 
             const updateBtn = (btn, isActive) => {
                 if (!btn) return;
                 btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-                btn.classList.toggle('seg-btn-active', isActive);
-                btn.classList.toggle('seg-btn-inactive', !isActive);
-                const disabledCls = (isLockedToDark && btn === lightBtn) ? ' opacity-40 cursor-not-allowed' : '';
-                btn.className = `touch-target-44 min-h-[44px] tap-effect px-3 py-2 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all ${isActive ? 'seg-btn-active' : 'seg-btn-inactive'}${disabledCls}`;
+                btn.className = `touch-target-44 min-h-[44px] tap-effect px-3 py-2 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all ${isActive ? 'seg-btn-active' : 'seg-btn-inactive'}`;
             };
 
-            updateBtn(lightBtn, !isAuto && !isDark && !isLockedToDark);
-            updateBtn(darkBtn, (!isAuto && isDark) || isLockedToDark);
-            updateBtn(autoBtn, isAuto && !isLockedToDark);
+            updateBtn(lightBtn, !isAuto && !isDark);
+            updateBtn(darkBtn, !isAuto && isDark);
+            updateBtn(autoBtn, isAuto);
 
             const modeTrack = document.getElementById('settings-theme-mode-track');
             if (modeTrack) {
@@ -1386,7 +1511,16 @@
             document.querySelectorAll('.settings-accordion-card.open').forEach(c => c.classList.remove('open'));
         }
 
-        switchView(viewName) {
+        switchView(viewName, { fromBack = false } = {}) {
+            if (!fromBack && viewName && viewName !== this.currentView) {
+                if (!Array.isArray(this._viewHistory)) this._viewHistory = ['subjects'];
+                if (viewName === 'subjects') {
+                    this._viewHistory = ['subjects'];
+                } else {
+                    this._viewHistory.push(viewName);
+                    if (this._viewHistory.length > 15) this._viewHistory.shift();
+                }
+            }
             this.currentView = viewName;
             window.HapticsModule?.light();
             window.CardContextMenu?.close?.();
@@ -2265,7 +2399,13 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.6.0') {
+                        if (!Storage?.isTourCompleted?.() && window.TourModule?.start) {
+                            clearTimeout(this._tourTimer);
+                            this._tourTimer = setTimeout(() => {
+                                this._tourTimer = null;
+                                window.TourModule?.start?.();
+                            }, 350);
+                        } else if (lastSeenVersion !== '1.7.0') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this._changelogTimer = null;
@@ -2309,7 +2449,13 @@
                             window.NotificationsModule.requestPermission().catch(() => {});
                         }
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.6.0') {
+                        if (!Storage?.isTourCompleted?.() && window.TourModule?.start) {
+                            clearTimeout(this._tourTimer);
+                            this._tourTimer = setTimeout(() => {
+                                this._tourTimer = null;
+                                window.TourModule?.start?.();
+                            }, 350);
+                        } else if (lastSeenVersion !== '1.7.0') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this._changelogTimer = null;
@@ -2324,7 +2470,6 @@
         }
 
         setupExitModal() {
-            const exitBtn = document.getElementById('app-exit-btn');
             const exitModal = document.getElementById('exit-modal');
             const cancelBtn = document.getElementById('cancel-exit-btn');
             const confirmBtn = document.getElementById('confirm-exit-btn');
@@ -2364,9 +2509,9 @@
                 }, 200);
             };
 
+            this.openExitModal = openExit;
             this.closeExitModal = closeExit;
 
-            if (exitBtn) exitBtn.onclick = openExit;
             if (cancelBtn) cancelBtn.onclick = closeExit;
             if (backdrop) backdrop.onclick = closeExit;
 
@@ -2414,6 +2559,83 @@
             });
         }
 
+        handleNativeBack() {
+            // 1. Tutorial animado abierto
+            if (window.TourModule?.isOpen?.()) {
+                window.TourModule.close();
+                return 'handled';
+            }
+
+            // 2. Cajón lateral abierto
+            const drawer = document.getElementById('sidebar-drawer');
+            if (drawer && !drawer.classList.contains('-translate-x-full')) {
+                this.closeSidebarDrawer?.(true);
+                return 'handled';
+            }
+
+            // 3. Menú contextual o rail lateral abierto
+            if (window.CardContextMenu?.activeMenuEl && !window.CardContextMenu.activeMenuEl.classList.contains('hidden')) {
+                window.CardContextMenu.close();
+                return 'handled';
+            }
+            const railNav = document.getElementById('tablet-rail-nav');
+            if (railNav && !railNav.classList.contains('tablet-rail-collapsed')) {
+                this.closeTabletRailNav?.();
+                return 'handled';
+            }
+
+            // 4. Modales visibles abiertos (incluye #exit-modal: un segundo Atrás cancela el aviso)
+            const openModals = Array.from(document.querySelectorAll('.modal-overlay:not(.hidden)')).filter(m => {
+                const cs = window.getComputedStyle(m);
+                return cs.display !== 'none' && cs.visibility !== 'hidden';
+            });
+            if (openModals.length > 0) {
+                const topModal = openModals[openModals.length - 1];
+                const id = topModal.id;
+                if (id === 'exit-modal') {
+                    this.closeExitModal?.();
+                } else if (id === 'subject-modal') {
+                    window.SubjectsModule?.closeModal?.();
+                } else if (id === 'task-modal') {
+                    window.TasksModule?.closeModal?.();
+                } else if (id === 'note-modal') {
+                    window.NotesModule?.closeModal?.();
+                } else if (id === 'calendar-modal') {
+                    window.CalendarModule?.closeModal?.();
+                } else if (id === 'photo-editor-modal') {
+                    window.PhotoEditorModule?.cancel?.();
+                } else {
+                    const closeBtn = topModal.querySelector('[id^="close-"], [id*="cancel"], #changelog-confirm-btn, #photo-preview-close, #vault-reveal-dismiss-btn');
+                    if (closeBtn) {
+                        closeBtn.click();
+                    } else {
+                        topModal.classList.remove('active');
+                        topModal.classList.add('hidden');
+                        topModal.classList.remove('flex');
+                        document.body.classList.remove('overflow-hidden');
+                    }
+                }
+                return 'handled';
+            }
+
+            // 5. Navegación interna hacia vista anterior o pantalla principal ('subjects')
+            if (this.currentView && this.currentView !== 'subjects') {
+                if (Array.isArray(this._viewHistory) && this._viewHistory.length > 1) {
+                    this._viewHistory.pop();
+                    const prev = this._viewHistory[this._viewHistory.length - 1] || 'subjects';
+                    this.switchView(prev, { fromBack: true });
+                } else {
+                    this._viewHistory = ['subjects'];
+                    this.switchView('subjects', { fromBack: true });
+                }
+                return 'handled';
+            }
+
+            // 6. En la pantalla principal: mostrar aviso de salida en lugar de cerrar directo
+            this.openExitModal?.();
+            return 'handled';
+        }
+
         updateStorageMetrics() {
             const Storage = window.StorageModule;
             const metrics = Storage.getStorageMetrics();
@@ -2447,17 +2669,7 @@
         setupSettingsView() {
             const Storage = window.StorageModule;
 
-            // Helper de auto-cierre inteligente tras interactuar con una sección
-            const autoCloseCard = (el) => {
-                const card = el?.closest ? el.closest('.settings-accordion-card') : (typeof el === 'string' ? document.getElementById(el) : null);
-                if (card) {
-                    setTimeout(() => {
-                        card.classList.remove('open');
-                    }, 400);
-                }
-            };
-
-            // 1. Manejo de Acordeones Colapsables (Bloques concisos y cierre automático de otros)
+            // 1. Manejo de Acordeones Colapsables (un acordeón abierto cierra a los demás, pero interactuar dentro NO lo cierra)
             document.querySelectorAll('.settings-accordion-header').forEach(header => {
                 header.onclick = (e) => {
                     e.preventDefault();
@@ -2497,7 +2709,6 @@
                     this.refreshSettingsProfileUI();
                     window.HapticsModule?.light();
                     this.showToast('Nombre de usuario guardado con éxito.', 'success');
-                    autoCloseCard(saveUserNameBtn);
                 };
             }
 
@@ -2577,7 +2788,6 @@
                     val ? `Periodo actualizado: ${val}` : 'Periodo borrado y ocultado de la cabecera.',
                     val ? 'success' : 'info'
                 );
-                autoCloseCard(saveCustomPeriodBtn || customPeriodInput);
             };
 
             if (saveCustomPeriodBtn) {
@@ -2631,7 +2841,6 @@
                         window.CalendarModule?.render?.();
                         window.WidgetSyncModule?.sync?.();
                         this.showToast(`Ciclo escolar guardado: ${newStart} al ${newEnd}`, 'success');
-                        autoCloseCard(cycleForm);
                     } catch (err) {
                         this.showToast(err.message, 'error');
                     }
@@ -2639,17 +2848,14 @@
             }
 
             // 3. Tema y Modo Oscuro en Configuración
-            document.getElementById('settings-theme-light')?.addEventListener('click', (e) => {
+            document.getElementById('settings-theme-light')?.addEventListener('click', () => {
                 this.setTheme('light');
-                autoCloseCard(e.target);
             });
-            document.getElementById('settings-theme-dark')?.addEventListener('click', (e) => {
+            document.getElementById('settings-theme-dark')?.addEventListener('click', () => {
                 this.setTheme('dark');
-                autoCloseCard(e.target);
             });
-            document.getElementById('settings-theme-auto')?.addEventListener('click', (e) => {
+            document.getElementById('settings-theme-auto')?.addEventListener('click', () => {
                 this.setTheme('auto');
-                autoCloseCard(e.target);
             });
 
             this.updateThemeUI(
@@ -2686,6 +2892,18 @@
             // 5.6 Fondo de Pantalla, Temáticos Experimentales y Mi foto (Etapa 3)
             window.BackgroundsModule?.bindSettingsUI?.();
 
+            // 5.7 Temas de Bóveda desbloqueados en Apariencia
+            this.renderSettingsVaultThemes();
+            if (!this._vaultUnlockedListenerBound) {
+                this._vaultUnlockedListenerBound = true;
+                window.addEventListener('vault-unlocked', () => {
+                    this.renderSettingsVaultThemes?.();
+                    this.syncSettingsFontButtons?.();
+                    this.updateVaultProgressCard?.();
+                    window.BackgroundsModule?.renderSettingsUI?.();
+                });
+            }
+
             // 6. Tipografía Mediante Botones Interactivos (5 Opciones Estándar + Desbloqueables Bóveda)
             this.syncSettingsFontButtons();
             document.querySelectorAll('#settings-font-buttons-grid [data-font-btn]').forEach(btn => {
@@ -2704,7 +2922,12 @@
                         firacode: 'Fira Code (Hacker)',
                         playfair: 'Playfair Display (Imperial)',
                         caveat: 'Caveat (Cuaderno)',
-                        orbitron: 'Orbitron (Cyber HUD)'
+                        orbitron: 'Orbitron (Cyber HUD)',
+                        spacegrotesk: 'Space Grotesk',
+                        fredoka: 'Fredoka',
+                        dancingscript: 'Dancing Script',
+                        pixelify: 'Pixelify Sans',
+                        specialelite: 'Special Elite'
                     };
                     this.showToast(`Tipografía aplicada: ${fontNames[font] || font}`, 'success');
                     // La ventana de tipografías permanece abierta para poder probar varias fuentes seguidas.
@@ -2741,7 +2964,49 @@
                 };
             }
 
-            // 7b. Edición por pulsación larga (botón estándar, sin switches)
+            // 7b. Sonidos de Notificación (App | Sistema | Silencio)
+            const notifSoundTrack = document.getElementById('settings-notif-sound-track');
+            const notifSoundPill = document.getElementById('settings-notif-sound-pill');
+            const syncNotifSoundUI = () => {
+                const mode = Storage.getNotificationSoundMode?.() || 'app';
+                const labels = { app: 'App', system: 'Sistema', silent: 'Silencio' };
+                if (notifSoundPill) notifSoundPill.textContent = labels[mode] || 'App';
+                if (notifSoundTrack) {
+                    notifSoundTrack.querySelectorAll('[data-notif-sound-mode]').forEach(btn => {
+                        const active = btn.dataset.notifSoundMode === mode;
+                        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+                        btn.classList.toggle('seg-btn-active', active);
+                        btn.classList.toggle('seg-btn-inactive', !active);
+                    });
+                    window.SegmentedControl?.syncTrack?.(notifSoundTrack);
+                }
+            };
+            this.syncNotifSoundUI = syncNotifSoundUI;
+            if (notifSoundTrack) {
+                syncNotifSoundUI();
+                notifSoundTrack.querySelectorAll('[data-notif-sound-mode]').forEach(btn => {
+                    btn.onclick = () => {
+                        const mode = btn.dataset.notifSoundMode;
+                        window.NotificationsModule?.setSoundMode?.(mode);
+                        syncNotifSoundUI();
+                        window.HapticsModule?.light?.();
+                        const toastLabels = {
+                            app: 'Tonos integrados de Organizador activados.',
+                            system: 'Se usará el tono predeterminado del sistema.',
+                            silent: 'Notificaciones configuradas en silencio.'
+                        };
+                        this.showToast(toastLabels[mode] || toastLabels.app, 'info');
+                    };
+                });
+            }
+            const notifSoundTestBtn = document.getElementById('settings-notif-sound-test-btn');
+            if (notifSoundTestBtn) {
+                notifSoundTestBtn.onclick = () => {
+                    window.NotificationsModule?.testSound?.();
+                };
+            }
+
+            // 7c. Edición por pulsación larga (botón estándar, sin switches)
             const longPressBtn = document.getElementById('settings-longpress-btn');
             const longPressStatus = document.getElementById('settings-longpress-status');
             const refreshLongPressUi = () => {
@@ -2786,10 +3051,28 @@
                         this.setupBottomActionButton();
                         window.HapticsModule?.light();
                         this.showToast('Atajo del botón central actualizado.', 'success');
-                        autoCloseCard(e.target);
                     }
                 };
             });
+
+            // 8b. Posición del botón Nueva materia (Automático >= 8 | Arriba | Abajo)
+            const placementTrack = document.getElementById('settings-subjects-add-placement-track');
+            if (placementTrack) {
+                window.SubjectsModule?.syncPlacementSettingsUI?.();
+                placementTrack.querySelectorAll('[data-subjects-add-placement]').forEach(btn => {
+                    btn.onclick = () => {
+                        const mode = btn.getAttribute('data-subjects-add-placement') || 'auto';
+                        window.HapticsModule?.light?.();
+                        window.SubjectsModule?.setAddButtonPlacement?.(mode, { animate: true });
+                        const msgs = {
+                            auto: 'Botón «Nueva materia» en modo Automático (abajo a partir de 8).',
+                            top: 'Botón «Nueva materia» fijado siempre arriba.',
+                            bottom: 'Botón «Nueva materia» fijado siempre abajo.'
+                        };
+                        this.showToast(msgs[mode] || msgs.auto, 'success');
+                    };
+                });
+            }
 
             // 9. Depuración Automática de 60 Días para el Baúl
             const archivePurgeToggle = document.getElementById('settings-archive-purge-toggle');
@@ -2801,6 +3084,15 @@
                     window.ArchiveModule?.render?.();
                     window.HapticsModule?.light();
                     this.showToast(enabled ? 'Depuración automática a los 60 días activada.' : 'Depuración desactivada (conservación permanente).', 'info');
+                };
+            }
+
+            // 9. Acordeón: Tutorial / Ver tutorial otra vez
+            const replayTourBtn = document.getElementById('settings-replay-tour-btn');
+            if (replayTourBtn) {
+                replayTourBtn.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    window.TourModule?.start?.({ force: true });
                 };
             }
 
@@ -2858,11 +3150,17 @@
                             Storage.cleanupLegacyKeys?.();
                             this.initFontFamily();
                             this.initGlassIntensity();
+                            window.PerformanceModeModule?.syncProfileUI?.();
+                            window.PerformanceModeModule?.syncUI?.();
                             window.BackgroundsModule?.applyBackground?.();
                             window.BackgroundsModule?.renderSettingsUI?.();
+                            this.renderSettingsVaultThemes?.();
                             this.refreshSettingsProfileUI();
                             this.syncPeriodUI();
                             this.refreshAll();
+                            window.SubjectsModule?.syncPlacementSettingsUI?.();
+                            this.syncNotifSoundUI?.();
+                            window.NotificationsModule?.setSoundMode?.(Storage.getNotificationSoundMode?.() || 'app');
                             window.NotificationsModule?.resyncAllScheduled?.();
                             window.WidgetSyncModule?.sync?.();
                             this.showToast('Respaldo restaurado con éxito.', 'success');
@@ -2931,7 +3229,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.6.0');
+                window.StorageModule.setLastSeenVersion('1.7.0');
                 this.initApkDownloadBanner?.();
             };
 
@@ -2973,11 +3271,14 @@
             const Storage = window.StorageModule;
             const completedCount = Storage.getCompletedTasksCount ? Storage.getCompletedTasksCount() : 0;
             const unlockedCodes = Storage.getUnlockedCodes ? Storage.getUnlockedCodes() : [];
-            const AUTO_UNLOCK_POOL = [
-                'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
-                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'READABLE',
-                'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON'
-            ];
+            const AUTO_UNLOCK_POOL = Array.isArray(Storage.AUTO_UNLOCK_POOL)
+                ? Storage.AUTO_UNLOCK_POOL
+                : [
+                    'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
+                    'COFFEE42', 'ARCADE90', 'STUDYMAX', 'READABLE',
+                    'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON',
+                    'GROTESK', 'FREDOKA', 'SCRIPTY', 'PIXEL88', 'TYPEWRIT'
+                ];
             const unlockedFromPool = AUTO_UNLOCK_POOL.filter(id => unlockedCodes.includes(id)).length;
 
             if (tasksCountBadge) {
@@ -3184,6 +3485,8 @@
 
                     this.openVaultRevealModal(codeDef);
                     this.renderVaultInventory();
+                    this.renderSettingsVaultThemes?.();
+                    window.dispatchEvent(new CustomEvent('vault-unlocked', { detail: { codeId: codeDef.id } }));
                     // Diferir actualizaciones secundarias fuera de la vista para mantener 60 FPS en el desbloqueo
                     setTimeout(() => {
                         window.BackgroundsModule?.renderSettingsUI?.();
@@ -3268,34 +3571,8 @@
                             this.showToast(`✨ ¡${codeDef.name} aplicada con éxito!`, 'success');
                             this.syncSettingsFontButtons?.();
                         } else if (codeDef.themeId) {
-                            const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
-                            if (isCurrentlyActive) {
-                                window.StorageModule.setActiveSpecialTheme('default');
-                                specialClasses.forEach(c => document.documentElement.classList.remove(c));
-                                const savedTheme = window.StorageModule.getTheme() || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                                this.applyTheme(savedTheme, false);
-                                this.showToast('Modo estándar restaurado', 'info');
-                            } else {
-                                window.StorageModule.setActiveSpecialTheme(codeDef.themeId);
-                                specialClasses.forEach(c => document.documentElement.classList.remove(c));
-                                if (codeDef.themeClass) {
-                                    document.documentElement.classList.add(codeDef.themeClass);
-                                }
-                                if (codeDef.themeId !== 'gray') {
-                                    document.documentElement.classList.add('dark');
-                                    window.StorageModule.setTheme('dark');
-                                    this.updateThemeUI('dark', false);
-                                }
-                                this.showToast(`✨ ¡${codeDef.name} activado con éxito!`, 'success');
-                            }
-                            window.BackgroundsModule?.onSpecialThemeChanged?.(isCurrentlyActive ? 'default' : codeDef.themeId);
+                            this.toggleVaultTheme(codeDef.themeId, { forceActivate: !isCurrentlyActive, toastName: codeDef.name });
                         }
-                        if (codeDef.supportsRockets) {
-                            window.StorageModule.setApolloRocketsEnabled(!isCurrentlyActive);
-                        } else if (codeDef.themeId) {
-                            window.StorageModule.setApolloRocketsEnabled(false);
-                        }
-                        this.updateApolloRockets();
                         closeModal();
                         this.renderVaultInventory();
                     };
@@ -3468,43 +3745,97 @@
 
                     if (!def.themeId) return;
 
-                    const isCurrentlyActive = (window.StorageModule.getActiveSpecialTheme() === def.themeId);
                     window.HapticsModule?.light?.();
-
-                    const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
-
-                    if (isCurrentlyActive) {
-                        // Deactivate
-                        window.StorageModule.setActiveSpecialTheme('default');
-                        specialClasses.forEach(c => document.documentElement.classList.remove(c));
-                        if (def.supportsRockets) {
-                            window.StorageModule.setApolloRocketsEnabled(false);
-                        }
-                        this.updateApolloRockets();
-                        const savedTheme = window.StorageModule.getTheme() || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                        this.applyTheme(savedTheme, false);
-                        this.showToast(`Modo estándar restaurado`, 'info');
-                    } else {
-                        // Activate
-                        window.StorageModule.setActiveSpecialTheme(def.themeId);
-                        specialClasses.forEach(c => document.documentElement.classList.remove(c));
-                        if (def.themeClass) {
-                            document.documentElement.classList.add(def.themeClass);
-                        }
-                        if (def.supportsRockets) {
-                            window.StorageModule.setApolloRocketsEnabled(true);
-                        } else {
-                            window.StorageModule.setApolloRocketsEnabled(false);
-                        }
-                        this.updateApolloRockets();
-                        document.documentElement.classList.add('dark');
-                        window.StorageModule.setTheme('dark');
-                        this.updateThemeUI('dark', false);
-                        this.showToast(`✨ ${def.name} activado`, 'success');
-                    }
-                    window.BackgroundsModule?.onSpecialThemeChanged?.(isCurrentlyActive ? 'default' : def.themeId);
-                    this.renderVaultInventory();
+                    this.toggleVaultTheme(def.themeId, { toastName: def.name });
                 };
+            });
+        }
+
+        toggleVaultTheme(themeId, opts = {}) {
+            const Storage = window.StorageModule;
+            if (!Storage || !themeId) return;
+            const specialClasses = ['theme-apollo', 'theme-eduardo-gold', 'theme-penguin', 'theme-synthwave', 'theme-matrix', 'theme-sakura', 'theme-coffee', 'theme-arcade', 'theme-hyperfocus', 'theme-starlight', 'theme-gray'];
+            const current = Storage.getActiveSpecialTheme?.() || 'default';
+            const def = Object.values(VAULT_CATALOG).find(c => c && c.themeId === themeId);
+            const isCurrentlyActive = current === themeId;
+            const shouldActivate = typeof opts.forceActivate === 'boolean' ? opts.forceActivate : !isCurrentlyActive;
+
+            specialClasses.forEach(c => {
+                if (c === 'theme-gray' && Storage.getGrayModeEnabled?.()) return;
+                document.documentElement.classList.remove(c);
+            });
+
+            if (!shouldActivate) {
+                Storage.setActiveSpecialTheme('default');
+                Storage.setApolloRocketsEnabled?.(false);
+                this.showToast('Modo estándar restaurado', 'info');
+            } else {
+                Storage.setActiveSpecialTheme(themeId);
+                if (def?.themeClass) {
+                    document.documentElement.classList.add(def.themeClass);
+                }
+                Storage.setApolloRocketsEnabled?.(Boolean(def?.supportsRockets));
+                const label = opts.toastName || def?.name || themeId;
+                this.showToast(`✨ ${label} activado`, 'success');
+            }
+
+            if (Storage.getGrayModeEnabled?.()) {
+                document.documentElement.classList.add('theme-gray');
+            }
+
+            const currentMode = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            this.updateApolloRockets();
+            this.updateThemeUI(currentMode, !Storage.getTheme?.());
+            window.BackgroundsModule?.onSpecialThemeChanged?.(shouldActivate ? themeId : 'default');
+            this.renderSettingsVaultThemes();
+            this.renderVaultInventory();
+        }
+
+        renderSettingsVaultThemes() {
+            const section = document.getElementById('settings-vault-themes-section');
+            const Storage = window.StorageModule;
+            if (!section || !Storage) return;
+
+            const unlockedThemes = Object.values(VAULT_CATALOG).filter(def =>
+                def && def.themeId && def.themeClass && Storage.isCodeUnlocked?.(def.id)
+            );
+
+            if (unlockedThemes.length === 0) {
+                section.innerHTML = '';
+                section.classList.add('hidden');
+                return;
+            }
+
+            const activeTheme = Storage.getActiveSpecialTheme?.() || 'default';
+            section.classList.remove('hidden');
+            section.innerHTML = `
+                <div class="flex items-center justify-between gap-2 flex-wrap min-w-0">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        Temas desbloqueados (${unlockedThemes.length})
+                    </label>
+                    <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Compatibles con modo claro y oscuro</span>
+                </div>
+                <div id="settings-vault-themes-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+            `;
+
+            const grid = section.querySelector('#settings-vault-themes-grid');
+            if (!grid) return;
+
+            unlockedThemes.forEach(def => {
+                const isActive = activeTheme === def.themeId;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.setAttribute('data-vault-theme-btn', def.themeId);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                btn.className = isActive
+                    ? 'tap-effect touch-target-44 px-3 py-2 rounded-xl border-2 border-indigo-500 bg-indigo-50/85 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-200 text-xs font-bold flex items-center gap-2 text-left transition-all shadow-xs'
+                    : 'tap-effect touch-target-44 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:border-indigo-400 text-xs font-semibold flex items-center gap-2 text-left transition-all';
+                btn.innerHTML = `<span class="text-base leading-none shrink-0">${def.icon || '✨'}</span><span class="truncate">${def.name}</span>`;
+                btn.onclick = () => {
+                    window.HapticsModule?.light?.();
+                    this.toggleVaultTheme(def.themeId, { toastName: def.name });
+                };
+                grid.appendChild(btn);
             });
         }
 
@@ -3557,11 +3888,6 @@
                     if (found && found.themeClass) {
                         document.documentElement.classList.add(found.themeClass);
                     }
-                    if (current !== 'gray' && current !== 'theme-gray') {
-                        document.documentElement.classList.add('dark');
-                        Storage.setTheme('dark');
-                        this.updateThemeUI('dark', false);
-                    }
                 }
             }
             if (Storage?.getGrayModeEnabled?.()) {
@@ -3569,6 +3895,7 @@
                 document.body?.classList.add('theme-gray');
             }
             this.updateApolloRockets();
+            this.renderSettingsVaultThemes();
         }
 
         showToast(message, type = 'info') {

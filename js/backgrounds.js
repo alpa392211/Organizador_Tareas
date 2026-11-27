@@ -99,7 +99,8 @@
             name: 'Terminal Matrix',
             icon: '🟢',
             thumbBg: 'linear-gradient(135deg, #022c22 0%, #065f46 55%, #020804 100%)',
-            gradient: 'radial-gradient(52vw 44vh at 20% 18%, rgba(16, 185, 129, 0.28) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 80%, rgba(5, 150, 105, 0.24) 0%, transparent 74%), linear-gradient(160deg, #020c06 0%, #020804 60%, #010402 100%)'
+            gradient: 'radial-gradient(52vw 44vh at 20% 18%, rgba(16, 185, 129, 0.28) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 80%, rgba(5, 150, 105, 0.24) 0%, transparent 74%), linear-gradient(160deg, #020c06 0%, #020804 60%, #010402 100%)',
+            lightGradient: 'radial-gradient(52vw 44vh at 20% 18%, rgba(16, 185, 129, 0.22) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 80%, rgba(5, 150, 105, 0.18) 0%, transparent 74%), linear-gradient(160deg, #ecfdf5 0%, #f0fdf4 55%, #d1fae5 100%)'
         },
         {
             id: 'theme_sakura',
@@ -108,7 +109,8 @@
             name: 'Jardín Sakura',
             icon: '🌸',
             thumbBg: 'linear-gradient(135deg, #881337 0%, #f43f5e 52%, #2e1065 100%)',
-            gradient: 'radial-gradient(52vw 44vh at 18% 16%, rgba(244, 63, 94, 0.34) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(251, 113, 133, 0.28) 0%, transparent 74%), radial-gradient(50vw 40vh at 50% 90%, rgba(167, 139, 250, 0.22) 0%, transparent 76%), linear-gradient(160deg, #28101a 0%, #16080e 60%, #0a0306 100%)'
+            gradient: 'radial-gradient(52vw 44vh at 18% 16%, rgba(244, 63, 94, 0.34) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(251, 113, 133, 0.28) 0%, transparent 74%), radial-gradient(50vw 40vh at 50% 90%, rgba(167, 139, 250, 0.22) 0%, transparent 76%), linear-gradient(160deg, #28101a 0%, #16080e 60%, #0a0306 100%)',
+            lightGradient: 'radial-gradient(52vw 44vh at 18% 16%, rgba(244, 63, 94, 0.22) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(251, 113, 133, 0.20) 0%, transparent 74%), radial-gradient(50vw 40vh at 50% 90%, rgba(196, 181, 253, 0.22) 0%, transparent 76%), linear-gradient(160deg, #fff1f2 0%, #ffe4e6 55%, #fdf2f8 100%)'
         },
         {
             id: 'theme_synthwave',
@@ -117,7 +119,8 @@
             name: 'Synthwave 1984',
             icon: '🌆',
             thumbBg: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 52%, #06b6d4 100%)',
-            gradient: 'radial-gradient(52vw 44vh at 50% 24%, rgba(236, 72, 153, 0.34) 0%, transparent 72%), radial-gradient(48vw 40vh at 82% 82%, rgba(6, 182, 212, 0.24) 0%, transparent 74%), linear-gradient(170deg, #260a38 0%, #140520 55%, #07010d 100%)'
+            gradient: 'radial-gradient(52vw 44vh at 50% 24%, rgba(236, 72, 153, 0.34) 0%, transparent 72%), radial-gradient(48vw 40vh at 82% 82%, rgba(6, 182, 212, 0.24) 0%, transparent 74%), linear-gradient(170deg, #260a38 0%, #140520 55%, #07010d 100%)',
+            lightGradient: 'radial-gradient(52vw 44vh at 50% 24%, rgba(236, 72, 153, 0.22) 0%, transparent 72%), radial-gradient(48vw 40vh at 82% 82%, rgba(6, 182, 212, 0.22) 0%, transparent 74%), linear-gradient(170deg, #fdf4ff 0%, #fae8ff 55%, #e0f2fe 100%)'
         },
         {
             id: 'theme_starlight',
@@ -126,7 +129,8 @@
             name: 'Starlight Tribute',
             icon: '✨',
             thumbBg: 'linear-gradient(135deg, #db2777 0%, #9333ea 52%, #1e1b4b 100%)',
-            gradient: 'radial-gradient(52vw 44vh at 18% 18%, rgba(236, 72, 153, 0.32) 0%, transparent 72%), radial-gradient(48vw 38vh at 82% 24%, rgba(168, 85, 247, 0.32) 0%, transparent 74%), linear-gradient(160deg, #1f0c2e 0%, #0e0519 60%, #05020b 100%)'
+            gradient: 'radial-gradient(52vw 44vh at 18% 18%, rgba(236, 72, 153, 0.32) 0%, transparent 72%), radial-gradient(48vw 38vh at 82% 24%, rgba(168, 85, 247, 0.32) 0%, transparent 74%), linear-gradient(160deg, #1f0c2e 0%, #0e0519 60%, #05020b 100%)',
+            lightGradient: 'radial-gradient(52vw 44vh at 18% 18%, rgba(236, 72, 153, 0.22) 0%, transparent 72%), radial-gradient(48vw 38vh at 82% 24%, rgba(168, 85, 247, 0.22) 0%, transparent 74%), linear-gradient(160deg, #fdf2f8 0%, #f5f3ff 55%, #fce7f3 100%)'
         },
         {
             id: 'theme_arcade',
@@ -135,7 +139,8 @@
             name: 'Arcade 8-Bit',
             icon: '👾',
             thumbBg: 'linear-gradient(135deg, #eab308 0%, #8b5cf6 52%, #ef4444 100%)',
-            gradient: 'radial-gradient(50vw 42vh at 18% 16%, rgba(234, 179, 8, 0.28) 0%, transparent 72%), radial-gradient(46vw 38vh at 82% 26%, rgba(139, 92, 246, 0.30) 0%, transparent 74%), radial-gradient(48vw 40vh at 50% 90%, rgba(239, 68, 68, 0.22) 0%, transparent 76%), linear-gradient(160deg, #181129 0%, #0c0817 60%, #040209 100%)'
+            gradient: 'radial-gradient(50vw 42vh at 18% 16%, rgba(234, 179, 8, 0.28) 0%, transparent 72%), radial-gradient(46vw 38vh at 82% 26%, rgba(139, 92, 246, 0.30) 0%, transparent 74%), radial-gradient(48vw 40vh at 50% 90%, rgba(239, 68, 68, 0.22) 0%, transparent 76%), linear-gradient(160deg, #181129 0%, #0c0817 60%, #040209 100%)',
+            lightGradient: 'radial-gradient(50vw 42vh at 18% 16%, rgba(234, 179, 8, 0.22) 0%, transparent 72%), radial-gradient(46vw 38vh at 82% 26%, rgba(139, 92, 246, 0.20) 0%, transparent 74%), radial-gradient(48vw 40vh at 50% 90%, rgba(239, 68, 68, 0.14) 0%, transparent 76%), linear-gradient(160deg, #f5f3ff 0%, #fefce8 55%, #ede9fe 100%)'
         },
         {
             id: 'theme_coffee',
@@ -144,7 +149,8 @@
             name: 'Dark Roast',
             icon: '☕',
             thumbBg: 'linear-gradient(135deg, #d97706 0%, #78350f 55%, #1c0f07 100%)',
-            gradient: 'radial-gradient(52vw 42vh at 20% 18%, rgba(217, 119, 6, 0.28) 0%, transparent 72%), radial-gradient(46vw 38vh at 82% 26%, rgba(180, 83, 9, 0.24) 0%, transparent 74%), linear-gradient(160deg, #26150b 0%, #150b06 60%, #090402 100%)'
+            gradient: 'radial-gradient(52vw 42vh at 20% 18%, rgba(217, 119, 6, 0.28) 0%, transparent 72%), radial-gradient(46vw 38vh at 82% 26%, rgba(180, 83, 9, 0.24) 0%, transparent 74%), linear-gradient(160deg, #26150b 0%, #150b06 60%, #090402 100%)',
+            lightGradient: 'radial-gradient(52vw 42vh at 20% 18%, rgba(217, 119, 6, 0.22) 0%, transparent 72%), radial-gradient(46vw 38vh at 82% 26%, rgba(180, 83, 9, 0.16) 0%, transparent 74%), linear-gradient(160deg, #fffbeb 0%, #fef3c7 55%, #f5e6d3 100%)'
         },
         {
             id: 'theme_apollo',
@@ -153,7 +159,8 @@
             name: 'Apollo 11',
             icon: '🚀',
             thumbBg: 'linear-gradient(135deg, #4f46e5 0%, #f97316 55%, #020617 100%)',
-            gradient: 'radial-gradient(52vw 42vh at 16% 16%, rgba(99, 102, 241, 0.36) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(249, 115, 22, 0.26) 0%, transparent 74%), linear-gradient(160deg, #0d122d 0%, #060916 60%, #020308 100%)'
+            gradient: 'radial-gradient(52vw 42vh at 16% 16%, rgba(99, 102, 241, 0.36) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(249, 115, 22, 0.26) 0%, transparent 74%), linear-gradient(160deg, #0d122d 0%, #060916 60%, #020308 100%)',
+            lightGradient: 'radial-gradient(52vw 42vh at 16% 16%, rgba(99, 102, 241, 0.24) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(249, 115, 22, 0.18) 0%, transparent 74%), linear-gradient(160deg, #eef2ff 0%, #e0e7ff 55%, #fff7ed 100%)'
         },
         {
             id: 'theme_eduardo-gold',
@@ -162,7 +169,8 @@
             name: 'Maestro Dorado',
             icon: '👑',
             thumbBg: 'linear-gradient(135deg, #fbbf24 0%, #b45309 55%, #1c1406 100%)',
-            gradient: 'radial-gradient(52vw 42vh at 18% 14%, rgba(245, 158, 11, 0.32) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(234, 179, 8, 0.24) 0%, transparent 74%), linear-gradient(160deg, #241908 0%, #130d04 60%, #080501 100%)'
+            gradient: 'radial-gradient(52vw 42vh at 18% 14%, rgba(245, 158, 11, 0.32) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(234, 179, 8, 0.24) 0%, transparent 74%), linear-gradient(160deg, #241908 0%, #130d04 60%, #080501 100%)',
+            lightGradient: 'radial-gradient(52vw 42vh at 18% 14%, rgba(245, 158, 11, 0.24) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 26%, rgba(234, 179, 8, 0.20) 0%, transparent 74%), linear-gradient(160deg, #fffdf0 0%, #fef9c3 55%, #fde68a 100%)'
         },
         {
             id: 'theme_penguin',
@@ -171,7 +179,8 @@
             name: 'Glacial Polar',
             icon: '🐧',
             thumbBg: 'linear-gradient(135deg, #06b6d4 0%, #38bdf8 55%, #082f49 100%)',
-            gradient: 'radial-gradient(52vw 42vh at 18% 16%, rgba(6, 182, 212, 0.32) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 24%, rgba(56, 189, 248, 0.28) 0%, transparent 74%), linear-gradient(160deg, #082032 0%, #030e19 60%, #01060b 100%)'
+            gradient: 'radial-gradient(52vw 42vh at 18% 16%, rgba(6, 182, 212, 0.32) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 24%, rgba(56, 189, 248, 0.28) 0%, transparent 74%), linear-gradient(160deg, #082032 0%, #030e19 60%, #01060b 100%)',
+            lightGradient: 'radial-gradient(52vw 42vh at 18% 16%, rgba(6, 182, 212, 0.22) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 24%, rgba(56, 189, 248, 0.20) 0%, transparent 74%), linear-gradient(160deg, #ecfeff 0%, #e0f2fe 55%, #cffafe 100%)'
         },
         {
             id: 'theme_hyperfocus',
@@ -180,12 +189,16 @@
             name: 'Hiperenfoque',
             icon: '⚡',
             thumbBg: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 55%, #040c17 100%)',
-            gradient: 'radial-gradient(52vw 42vh at 18% 16%, rgba(59, 130, 246, 0.32) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 24%, rgba(6, 182, 212, 0.22) 0%, transparent 74%), linear-gradient(160deg, #0a1a2e 0%, #040c17 60%, #010408 100%)'
+            gradient: 'radial-gradient(52vw 42vh at 18% 16%, rgba(59, 130, 246, 0.32) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 24%, rgba(6, 182, 212, 0.22) 0%, transparent 74%), linear-gradient(160deg, #0a1a2e 0%, #040c17 60%, #010408 100%)',
+            lightGradient: 'radial-gradient(52vw 42vh at 18% 16%, rgba(59, 130, 246, 0.22) 0%, transparent 72%), radial-gradient(46vw 38vh at 84% 24%, rgba(14, 165, 233, 0.18) 0%, transparent 74%), linear-gradient(160deg, #eff6ff 0%, #dbeafe 55%, #e0f2fe 100%)'
         }
     ];
 
-    const FPS_CAP = 30;
-    const FRAME_INTERVAL_MS = 1000 / FPS_CAP;
+    const BG_QUALITY_CONFIG = {
+        low:    { fps: 18, particlesMob: 0,  particlesDesk: 0,  cssOnly: true },
+        medium: { fps: 30, particlesMob: 14, particlesDesk: 18, cssOnly: false },
+        high:   { fps: 60, particlesMob: 36, particlesDesk: 48, cssOnly: false }
+    };
     const SLOW_FRAME_THRESHOLD_MS = 50;
     const SLOW_FRAMES_LIMIT = 4;
 
@@ -210,6 +223,10 @@
             this._missingPhotoNotified = false;
             this._forceFailIdbForTest = false;
             this._particles = [];
+            this._blurCache = new Map();
+            this._blurDebounceTimer = null;
+            this._blurRafId = null;
+            this._blurRenderSeq = 0;
 
             this._boundVisibilityHandler = () => this._onVisibilityChange();
             this._boundResizeHandler = () => this._onResize();
@@ -464,6 +481,7 @@
                 croppedHeight: payload.croppedHeight || dims.height,
                 avgLuminance
             });
+            this._blurCache?.clear?.();
 
             if (Storage) {
                 if (resolvedFocal) {
@@ -597,13 +615,11 @@
         }
 
         isDarkOnlyPreset(id) {
-            return THEMATIC_PRESETS.some(p => p.id === id);
+            return false;
         }
 
         isDarkOnlyBackgroundActive() {
-            const Storage = window.StorageModule;
-            if (!Storage || this.isMonochromeActive()) return false;
-            return this.isDarkOnlyPreset(this.resolveEffectiveBackgroundId());
+            return false;
         }
 
         _syncAppThemeUI() {
@@ -615,52 +631,18 @@
             }
         }
 
-        _ensureDarkModeForThematic({ showToast = false } = {}) {
-            if (this._forcingDarkTheme) return false;
-            const Storage = window.StorageModule;
-            const wasDark = document.documentElement.classList.contains('dark');
-            if (wasDark) {
-                if (Storage && Storage.getTheme?.() !== 'dark') {
-                    Storage.setTheme('dark');
-                    this._syncAppThemeUI();
-                }
-                return false;
-            }
-            this._forcingDarkTheme = true;
-            try {
-                if (window.OrganizadorApp?.applyTheme) {
-                    window.OrganizadorApp.applyTheme('dark', true);
-                } else {
-                    document.documentElement.classList.add('dark');
-                    Storage?.setTheme?.('dark');
-                }
-                if (showToast) {
-                    window.OrganizadorApp?.showToast?.('🌙 Modo oscuro activado automáticamente para usar este fondo.', 'info');
-                }
-            } finally {
-                this._forcingDarkTheme = false;
-            }
-            return true;
+        _ensureDarkModeForThematic() {
+            return false;
         }
 
-        selectPreset(presetId, { silentThemeToast = false } = {}) {
+        selectPreset(presetId) {
             const Storage = window.StorageModule;
             if (!Storage || !presetId) return;
             window.HapticsModule?.light?.();
 
-            const wasDark = document.documentElement.classList.contains('dark');
             Storage.setBackgroundPreset(presetId);
-
-            const effectiveId = this.resolveEffectiveBackgroundId();
-            const isDarkOnly = !this.isMonochromeActive() && this.isDarkOnlyPreset(effectiveId);
-
-            if (isDarkOnly && !wasDark) {
-                this._ensureDarkModeForThematic({ showToast: !silentThemeToast });
-            } else {
-                this.applyBackground();
-                this._syncAppThemeUI();
-            }
-
+            this.applyBackground();
+            this._syncAppThemeUI();
             this.renderSettingsUI();
         }
 
@@ -785,9 +767,22 @@
             this._initParticles(w, h);
         }
 
+        _getQualityConfig() {
+            const Storage = window.StorageModule;
+            const reduced = Boolean(Storage?.getReducedEffects?.() || document.documentElement.getAttribute('data-reduced-effects') === 'true');
+            let q = Storage?.getBackgroundQuality?.() || 'medium';
+            if (reduced && q === 'high') q = 'low';
+            return { key: q, ...(BG_QUALITY_CONFIG[q] || BG_QUALITY_CONFIG.medium) };
+        }
+
+        _hasOpenBlockingModal() {
+            return Boolean(document.querySelector('.modal-overlay.active:not(.hidden)'));
+        }
+
         _initParticles(w, h) {
             this._particles = [];
-            const count = w < 640 ? 28 : 44;
+            const qCfg = this._getQualityConfig();
+            const count = w < 640 ? qCfg.particlesMob : qCfg.particlesDesk;
             for (let i = 0; i < count; i++) {
                 this._particles.push({
                     x: ((i * 73) % 100) / 100 * w,
@@ -815,9 +810,9 @@
             }
 
             const cores = typeof navigator !== 'undefined' ? Number(navigator.hardwareConcurrency) : 0;
-            if (cores > 0 && cores <= 2) {
+            if (cores > 0 && cores <= 2 && this._getQualityConfig().key !== 'low') {
                 this.isDegraded = true;
-                return { ok: false, reason: 'Dispositivo con pocos recursos (<= 2 núcleos): fondo degradado a modo estático para mantener fluidez.' };
+                return { ok: false, reason: 'Dispositivo con pocos recursos (<= 2 núcleos): cambia a Calidad Baja o modo estático.' };
             }
 
             if (this.isDegraded) {
@@ -832,7 +827,7 @@
                 cancelAnimationFrame(this._rafId);
                 this._rafId = null;
             }
-            document.documentElement.classList.remove('animated-bg-running');
+            document.documentElement.classList.remove('animated-bg-running', 'bg-low-motion');
         }
 
         _onVisibilityChange() {
@@ -866,23 +861,30 @@
                 }
             }
 
-            if (!can.ok || document.hidden || resolvedId === 'custom_photo') {
+            if (!can.ok || document.hidden || resolvedId === 'custom_photo' || this._hasOpenBlockingModal()) {
                 return;
             }
 
+            const qCfg = this._getQualityConfig();
+            if (qCfg.cssOnly) {
+                document.documentElement.classList.add('animated-bg-running', 'bg-low-motion');
+                return;
+            }
+
+            const frameIntervalMs = 1000 / Math.max(12, qCfg.fps || 30);
             document.documentElement.classList.add('animated-bg-running');
             this._lastFrameTime = performance.now();
             this._slowFramesCount = 0;
 
             const loop = (now) => {
-                if (!this._canAnimateNow().ok || document.hidden) {
+                if (!this._canAnimateNow().ok || document.hidden || this._hasOpenBlockingModal() || this._getQualityConfig().cssOnly) {
                     this._stopAnimationLoop();
                     return;
                 }
                 const elapsed = now - this._lastFrameTime;
-                if (elapsed >= FRAME_INTERVAL_MS - 1) {
+                if (elapsed >= frameIntervalMs - 1) {
                     const drawStart = performance.now();
-                    this._lastFrameTime = now - (elapsed % FRAME_INTERVAL_MS);
+                    this._lastFrameTime = now - (elapsed % frameIntervalMs);
                     this._phase += Math.min(0.08, (elapsed / 1000) * 0.9);
                     this._drawFrame(resolvedId, this._phase);
                     const drawCost = performance.now() - drawStart;
@@ -910,6 +912,7 @@
             const w = window.innerWidth || 390;
             const h = window.innerHeight || 844;
             const ctx = this.ctx;
+            const isDark = document.documentElement.classList.contains('dark');
             ctx.clearRect(0, 0, w, h);
 
             if (resolvedId === 'theme_matrix') {
@@ -917,7 +920,9 @@
                 ctx.font = '600 13px "Fira Code", monospace';
                 this._particles.forEach((p, idx) => {
                     const y = (p.y + phase * 42 * p.speed) % (h + 40) - 20;
-                    ctx.fillStyle = idx % 3 === 0 ? 'rgba(110, 231, 183, 0.28)' : 'rgba(16, 185, 129, 0.16)';
+                    ctx.fillStyle = isDark
+                        ? (idx % 3 === 0 ? 'rgba(110, 231, 183, 0.28)' : 'rgba(16, 185, 129, 0.16)')
+                        : (idx % 3 === 0 ? 'rgba(5, 150, 105, 0.24)' : 'rgba(4, 120, 87, 0.16)');
                     const ch = chars[(p.charIdx + Math.floor(phase * 2)) % chars.length];
                     ctx.fillText(ch, p.x % w, y);
                 });
@@ -931,7 +936,9 @@
                     ctx.save();
                     ctx.translate(x, y);
                     ctx.rotate(phase * 0.6 + idx * 0.4);
-                    ctx.fillStyle = idx % 2 === 0 ? 'rgba(251, 113, 133, 0.30)' : 'rgba(254, 205, 211, 0.22)';
+                    ctx.fillStyle = isDark
+                        ? (idx % 2 === 0 ? 'rgba(251, 113, 133, 0.30)' : 'rgba(254, 205, 211, 0.22)')
+                        : (idx % 2 === 0 ? 'rgba(225, 29, 72, 0.24)' : 'rgba(244, 63, 94, 0.16)');
                     ctx.beginPath();
                     ctx.ellipse(0, 0, p.r * 2.1, p.r * 1.05, 0, 0, Math.PI * 2);
                     ctx.fill();
@@ -946,15 +953,15 @@
                 const horizon = h * 0.56;
                 const sunR = Math.min(w, h) * 0.16;
                 const sunGrad = ctx.createLinearGradient(cx, horizon - sunR, cx, horizon);
-                sunGrad.addColorStop(0, 'rgba(251, 191, 36, 0.42)');
-                sunGrad.addColorStop(0.55, 'rgba(236, 72, 153, 0.34)');
-                sunGrad.addColorStop(1, 'rgba(139, 92, 246, 0.14)');
+                sunGrad.addColorStop(0, isDark ? 'rgba(251, 191, 36, 0.42)' : 'rgba(245, 158, 11, 0.34)');
+                sunGrad.addColorStop(0.55, isDark ? 'rgba(236, 72, 153, 0.34)' : 'rgba(219, 39, 119, 0.26)');
+                sunGrad.addColorStop(1, isDark ? 'rgba(139, 92, 246, 0.14)' : 'rgba(124, 58, 237, 0.14)');
                 ctx.fillStyle = sunGrad;
                 ctx.beginPath();
                 ctx.arc(cx, horizon - sunR * 0.35, sunR, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.strokeStyle = 'rgba(236, 72, 153, 0.20)';
+                ctx.strokeStyle = isDark ? 'rgba(236, 72, 153, 0.20)' : 'rgba(190, 24, 93, 0.18)';
                 ctx.lineWidth = 1;
                 for (let i = -6; i <= 6; i++) {
                     ctx.beginPath();
@@ -975,16 +982,18 @@
             }
 
             if (resolvedId === 'theme_starlight' || resolvedId === 'theme_apollo') {
-                const accent = resolvedId === 'theme_starlight' ? 'rgba(244, 114, 182,' : 'rgba(165, 180, 252,';
+                const accent = resolvedId === 'theme_starlight'
+                    ? (isDark ? 'rgba(244, 114, 182,' : 'rgba(219, 39, 119,')
+                    : (isDark ? 'rgba(165, 180, 252,' : 'rgba(79, 70, 229,');
                 this._particles.forEach((p, idx) => {
-                    const alpha = 0.18 + 0.24 * (0.5 + 0.5 * Math.sin(phase * 1.8 + idx));
+                    const alpha = (isDark ? 0.18 : 0.14) + 0.22 * (0.5 + 0.5 * Math.sin(phase * 1.8 + idx));
                     ctx.fillStyle = `${accent} ${alpha.toFixed(2)})`;
                     ctx.beginPath();
                     ctx.arc((p.x + phase * p.drift * 8 + w) % w, p.y % h, p.r * 0.75, 0, Math.PI * 2);
                     ctx.fill();
                 });
                 if (resolvedId === 'theme_apollo') {
-                    ctx.strokeStyle = 'rgba(129, 140, 248, 0.16)';
+                    ctx.strokeStyle = isDark ? 'rgba(129, 140, 248, 0.16)' : 'rgba(79, 70, 229, 0.18)';
                     ctx.lineWidth = 1.2;
                     ctx.beginPath();
                     ctx.ellipse(w * 0.5, h * 0.48, w * 0.42, h * 0.22, -0.25, 0, Math.PI * 2);
@@ -997,14 +1006,16 @@
                 this._particles.forEach((p, idx) => {
                     const y = ((p.y - phase * 18 * p.speed) % h + h) % h;
                     const s = Math.round(p.r * 2.2);
-                    ctx.fillStyle = idx % 3 === 0 ? 'rgba(234, 179, 8, 0.24)' : (idx % 3 === 1 ? 'rgba(139, 92, 246, 0.22)' : 'rgba(239, 68, 68, 0.18)');
+                    ctx.fillStyle = isDark
+                        ? (idx % 3 === 0 ? 'rgba(234, 179, 8, 0.24)' : (idx % 3 === 1 ? 'rgba(139, 92, 246, 0.22)' : 'rgba(239, 68, 68, 0.18)'))
+                        : (idx % 3 === 0 ? 'rgba(217, 119, 6, 0.24)' : (idx % 3 === 1 ? 'rgba(109, 40, 217, 0.22)' : 'rgba(220, 38, 38, 0.20)'));
                     ctx.fillRect(Math.round(p.x % w), Math.round(y), s, s);
                 });
                 return;
             }
 
             if (resolvedId === 'theme_hyperfocus') {
-                ctx.strokeStyle = 'rgba(59, 130, 246, 0.12)';
+                ctx.strokeStyle = isDark ? 'rgba(59, 130, 246, 0.12)' : 'rgba(37, 99, 235, 0.13)';
                 ctx.lineWidth = 1;
                 const step = 48;
                 for (let x = 0; x < w; x += step) {
@@ -1018,8 +1029,10 @@
 
             if (resolvedId === 'theme_penguin' || resolvedId === 'theme_coffee' || resolvedId === 'theme_eduardo-gold') {
                 const color = resolvedId === 'theme_penguin'
-                    ? 'rgba(103, 232, 249, 0.22)'
-                    : (resolvedId === 'theme_eduardo-gold' ? 'rgba(251, 191, 36, 0.20)' : 'rgba(217, 119, 6, 0.20)');
+                    ? (isDark ? 'rgba(103, 232, 249, 0.22)' : 'rgba(8, 145, 178, 0.22)')
+                    : (resolvedId === 'theme_eduardo-gold'
+                        ? (isDark ? 'rgba(251, 191, 36, 0.20)' : 'rgba(217, 119, 6, 0.22)')
+                        : (isDark ? 'rgba(217, 119, 6, 0.20)' : 'rgba(180, 83, 9, 0.20)'));
                 this._particles.forEach((p, idx) => {
                     const y = ((p.y - phase * 12 * p.speed) % h + h) % h;
                     const x = (p.x + Math.cos(phase + idx) * 10 + w) % w;
@@ -1033,7 +1046,6 @@
 
             // Presets básicos o monocromáticos animados: orbes suaves flotantes
             const isMono = resolvedId.startsWith('mono_') || this.isMonochromeActive();
-            const isDark = document.documentElement.classList.contains('dark');
             const orbColor = isMono
                 ? (isDark ? 'rgba(226, 232, 240, 0.08)' : 'rgba(100, 116, 139, 0.10)')
                 : (isDark ? 'rgba(129, 140, 248, 0.14)' : 'rgba(99, 102, 241, 0.12)');
@@ -1051,6 +1063,165 @@
             }
         }
 
+        _boxBlurPass(src, dst, w, h, radius) {
+            if (radius < 1) {
+                dst.set(src);
+                return;
+            }
+            const temp = new Uint8ClampedArray(src.length);
+            const div = radius * 2 + 1;
+            // Pasada horizontal
+            for (let y = 0; y < h; y++) {
+                const rowOff = y * w * 4;
+                let r = 0, g = 0, b = 0, a = 0;
+                for (let ix = -radius; ix <= radius; ix++) {
+                    const cx = Math.min(w - 1, Math.max(0, ix));
+                    const p = rowOff + cx * 4;
+                    r += src[p]; g += src[p + 1]; b += src[p + 2]; a += src[p + 3];
+                }
+                for (let x = 0; x < w; x++) {
+                    const p = rowOff + x * 4;
+                    temp[p] = (r / div) | 0;
+                    temp[p + 1] = (g / div) | 0;
+                    temp[p + 2] = (b / div) | 0;
+                    temp[p + 3] = (a / div) | 0;
+                    const xOut = Math.max(0, x - radius);
+                    const xIn = Math.min(w - 1, x + radius + 1);
+                    const pOut = rowOff + xOut * 4;
+                    const pIn = rowOff + xIn * 4;
+                    r += src[pIn] - src[pOut];
+                    g += src[pIn + 1] - src[pOut + 1];
+                    b += src[pIn + 2] - src[pOut + 2];
+                    a += src[pIn + 3] - src[pOut + 3];
+                }
+            }
+            // Pasada vertical
+            for (let x = 0; x < w; x++) {
+                let r = 0, g = 0, b = 0, a = 0;
+                for (let iy = -radius; iy <= radius; iy++) {
+                    const cy = Math.min(h - 1, Math.max(0, iy));
+                    const p = (cy * w + x) * 4;
+                    r += temp[p]; g += temp[p + 1]; b += temp[p + 2]; a += temp[p + 3];
+                }
+                for (let y = 0; y < h; y++) {
+                    const p = (y * w + x) * 4;
+                    dst[p] = (r / div) | 0;
+                    dst[p + 1] = (g / div) | 0;
+                    dst[p + 2] = (b / div) | 0;
+                    dst[p + 3] = (a / div) | 0;
+                    const yOut = Math.max(0, y - radius);
+                    const yIn = Math.min(h - 1, y + radius + 1);
+                    const pOut = (yOut * w + x) * 4;
+                    const pIn = (yIn * w + x) * 4;
+                    r += temp[pIn] - temp[pOut];
+                    g += temp[pIn + 1] - temp[pOut + 1];
+                    b += temp[pIn + 2] - temp[pOut + 2];
+                    a += temp[pIn + 3] - temp[pOut + 3];
+                }
+            }
+        }
+
+        _generateBlurredPhotoUrl(src, blurPx) {
+            if (!src || blurPx <= 0) return Promise.resolve(src);
+            const key = `${src.length}_${src.slice(0, 48)}_${blurPx}`;
+            if (this._blurCache.has(key)) {
+                return Promise.resolve(this._blurCache.get(key));
+            }
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const iw = img.naturalWidth || img.width || 360;
+                        const ih = img.naturalHeight || img.height || 640;
+                        const targetW = Math.min(360, Math.max(120, iw));
+                        const targetH = Math.max(80, Math.round((ih / iw) * targetW));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetW;
+                        canvas.height = targetH;
+                        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                        if (!ctx) { resolve(src); return; }
+                        ctx.drawImage(img, 0, 0, targetW, targetH);
+                        const radius = Math.max(1, Math.min(24, Math.round(blurPx * (targetW / 390) * 1.15)));
+                        const imgData = ctx.getImageData(0, 0, targetW, targetH);
+                        const bufA = new Uint8ClampedArray(imgData.data);
+                        const bufB = new Uint8ClampedArray(bufA.length);
+                        // Dos pasadas de box blur aproximan un desenfoque gaussiano limpio y funcionan sin ctx.filter
+                        this._boxBlurPass(bufA, bufB, targetW, targetH, radius);
+                        this._boxBlurPass(bufB, bufA, targetW, targetH, radius);
+                        imgData.data.set(bufA);
+                        ctx.putImageData(imgData, 0, 0);
+                        const outUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        if (this._blurCache.size >= 24) {
+                            const oldest = this._blurCache.keys().next().value;
+                            this._blurCache.delete(oldest);
+                        }
+                        this._blurCache.set(key, outUrl);
+                        resolve(outUrl);
+                    } catch (_) {
+                        resolve(src);
+                    }
+                };
+                img.onerror = () => resolve(src);
+                img.src = src;
+            });
+        }
+
+        _applyPhotoBlurLive(displayUrl, blurPx, { immediatePreblur = false } = {}) {
+            if (!this.photoEl) return;
+            const blur = Math.min(20, Math.max(0, Math.round(Number(blurPx) || 0)));
+            const reduced = document.documentElement.getAttribute('data-reduced-effects') === 'true';
+
+            this.photoEl.style.setProperty('--bg-photo-blur', `${blur}px`);
+            this.photoEl.dataset.appliedBlur = String(blur);
+            this.photoEl.style.transform = 'none';
+
+            if (blur === 0) {
+                this._blurRenderSeq += 1;
+                clearTimeout(this._blurDebounceTimer);
+                this.photoEl.style.filter = 'none';
+                if (displayUrl) {
+                    this.photoEl.style.backgroundImage = `url("${displayUrl}")`;
+                    this.photoEl.dataset.preblurred = 'false';
+                }
+                return;
+            }
+
+            const cacheKey = displayUrl ? `${displayUrl.length}_${displayUrl.slice(0, 48)}_${blur}` : '';
+            if (cacheKey && this._blurCache.has(cacheKey)) {
+                this.photoEl.style.backgroundImage = `url("${this._blurCache.get(cacheKey)}")`;
+                this.photoEl.style.filter = 'none';
+                this.photoEl.dataset.preblurred = 'true';
+                return;
+            }
+
+            // Vista previa inmediata mientras se genera la versión pre-desenfocada
+            if (!reduced) {
+                this.photoEl.style.filter = `blur(${blur}px)`;
+            } else {
+                this.photoEl.style.filter = 'none';
+            }
+
+            if (!displayUrl) return;
+            const seq = ++this._blurRenderSeq;
+            const runSwap = () => {
+                this._generateBlurredPhotoUrl(displayUrl, blur).then((blurredUrl) => {
+                    if (seq !== this._blurRenderSeq || !this.photoEl || this.photoEl.classList.contains('hidden')) return;
+                    if (blurredUrl && blurredUrl !== displayUrl) {
+                        this.photoEl.style.backgroundImage = `url("${blurredUrl}")`;
+                        this.photoEl.style.filter = 'none';
+                        this.photoEl.dataset.preblurred = 'true';
+                    }
+                }).catch(() => {});
+            };
+
+            clearTimeout(this._blurDebounceTimer);
+            if (immediatePreblur) {
+                runSwap();
+            } else {
+                this._blurDebounceTimer = setTimeout(runSwap, 110);
+            }
+        }
+
         _renderCustomPhotoLayers(record) {
             const Storage = window.StorageModule;
             const focal = Storage?.getBackgroundFocalPoint?.() || { x: 50, y: 50 };
@@ -1063,9 +1234,8 @@
             this.photoEl.style.backgroundSize = 'cover';
             this.photoEl.style.backgroundRepeat = 'no-repeat';
             this.photoEl.style.backgroundPosition = `${focal.x}% ${focal.y}%`;
-            this.photoEl.style.filter = blur > 0 ? `blur(${blur}px)` : 'none';
-            this.photoEl.style.transform = blur > 0 ? 'scale(1.06)' : 'none';
             this.photoEl.classList.remove('hidden');
+            this._applyPhotoBlurLive(displayUrl, blur, { immediatePreblur: true });
 
             if (scrim !== 0) {
                 const alpha = (Math.abs(scrim) / 100).toFixed(2);
@@ -1131,17 +1301,22 @@
 
             const isThemedOrStyled = Boolean((basicMatch && basicMatch.id !== 'default') || monoMatch || thematicMatch);
 
+            const qCfg = this._getQualityConfig();
+            const showCanvas = !qCfg.cssOnly && (Boolean(thematicMatch) || this._canAnimateNow().ok);
             if (thematicMatch) {
-                if (!isDark && this._ensureDarkModeForThematic({ showToast: false })) {
-                    return;
+                this.gradientEl.style.backgroundImage = isDark
+                    ? thematicMatch.gradient
+                    : (thematicMatch.lightGradient || thematicMatch.gradient);
+                if (showCanvas) {
+                    this._resizeCanvas();
+                    this.canvas.classList.remove('hidden');
+                    this._drawFrame(resolvedId, this._phase);
+                } else {
+                    this.canvas.classList.add('hidden');
                 }
-                this.gradientEl.style.backgroundImage = thematicMatch.gradient;
-                this._resizeCanvas();
-                this.canvas.classList.remove('hidden');
-                this._drawFrame(resolvedId, this._phase);
             } else if (monoMatch) {
                 this.gradientEl.style.backgroundImage = isDark ? monoMatch.darkGradient : monoMatch.lightGradient;
-                if (this._canAnimateNow().ok) {
+                if (this._canAnimateNow().ok && !qCfg.cssOnly) {
                     this._resizeCanvas();
                     this.canvas.classList.remove('hidden');
                     this._drawFrame(resolvedId, this._phase);
@@ -1150,7 +1325,7 @@
                 }
             } else if (basicMatch && basicMatch.id !== 'default') {
                 this.gradientEl.style.backgroundImage = isDark ? basicMatch.darkGradient : basicMatch.lightGradient;
-                if (this._canAnimateNow().ok) {
+                if (this._canAnimateNow().ok && !qCfg.cssOnly) {
                     this._resizeCanvas();
                     this.canvas.classList.remove('hidden');
                     this._drawFrame(resolvedId, this._phase);
@@ -1159,7 +1334,7 @@
                 }
             } else {
                 // 'default' -> mantiene el fondo ambiental base CSS de Etapa 1
-                if (this._canAnimateNow().ok) {
+                if (this._canAnimateNow().ok && !qCfg.cssOnly) {
                     this._resizeCanvas();
                     this.canvas.classList.remove('hidden');
                     this._drawFrame('default', this._phase);
@@ -1277,7 +1452,7 @@
                             <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Fondos temáticos de Bóveda</p>
                             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">Experimental</span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2">Solo funcionan en modo oscuro; se activa automáticamente al seleccionarlos.</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2">Disponibles en modo claro y oscuro.</p>
                         <div id="settings-bg-experimental-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">${autoBtn}${manualCards}</div>`;
 
                     expSection.querySelectorAll('[data-bg-preset]').forEach(btn => {
@@ -1352,6 +1527,30 @@
 
             const animToggle = document.getElementById('settings-bg-animate-toggle');
             if (animToggle) animToggle.checked = Storage.getBackgroundAnimated();
+
+            const qCfg = this._getQualityConfig();
+            const qTrack = document.getElementById('settings-bg-quality-track');
+            if (qTrack) {
+                const reduced = Boolean(Storage.getReducedEffects?.() || document.documentElement.getAttribute('data-reduced-effects') === 'true');
+                qTrack.querySelectorAll('[data-bg-quality]').forEach(btn => {
+                    const q = btn.dataset.bgQuality;
+                    const active = q === qCfg.key;
+                    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+                    btn.classList.toggle('seg-btn-active', active);
+                    btn.classList.toggle('seg-btn-inactive', !active);
+                    if (q === 'high') {
+                        btn.disabled = reduced;
+                        btn.classList.toggle('opacity-40', reduced);
+                        btn.classList.toggle('cursor-not-allowed', reduced);
+                    }
+                });
+                window.SegmentedControl?.syncTrack?.(qTrack);
+            }
+            const qPill = document.getElementById('settings-bg-quality-pill');
+            if (qPill) {
+                const qLabels = { low: 'Baja (18 FPS)', medium: 'Media (30 FPS)', high: 'Alta (60 FPS)' };
+                qPill.textContent = qLabels[qCfg.key] || 'Media (30 FPS)';
+            }
 
             const noticeEl = document.getElementById('settings-bg-perf-notice');
             if (noticeEl) {
@@ -1438,11 +1637,13 @@
                     const val = Storage.setBackgroundBlur(Number(e.target.value));
                     const lbl = document.getElementById('settings-bg-blur-val');
                     if (lbl) lbl.textContent = `${val} px`;
-                    if (this.photoEl && !this.photoEl.classList.contains('hidden')) {
-                        this.photoEl.style.filter = val > 0 ? `blur(${val}px)` : 'none';
-                        this.photoEl.style.transform = val > 0 ? 'scale(1.06)' : 'none';
-                    }
-                    this.applyBackground();
+                    if (this._blurRafId) cancelAnimationFrame(this._blurRafId);
+                    this._blurRafId = requestAnimationFrame(() => {
+                        this._blurRafId = null;
+                        if (!this.photoEl || this.photoEl.classList.contains('hidden')) return;
+                        const displayUrl = this._customPhotoRecord?.croppedDataUrl || this._customPhotoRecord?.dataUrl || '';
+                        this._applyPhotoBlurLive(displayUrl, val, { immediatePreblur: false });
+                    });
                 };
             }
 
@@ -1511,6 +1712,43 @@
                     this.applyBackground();
                     this.renderSettingsUI();
                 };
+            }
+
+            const qTrack = document.getElementById('settings-bg-quality-track');
+            if (qTrack && qTrack.dataset.bgQualityBound !== 'true') {
+                qTrack.dataset.bgQualityBound = 'true';
+                qTrack.querySelectorAll('[data-bg-quality]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const q = btn.dataset.bgQuality;
+                        if (q === 'high' && (Storage.getReducedEffects?.() || document.documentElement.getAttribute('data-reduced-effects') === 'true')) {
+                            window.OrganizadorApp?.showToast?.('Calidad Alta no disponible con Reducir efectos activo.', 'warning');
+                            return;
+                        }
+                        this.isDegraded = false;
+                        this.degradedReason = '';
+                        Storage.setBackgroundQuality?.(q);
+                        window.HapticsModule?.light?.();
+                        const w = window.innerWidth || 390;
+                        const h = window.innerHeight || 844;
+                        this._initParticles(w, h);
+                        this.applyBackground();
+                        this.renderSettingsUI();
+                    });
+                });
+            }
+
+            if (!this._modalObserver && typeof MutationObserver !== 'undefined') {
+                this._modalObserver = new MutationObserver(() => {
+                    const hasOpenModal = this._hasOpenBlockingModal();
+                    if (hasOpenModal) {
+                        this._stopAnimationLoop();
+                    } else if (!this._rafId) {
+                        this._syncAnimationState(this.resolveEffectiveBackgroundId());
+                    }
+                });
+                document.querySelectorAll('.modal-overlay').forEach(m => {
+                    this._modalObserver.observe(m, { attributes: true, attributeFilter: ['class'] });
+                });
             }
 
             this.renderSettingsUI();

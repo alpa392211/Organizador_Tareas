@@ -40,7 +40,12 @@ window.StorageModule = (() => {
         BACKGROUND_ANIMATED: 'org_escolar_background_animated_v1',
         BACKGROUND_BLUR: 'org_escolar_background_blur_v1',
         BACKGROUND_SCRIM: 'org_escolar_background_scrim_v1',
-        BACKGROUND_FOCAL: 'org_escolar_background_focal_v1'
+        BACKGROUND_FOCAL: 'org_escolar_background_focal_v1',
+        BG_QUALITY: 'org_escolar_bg_quality_v1',
+        DEVICE_PROFILE: 'org_escolar_device_profile_v1',
+        TOUR_COMPLETED: 'org_escolar_tour_completed_v1',
+        NOTIF_SOUND_MODE: 'org_escolar_notif_sound_mode_v1',
+        SUBJECTS_ADD_PLACEMENT: 'org_escolar_subjects_add_placement_v1'
     };
 
     const LEGACY_KEYS = [
@@ -392,15 +397,23 @@ window.StorageModule = (() => {
         },
 
         // --- Control de Versión y Changelog de Novedades ---
-        APP_VERSION: '1.6.0',
+        APP_VERSION: '1.7.0',
         getLastSeenVersion() {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.6.0');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.7.0');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---
+        MANUAL_ONLY_CODES: Object.freeze(['EDUARDO', '06062009', 'KRONOS99']),
+        AUTO_UNLOCK_POOL: Object.freeze([
+            'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
+            'COFFEE42', 'ARCADE90', 'STUDYMAX', 'READABLE',
+            'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON',
+            'GROTESK', 'FREDOKA', 'SCRIPTY', 'PIXEL88', 'TYPEWRIT'
+        ]),
+
         getCompletedTasksCount() {
             const activeTasks = this.getTasks() || [];
             const activeCompleted = activeTasks.filter(t => t.completed).length;
@@ -411,24 +424,23 @@ window.StorageModule = (() => {
 
         checkVaultAutoUnlockOnTaskCompleted() {
             // Pool de códigos auto-desbloqueables en orden progresivo
-            // EXCLUSIÓN ESTRICTA: 'EDUARDO' y '06062009' NUNCA se auto-desbloquean (requerimiento explícito)
-            const AUTO_UNLOCK_POOL = [
-                'APOLLO11', 'PINGUINO', 'RETRO80S', 'MATRIX99', 'ZENPEACE',
-                'COFFEE42', 'ARCADE90', 'STUDYMAX', 'READABLE',
-                'FIRACODE', 'PLAYFAIR', 'HANDNOTE', 'ORBITRON'
-            ];
+            // EXCLUSIÓN ESTRICTA: MANUAL_ONLY_CODES ('EDUARDO', '06062009', 'KRONOS99') NUNCA se auto-desbloquean
+            const pool = this.AUTO_UNLOCK_POOL.filter(c => !this.MANUAL_ONLY_CODES.includes(c));
 
             const count = this.getCompletedTasksCount();
             const unlocksEarned = Math.floor(count / 5);
             if (unlocksEarned <= 0) return null;
 
             const currentUnlocked = this.getUnlockedCodes();
-            const unlockedFromPool = AUTO_UNLOCK_POOL.filter(id => currentUnlocked.includes(id));
+            const unlockedFromPool = pool.filter(id => currentUnlocked.includes(id));
 
-            if (unlockedFromPool.length < unlocksEarned && unlockedFromPool.length < AUTO_UNLOCK_POOL.length) {
-                const nextCode = AUTO_UNLOCK_POOL.find(id => !currentUnlocked.includes(id));
-                if (nextCode) {
+            if (unlockedFromPool.length < unlocksEarned && unlockedFromPool.length < pool.length) {
+                const nextCode = pool.find(id => !currentUnlocked.includes(id));
+                if (nextCode && !this.MANUAL_ONLY_CODES.includes(nextCode)) {
                     this.unlockCode(nextCode);
+                    try {
+                        window.dispatchEvent(new CustomEvent('vault-unlocked', { detail: { codeId: nextCode, source: 'auto' } }));
+                    } catch (_) {}
                     return nextCode;
                 }
             }
@@ -957,6 +969,18 @@ window.StorageModule = (() => {
             return chosen;
         },
 
+        // --- Posición del botón "Nueva materia" ('auto' | 'top' | 'bottom') ---
+        getSubjectsAddPlacement() {
+            const val = (localStorage.getItem(KEYS.SUBJECTS_ADD_PLACEMENT) || '').trim().toLowerCase();
+            return (val === 'top' || val === 'bottom' || val === 'auto') ? val : 'auto';
+        },
+        setSubjectsAddPlacement(placement) {
+            const normalized = typeof placement === 'string' ? placement.trim().toLowerCase() : '';
+            const chosen = (normalized === 'top' || normalized === 'bottom' || normalized === 'auto') ? normalized : 'auto';
+            localStorage.setItem(KEYS.SUBJECTS_ADD_PLACEMENT, chosen);
+            return chosen;
+        },
+
         // --- Vibración Háptica ---
         getHapticsEnabled() {
             const val = localStorage.getItem(KEYS.HAPTICS);
@@ -976,6 +1000,29 @@ window.StorageModule = (() => {
             } else {
                 localStorage.removeItem(KEYS.THEME);
             }
+        },
+
+        // --- Tutorial Interactivo ---
+        isTourCompleted() {
+            return localStorage.getItem(KEYS.TOUR_COMPLETED) === 'true';
+        },
+        setTourCompleted(done) {
+            const val = done === true;
+            localStorage.setItem(KEYS.TOUR_COMPLETED, val ? 'true' : 'false');
+            return val;
+        },
+
+        // --- Modo de Sonido de Notificaciones ('app' | 'system' | 'silent') ---
+        getNotificationSoundMode() {
+            const val = (localStorage.getItem(KEYS.NOTIF_SOUND_MODE) || '').trim().toLowerCase();
+            if (val === 'app' || val === 'system' || val === 'silent') return val;
+            return 'app';
+        },
+        setNotificationSoundMode(mode) {
+            const m = String(mode || '').trim().toLowerCase();
+            const chosen = (m === 'app' || m === 'system' || m === 'silent') ? m : 'app';
+            localStorage.setItem(KEYS.NOTIF_SOUND_MODE, chosen);
+            return chosen;
         },
 
         // --- Tipografía ---
@@ -1023,6 +1070,36 @@ window.StorageModule = (() => {
             const val = enabled === true;
             localStorage.setItem(KEYS.REDUCED_EFFECTS, val ? 'true' : 'false');
             return val;
+        },
+
+        // --- Calidad del Fondo Animado ('low' | 'medium' | 'high') ---
+        getBackgroundQuality() {
+            const val = (localStorage.getItem(KEYS.BG_QUALITY) || '').trim().toLowerCase();
+            if (val === 'low' || val === 'medium' || val === 'high') return val;
+            return 'medium';
+        },
+        setBackgroundQuality(quality) {
+            const q = String(quality || '').trim().toLowerCase();
+            const chosen = (q === 'low' || q === 'medium' || q === 'high') ? q : 'medium';
+            localStorage.setItem(KEYS.BG_QUALITY, chosen);
+            return chosen;
+        },
+
+        // --- Perfil de Dispositivo ('low' | 'medium' | 'high') ---
+        hasExplicitDeviceProfile() {
+            const val = (localStorage.getItem(KEYS.DEVICE_PROFILE) || '').trim().toLowerCase();
+            return val === 'low' || val === 'medium' || val === 'high';
+        },
+        getDeviceProfile() {
+            const val = (localStorage.getItem(KEYS.DEVICE_PROFILE) || '').trim().toLowerCase();
+            if (val === 'low' || val === 'medium' || val === 'high') return val;
+            return 'medium';
+        },
+        setDeviceProfile(profile) {
+            const p = String(profile || '').trim().toLowerCase();
+            const chosen = (p === 'low' || p === 'medium' || p === 'high') ? p : 'medium';
+            localStorage.setItem(KEYS.DEVICE_PROFILE, chosen);
+            return chosen;
         },
 
         // --- Fondos y Preferencias Visuales (sin guardar bytes de imagen en localStorage) ---
@@ -1329,7 +1406,12 @@ window.StorageModule = (() => {
                 'firacode': 'FIRACODE',
                 'playfair': 'PLAYFAIR',
                 'caveat': 'HANDNOTE',
-                'orbitron': 'ORBITRON'
+                'orbitron': 'ORBITRON',
+                'spacegrotesk': 'GROTESK',
+                'fredoka': 'FREDOKA',
+                'dancingscript': 'SCRIPTY',
+                'pixelify': 'PIXEL88',
+                'specialelite': 'TYPEWRIT'
             };
             const codeId = map[fontKey.trim().toLowerCase()];
             return codeId ? this.isCodeUnlocked(codeId) : true;
@@ -1511,14 +1593,18 @@ window.StorageModule = (() => {
 
         exportJson() {
             const data = {
-                version: '1.6.0',
+                version: '1.7.0',
                 exportedAt: new Date().toISOString(),
                 theme: this.getTheme(),
                 fontFamily: this.getFontFamily(),
                 glassIntensity: this.getGlassIntensity(),
                 reducedEffects: this.getReducedEffects(),
+                deviceProfile: this.hasExplicitDeviceProfile() ? this.getDeviceProfile() : null,
                 backgroundPreset: this.getBackgroundPreset(),
                 backgroundAnimated: this.getBackgroundAnimated(),
+                backgroundQuality: this.getBackgroundQuality(),
+                tourCompleted: this.isTourCompleted(),
+                notifSoundMode: this.getNotificationSoundMode(),
                 backgroundBlur: this.getBackgroundBlur(),
                 backgroundScrim: this.getBackgroundScrim(),
                 backgroundFocal: this.getBackgroundFocalPoint(),
@@ -1526,6 +1612,7 @@ window.StorageModule = (() => {
                 academicCycle: this.getAcademicCycle(),
                 isCycleConfigured: this.isCycleConfigured(),
                 bottomAction: this.getBottomAction(),
+                subjectsAddPlacement: this.getSubjectsAddPlacement(),
                 hapticsEnabled: this.getHapticsEnabled(),
                 autoPurgeArchive: this.getAutoPurgeArchive(),
                 headerThemeBtnEnabled: this.getHeaderThemeBtnEnabled(),
@@ -1559,6 +1646,7 @@ window.StorageModule = (() => {
                 }
                 if (data.theme) this.setTheme(data.theme);
                 if (typeof data.glassIntensity === 'string') this.setGlassIntensity(data.glassIntensity);
+                if (typeof data.deviceProfile === 'string') this.setDeviceProfile(data.deviceProfile);
                 if (typeof data.reducedEffects === 'boolean') this.setReducedEffects(data.reducedEffects);
 
                 // Restaurar primero claves secretas y bóveda antes de evaluar estilos desbloqueables
@@ -1593,6 +1681,9 @@ window.StorageModule = (() => {
                     this.setActiveSpecialTheme(this.isSpecialThemeUnlocked(data.activeSpecialTheme) ? data.activeSpecialTheme : 'default');
                 }
                 if (typeof data.backgroundAnimated === 'boolean') this.setBackgroundAnimated(data.backgroundAnimated);
+                if (typeof data.backgroundQuality === 'string') this.setBackgroundQuality(data.backgroundQuality);
+                if (typeof data.tourCompleted === 'boolean') this.setTourCompleted(data.tourCompleted);
+                if (typeof data.notifSoundMode === 'string') this.setNotificationSoundMode(data.notifSoundMode);
                 if (typeof data.backgroundBlur === 'number') this.setBackgroundBlur(data.backgroundBlur);
                 if (typeof data.backgroundScrim === 'number') this.setBackgroundScrim(data.backgroundScrim);
                 if (data.backgroundFocal && typeof data.backgroundFocal === 'object') this.setBackgroundFocalPoint(data.backgroundFocal);
@@ -1604,6 +1695,7 @@ window.StorageModule = (() => {
                     this.setCycleConfigured(data.isCycleConfigured);
                 }
                 if (data.bottomAction) this.setBottomAction(data.bottomAction);
+                if (typeof data.subjectsAddPlacement === 'string') this.setSubjectsAddPlacement(data.subjectsAddPlacement);
                 if (typeof data.hapticsEnabled === 'boolean') this.setHapticsEnabled(data.hapticsEnabled);
                 if (typeof data.autoPurgeArchive === 'boolean') this.setAutoPurgeArchive(data.autoPurgeArchive);
                 if (typeof data.headerThemeBtnEnabled === 'boolean') this.setHeaderThemeBtnEnabled(data.headerThemeBtnEnabled);

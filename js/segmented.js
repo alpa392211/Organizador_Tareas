@@ -45,6 +45,10 @@ window.SegmentedControl = (() => {
         if (track.querySelector('[data-archive-filter]')) return 'track:archive-filter';
         if (track.querySelector('[data-notes-tab]')) return 'track:notes-tabs';
         if (track.querySelector('[data-glass-intensity]')) return 'track:glass-intensity';
+        if (track.querySelector('[data-device-profile]')) return 'track:device-profile';
+        if (track.querySelector('[data-bg-quality]')) return 'track:bg-quality';
+        if (track.querySelector('[data-subjects-add-placement]')) return 'track:subjects-add-placement';
+        if (track.querySelector('[data-notif-sound-mode]')) return 'track:notif-sound-mode';
         if (track.querySelector('[data-theme-choice]')) return 'track:theme-mode';
         if (track.querySelector('[data-task-priority]')) return 'track:task-priority';
         if (track.querySelector('[data-note-type]')) return 'track:note-type';
@@ -64,6 +68,10 @@ window.SegmentedControl = (() => {
             btn.dataset.archiveFilter ||
             btn.dataset.notesTab ||
             btn.dataset.glassIntensity ||
+            btn.dataset.deviceProfile ||
+            btn.dataset.bgQuality ||
+            btn.dataset.subjectsAddPlacement ||
+            btn.dataset.notifSoundMode ||
             btn.dataset.themeChoice ||
             btn.dataset.taskPriority ||
             btn.dataset.noteType ||
@@ -540,6 +548,332 @@ window.SegmentedControl = (() => {
         }
 
         syncTrack(track, { instant: !state.hasMeasured });
+        attachSegmentedDrag(track, state);
+    }
+
+    function attachDragController({ track, getIndicator, getButtons, getActiveIndex, onPreview, onCommit }) {
+        if (!track || track._dragControllerBound) return;
+        track._dragControllerBound = true;
+
+        let activeDrag = null;
+        let suppressClickUntil = 0;
+
+        track.addEventListener('click', (e) => {
+            if (Date.now() < suppressClickUntil) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+
+        const cleanupDrag = (commit) => {
+            if (!activeDrag) return;
+            const d = activeDrag;
+            activeDrag = null;
+            clearTimeout(d.holdTimer);
+            if (d.rafId) cancelAnimationFrame(d.rafId);
+
+            if (d.pointerId !== null && typeof track.releasePointerCapture === 'function') {
+                try {
+                    if (track.hasPointerCapture?.(d.pointerId)) {
+                        track.releasePointerCapture(d.pointerId);
+                    }
+                } catch (_) {}
+            }
+
+            d.buttons.forEach(b => b.removeAttribute('data-drag-preview'));
+            if (d.indicator) {
+                d.indicator.classList.remove('is-dragging');
+                d.indicator.style.willChange = 'auto';
+            }
+
+            if (d.didDrag) {
+                suppressClickUntil = Date.now() + 80;
+                const targetBtn = d.buttons[d.hoveredIdx];
+                if (commit && targetBtn) {
+                    if (typeof onCommit === 'function') {
+                        onCommit(targetBtn, d.hoveredIdx, d.startActiveIdx);
+                    } else {
+                        targetBtn.click();
+                    }
+                } else {
+                    if (typeof onPreview === 'function') {
+                        onPreview(null, d.startActiveIdx, true);
+                    }
+                }
+            }
+        };
+
+        track.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            const indicator = getIndicator();
+            const buttons = getButtons().filter(b => !b.disabled && b.offsetParent !== null);
+            if (!indicator || buttons.length <= 1) return;
+
+            const trackRect = track.getBoundingClientRect();
+            if (trackRect.width <= 0) return;
+
+            const clientLeft = track.clientLeft || 0;
+            const clientTop = track.clientTop || 0;
+            const scrollLeft = track.scrollLeft || 0;
+            const scrollTop = track.scrollTop || 0;
+
+            const metrics = buttons.map(btn => {
+                const r = btn.getBoundingClientRect();
+                const x = Math.round((r.left - trackRect.left - clientLeft + scrollLeft) * 100) / 100;
+                const y = Math.round((r.top - trackRect.top - clientTop + scrollTop) * 100) / 100;
+                return {
+                    btn,
+                    x,
+                    y,
+                    w: Math.round(r.width * 100) / 100,
+                    h: Math.round(r.height * 100) / 100,
+                    cx: r.left + r.width / 2
+                };
+            });
+
+            const startActiveIdx = Math.max(0, getActiveIndex(buttons));
+            const startMetric = metrics[startActiveIdx] || metrics[0];
+            const minX = Math.min(...metrics.map(m => m.x));
+            const maxX = Math.max(...metrics.map(m => m.x));
+
+            const startDragVisual = () => {
+                if (!activeDrag || activeDrag.didDrag) return;
+                activeDrag.didDrag = true;
+                indicator.classList.remove('is-instant');
+                indicator.classList.add('is-dragging');
+                indicator.style.willChange = 'transform, scale';
+                if (typeof track.setPointerCapture === 'function') {
+                    try { track.setPointerCapture(activeDrag.pointerId); } catch (_) {}
+                }
+            };
+
+            activeDrag = {
+                pointerId: e.pointerId ?? null,
+                indicator,
+                buttons,
+                metrics,
+                startActiveIdx,
+                hoveredIdx: startActiveIdx,
+                startX: e.clientX,
+                startY: e.clientY,
+                grabOffsetX: e.clientX - (trackRect.left + startMetric.x),
+                minX,
+                maxX,
+                trackLeft: trackRect.left,
+                didDrag: false,
+                rafId: null,
+                pendingClientX: e.clientX,
+                holdTimer: setTimeout(startDragVisual, 120)
+            };
+        });
+
+        track.addEventListener('pointermove', (e) => {
+            if (!activeDrag) return;
+            const dx = Math.abs(e.clientX - activeDrag.startX);
+            const dy = Math.abs(e.clientY - activeDrag.startY);
+            if (!activeDrag.didDrag) {
+                if (dy > 12 && dy > dx * 1.4) {
+                    cleanupDrag(false);
+                    return;
+                }
+                if (dx > 6) {
+                    clearTimeout(activeDrag.holdTimer);
+                    activeDrag.didDrag = true;
+                    activeDrag.indicator.classList.remove('is-instant');
+                    activeDrag.indicator.classList.add('is-dragging');
+                    activeDrag.indicator.style.willChange = 'transform, scale';
+                    if (activeDrag.pointerId !== null && typeof track.setPointerCapture === 'function') {
+                        try { track.setPointerCapture(activeDrag.pointerId); } catch (_) {}
+                    }
+                } else {
+                    return;
+                }
+            }
+
+            activeDrag.pendingClientX = e.clientX;
+            if (activeDrag.rafId) return;
+            activeDrag.rafId = requestAnimationFrame(() => {
+                if (!activeDrag) return;
+                activeDrag.rafId = null;
+                const d = activeDrag;
+                const rawX = (d.pendingClientX - d.trackLeft) - d.grabOffsetX;
+                const clampedX = Math.max(d.minX, Math.min(d.maxX, rawX));
+
+                let bestIdx = 0;
+                let bestDist = Infinity;
+                for (let i = 0; i < d.metrics.length; i++) {
+                    const dist = Math.abs(d.pendingClientX - d.metrics[i].cx);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestIdx = i;
+                    }
+                }
+                const targetMetric = d.metrics[bestIdx] || d.metrics[0];
+                d.indicator.style.width = `${targetMetric.w}px`;
+                d.indicator.style.height = `${targetMetric.h}px`;
+                d.indicator.style.transform = `translate3d(${Math.round(clampedX * 100) / 100}px, ${targetMetric.y}px, 0)`;
+
+                if (bestIdx !== d.hoveredIdx) {
+                    d.buttons.forEach((b, idx) => {
+                        if (idx === bestIdx) b.setAttribute('data-drag-preview', 'true');
+                        else b.removeAttribute('data-drag-preview');
+                    });
+                    d.hoveredIdx = bestIdx;
+                    triggerLightHaptic();
+                    if (typeof onPreview === 'function') {
+                        onPreview(d.buttons[bestIdx], bestIdx, false);
+                    }
+                }
+            });
+        });
+
+        track.addEventListener('pointerup', () => cleanupDrag(true));
+        track.addEventListener('pointercancel', () => cleanupDrag(false));
+    }
+
+    function attachSegmentedDrag(track, state) {
+        attachDragController({
+            track,
+            getIndicator: () => state.indicatorEl,
+            getButtons: () => getTrackButtons(track),
+            getActiveIndex: (btns) => detectActiveIndex(btns),
+            onPreview: (_btn, _idx, cancelled) => {
+                if (cancelled) syncTrack(track);
+            },
+            onCommit: (targetBtn) => {
+                targetBtn.click();
+                syncTrack(track, { forceAnimate: true });
+            }
+        });
+    }
+
+    function bindNavAndChipDrags() {
+        const bottomInner = document.querySelector('#bottom-nav .bottom-nav-inner');
+        const bottomInd = document.getElementById('bottom-nav-indicator');
+        if (bottomInner && bottomInd) {
+            attachDragController({
+                track: bottomInner,
+                getIndicator: () => bottomInd,
+                getButtons: () => Array.from(bottomInner.querySelectorAll('button[data-view-target]')),
+                getActiveIndex: (btns) => Math.max(0, btns.findIndex(b => b.dataset.viewTarget === window.OrganizadorApp?.currentView)),
+                onPreview: (_btn, _idx, cancelled) => {
+                    if (cancelled) window.OrganizadorApp?.updateNavIndicators?.();
+                },
+                onCommit: (btn) => {
+                    btn.click();
+                }
+            });
+        }
+
+        const desktopPill = document.getElementById('desktop-nav-pill');
+        const desktopInd = document.getElementById('desktop-nav-indicator');
+        if (desktopPill && desktopInd) {
+            attachDragController({
+                track: desktopPill,
+                getIndicator: () => desktopInd,
+                getButtons: () => Array.from(desktopPill.querySelectorAll('button[data-view-target]')),
+                getActiveIndex: (btns) => Math.max(0, btns.findIndex(b => b.dataset.viewTarget === window.OrganizadorApp?.currentView)),
+                onPreview: (_btn, _idx, cancelled) => {
+                    if (cancelled) window.OrganizadorApp?.updateNavIndicators?.();
+                },
+                onCommit: (btn) => {
+                    btn.click();
+                }
+            });
+        }
+
+        const notesScroll = document.getElementById('notes-filter-scroll');
+        const notesInd = document.getElementById('notes-filter-indicator');
+        if (notesScroll && notesInd) {
+            attachDragController({
+                track: notesScroll,
+                getIndicator: () => notesInd,
+                getButtons: () => Array.from(notesScroll.querySelectorAll('[data-note-filter]')),
+                getActiveIndex: (btns) => Math.max(0, btns.findIndex(b => b.classList.contains('note-filter-active'))),
+                onPreview: (_btn, _idx, cancelled) => {
+                    if (cancelled) window.NotesModule?.syncNoteFilterIndicator?.();
+                },
+                onCommit: (btn) => {
+                    btn.click();
+                }
+            });
+        }
+
+        document.querySelectorAll('.app-switch').forEach(sw => {
+            if (sw._switchDragBound) return;
+            sw._switchDragBound = true;
+            const input = sw.querySelector('input[type="checkbox"]');
+            const thumb = sw.querySelector('.app-switch-thumb');
+            if (!input || !thumb) return;
+
+            let swDrag = null;
+            let suppressSwClickUntil = 0;
+
+            sw.addEventListener('click', (e) => {
+                if (Date.now() < suppressSwClickUntil) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+            }, true);
+
+            sw.addEventListener('pointerdown', (e) => {
+                if ((e.pointerType === 'mouse' && e.button !== 0) || input.disabled) return;
+                const rect = sw.getBoundingClientRect();
+                swDrag = {
+                    pointerId: e.pointerId ?? null,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    rectLeft: rect.left,
+                    initialChecked: input.checked,
+                    didDrag: false,
+                    currentX: input.checked ? 20 : 0
+                };
+            });
+
+            sw.addEventListener('pointermove', (e) => {
+                if (!swDrag) return;
+                const dx = Math.abs(e.clientX - swDrag.startX);
+                const dy = Math.abs(e.clientY - swDrag.startY);
+                if (!swDrag.didDrag) {
+                    if (dy > 10 && dy > dx * 1.4) { swDrag = null; return; }
+                    if (dx > 4) {
+                        swDrag.didDrag = true;
+                        thumb.classList.add('is-dragging');
+                        if (swDrag.pointerId !== null && typeof sw.setPointerCapture === 'function') {
+                            try { sw.setPointerCapture(swDrag.pointerId); } catch (_) {}
+                        }
+                    } else return;
+                }
+                const base = swDrag.initialChecked ? 20 : 0;
+                const nextX = Math.max(0, Math.min(20, base + (e.clientX - swDrag.startX)));
+                swDrag.currentX = nextX;
+                thumb.style.setProperty('--switch-drag-x', `${Math.round(nextX)}px`);
+            });
+
+            const endSw = (commit) => {
+                if (!swDrag) return;
+                const d = swDrag;
+                swDrag = null;
+                thumb.classList.remove('is-dragging');
+                thumb.style.removeProperty('--switch-drag-x');
+                if (d.pointerId !== null && typeof sw.releasePointerCapture === 'function') {
+                    try {
+                        if (sw.hasPointerCapture?.(d.pointerId)) sw.releasePointerCapture(d.pointerId);
+                    } catch (_) {}
+                }
+                if (d.didDrag && commit) {
+                    suppressSwClickUntil = Date.now() + 80;
+                    const nextChecked = d.currentX >= 10;
+                    if (nextChecked !== input.checked) {
+                        input.checked = nextChecked;
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                        triggerLightHaptic();
+                    }
+                }
+            };
+            sw.addEventListener('pointerup', () => endSw(true));
+            sw.addEventListener('pointercancel', () => endSw(false));
+        });
     }
 
     function syncAll(options = {}) {
@@ -550,6 +884,7 @@ window.SegmentedControl = (() => {
                 syncTrack(track, options);
             }
         });
+        bindNavAndChipDrags();
     }
 
     function handleCaptureClick(e) {
@@ -664,6 +999,8 @@ window.SegmentedControl = (() => {
         init,
         initTrack,
         sync: syncTrack,
-        syncAll
+        syncAll,
+        attachDragController,
+        bindNavAndChipDrags
     };
 })();

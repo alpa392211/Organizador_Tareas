@@ -602,11 +602,12 @@ window.TasksModule = (() => {
             const urgencyInfo = getUrgencyDetails(task.dueDate, task.completed);
 
             const card = document.createElement('div');
-            card.className = `stagger-card card-hover group relative bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
-                task.completed ? 'opacity-70 bg-slate-50/60 dark:bg-slate-800/40' : ''
-            }`;
+            card.className = `task-card stagger-card card-hover group relative bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                task.completed ? 'is-completed opacity-70 bg-slate-50/60 dark:bg-slate-800/40' : ''
+            } ${urgencyInfo.isOverdue ? 'is-overdue' : ''}`;
             card.style.setProperty('--stagger-i', index);
-            card.style.borderLeft = `6px solid ${subject.color}`;
+            card.style.setProperty('--task-accent-color', subject.color || '#6366F1');
+            card.dataset.accentColor = subject.color || '#6366F1';
             card.dataset.taskId = task.id;
 
             card.innerHTML = `

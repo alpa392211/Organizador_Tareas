@@ -1,0 +1,18 @@
+{
+  "versionCode": 170,
+  "versionName": "1.7.0",
+  "apkUrl": "https://raw.githubusercontent.com/alpa392211/Organizador_Tareas/main/downloads/Organizador-v1.7.0.apk",
+  "sha256": "9b2d32697c811463ece32ee377cd1875afc117a027b7afcb47a9fd3b39b97f03",
+  "sizeBytes": 4681826,
+  "releaseDate": "2026-11-27",
+  "forceUpdate": false,
+  "changelog": [
+    "Modo claro y oscuro completos para los 10 temas visuales y 10 fondos temáticos",
+    "5 nuevas tipografías locales sin conexión disponibles en la Bóveda (18 códigos automáticos)",
+    "Sonidos de notificación integrados CC0 (clases, tareas y alertas) o tono del sistema/silencio",
+    "Tutorial animado interactivo de 9 pasos con foco visual y repetición desde Configuración",
+    "Barra lateral de color siempre visible en tarjetas de Tareas y control táctil deslizable",
+    "3 calidades de fondo animado (Baja/Media/Alta), 3 perfiles de rendimiento y desenfoque estable en Mi foto",
+    "Botón Nueva materia adaptable Arriba/Abajo, confirmación de salida al pulsar Atrás y actualización automática dentro de la app"
+  ]
+}

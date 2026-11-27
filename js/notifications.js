@@ -115,11 +115,72 @@ window.NotificationsModule = (() => {
         return 'assets/icons/icon-192x192.png';
     }
 
+    function resolveSoundTypeForAction(action) {
+        if (action === 'subjects' || action === 'class') return 'class';
+        if (action === 'alert' || action === 'test' || action === 'urgent') return 'alert';
+        return 'task';
+    }
+
     const Notifications = {
+        getSoundMode() {
+            return window.StorageModule?.getNotificationSoundMode?.() || 'app';
+        },
+
+        setSoundMode(mode) {
+            const chosen = window.StorageModule?.setNotificationSoundMode?.(mode) || 'app';
+            try {
+                if (typeof window.AndroidWidgetBridge?.setNotificationSoundMode === 'function') {
+                    window.AndroidWidgetBridge.setNotificationSoundMode(chosen);
+                }
+            } catch (_) {}
+            return chosen;
+        },
+
+        playSoundPreview(type = 'alert') {
+            const mode = this.getSoundMode();
+            if (mode === 'silent') return false;
+            if (mode !== 'app') return false;
+            const kind = resolveSoundTypeForAction(type);
+            try {
+                const audio = new Audio(`assets/sounds/notif_${kind}.ogg`);
+                audio.volume = 0.85;
+                const p = audio.play();
+                if (p && typeof p.catch === 'function') {
+                    p.catch(() => {});
+                }
+                return true;
+            } catch (_) {
+                return false;
+            }
+        },
+
+        testSound() {
+            const mode = this.getSoundMode();
+            if (mode === 'silent') {
+                window.showNotification?.('Las notificaciones están en modo Silencio.', 'info');
+                return false;
+            }
+            if (isAndroidNativeAvailable() && mode === 'system') {
+                try {
+                    window.AndroidWidgetBridge.showNativeNotification(9991, 'Prueba de sonido', 'Usando el tono del sistema Android.', 'test');
+                    return true;
+                } catch (_) {}
+            }
+            if (!this.playSoundPreview('alert') && isAndroidNativeAvailable()) {
+                try {
+                    window.AndroidWidgetBridge.showNativeNotification(9991, 'Prueba de sonido', 'Tono integrado de Organizador.', 'test');
+                } catch (_) {}
+            }
+            window.HapticsModule?.light?.();
+            window.showNotification?.('Sonido de notificación reproducido.', 'success');
+            return true;
+        },
+
         /**
          * Inicializa permisos, reprograma avisos nativos pendientes y arranca el vigilante
          */
         async init() {
+            this.setSoundMode(this.getSoundMode());
             if (window.StorageModule?.isOnboardingCompleted?.()) {
                 await this.requestPermission();
             }
@@ -178,6 +239,8 @@ window.NotificationsModule = (() => {
                     const notifId = hashStringTo32BitInt(tag || title);
                     window.AndroidWidgetBridge.showNativeNotification(notifId, title, body, action || 'tasks');
                 } catch (_) {}
+            } else if (!document.hidden && this.getSoundMode() === 'app') {
+                this.playSoundPreview(action || 'tasks');
             }
 
             // 2. Web Notification (ServiceWorker primero para Android Chrome / PWA, luego Notification API)

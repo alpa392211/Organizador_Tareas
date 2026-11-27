@@ -28,6 +28,10 @@ public class WidgetJsBridge {
         boolean saveBase64File(String filename, String mimeType, String base64Data);
         void requestNotificationPermission();
         void exitApp();
+        String getAppVersionInfo();
+        void checkForAppUpdate();
+        void downloadAndInstallUpdate(String url, String sha256);
+        void openInstallPermissionSettings();
     }
 
     private final Context context;
@@ -113,9 +117,48 @@ public class WidgetJsBridge {
     }
 
     @JavascriptInterface
+    public void setNotificationSoundMode(String mode) {
+        NotificationHelper.setSoundMode(context, mode);
+    }
+
+    @JavascriptInterface
+    public String getNotificationSoundMode() {
+        return NotificationHelper.getSoundMode(context);
+    }
+
+    @JavascriptInterface
     public void exitApp() {
         if (hostActions != null) {
             hostActions.exitApp();
+        }
+    }
+
+    @JavascriptInterface
+    public String getAppVersionInfo() {
+        if (hostActions != null) {
+            return hostActions.getAppVersionInfo();
+        }
+        return "{}";
+    }
+
+    @JavascriptInterface
+    public void checkForAppUpdate() {
+        if (hostActions != null) {
+            hostActions.checkForAppUpdate();
+        }
+    }
+
+    @JavascriptInterface
+    public void downloadAndInstallUpdate(String url, String sha256) {
+        if (hostActions != null) {
+            hostActions.downloadAndInstallUpdate(url, sha256);
+        }
+    }
+
+    @JavascriptInterface
+    public void openInstallPermissionSettings() {
+        if (hostActions != null) {
+            hostActions.openInstallPermissionSettings();
         }
     }
 }

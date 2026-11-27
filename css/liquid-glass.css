@@ -192,6 +192,59 @@ html.dark .nav-sliding-indicator {
     --lgx-fill-a: 0.30;
 }
 
+/* Barra inferior en claro: cristal luminoso blanco-azulado con alto contraste */
+html:not(.dark) .nav-sliding-indicator {
+    --lgx-tint: 244, 247, 255;
+    --lgx-fill-a: 0.52;
+    --lgx-rim-hi: rgba(255, 255, 255, 0.98);
+    --lgx-rim-lo: rgba(148, 163, 184, 0.24);
+    --lgx-shadow: 79, 70, 229;
+}
+
+/* Arrastre interactivo de controles deslizables (solo transform/scale/opacity para 60 FPS) */
+.segmented-control-track,
+.notes-segmented-control,
+#bottom-nav .bottom-nav-inner,
+#desktop-nav-pill,
+#notes-filter-scroll {
+    touch-action: pan-y;
+}
+
+.segmented-glass-indicator.is-dragging,
+.nav-sliding-indicator.is-dragging,
+.chip-glass-indicator.is-dragging {
+    transition-property: scale, opacity !important;
+    transition-duration: 0.16s !important;
+    transition-timing-function: cubic-bezier(0.32, 1.25, 0.4, 1) !important;
+    scale: 1.10 1.10;
+    will-change: transform, scale;
+}
+.segmented-glass-indicator.is-dragging::after,
+.nav-sliding-indicator.is-dragging::after,
+.chip-glass-indicator.is-dragging::after {
+    opacity: 0.48 !important;
+}
+.app-switch {
+    touch-action: pan-y;
+}
+.app-switch-thumb.is-dragging {
+    transition: none !important;
+    transform: translate3d(var(--switch-drag-x, 0px), 0, 0) scale(1.12) !important;
+}
+html[data-reduced-effects="true"] .segmented-glass-indicator.is-dragging,
+html[data-reduced-effects="true"] .nav-sliding-indicator.is-dragging,
+html[data-reduced-effects="true"] .chip-glass-indicator.is-dragging {
+    scale: 1 1 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    .segmented-glass-indicator.is-dragging,
+    .nav-sliding-indicator.is-dragging,
+    .chip-glass-indicator.is-dragging,
+    .app-switch-thumb.is-dragging {
+        scale: 1 1 !important;
+    }
+}
+
 /* ---------------------------------------------------------------------------
    7) Chips de filtro de Notas: cristal translúcido (los temas especiales conservan sus colores
       porque sus reglas, más específicas, siguen ganando).
