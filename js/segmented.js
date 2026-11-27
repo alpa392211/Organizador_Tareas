@@ -244,6 +244,7 @@ window.SegmentedControl = (() => {
             clearTimeout(state.animTimer);
             state.animTimer = null;
         }
+        state.track?.classList?.remove('is-animating-track');
         state.indicatorEl.classList.remove('is-animating', 'is-deforming');
         state.indicatorEl.removeAttribute('data-deforming');
         state.indicatorEl.style.willChange = 'auto';
@@ -389,6 +390,7 @@ window.SegmentedControl = (() => {
                 }
 
                 const stepSpan = Math.max(1, Math.abs(activeIdx - (prevIdx >= 0 ? prevIdx : activeIdx)));
+                track.classList.add('is-animating-track');
                 indicator.classList.add('is-animating');
                 indicator.style.willChange = 'transform, width';
 
@@ -510,7 +512,7 @@ window.SegmentedControl = (() => {
             // Observador de mutaciones en el track (clases, aria-*, o reemplazo de hijos)
             if (typeof MutationObserver !== 'undefined') {
                 const mo = new MutationObserver((mutations) => {
-                    if (state.isSyncing) return;
+                    if (state.isSyncing || track.classList.contains('is-dragging-track')) return;
                     let childChanged = false;
                     let attrChanged = false;
                     for (const m of mutations) {
@@ -557,15 +559,37 @@ window.SegmentedControl = (() => {
 
         let activeDrag = null;
         let suppressClickUntil = 0;
+        let isProgrammaticCommit = false;
+
+        const findBestIndex = (metrics, clientX) => {
+            if (!metrics || metrics.length === 0) return 0;
+            for (let i = 0; i < metrics.length; i++) {
+                const m = metrics[i];
+                if (clientX >= m.left && clientX <= m.right) {
+                    return i;
+                }
+            }
+            let bestIdx = 0;
+            let bestDist = Infinity;
+            for (let i = 0; i < metrics.length; i++) {
+                const dist = Math.abs(clientX - metrics[i].cx);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIdx = i;
+                }
+            }
+            return bestIdx;
+        };
 
         track.addEventListener('click', (e) => {
+            if (isProgrammaticCommit) return;
             if (Date.now() < suppressClickUntil) {
                 e.stopImmediatePropagation();
                 e.preventDefault();
             }
         }, true);
 
-        const cleanupDrag = (commit) => {
+        const cleanupDrag = (commit, releaseClientX = null) => {
             if (!activeDrag) return;
             const d = activeDrag;
             activeDrag = null;
@@ -580,6 +604,7 @@ window.SegmentedControl = (() => {
                 } catch (_) {}
             }
 
+            track.classList.remove('is-dragging-track');
             d.buttons.forEach(b => b.removeAttribute('data-drag-preview'));
             if (d.indicator) {
                 d.indicator.classList.remove('is-dragging');
@@ -587,18 +612,24 @@ window.SegmentedControl = (() => {
             }
 
             if (d.didDrag) {
-                suppressClickUntil = Date.now() + 80;
-                const targetBtn = d.buttons[d.hoveredIdx];
+                suppressClickUntil = Date.now() + 140;
+                const finalIdx = (typeof releaseClientX === 'number' && Number.isFinite(releaseClientX))
+                    ? findBestIndex(d.metrics, releaseClientX)
+                    : d.hoveredIdx;
+                const targetBtn = d.buttons[finalIdx] || d.buttons[d.hoveredIdx];
                 if (commit && targetBtn) {
-                    if (typeof onCommit === 'function') {
-                        onCommit(targetBtn, d.hoveredIdx, d.startActiveIdx);
-                    } else {
-                        targetBtn.click();
+                    isProgrammaticCommit = true;
+                    try {
+                        if (typeof onCommit === 'function') {
+                            onCommit(targetBtn, finalIdx, d.startActiveIdx);
+                        } else {
+                            targetBtn.click();
+                        }
+                    } finally {
+                        isProgrammaticCommit = false;
                     }
-                } else {
-                    if (typeof onPreview === 'function') {
-                        onPreview(null, d.startActiveIdx, true);
-                    }
+                } else if (typeof onPreview === 'function') {
+                    onPreview(null, d.startActiveIdx, true);
                 }
             }
         };
@@ -627,6 +658,8 @@ window.SegmentedControl = (() => {
                     y,
                     w: Math.round(r.width * 100) / 100,
                     h: Math.round(r.height * 100) / 100,
+                    left: r.left,
+                    right: r.right,
                     cx: r.left + r.width / 2
                 };
             });
@@ -635,14 +668,19 @@ window.SegmentedControl = (() => {
             const startMetric = metrics[startActiveIdx] || metrics[0];
             const minX = Math.min(...metrics.map(m => m.x));
             const maxX = Math.max(...metrics.map(m => m.x));
+            const grabOffsetX = (e.clientX >= startMetric.left && e.clientX <= startMetric.right)
+                ? (e.clientX - (trackRect.left + startMetric.x))
+                : (startMetric.w / 2);
 
             const startDragVisual = () => {
                 if (!activeDrag || activeDrag.didDrag) return;
                 activeDrag.didDrag = true;
+                track.classList.add('is-dragging-track');
                 indicator.classList.remove('is-instant');
                 indicator.classList.add('is-dragging');
                 indicator.style.willChange = 'transform, scale';
-                if (typeof track.setPointerCapture === 'function') {
+                activeDrag.buttons[activeDrag.hoveredIdx]?.setAttribute('data-drag-preview', 'true');
+                if (activeDrag.pointerId !== null && typeof track.setPointerCapture === 'function') {
                     try { track.setPointerCapture(activeDrag.pointerId); } catch (_) {}
                 }
             };
@@ -656,7 +694,7 @@ window.SegmentedControl = (() => {
                 hoveredIdx: startActiveIdx,
                 startX: e.clientX,
                 startY: e.clientY,
-                grabOffsetX: e.clientX - (trackRect.left + startMetric.x),
+                grabOffsetX,
                 minX,
                 maxX,
                 trackLeft: trackRect.left,
@@ -673,15 +711,17 @@ window.SegmentedControl = (() => {
             const dy = Math.abs(e.clientY - activeDrag.startY);
             if (!activeDrag.didDrag) {
                 if (dy > 12 && dy > dx * 1.4) {
-                    cleanupDrag(false);
+                    cleanupDrag(false, null);
                     return;
                 }
                 if (dx > 6) {
                     clearTimeout(activeDrag.holdTimer);
                     activeDrag.didDrag = true;
+                    track.classList.add('is-dragging-track');
                     activeDrag.indicator.classList.remove('is-instant');
                     activeDrag.indicator.classList.add('is-dragging');
                     activeDrag.indicator.style.willChange = 'transform, scale';
+                    activeDrag.buttons[activeDrag.hoveredIdx]?.setAttribute('data-drag-preview', 'true');
                     if (activeDrag.pointerId !== null && typeof track.setPointerCapture === 'function') {
                         try { track.setPointerCapture(activeDrag.pointerId); } catch (_) {}
                     }
@@ -699,15 +739,7 @@ window.SegmentedControl = (() => {
                 const rawX = (d.pendingClientX - d.trackLeft) - d.grabOffsetX;
                 const clampedX = Math.max(d.minX, Math.min(d.maxX, rawX));
 
-                let bestIdx = 0;
-                let bestDist = Infinity;
-                for (let i = 0; i < d.metrics.length; i++) {
-                    const dist = Math.abs(d.pendingClientX - d.metrics[i].cx);
-                    if (dist < bestDist) {
-                        bestDist = dist;
-                        bestIdx = i;
-                    }
-                }
+                const bestIdx = findBestIndex(d.metrics, d.pendingClientX);
                 const targetMetric = d.metrics[bestIdx] || d.metrics[0];
                 d.indicator.style.width = `${targetMetric.w}px`;
                 d.indicator.style.height = `${targetMetric.h}px`;
@@ -727,8 +759,8 @@ window.SegmentedControl = (() => {
             });
         });
 
-        track.addEventListener('pointerup', () => cleanupDrag(true));
-        track.addEventListener('pointercancel', () => cleanupDrag(false));
+        track.addEventListener('pointerup', (e) => cleanupDrag(true, e.clientX));
+        track.addEventListener('pointercancel', () => cleanupDrag(false, null));
     }
 
     function attachSegmentedDrag(track, state) {
@@ -748,23 +780,6 @@ window.SegmentedControl = (() => {
     }
 
     function bindNavAndChipDrags() {
-        const bottomInner = document.querySelector('#bottom-nav .bottom-nav-inner');
-        const bottomInd = document.getElementById('bottom-nav-indicator');
-        if (bottomInner && bottomInd) {
-            attachDragController({
-                track: bottomInner,
-                getIndicator: () => bottomInd,
-                getButtons: () => Array.from(bottomInner.querySelectorAll('button[data-view-target]')),
-                getActiveIndex: (btns) => Math.max(0, btns.findIndex(b => b.dataset.viewTarget === window.OrganizadorApp?.currentView)),
-                onPreview: (_btn, _idx, cancelled) => {
-                    if (cancelled) window.OrganizadorApp?.updateNavIndicators?.();
-                },
-                onCommit: (btn) => {
-                    btn.click();
-                }
-            });
-        }
-
         const desktopPill = document.getElementById('desktop-nav-pill');
         const desktopInd = document.getElementById('desktop-nav-indicator');
         if (desktopPill && desktopInd) {

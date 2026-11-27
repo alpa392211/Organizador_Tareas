@@ -82,6 +82,15 @@
         } catch (_) { return false; }
     }
 
+    function isMobileWebView() {
+        try {
+            if (document.documentElement?.dataset?.platform === 'android-apk') return true;
+            return Boolean(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        } catch (_) {
+            return false;
+        }
+    }
+
     // Solo equipos realmente muy limitados (1-2 núcleos o <= 1 GB). Ya NO se usa el umbral de 4 GB / 4 núcleos.
     function isLowEndDevice() {
         try {
@@ -163,13 +172,16 @@
      * de muestreo (hacia adentro) en los canales R y G alrededor de 128 (neutro).
      */
     function getDisplacementDataUrl(w, h, shape, bezelPx) {
-        const key = `${w}x${h}_${shape}_${Math.round(bezelPx)}`;
+        const mobile = isMobileWebView();
+        const key = `${w}x${h}_${shape}_${Math.round(bezelPx)}_${mobile ? 'm' : 'd'}`;
         if (mapUrlCache.has(key)) return mapUrlCache.get(key);
 
-        // Resolución interna: 2x para bordes suaves, con tope para no gastar memoria
-        const dpr = Math.min(2, Math.max(1, Math.round(window.devicePixelRatio || 1)));
-        const cw = Math.min(900, Math.round(w * dpr));
-        const ch = Math.min(400, Math.round(h * dpr));
+        // En móvil/WebView usar dpr=1 y tope compacto para construir el mapa 4x más rápido
+        const dpr = mobile ? 1 : Math.min(2, Math.max(1, Math.round(window.devicePixelRatio || 1)));
+        const maxCw = mobile ? 360 : 640;
+        const maxCh = mobile ? 160 : 280;
+        const cw = Math.min(maxCw, Math.round(w * dpr));
+        const ch = Math.min(maxCh, Math.round(h * dpr));
         const canvas = document.createElement('canvas');
         canvas.width = cw;
         canvas.height = ch;
@@ -246,9 +258,10 @@
         const scale = Math.round(maxPx * 2 * 10) / 10;     // feDisplacementMap: ±scale/2
         const minHalf = Math.min(w, h) / 2;
         const bezelPx = Math.max(3, Math.min(minHalf * profile.bezel, profile.maxBez));
-        const chroma = intensity === 'intenso' && profile.chroma;
+        const isNativeApk = document.documentElement?.dataset?.platform === 'android-apk';
+        const chroma = !isNativeApk && intensity === 'intenso' && profile.chroma;
 
-        const key = `${w}x${h}_${shape}_${variant}_${intensity}_${scale}`;
+        const key = `${w}x${h}_${shape}_${variant}_${intensity}_${scale}_${chroma ? 'c' : 's'}`;
         const cached = filterCache.get(key);
         if (cached && cached.node && cached.node.isConnected) return cached.id;
         if (cached) filterCache.delete(key);
@@ -328,16 +341,22 @@
             const shape = resolveShape(el, variant, opts.shape || prev.shape);
             const profile = PROFILES[variant] || DEFAULT_PROFILE;
 
+            const step = isMobileWebView() ? 16 : 4;
             const rect = el.getBoundingClientRect();
             const rawW = rect.width || el.offsetWidth || 0;
             const rawH = rect.height || el.offsetHeight || 0;
             // Elementos aún sin medir (display:none, etc.): se marcan y se reintentan con el ResizeObserver
-            const w = quantize(Math.max(rawW, 24), 4, 24, 900);
-            const h = quantize(Math.max(rawH, 20), 4, 20, 400);
+            const w = quantize(Math.max(rawW, 24), step, 24, 900);
+            const h = quantize(Math.max(rawH, 20), step, 20, 400);
+            const bucketKey = `${w}x${h}`;
 
             const intensity = getIntensity();
             const isNativeApk = document.documentElement?.dataset?.platform === 'android-apk';
-            const useRefraction = canUseRefraction(intensity) && !(isNativeApk && variant === 'switch');
+            const useRefraction = canUseRefraction(intensity) && !(isNativeApk && (variant === 'switch' || variant === 'bar'));
+
+            if (prev.bucketKey === bucketKey && prev.intensity === intensity && prev.useRefraction === useRefraction && (!useRefraction || el.dataset.lgFilterId)) {
+                return true;
+            }
 
             el.setAttribute('data-lg-surface', variant);
             el.setAttribute('data-lg-refraction', useRefraction ? intensity : 'fallback');
@@ -421,7 +440,8 @@
                         const w = target.offsetWidth || 0;
                         const h = target.offsetHeight || 0;
                         if (w <= 0 || h <= 0) return;
-                        const bucket = `${quantize(Math.max(w, 24), 4, 24, 900)}x${quantize(Math.max(h, 20), 4, 20, 400)}`;
+                        const step = isMobileWebView() ? 16 : 4;
+                        const bucket = `${quantize(Math.max(w, 24), step, 24, 900)}x${quantize(Math.max(h, 20), step, 20, 400)}`;
                         if (!prev || prev.bucketKey !== bucket) applyToElement(target);
                     });
                     pending.clear();

@@ -1,13 +1,13 @@
 /**
- * updater.js - Comprobador e Instalador Remoto de Actualizaciones APK (v1.7.0)
+ * updater.js - Comprobador e Instalador Remoto de Actualizaciones APK (v1.7.1)
  * Lee version.json desde el repositorio oficial de GitHub y, en Android nativo,
  * descarga el APK verificando su SHA-256 con progreso en tiempo real.
  */
 (() => {
     'use strict';
 
-    const CURRENT_VERSION = '1.7.0';
-    const CURRENT_VERSION_CODE = 170;
+    const CURRENT_VERSION = '1.7.1';
+    const CURRENT_VERSION_CODE = 171;
     const MANIFEST_URL = 'https://raw.githubusercontent.com/alpa392211/Organizador_Tareas/main/version.json';
     const LAST_CHECK_KEY = 'org_escolar_updater_last_check_v1';
     const CHECK_COOLDOWN_MS = 12 * 60 * 60 * 1000;

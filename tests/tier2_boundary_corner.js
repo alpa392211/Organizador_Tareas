@@ -10,16 +10,16 @@ const APP_PKG_VERSION = require('../package.json').version;
 
 const tests = [
     // =========================================================================
-    // F01: Version Bump 1.7.0 & Scoped Changelog (Boundary & Corner)
+    // F01: Version Bump 1.7.1 & Scoped Changelog (Boundary & Corner)
     // =========================================================================
     {
         id: 'T2_F01_01_semver_strict_pattern',
         feature: 'F01',
-        name: 'package.json version matches strict semver 1.7.0',
+        name: 'package.json version matches strict semver 1.7.1',
         run: async (page, helpers) => {
             const pkgPath = path.join(helpers.PROJECT_ROOT, 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            helpers.assertEqual(pkg.version, '1.7.0', 'package.json version must be 1.7.0');
+            helpers.assertEqual(pkg.version, '1.7.1', 'package.json version must be 1.7.1');
         }
     },
     {
@@ -31,7 +31,7 @@ const tests = [
                 localStorage.setItem('org_escolar_last_version', '');
             });
             const fallback = await page.evaluate(() => {
-                return window.StorageModule?.getLastSeenVersion?.() || '1.7.0';
+                return window.StorageModule?.getLastSeenVersion?.() || '1.7.1';
             });
             helpers.assert(typeof fallback === 'string' && fallback.length > 0, 'Fallback version must be a non-empty string');
         }
@@ -39,14 +39,14 @@ const tests = [
     {
         id: 'T2_F01_03_changelog_modal_dismiss_records_version',
         feature: 'F01',
-        name: 'Dismissing changelog modal records target 1.7.0 version in LocalStorage',
+        name: 'Dismissing changelog modal records target 1.7.1 version in LocalStorage',
         run: async (page, helpers) => {
             await page.evaluate(() => {
                 window.OrganizadorApp?.openChangelogModal?.();
                 document.getElementById('changelog-confirm-btn')?.click();
             });
             const saved = await page.evaluate(() => localStorage.getItem('org_escolar_last_version'));
-            helpers.assertEqual(saved, '1.7.0', 'LocalStorage must record version 1.7.0');
+            helpers.assertEqual(saved, '1.7.1', 'LocalStorage must record version 1.7.1');
         }
     },
     {
@@ -3160,7 +3160,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -3248,7 +3248,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -3291,7 +3291,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -3333,7 +3333,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -3364,7 +3364,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -5763,7 +5763,7 @@ const tests = [
             await page.evaluate(() => {
                 localStorage.setItem('org_escolar_onboarding_completed_v1', 'true');
                 localStorage.setItem('org_escolar_cycle_configured_v1', 'true');
-                localStorage.setItem('org_escolar_last_version', '1.7.0');
+                localStorage.setItem('org_escolar_last_version', '1.7.1');
                 window.StorageModule?.saveSubjects?.([
                     { id: 'sub_sel_1', name: 'Matemáticas', color: '#4f46e5' }
                 ]);
@@ -5997,7 +5997,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -6047,7 +6047,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -6110,7 +6110,7 @@ const tests = [
                 localStorage.setItem('org_escolar_initialized_v3', 'true');
                 window.StorageModule?.setOnboardingCompleted?.(true);
                 window.StorageModule?.setCycleConfigured?.(true);
-                window.StorageModule?.setLastSeenVersion?.('1.7.0');
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
                 window.StorageModule?.setTourCompleted?.(true);
                 window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
             });
@@ -6208,6 +6208,185 @@ const tests = [
             helpers.assertTrue(res.soundModeSaved, 'NotificationsModule.setSoundMode must persist silent/app');
             helpers.assertTrue(res.cmpNewer && res.cmpSame, 'AppUpdater.compareVersions must compare semver accurately');
             helpers.assertTrue(res.hasUpdateCard && res.updateModalOpen, 'Settings update card and update modal must work');
+        }
+    },
+    // =========================================================================
+    // F33: v1.7.1 Regressions (Drag commit, Nav no-drag, Light clarity, Drawer, Accordion framing, Tour tone, Blur wave)
+    // =========================================================================
+    {
+        id: 'T2_F33_01_v171_drag_nav_light_drawer_settings_tour_theme_perf',
+        feature: 'F33',
+        name: 'Verify segmented drag-to-select commit, bottom-nav no-drag, Light Mode clarity, single drawer Configuracion, Settings accordion framing, steady tour tone, and theme blur wave',
+        run: async (page, helpers) => {
+            await helpers.resetPageState(page);
+            await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+            await page.evaluate(() => {
+                localStorage.setItem('org_escolar_initialized_v3', 'true');
+                window.StorageModule?.setOnboardingCompleted?.(true);
+                window.StorageModule?.setCycleConfigured?.(true);
+                window.StorageModule?.setLastSeenVersion?.('1.7.1');
+                window.StorageModule?.setTourCompleted?.(true);
+                window.StorageModule?.setAcademicCycle?.('2026-08-10', '2026-12-18');
+                window.StorageModule?.unlockCode?.('APOLLO11');
+            });
+            await page.reload({ waitUntil: 'load' });
+            await new Promise(r => setTimeout(r, 150));
+
+            // 1. Segmented drag commit on Tasks filter (Todas -> Pendientes) using real mouse pointer events
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('tasks');
+                window.TasksModule?.setFilter?.('all');
+            });
+            await new Promise(r => setTimeout(r, 120));
+
+            const dragCoords = await page.evaluate(() => {
+                const track = document.querySelector('#view-tasks .segmented-control-track');
+                const allBtn = track?.querySelector('[data-task-filter="all"]');
+                const pendBtn = track?.querySelector('[data-task-filter="pending"]');
+                if (!track || !allBtn || !pendBtn) return null;
+                const r1 = allBtn.getBoundingClientRect();
+                const r2 = pendBtn.getBoundingClientRect();
+                return {
+                    x1: r1.left + r1.width / 2,
+                    y1: r1.top + r1.height / 2,
+                    x2: r2.left + r2.width / 2,
+                    y2: r2.top + r2.height / 2
+                };
+            });
+            helpers.assertTrue(Boolean(dragCoords), 'Tasks segmented filter buttons must exist and be visible');
+
+            await page.mouse.move(dragCoords.x1, dragCoords.y1);
+            await page.mouse.down();
+            await page.mouse.move((dragCoords.x1 + dragCoords.x2) / 2, dragCoords.y1, { steps: 4 });
+            const draggingActive = await page.evaluate(() => {
+                const track = document.querySelector('#view-tasks .segmented-control-track');
+                return Boolean(track?.classList.contains('is-dragging-track'));
+            });
+            await page.mouse.move(dragCoords.x2, dragCoords.y2, { steps: 4 });
+            await page.mouse.up();
+            await new Promise(r => setTimeout(r, 150));
+
+            const dragCommitResult = await page.evaluate(() => {
+                const track = document.querySelector('#view-tasks .segmented-control-track');
+                const pendBtn = track?.querySelector('[data-task-filter="pending"]');
+                const ind = track?.querySelector('.segmented-glass-indicator');
+                const targetRect = pendBtn?.getBoundingClientRect();
+                const indRect = ind?.getBoundingClientRect();
+                return {
+                    isDraggingAfter: Boolean(track?.classList.contains('is-dragging-track')),
+                    pendActive: Boolean(pendBtn?.classList.contains('seg-btn-active') || pendBtn?.getAttribute('aria-selected') === 'true'),
+                    indicatorDeltaX: targetRect && indRect ? Math.abs(targetRect.left - indRect.left) : 999
+                };
+            });
+
+            // 2. Bottom nav no-drag + single Drawer Configuracion + Light Mode Notes clarity
+            const uiChecks = await page.evaluate(() => {
+                const bottomInner = document.querySelector('#bottom-nav .bottom-nav-inner');
+                const bottomNoDrag = Boolean(bottomInner && bottomInner._dragControllerBound !== true);
+
+                const drawerSettingsNodes = Array.from(document.querySelectorAll('#sidebar-drawer [data-view-target="settings"]'));
+                const singleDrawerSettings = drawerSettingsNodes.length === 1 && drawerSettingsNodes[0].id === 'drawer-footer-settings-btn';
+
+                // Switch to Light Mode + theme-apollo + Notes view
+                window.OrganizadorApp?.applyTheme?.('light', true, { animate: false });
+                window.StorageModule?.setActiveSpecialTheme?.('apollo');
+                window.OrganizadorApp?.applySpecialTheme?.('apollo');
+                window.OrganizadorApp?.switchView?.('notes');
+
+                const notesTrack = document.querySelector('#view-notes .notes-segmented-control');
+                const notesBtn = notesTrack?.querySelector('[data-notes-tab="notes"]');
+                const galleryBtn = notesTrack?.querySelector('[data-notes-tab="gallery"]');
+                const fillAlpha = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lgx-fill-a')) || 0;
+                const parseRgb = (c) => {
+                    const m = (c || '').match(/\d+/g);
+                    return m ? m.slice(0, 3).map(Number) : [255, 255, 255];
+                };
+                const nRgb = parseRgb(notesBtn ? getComputedStyle(notesBtn).color : '');
+                const gRgb = parseRgb(galleryBtn ? getComputedStyle(galleryBtn).color : '');
+                const lightNotesInkDark = nRgb[0] < 90 && nRgb[1] < 90 && nRgb[2] < 90;
+                const lightGalleryInkDark = gRgb[0] < 90 && gRgb[1] < 90 && gRgb[2] < 90;
+
+                // Restore default theme
+                window.StorageModule?.setActiveSpecialTheme?.('default');
+                window.OrganizadorApp?.applySpecialTheme?.('default');
+
+                return {
+                    bottomNoDrag,
+                    singleDrawerSettings,
+                    fillAlpha,
+                    lightNotesInkDark,
+                    lightGalleryInkDark
+                };
+            });
+
+            // 3. Settings Accordion auto-framing on mobile viewport
+            await page.evaluate(() => {
+                window.OrganizadorApp?.switchView?.('settings');
+            });
+            await new Promise(r => setTimeout(r, 150));
+            const framingResult = await page.evaluate(async () => {
+                const headers = Array.from(document.querySelectorAll('#view-settings .settings-accordion-header'));
+                if (headers.length < 4) return { ok: false, reason: 'less than 4 accordions' };
+                headers[0].click();
+                await new Promise(r => setTimeout(r, 120));
+                headers[3].click();
+                await new Promise(r => setTimeout(r, 420));
+                const card = headers[3].closest('.settings-accordion-card');
+                const headerEl = document.querySelector('header');
+                const cardTop = card.getBoundingClientRect().top;
+                const hdrBottom = headerEl ? headerEl.getBoundingClientRect().bottom : 72;
+                return {
+                    ok: Boolean(card.classList.contains('open')) && cardTop >= hdrBottom - 6 && cardTop <= 210,
+                    isOpen: Boolean(card.classList.contains('open')),
+                    cardTop,
+                    hdrBottom
+                };
+            });
+
+            // 4. Tour steady backdrop tone & Theme Blur Wave
+            const tourAndWaveResult = await page.evaluate(async () => {
+                const Tour = window.TourModule;
+                Tour.start({ force: true, startIndex: 0 });
+                const bgStep1 = getComputedStyle(document.querySelector('.tour-backdrop')).backgroundColor;
+                const shadow1 = getComputedStyle(document.getElementById('tour-spotlight-ring')).boxShadow;
+                Tour.goTo(6);
+                const bgStep7 = getComputedStyle(document.querySelector('.tour-backdrop')).backgroundColor;
+                const shadow7 = getComputedStyle(document.getElementById('tour-spotlight-ring')).boxShadow;
+                Tour.close(true);
+
+                // Theme Blur Wave transition
+                const wasDark = document.documentElement.classList.contains('dark');
+                window.OrganizadorApp?.toggleTheme?.();
+                await new Promise(r => setTimeout(r, 60));
+                const waveMounted = Boolean(document.querySelector('.theme-blur-wave'));
+                await new Promise(r => setTimeout(r, 680));
+                const isDarkAfter = document.documentElement.classList.contains('dark');
+                const waveUnmounted = !document.querySelector('.theme-blur-wave');
+
+                return {
+                    bgConsistent: bgStep1 === bgStep7,
+                    no9999Shadow: !String(shadow1).includes('9999px') && !String(shadow7).includes('9999px'),
+                    waveMounted,
+                    themeToggled: wasDark !== isDarkAfter,
+                    waveUnmounted
+                };
+            });
+
+            await page.setViewport({ width: 1280, height: 800, isMobile: false, hasTouch: false });
+            await helpers.resetPageState(page);
+
+            helpers.assertTrue(draggingActive, 'Dragging segmented control must activate .is-dragging-track');
+            helpers.assertFalse(dragCommitResult.isDraggingAfter, '.is-dragging-track must clear after pointerup');
+            helpers.assertTrue(dragCommitResult.pendActive, 'Releasing dragged pill over Pendientes must select Pendientes (no snap-back)');
+            helpers.assertTrue(dragCommitResult.indicatorDeltaX < 18, 'Segmented indicator must snap onto selected Pendientes option');
+            helpers.assertTrue(uiChecks.bottomNoDrag, '#bottom-nav .bottom-nav-inner must not bind drag controller');
+            helpers.assertTrue(uiChecks.singleDrawerSettings, 'Sidebar drawer must show exactly 1 Configuracion button (#drawer-footer-settings-btn)');
+            helpers.assertTrue(uiChecks.fillAlpha <= 0.30, `Light Vault theme glass fill alpha (${uiChecks.fillAlpha}) must stay <= 0.30`);
+            helpers.assertTrue(uiChecks.lightNotesInkDark && uiChecks.lightGalleryInkDark, 'Light mode Notas & Galeria buttons must keep dark readable ink');
+            helpers.assertTrue(framingResult.ok, `Settings accordion must auto-frame cleanly below header (got top=${framingResult.cardTop}, hdrBottom=${framingResult.hdrBottom})`);
+            helpers.assertTrue(tourAndWaveResult.bgConsistent, 'Tour backdrop background tone must stay steady across steps');
+            helpers.assertTrue(tourAndWaveResult.no9999Shadow, 'Tour spotlight must not cast 9999px double-backdrop shadow');
+            helpers.assertTrue(tourAndWaveResult.waveMounted && tourAndWaveResult.waveUnmounted && tourAndWaveResult.themeToggled, 'Theme blur wave must mount cleanly, toggle theme, and clean up');
         }
     }
 ];

@@ -197,7 +197,7 @@
     const BG_QUALITY_CONFIG = {
         low:    { fps: 18, particlesMob: 0,  particlesDesk: 0,  cssOnly: true },
         medium: { fps: 30, particlesMob: 14, particlesDesk: 18, cssOnly: false },
-        high:   { fps: 60, particlesMob: 36, particlesDesk: 48, cssOnly: false }
+        high:   { fps: 60, particlesMob: 24, particlesDesk: 48, cssOnly: false }
     };
     const SLOW_FRAME_THRESHOLD_MS = 50;
     const SLOW_FRAMES_LIMIT = 4;
@@ -224,12 +224,15 @@
             this._forceFailIdbForTest = false;
             this._particles = [];
             this._blurCache = new Map();
+            this._orbSpriteCache = new Map();
+            this._pausedUntil = 0;
             this._blurDebounceTimer = null;
             this._blurRafId = null;
             this._blurRenderSeq = 0;
 
             this._boundVisibilityHandler = () => this._onVisibilityChange();
             this._boundResizeHandler = () => this._onResize();
+            this._boundScrollHandler = () => this.pauseTemporarily(120);
             this._motionQuery = null;
             this._boundMotionHandler = () => this.applyBackground();
         }
@@ -756,11 +759,19 @@
             return true;
         }
 
+        pauseTemporarily(ms = 550) {
+            const until = performance.now() + Math.max(0, Number(ms) || 0);
+            if (until > this._pausedUntil) {
+                this._pausedUntil = until;
+            }
+        }
+
         _resizeCanvas() {
             if (!this.canvas || !this.ctx) return;
-            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            const isApk = document.documentElement?.dataset?.platform === 'android-apk';
             const w = Math.max(320, window.innerWidth || 390);
             const h = Math.max(320, window.innerHeight || 844);
+            const dpr = isApk ? 1 : (w < 768 ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(window.devicePixelRatio || 1, 1.5));
             this.canvas.width = Math.round(w * dpr);
             this.canvas.height = Math.round(h * dpr);
             this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -881,6 +892,11 @@
                     this._stopAnimationLoop();
                     return;
                 }
+                if (now < this._pausedUntil) {
+                    this._lastFrameTime = now;
+                    this._rafId = requestAnimationFrame(loop);
+                    return;
+                }
                 const elapsed = now - this._lastFrameTime;
                 if (elapsed >= frameIntervalMs - 1) {
                     const drawStart = performance.now();
@@ -907,6 +923,30 @@
             this._rafId = requestAnimationFrame(loop);
         }
 
+        _getOrbSprite(isMono, isDark) {
+            const key = `${isMono ? 'm' : 'c'}_${isDark ? 'd' : 'l'}`;
+            const cached = this._orbSpriteCache.get(key);
+            if (cached) return cached;
+            const size = 128;
+            const c = document.createElement('canvas');
+            c.width = size;
+            c.height = size;
+            const octx = c.getContext('2d');
+            if (octx) {
+                const orbColor = isMono
+                    ? (isDark ? 'rgba(226, 232, 240, 0.08)' : 'rgba(100, 116, 139, 0.10)')
+                    : (isDark ? 'rgba(129, 140, 248, 0.14)' : 'rgba(99, 102, 241, 0.12)');
+                const half = size / 2;
+                const g = octx.createRadialGradient(half, half, 0, half, half, half);
+                g.addColorStop(0, orbColor);
+                g.addColorStop(1, 'transparent');
+                octx.fillStyle = g;
+                octx.fillRect(0, 0, size, size);
+            }
+            this._orbSpriteCache.set(key, c);
+            return c;
+        }
+
         _drawFrame(resolvedId, phase = 0) {
             if (!this.canvas || !this.ctx || !this.canvas.width || !this.canvas.height) return;
             const w = window.innerWidth || 390;
@@ -918,32 +958,42 @@
             if (resolvedId === 'theme_matrix') {
                 const chars = '01ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ';
                 ctx.font = '600 13px "Fira Code", monospace';
-                this._particles.forEach((p, idx) => {
+                const bright = isDark ? 'rgba(110, 231, 183, 0.28)' : 'rgba(5, 150, 105, 0.24)';
+                const soft = isDark ? 'rgba(16, 185, 129, 0.16)' : 'rgba(4, 120, 87, 0.16)';
+                const glyphShift = Math.floor(phase * 2);
+                ctx.fillStyle = bright;
+                for (let idx = 0; idx < this._particles.length; idx += 3) {
+                    const p = this._particles[idx];
                     const y = (p.y + phase * 42 * p.speed) % (h + 40) - 20;
-                    ctx.fillStyle = isDark
-                        ? (idx % 3 === 0 ? 'rgba(110, 231, 183, 0.28)' : 'rgba(16, 185, 129, 0.16)')
-                        : (idx % 3 === 0 ? 'rgba(5, 150, 105, 0.24)' : 'rgba(4, 120, 87, 0.16)');
-                    const ch = chars[(p.charIdx + Math.floor(phase * 2)) % chars.length];
-                    ctx.fillText(ch, p.x % w, y);
-                });
+                    ctx.fillText(chars[(p.charIdx + glyphShift) % chars.length], p.x % w, y);
+                }
+                ctx.fillStyle = soft;
+                for (let idx = 0; idx < this._particles.length; idx++) {
+                    if (idx % 3 === 0) continue;
+                    const p = this._particles[idx];
+                    const y = (p.y + phase * 42 * p.speed) % (h + 40) - 20;
+                    ctx.fillText(chars[(p.charIdx + glyphShift) % chars.length], p.x % w, y);
+                }
                 return;
             }
 
             if (resolvedId === 'theme_sakura') {
-                this._particles.forEach((p, idx) => {
-                    const y = (p.y + phase * 22 * p.speed) % (h + 30) - 15;
-                    const x = (p.x + Math.sin(phase * 1.4 + idx) * 18 + w) % w;
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(phase * 0.6 + idx * 0.4);
-                    ctx.fillStyle = isDark
-                        ? (idx % 2 === 0 ? 'rgba(251, 113, 133, 0.30)' : 'rgba(254, 205, 211, 0.22)')
-                        : (idx % 2 === 0 ? 'rgba(225, 29, 72, 0.24)' : 'rgba(244, 63, 94, 0.16)');
+                const colors = isDark
+                    ? ['rgba(251, 113, 133, 0.30)', 'rgba(254, 205, 211, 0.22)']
+                    : ['rgba(225, 29, 72, 0.24)', 'rgba(244, 63, 94, 0.16)'];
+                for (let parity = 0; parity < 2; parity++) {
+                    ctx.fillStyle = colors[parity];
                     ctx.beginPath();
-                    ctx.ellipse(0, 0, p.r * 2.1, p.r * 1.05, 0, 0, Math.PI * 2);
+                    for (let idx = parity; idx < this._particles.length; idx += 2) {
+                        const p = this._particles[idx];
+                        const y = (p.y + phase * 22 * p.speed) % (h + 30) - 15;
+                        const x = (p.x + Math.sin(phase * 1.4 + idx) * 18 + w) % w;
+                        const rot = phase * 0.6 + idx * 0.4;
+                        ctx.moveTo(x + p.r * 2.1 * Math.cos(rot), y + p.r * 2.1 * Math.sin(rot));
+                        ctx.ellipse(x, y, p.r * 2.1, p.r * 1.05, rot, 0, Math.PI * 2);
+                    }
                     ctx.fill();
-                    ctx.restore();
-                });
+                }
                 return;
             }
 
@@ -963,21 +1013,19 @@
 
                 ctx.strokeStyle = isDark ? 'rgba(236, 72, 153, 0.20)' : 'rgba(190, 24, 93, 0.18)';
                 ctx.lineWidth = 1;
+                ctx.beginPath();
                 for (let i = -6; i <= 6; i++) {
-                    ctx.beginPath();
                     ctx.moveTo(cx + i * (w * 0.03), horizon);
                     ctx.lineTo(cx + i * (w * 0.22), h);
-                    ctx.stroke();
                 }
                 const scroll = (phase * 0.4) % 1;
                 for (let row = 0; row < 7; row++) {
                     const t = Math.pow((row + scroll) / 7, 1.7);
                     const y = horizon + t * (h - horizon);
-                    ctx.beginPath();
                     ctx.moveTo(0, y);
                     ctx.lineTo(w, y);
-                    ctx.stroke();
                 }
+                ctx.stroke();
                 return;
             }
 
@@ -985,13 +1033,20 @@
                 const accent = resolvedId === 'theme_starlight'
                     ? (isDark ? 'rgba(244, 114, 182,' : 'rgba(219, 39, 119,')
                     : (isDark ? 'rgba(165, 180, 252,' : 'rgba(79, 70, 229,');
-                this._particles.forEach((p, idx) => {
-                    const alpha = (isDark ? 0.18 : 0.14) + 0.22 * (0.5 + 0.5 * Math.sin(phase * 1.8 + idx));
-                    ctx.fillStyle = `${accent} ${alpha.toFixed(2)})`;
+                const buckets = [0.18, 0.30, 0.40];
+                for (let b = 0; b < buckets.length; b++) {
+                    ctx.fillStyle = `${accent} ${buckets[b]})`;
                     ctx.beginPath();
-                    ctx.arc((p.x + phase * p.drift * 8 + w) % w, p.y % h, p.r * 0.75, 0, Math.PI * 2);
+                    for (let idx = b; idx < this._particles.length; idx += 3) {
+                        const p = this._particles[idx];
+                        const px = (p.x + phase * p.drift * 8 + w) % w;
+                        const py = p.y % h;
+                        const pr = p.r * 0.75;
+                        ctx.moveTo(px + pr, py);
+                        ctx.arc(px, py, pr, 0, Math.PI * 2);
+                    }
                     ctx.fill();
-                });
+                }
                 if (resolvedId === 'theme_apollo') {
                     ctx.strokeStyle = isDark ? 'rgba(129, 140, 248, 0.16)' : 'rgba(79, 70, 229, 0.18)';
                     ctx.lineWidth = 1.2;
@@ -1003,14 +1058,18 @@
             }
 
             if (resolvedId === 'theme_arcade') {
-                this._particles.forEach((p, idx) => {
-                    const y = ((p.y - phase * 18 * p.speed) % h + h) % h;
-                    const s = Math.round(p.r * 2.2);
-                    ctx.fillStyle = isDark
-                        ? (idx % 3 === 0 ? 'rgba(234, 179, 8, 0.24)' : (idx % 3 === 1 ? 'rgba(139, 92, 246, 0.22)' : 'rgba(239, 68, 68, 0.18)'))
-                        : (idx % 3 === 0 ? 'rgba(217, 119, 6, 0.24)' : (idx % 3 === 1 ? 'rgba(109, 40, 217, 0.22)' : 'rgba(220, 38, 38, 0.20)'));
-                    ctx.fillRect(Math.round(p.x % w), Math.round(y), s, s);
-                });
+                const palette = isDark
+                    ? ['rgba(234, 179, 8, 0.24)', 'rgba(139, 92, 246, 0.22)', 'rgba(239, 68, 68, 0.18)']
+                    : ['rgba(217, 119, 6, 0.24)', 'rgba(109, 40, 217, 0.22)', 'rgba(220, 38, 38, 0.20)'];
+                for (let cIdx = 0; cIdx < 3; cIdx++) {
+                    ctx.fillStyle = palette[cIdx];
+                    for (let idx = cIdx; idx < this._particles.length; idx += 3) {
+                        const p = this._particles[idx];
+                        const y = ((p.y - phase * 18 * p.speed) % h + h) % h;
+                        const s = Math.round(p.r * 2.2);
+                        ctx.fillRect(Math.round(p.x % w), Math.round(y), s, s);
+                    }
+                }
                 return;
             }
 
@@ -1018,12 +1077,14 @@
                 ctx.strokeStyle = isDark ? 'rgba(59, 130, 246, 0.12)' : 'rgba(37, 99, 235, 0.13)';
                 ctx.lineWidth = 1;
                 const step = 48;
+                ctx.beginPath();
                 for (let x = 0; x < w; x += step) {
-                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+                    ctx.moveTo(x, 0); ctx.lineTo(x, h);
                 }
                 for (let y = 0; y < h; y += step) {
-                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+                    ctx.moveTo(0, y); ctx.lineTo(w, y);
                 }
+                ctx.stroke();
                 return;
             }
 
@@ -1033,33 +1094,28 @@
                     : (resolvedId === 'theme_eduardo-gold'
                         ? (isDark ? 'rgba(251, 191, 36, 0.20)' : 'rgba(217, 119, 6, 0.22)')
                         : (isDark ? 'rgba(217, 119, 6, 0.20)' : 'rgba(180, 83, 9, 0.20)'));
+                ctx.fillStyle = color;
+                ctx.beginPath();
                 this._particles.forEach((p, idx) => {
                     const y = ((p.y - phase * 12 * p.speed) % h + h) % h;
                     const x = (p.x + Math.cos(phase + idx) * 10 + w) % w;
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(x, y, p.r * 1.6, 0, Math.PI * 2);
-                    ctx.fill();
+                    const pr = p.r * 1.6;
+                    ctx.moveTo(x + pr, y);
+                    ctx.arc(x, y, pr, 0, Math.PI * 2);
                 });
+                ctx.fill();
                 return;
             }
 
-            // Presets básicos o monocromáticos animados: orbes suaves flotantes
+            // Presets básicos o monocromáticos animados: orbes pre-renderizados (0 allocaciones/frame)
             const isMono = resolvedId.startsWith('mono_') || this.isMonochromeActive();
-            const orbColor = isMono
-                ? (isDark ? 'rgba(226, 232, 240, 0.08)' : 'rgba(100, 116, 139, 0.10)')
-                : (isDark ? 'rgba(129, 140, 248, 0.14)' : 'rgba(99, 102, 241, 0.12)');
+            const sprite = this._getOrbSprite(isMono, isDark);
+            const rad = Math.min(w, h) * 0.30;
+            const diam = rad * 2;
             for (let i = 0; i < 4; i++) {
                 const cx = w * (0.2 + 0.6 * ((i % 2) + 0.15 * Math.sin(phase + i)));
                 const cy = h * (0.2 + 0.55 * (Math.floor(i / 2) + 0.15 * Math.cos(phase * 0.8 + i)));
-                const rad = Math.min(w, h) * 0.30;
-                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
-                g.addColorStop(0, orbColor);
-                g.addColorStop(1, 'transparent');
-                ctx.fillStyle = g;
-                ctx.beginPath();
-                ctx.arc(cx, cy, rad, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.drawImage(sprite, cx - rad, cy - rad, diam, diam);
             }
         }
 
@@ -1769,6 +1825,7 @@
             }
             document.addEventListener('visibilitychange', this._boundVisibilityHandler);
             window.addEventListener('resize', this._boundResizeHandler);
+            window.addEventListener('scroll', this._boundScrollHandler, { passive: true });
 
             await this.applyBackground();
             this.bindSettingsUI();

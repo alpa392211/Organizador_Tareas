@@ -397,12 +397,12 @@ window.StorageModule = (() => {
         },
 
         // --- Control de Versión y Changelog de Novedades ---
-        APP_VERSION: '1.7.0',
+        APP_VERSION: '1.7.1',
         getLastSeenVersion() {
             return localStorage.getItem(KEYS.LAST_SEEN_VERSION) || null;
         },
         setLastSeenVersion(version) {
-            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.7.0');
+            localStorage.setItem(KEYS.LAST_SEEN_VERSION, version || '1.7.1');
         },
 
         // --- Conteo de Tareas y Desbloqueo Progresivo de Bóveda (1 cada 5 tareas) ---

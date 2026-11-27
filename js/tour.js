@@ -147,7 +147,7 @@
             id: 'notes-quick',
             chapter: 'Capítulo 3 · Notas y Personalización',
             view: 'notes',
-            spotlightSelector: '#bottom-nav [data-view-target="notes"], #desktop-nav-pill [data-view-target="notes"]',
+            spotlightSelector: '#bottom-main-action-btn, #desktop-nav-pill [data-view-target="notes"]',
             badge: '7 / 9 · Notas',
             title: 'Notas rápidas y filtros inteligentes',
             desc: 'Guarda ideas al instante, desliza sobre los filtros de categoría o protege apuntes privados con contraseña.',
@@ -168,7 +168,7 @@
             id: 'notes-photos',
             chapter: 'Capítulo 3 · Notas y Personalización',
             view: 'notes',
-            spotlightSelector: '#bottom-nav [data-view-target="notes"], #desktop-nav-pill [data-view-target="notes"]',
+            spotlightSelector: '#bottom-main-action-btn, #desktop-nav-pill [data-view-target="notes"]',
             badge: '8 / 9 · Notas',
             title: 'Fotos de pizarrón y galería sin conexión',
             desc: 'Adjunta fotos a tus notas y consúltalas en la galería local (guardadas únicamente en tu dispositivo).',
@@ -186,7 +186,7 @@
             id: 'personalization',
             chapter: 'Capítulo 3 · Notas y Personalización',
             view: 'settings',
-            spotlightSelector: '#drawer-footer-settings-btn, #header-menu-btn',
+            spotlightSelector: '#drawer-toggle-btn, #desktop-nav-pill [data-view-target="settings"]',
             badge: '9 / 9 · Tu Estilo',
             title: 'Ajusta temas, blur y rendimiento',
             desc: 'Usa modo claro u oscuro con cualquier tema, desenfoca tu foto de fondo, elige calidad visual y repite este tutorial cuando quieras.',
@@ -240,7 +240,7 @@
         wrap.setAttribute('aria-modal', 'true');
         wrap.setAttribute('aria-label', 'Tutorial interactivo de Organizador');
         wrap.innerHTML = `
-            <div class="tour-backdrop fixed inset-0 bg-slate-950/70"></div>
+            <div class="tour-backdrop fixed inset-0"></div>
             <div id="tour-spotlight-ring" class="tour-spotlight hidden" aria-hidden="true"></div>
             <div id="tour-card" class="tour-card relative w-full max-w-md rounded-3xl border border-white/30 dark:border-slate-700/80 bg-white/95 dark:bg-slate-900/95 shadow-2xl overflow-hidden text-slate-900 dark:text-white">
                 <div class="tour-progress-track w-full h-1.5 bg-slate-200/80 dark:bg-slate-800 overflow-hidden">
@@ -322,7 +322,9 @@
         const candidates = Array.from(document.querySelectorAll(selector));
         const target = candidates.find(el => {
             const rect = el.getBoundingClientRect();
-            return rect.width > 0 && rect.height > 0;
+            return rect.width > 0 && rect.height > 0 &&
+                rect.right > 0 && rect.left < window.innerWidth &&
+                rect.bottom > 0 && rect.top < window.innerHeight;
         });
         if (!target) {
             ring.classList.add('hidden');
@@ -428,6 +430,7 @@
             });
         }
 
+        positionSpotlight(step.spotlightSelector);
         requestAnimationFrame(() => positionSpotlight(step.spotlightSelector));
         startProgressTimer(AUTO_ADVANCE_MS);
     }

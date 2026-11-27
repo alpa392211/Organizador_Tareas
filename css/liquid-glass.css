@@ -34,11 +34,11 @@ html.dark {
 html .segmented-control-track,
 html .notes-segmented-control {
     background:
-        linear-gradient(105deg, var(--lgx-track-a) 0%, var(--lgx-track-b) 52%, var(--lgx-track-c) 100%),
-        rgba(255, 255, 255, 0.35) !important;
-    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+        linear-gradient(105deg, rgba(99, 102, 241, 0.10) 0%, rgba(14, 165, 233, 0.08) 52%, rgba(236, 72, 153, 0.06) 100%),
+        rgba(241, 245, 249, 0.84) !important;
+    border: 1px solid rgba(148, 163, 184, 0.30) !important;
     box-shadow:
-        inset 0 2px 6px rgba(var(--lgx-shadow), 0.12),
+        inset 0 2px 6px rgba(var(--lgx-shadow), 0.10),
         inset 0 -1px 0 rgba(255, 255, 255, 0.5),
         0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
@@ -59,12 +59,26 @@ html .notes-segmented-control > button {
     background: transparent;
 }
 
-/* El botón activo se dibuja por ENCIMA del cristal: su texto siempre queda nítido */
+/* El botón activo en reposo se dibuja por ENCIMA del cristal: su texto siempre queda nítido */
 html .segmented-control-track button.seg-btn-active,
 html .segmented-control-track button[aria-selected="true"],
 html .segmented-control-track button[aria-pressed="true"],
 html .notes-segmented-control button.notes-seg-active {
     z-index: 3;
+}
+
+/* Durante arrastre o deslizamiento, todas las opciones (incluida la seleccionada)
+   pasan bajo la lente de cristal líquido para recibir la refracción uniforme */
+html .segmented-control-track.is-dragging-track > button,
+html .notes-segmented-control.is-dragging-track > button,
+html .segmented-control-track.is-animating-track > button,
+html .notes-segmented-control.is-animating-track > button {
+    z-index: 1 !important;
+}
+html .segmented-control-track > button[data-drag-preview="true"],
+html .notes-segmented-control > button[data-drag-preview="true"] {
+    transform: scale(1.03);
+    font-weight: 700;
 }
 
 /* ---------------------------------------------------------------------------
@@ -204,7 +218,6 @@ html:not(.dark) .nav-sliding-indicator {
 /* Arrastre interactivo de controles deslizables (solo transform/scale/opacity para 60 FPS) */
 .segmented-control-track,
 .notes-segmented-control,
-#bottom-nav .bottom-nav-inner,
 #desktop-nav-pill,
 #notes-filter-scroll {
     touch-action: pan-y;
@@ -213,11 +226,17 @@ html:not(.dark) .nav-sliding-indicator {
 .segmented-glass-indicator.is-dragging,
 .nav-sliding-indicator.is-dragging,
 .chip-glass-indicator.is-dragging {
+    --lgx-fill-a: 0.14;
     transition-property: scale, opacity !important;
     transition-duration: 0.16s !important;
     transition-timing-function: cubic-bezier(0.32, 1.25, 0.4, 1) !important;
     scale: 1.10 1.10;
     will-change: transform, scale;
+}
+html.dark .segmented-glass-indicator.is-dragging,
+html.dark .nav-sliding-indicator.is-dragging,
+html.dark .chip-glass-indicator.is-dragging {
+    --lgx-fill-a: 0.20;
 }
 .segmented-glass-indicator.is-dragging::after,
 .nav-sliding-indicator.is-dragging::after,

@@ -1585,23 +1585,26 @@ html.dark .glass-intensity-btn {
     color: #cbd5e1;
 }
 .glass-intensity-btn[aria-pressed="true"] {
+    color: #0f172a;
+}
+html.dark .glass-intensity-btn[aria-pressed="true"] {
     background-color: #4f46e5;
     color: #ffffff !important;
     box-shadow: 0 4px 14px -3px rgba(79, 70, 229, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
-html.theme-gray .glass-intensity-btn[aria-pressed="true"] {
+html.dark.theme-gray .glass-intensity-btn[aria-pressed="true"] {
     background-color: #334155;
     color: #ffffff !important;
 }
-html.theme-matrix .glass-intensity-btn[aria-pressed="true"] {
+html.dark.theme-matrix .glass-intensity-btn[aria-pressed="true"] {
     background-color: #047857;
     color: #ffffff !important;
 }
-html.theme-sakura .glass-intensity-btn[aria-pressed="true"] {
+html.dark.theme-sakura .glass-intensity-btn[aria-pressed="true"] {
     background-color: #be123c;
     color: #ffffff !important;
 }
-html.theme-arcade .glass-intensity-btn[aria-pressed="true"] {
+html.dark.theme-arcade .glass-intensity-btn[aria-pressed="true"] {
     background-color: #6d28d9;
     color: #ffffff !important;
 }
@@ -1830,43 +1833,68 @@ html.theme-switching *::after {
     transition: none !important;
 }
 
-/* Animación de barrido de arriba hacia abajo al cambiar claro <-> oscuro */
-@keyframes themeWipeDown {
-    from {
-        clip-path: inset(0 0 100% 0);
-    }
-    to {
-        clip-path: inset(0 0 0 0);
-    }
-}
-::view-transition-old(root) {
-    animation: none;
-}
-::view-transition-new(root) {
-    animation: themeWipeDown 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@media (prefers-reduced-motion: reduce) {
-    ::view-transition-new(root) {
-        animation: none !important;
-    }
-}
-html[data-reduced-effects="true"]::view-transition-new(root) {
-    animation: none !important;
-}
-.theme-wipe-fallback-curtain {
+/* Transición fluida con onda difuminada (blur/glow) al cambiar Claro <-> Oscuro (60 FPS GPU-only) */
+.theme-blur-wave {
     position: fixed;
-    inset: 0;
+    left: -12vw;
+    right: -12vw;
+    top: -155vh;
+    height: 155vh;
     z-index: 99999;
     pointer-events: none;
-    transform: translate3d(0, -100%, 0);
-    opacity: 0.96;
-    will-change: transform, opacity;
-    transition: transform 0.46s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
-}
-.theme-wipe-fallback-curtain.is-sweeping {
+    contain: strict;
+    opacity: 0.98;
     transform: translate3d(0, 0, 0);
+    will-change: transform, opacity;
+    transition:
+        transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.theme-wipe-fallback-curtain.is-fading {
+.theme-blur-wave.to-dark {
+    background: linear-gradient(
+        180deg,
+        rgba(7, 11, 21, 0.98) 0%,
+        rgba(11, 17, 32, 0.96) 46%,
+        rgba(30, 27, 75, 0.86) 66%,
+        rgba(79, 70, 229, 0.42) 80%,
+        rgba(56, 189, 248, 0.14) 91%,
+        rgba(7, 11, 21, 0) 100%
+    );
+}
+.theme-blur-wave.to-light {
+    background: linear-gradient(
+        180deg,
+        rgba(248, 250, 252, 0.98) 0%,
+        rgba(241, 245, 249, 0.96) 46%,
+        rgba(224, 231, 255, 0.86) 66%,
+        rgba(129, 140, 248, 0.36) 80%,
+        rgba(251, 191, 36, 0.16) 91%,
+        rgba(248, 250, 252, 0) 100%
+    );
+}
+.theme-blur-wave::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8vh;
+    height: 26vh;
+    border-radius: 50%;
+    filter: blur(24px);
+    pointer-events: none;
+    transform: translateZ(0);
+}
+.theme-blur-wave.to-dark::before {
+    background: radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.65) 0%, rgba(56, 189, 248, 0.28) 52%, transparent 78%);
+}
+.theme-blur-wave.to-light::before {
+    background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.92) 0%, rgba(165, 180, 252, 0.46) 48%, rgba(251, 191, 36, 0.22) 70%, transparent 82%);
+}
+.theme-blur-wave.is-sweeping {
+    transform: translate3d(0, 155vh, 0);
+}
+.theme-blur-wave.is-fading {
+    transform: translate3d(0, 178vh, 0);
     opacity: 0;
 }
 
@@ -1907,6 +1935,7 @@ html[data-platform="android-apk"] #view-settings .settings-accordion-card:not(.o
 
 .settings-accordion-card {
     contain: layout style;
+    scroll-margin-top: 5.5rem;
     transition: border-color 0.22s ease, transform 0.18s ease;
 }
 
@@ -4068,26 +4097,26 @@ html.context-menu-scroll-locked #sidebar-drawer {
     touch-action: manipulation;
 }
 html.dark .notes-seg-btn,
-html[class*="theme-"]:not(.theme-gray) .notes-seg-btn {
+html.dark[class*="theme-"]:not(.theme-gray) .notes-seg-btn {
     color: #cbd5e1;
 }
 .notes-seg-btn.notes-seg-active {
     background-color: #ffffff;
-    color: #1e293b;
+    color: #0f172a;
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.06);
 }
 html.dark .notes-seg-btn.notes-seg-active,
-html[class*="theme-"]:not(.theme-gray) .notes-seg-btn.notes-seg-active {
+html.dark[class*="theme-"]:not(.theme-gray) .notes-seg-btn.notes-seg-active {
     background-color: #4f46e5;
     color: #ffffff;
     box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.45);
 }
 .notes-seg-btn.notes-seg-active #notes-gallery-count {
     background-color: rgba(79, 70, 229, 0.14);
-    color: #3730a3;
+    color: #312e81;
 }
 html.dark .notes-seg-btn.notes-seg-active #notes-gallery-count,
-html[class*="theme-"]:not(.theme-gray) .notes-seg-btn.notes-seg-active #notes-gallery-count {
+html.dark[class*="theme-"]:not(.theme-gray) .notes-seg-btn.notes-seg-active #notes-gallery-count {
     background-color: rgba(255, 255, 255, 0.22);
     color: #ffffff;
 }
@@ -4765,15 +4794,17 @@ html.dark.theme-gray .segmented-control-track {
 }
 
 /* Textos de botones inactivos con contraste WCAG >= 4.5:1 */
+html:not(.dark) .segmented-control-track > button.seg-btn-inactive,
+html:not(.dark) .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active),
 .segmented-control-track > button.seg-btn-inactive,
 .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active) {
-    color: #1e293b !important;
+    color: #334155 !important;
 }
 html.dark .segmented-control-track > button.seg-btn-inactive,
 html.dark .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active),
 html.dark[class*="theme-"]:not(.theme-gray) .segmented-control-track > button.seg-btn-inactive,
 html.dark[class*="theme-"]:not(.theme-gray) .segmented-control-track > button:not(.seg-btn-active):not([aria-selected="true"]):not([aria-pressed="true"]):not(.bg-indigo-600):not(.notes-seg-active) {
-    color: #f1f5f9 !important;
+    color: #e2e8f0 !important;
 }
 
 /* Selectores sr-only ocultos visualmente manteniendo sincronización de formulario */
@@ -4817,29 +4848,33 @@ html.dark[class*="theme-"]:not(.theme-gray) .segmented-control-track > button:no
     transition: none !important;
 }
 
-/* Textos de botones activos sobre la cápsula de cristal (Claro: oscuro sobre cristal blanco; Oscuro/Temas: blanco) */
+/* Textos de botones activos y en previsualización de arrastre sobre la cápsula de cristal */
 html:not(.dark) .segmented-control-track > button.seg-btn-active,
 html:not(.dark) .segmented-control-track > button[aria-selected="true"],
 html:not(.dark) .segmented-control-track > button[aria-pressed="true"],
 html:not(.dark) .segmented-control-track > button.bg-indigo-600,
-html:not(.dark) .segmented-control-track > button.notes-seg-active {
+html:not(.dark) .segmented-control-track > button.notes-seg-active,
+html:not(.dark) .segmented-control-track > button[data-drag-preview="true"] {
     color: #0f172a !important;
 }
 html:not(.dark) .segmented-control-track > button.seg-btn-active #notes-gallery-count,
-html:not(.dark) .segmented-control-track > button.notes-seg-active #notes-gallery-count {
+html:not(.dark) .segmented-control-track > button.notes-seg-active #notes-gallery-count,
+html:not(.dark) .segmented-control-track > button[data-drag-preview="true"] #notes-gallery-count {
     background-color: rgba(79, 70, 229, 0.14) !important;
     color: #312e81 !important;
 }
 
-.segmented-control-track > button.seg-btn-active,
-.segmented-control-track > button[aria-selected="true"],
-.segmented-control-track > button[aria-pressed="true"],
-.segmented-control-track > button.bg-indigo-600,
-.segmented-control-track > button.notes-seg-active {
+html.dark .segmented-control-track > button.seg-btn-active,
+html.dark .segmented-control-track > button[aria-selected="true"],
+html.dark .segmented-control-track > button[aria-pressed="true"],
+html.dark .segmented-control-track > button.bg-indigo-600,
+html.dark .segmented-control-track > button.notes-seg-active,
+html.dark .segmented-control-track > button[data-drag-preview="true"] {
     color: #ffffff !important;
 }
-.segmented-control-track > button.seg-btn-active #notes-gallery-count,
-.segmented-control-track > button.notes-seg-active #notes-gallery-count {
+html.dark .segmented-control-track > button.seg-btn-active #notes-gallery-count,
+html.dark .segmented-control-track > button.notes-seg-active #notes-gallery-count,
+html.dark .segmented-control-track > button[data-drag-preview="true"] #notes-gallery-count {
     background-color: rgba(255, 255, 255, 0.24) !important;
     color: #ffffff !important;
 }
@@ -5440,6 +5475,11 @@ html.bg-low-motion #app-bg-gradient {
     will-change: transform;
 }
 
+.tour-backdrop {
+    background-color: rgba(2, 6, 23, 0.72) !important;
+    transition: none !important;
+}
+
 .tour-spotlight {
     position: fixed;
     top: 0;
@@ -5447,9 +5487,9 @@ html.bg-low-motion #app-bg-gradient {
     z-index: 93;
     border-radius: 9999px;
     border: 2.5px solid rgba(129, 140, 248, 0.95);
-    box-shadow: 0 0 0 9999px rgba(2, 6, 23, 0.42), 0 0 20px rgba(99, 102, 241, 0.65);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.28), 0 0 22px rgba(99, 102, 241, 0.65);
     pointer-events: none;
-    transition: transform 0.34s var(--ease-spring), width 0.34s var(--ease-spring), height 0.34s var(--ease-spring);
+    transition: transform 0.34s var(--ease-spring), width 0.34s var(--ease-spring), height 0.34s var(--ease-spring), opacity 0.2s ease;
 }
 
 @keyframes tourFloat {

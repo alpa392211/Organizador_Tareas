@@ -1,5 +1,5 @@
 /**
- * performance.js - Modo Rendimiento / Reducir Efectos (v1.7.0)
+ * performance.js - Modo Rendimiento / Reducir Efectos (v1.7.1)
  * Permite reducir al mínimo efectos visuales (transparencias, blur, refracción,
  * animaciones y sombras pesadas) en dispositivos con menores capacidades.
  */

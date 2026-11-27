@@ -1,9 +1,9 @@
 /**
- * sw.js - Service Worker for Organizador_Tareas v1.7.0
+ * sw.js - Service Worker for Organizador_Tareas v1.7.1
  * Offline caching, instant reload updates, and resilient network-first navigation.
  */
 
-const CACHE_NAME = 'organizador-tareas-cache-v1.7.0';
+const CACHE_NAME = 'organizador-tareas-cache-v1.7.1';
 
 const PRECACHE_ASSETS = [
     './',
@@ -48,28 +48,28 @@ const PRECACHE_ASSETS = [
     './assets/sounds/notif_task.ogg',
     './assets/sounds/notif_alert.ogg',
     // CSS stylesheets
-    './css/tailwind.min.css?v=1.7.0',
-    './css/styles.css?v=1.7.0',
-    './css/liquid-glass.css?v=1.7.0',
-    './css/mobile-perf.css?v=1.7.0',
+    './css/tailwind.min.css?v=1.7.1',
+    './css/styles.css?v=1.7.1',
+    './css/liquid-glass.css?v=1.7.1',
+    './css/mobile-perf.css?v=1.7.1',
     // JavaScript application modules
-    './js/storage.js?v=1.7.0',
-    './js/haptics.js?v=1.7.0',
-    './js/liquid-glass.js?v=1.7.0',
-    './js/segmented.js?v=1.7.0',
-    './js/notifications.js?v=1.7.0',
-    './js/widgets.js?v=1.7.0',
-    './js/subjects.js?v=1.7.0',
-    './js/tasks.js?v=1.7.0',
-    './js/notes.js?v=1.7.0',
-    './js/calendar.js?v=1.7.0',
-    './js/archive.js?v=1.7.0',
-    './js/photo-editor.js?v=1.7.0',
-    './js/backgrounds.js?v=1.7.0',
-    './js/tour.js?v=1.7.0',
-    './js/updater.js?v=1.7.0',
-    './js/app.js?v=1.7.0',
-    './js/performance.js?v=1.7.0',
+    './js/storage.js?v=1.7.1',
+    './js/haptics.js?v=1.7.1',
+    './js/liquid-glass.js?v=1.7.1',
+    './js/segmented.js?v=1.7.1',
+    './js/notifications.js?v=1.7.1',
+    './js/widgets.js?v=1.7.1',
+    './js/subjects.js?v=1.7.1',
+    './js/tasks.js?v=1.7.1',
+    './js/notes.js?v=1.7.1',
+    './js/calendar.js?v=1.7.1',
+    './js/archive.js?v=1.7.1',
+    './js/photo-editor.js?v=1.7.1',
+    './js/backgrounds.js?v=1.7.1',
+    './js/tour.js?v=1.7.1',
+    './js/updater.js?v=1.7.1',
+    './js/app.js?v=1.7.1',
+    './js/performance.js?v=1.7.1',
     // PWA Icons
     './assets/icons/icon-192x192.png',
     './assets/icons/icon-512x512.png',
@@ -100,7 +100,7 @@ self.addEventListener('install', event => {
                     )
                 )
             );
-            console.log(`[SW v1.7.0] Precaching complete. Processed ${results.length} assets.`);
+            console.log(`[SW v1.7.1] Precaching complete. Processed ${results.length} assets.`);
         })
     );
 });
@@ -112,7 +112,7 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(name => {
                     if (name !== CACHE_NAME) {
-                        console.log(`[SW v1.7.0] Purging deprecated cache: ${name}`);
+                        console.log(`[SW v1.7.1] Purging deprecated cache: ${name}`);
                         return caches.delete(name);
                     }
                 })
@@ -140,7 +140,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[SW v1.7.0] Navigation offline. Serving cached index.html fallback.');
+                    console.log('[SW v1.7.1] Navigation offline. Serving cached index.html fallback.');
                     const cachedNav = await caches.match(request);
                     if (cachedNav) return cachedNav;
                     return caches.match('./index.html') || caches.match('index.html');

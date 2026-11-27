@@ -618,7 +618,7 @@
                         }
 
                         const lastSeenVersion = Storage.getLastSeenVersion?.();
-                        if (lastSeenVersion !== '1.7.0') {
+                        if (lastSeenVersion !== '1.7.1') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this.openChangelogModal?.();
@@ -1172,37 +1172,28 @@
                 window.BackgroundsModule?.applyBackground?.();
             };
 
-            if (shouldWipe && typeof document.startViewTransition === 'function') {
-                try {
-                    if (this._activeThemeTransition && typeof this._activeThemeTransition.skipTransition === 'function') {
-                        try { this._activeThemeTransition.skipTransition(); } catch (_) {}
-                    }
-                    const vt = document.startViewTransition(() => applyCoreDom());
-                    this._activeThemeTransition = vt;
-                    vt?.ready?.catch?.(() => {});
-                    vt?.updateCallbackDone?.catch?.(() => {});
-                    vt?.finished?.catch?.(() => {})?.finally?.(() => {
-                        if (this._activeThemeTransition === vt) {
-                            this._activeThemeTransition = null;
-                        }
-                    });
-                    return;
-                } catch (_) {}
-            }
-
             if (shouldWipe) {
                 try {
-                    document.querySelectorAll('.theme-wipe-fallback-curtain').forEach(el => el.remove());
-                    const curtain = document.createElement('div');
-                    curtain.className = 'theme-wipe-fallback-curtain';
-                    curtain.setAttribute('aria-hidden', 'true');
-                    curtain.style.backgroundColor = isDark ? '#070b15' : '#f8fafc';
-                    document.body?.appendChild(curtain);
-                    void curtain.offsetHeight;
-                    requestAnimationFrame(() => curtain.classList.add('is-sweeping'));
-                    setTimeout(() => applyCoreDom(), 210);
-                    setTimeout(() => curtain.classList.add('is-fading'), 450);
-                    setTimeout(() => curtain.remove(), 660);
+                    if (Array.isArray(this._themeWaveTimers)) {
+                        this._themeWaveTimers.forEach(id => clearTimeout(id));
+                    }
+                    this._themeWaveTimers = [];
+                    document.querySelectorAll('.theme-blur-wave, .theme-wipe-fallback-curtain').forEach(el => el.remove());
+
+                    window.BackgroundsModule?.pauseTemporarily?.(620);
+
+                    const wave = document.createElement('div');
+                    wave.className = `theme-blur-wave ${isDark ? 'to-dark' : 'to-light'}`;
+                    wave.setAttribute('aria-hidden', 'true');
+                    document.body?.appendChild(wave);
+                    void wave.offsetHeight;
+
+                    requestAnimationFrame(() => wave.classList.add('is-sweeping'));
+                    this._themeWaveTimers.push(
+                        setTimeout(() => applyCoreDom(), 190),
+                        setTimeout(() => wave.classList.add('is-fading'), 330),
+                        setTimeout(() => wave.remove(), 590)
+                    );
                     return;
                 } catch (_) {}
             }
@@ -2401,11 +2392,9 @@
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
                         if (!Storage?.isTourCompleted?.() && window.TourModule?.start) {
                             clearTimeout(this._tourTimer);
-                            this._tourTimer = setTimeout(() => {
-                                this._tourTimer = null;
-                                window.TourModule?.start?.();
-                            }, 350);
-                        } else if (lastSeenVersion !== '1.7.0') {
+                            this._tourTimer = null;
+                            window.TourModule.start();
+                        } else if (lastSeenVersion !== '1.7.1') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this._changelogTimer = null;
@@ -2451,11 +2440,9 @@
                         const lastSeenVersion = Storage?.getLastSeenVersion?.();
                         if (!Storage?.isTourCompleted?.() && window.TourModule?.start) {
                             clearTimeout(this._tourTimer);
-                            this._tourTimer = setTimeout(() => {
-                                this._tourTimer = null;
-                                window.TourModule?.start?.();
-                            }, 350);
-                        } else if (lastSeenVersion !== '1.7.0') {
+                            this._tourTimer = null;
+                            window.TourModule.start();
+                        } else if (lastSeenVersion !== '1.7.1') {
                             clearTimeout(this._changelogTimer);
                             this._changelogTimer = setTimeout(() => {
                                 this._changelogTimer = null;
@@ -2684,10 +2671,22 @@
                             card.classList.remove('open');
                         } else {
                             card.classList.add('open');
+                            const frameCard = () => {
+                                if (!card.classList.contains('open')) return;
+                                const headerEl = document.querySelector('header');
+                                const headerBottom = headerEl ? Math.ceil(headerEl.getBoundingClientRect().bottom) : 76;
+                                const topOffset = Math.max(72, headerBottom + 12);
+                                const rect = card.getBoundingClientRect();
+                                const targetY = Math.max(0, Math.round(window.scrollY + rect.top - topOffset));
+                                const reduced = document.documentElement.getAttribute('data-reduced-effects') === 'true'
+                                    || Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+                                window.scrollTo({ top: targetY, behavior: reduced ? 'auto' : 'smooth' });
+                            };
                             requestAnimationFrame(() => {
                                 card.querySelectorAll('.segmented-control-track').forEach(track => {
                                     window.SegmentedControl?.sync?.(track, { instant: true });
                                 });
+                                frameCard();
                             });
                         }
                     }
@@ -3229,7 +3228,7 @@
                     modal.classList.remove('flex');
                     document.body.classList.remove('overflow-hidden');
                 }, 200);
-                window.StorageModule.setLastSeenVersion('1.7.0');
+                window.StorageModule.setLastSeenVersion('1.7.1');
                 this.initApkDownloadBanner?.();
             };
 

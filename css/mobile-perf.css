@@ -95,10 +95,33 @@ select,
     }
 }
 
-/* Optimización de overlays y hojas móviles en APK Android sin tocar superficies Liquid Glass */
+/* Optimización de overlays, tarjetas en scroll y hojas móviles en APK Android (60 FPS en Modo Alto y Medio) */
 html[data-platform="android-apk"] .app-modal-backdrop {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+}
+
+html[data-platform="android-apk"] header,
+html[data-platform="android-apk"] #bottom-nav[data-lg-surface="bar"] {
+    backdrop-filter: blur(12px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(165%) !important;
+}
+
+html[data-platform="android-apk"]:not([data-reduced-effects="true"]) .subject-card,
+html[data-platform="android-apk"]:not([data-reduced-effects="true"]) .task-card,
+html[data-platform="android-apk"]:not([data-reduced-effects="true"]) .note-card,
+html[data-platform="android-apk"]:not([data-reduced-effects="true"]) #archive-items-grid > div {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 116px;
+}
+
+html[data-platform="android-apk"]:not([data-reduced-effects="true"]) .subject-card::before,
+html[data-platform="android-apk"]:not([data-reduced-effects="true"]) .task-card::before,
+html[data-platform="android-apk"]:not([data-reduced-effects="true"]) .note-card::before {
+    -webkit-mask: none;
+    mask: none;
 }
 
 @media (max-width: 767px) {
@@ -210,19 +233,20 @@ html #vault-card-container .vault-lock-unlocked {
        + Reducción de brillo excesivo en botones deslizables de Liquid Glass
    ------------------------------------------------------------------------- */
 :root {
-    /* Liquid Glass suave (menos brillo / menos destello blanco) */
+    /* Liquid Glass luminoso en Claro (contraste limpio sin oscurecer etiquetas) */
     --lgx-tint: 255, 255, 255;
-    --lgx-fill-a: 0.14;
-    --lgx-rim-hi: rgba(255, 255, 255, 0.46);
-    --lgx-rim-lo: rgba(255, 255, 255, 0.08);
-    --lgx-glare-a: 0.15;
-    --lgx-inset-hi: rgba(255, 255, 255, 0.48);
-    --lgx-inset-lo: rgba(255, 255, 255, 0.20);
-    --lgx-inner-glow: rgba(255, 255, 255, 0.07);
+    --lgx-fill-a: 0.22;
+    --lgx-rim-hi: rgba(255, 255, 255, 0.88);
+    --lgx-rim-lo: rgba(148, 163, 184, 0.18);
+    --lgx-glare-a: 0.16;
+    --lgx-inset-hi: rgba(255, 255, 255, 0.90);
+    --lgx-inset-lo: rgba(148, 163, 184, 0.16);
+    --lgx-inner-glow: rgba(255, 255, 255, 0.22);
     --lgx-sheen-op: 0.20;
-    --lgx-track-a: rgba(99, 102, 241, 0.16);
-    --lgx-track-b: rgba(20, 184, 166, 0.12);
-    --lgx-track-c: rgba(236, 72, 153, 0.10);
+    --lgx-shadow: 15, 23, 42;
+    --lgx-track-a: rgba(99, 102, 241, 0.12);
+    --lgx-track-b: rgba(20, 184, 166, 0.09);
+    --lgx-track-c: rgba(236, 72, 153, 0.07);
 
     /* Tokens de Recordatorio de Materias (Claro) */
     --rem-box-bg: #f8fafc;
@@ -558,7 +582,7 @@ html.dark.theme-starlight {
 html:not(.dark).theme-apollo {
     --lgx-tint: 238, 242, 255;
     --theme-lg-tint: 238, 242, 255;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #eef2ff;
     --rem-box-border: #c7d2fe;
     --rem-heading: #1e1b4b;
@@ -576,7 +600,7 @@ html:not(.dark).theme-apollo {
 html:not(.dark).theme-eduardo-gold {
     --lgx-tint: 254, 249, 235;
     --theme-lg-tint: 254, 249, 235;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #fffbeb;
     --rem-box-border: #fde68a;
     --rem-heading: #451a03;
@@ -594,7 +618,7 @@ html:not(.dark).theme-eduardo-gold {
 html:not(.dark).theme-penguin {
     --lgx-tint: 236, 254, 255;
     --theme-lg-tint: 236, 254, 255;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #ecfeff;
     --rem-box-border: #a5f3fc;
     --rem-heading: #083344;
@@ -612,7 +636,7 @@ html:not(.dark).theme-penguin {
 html:not(.dark).theme-synthwave {
     --lgx-tint: 253, 242, 248;
     --theme-lg-tint: 253, 242, 248;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #fdf2f8;
     --rem-box-border: #f5d0fe;
     --rem-heading: #4a044e;
@@ -630,7 +654,7 @@ html:not(.dark).theme-synthwave {
 html:not(.dark).theme-matrix {
     --lgx-tint: 236, 253, 245;
     --theme-lg-tint: 236, 253, 245;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #ecfdf5;
     --rem-box-border: #a7f3d0;
     --rem-heading: #064e3b;
@@ -648,7 +672,7 @@ html:not(.dark).theme-matrix {
 html:not(.dark).theme-sakura {
     --lgx-tint: 255, 241, 242;
     --theme-lg-tint: 255, 241, 242;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #fff1f2;
     --rem-box-border: #fecdd3;
     --rem-heading: #4c0519;
@@ -666,7 +690,7 @@ html:not(.dark).theme-sakura {
 html:not(.dark).theme-coffee {
     --lgx-tint: 254, 247, 237;
     --theme-lg-tint: 254, 247, 237;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #fefaf4;
     --rem-box-border: #fed7aa;
     --rem-heading: #431407;
@@ -684,7 +708,7 @@ html:not(.dark).theme-coffee {
 html:not(.dark).theme-arcade {
     --lgx-tint: 245, 243, 255;
     --theme-lg-tint: 245, 243, 255;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #f5f3ff;
     --rem-box-border: #ddd6fe;
     --rem-heading: #2e1065;
@@ -702,7 +726,7 @@ html:not(.dark).theme-arcade {
 html:not(.dark).theme-hyperfocus {
     --lgx-tint: 239, 246, 255;
     --theme-lg-tint: 239, 246, 255;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #eff6ff;
     --rem-box-border: #bfdbfe;
     --rem-heading: #0f172a;
@@ -720,7 +744,7 @@ html:not(.dark).theme-hyperfocus {
 html:not(.dark).theme-starlight {
     --lgx-tint: 250, 245, 255;
     --theme-lg-tint: 250, 245, 255;
-    --lgx-fill-a: 0.72;
+    --lgx-fill-a: 0.22;
     --rem-box-bg: #fdf4ff;
     --rem-box-border: #f5d0fe;
     --rem-heading: #4a044e;
@@ -777,6 +801,16 @@ html .chip-glass-indicator {
         inset 0 0 10px 1px var(--lgx-inner-glow),
         0 8px 18px -8px rgba(var(--lgx-shadow), 0.38),
         0 2px 5px rgba(var(--lgx-shadow), 0.14) !important;
+}
+
+html:not(.dark) .segmented-glass-indicator,
+html:not(.dark) .chip-glass-indicator {
+    box-shadow:
+        inset 1px 1px 0.5px -0.5px var(--lgx-inset-hi),
+        inset -1px -1px 0.5px -0.5px var(--lgx-inset-lo),
+        inset 0 0 10px 1px rgba(255, 255, 255, 0.24),
+        0 4px 12px -4px rgba(15, 23, 42, 0.14),
+        0 1px 3px rgba(15, 23, 42, 0.08) !important;
 }
 
 html .segmented-glass-indicator::after,
